@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1080" viewBox="0 0 1080 1080">
+<defs><linearGradient id="old" x2="1" y2="1"><stop stop-color="#887967"/><stop offset="1" stop-color="#394e58"/></linearGradient></defs>
+<rect width="1080" height="1080" fill="url(#old)"/><circle cx="795" cy="245" r="120" fill="#f3d5af" opacity=".55"/><path d="M0 810Q200 680 480 760T1080 710V1080H0Z" fill="#29444c"/>
+<text x="80" y="125" fill="#fff" font-family="Arial,sans-serif" font-size="36" letter-spacing="7">AURELIA TRAVEL</text><text x="80" y="455" fill="#fff" font-family="Georgia,serif" font-size="97">Winter city</text><text x="80" y="560" fill="#fff" font-family="Georgia,serif" font-size="97">breaks</text><text x="80" y="975" fill="#fff" font-family="Arial,sans-serif" font-size="24" letter-spacing="4">SUPERSEDED · SQUARE CREATIVE</text>
+</svg>

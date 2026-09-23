@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600">
+<defs><linearGradient id="sky" x2="0" y2="1"><stop stop-color="#163c50"/><stop offset=".58" stop-color="#547f93"/><stop offset="1" stop-color="#d9b68b"/></linearGradient></defs>
+<rect width="1200" height="600" fill="url(#sky)"/><circle cx="942" cy="144" r="72" fill="#f7d7ad" opacity=".8"/>
+<path d="M0 430Q240 315 450 420T860 400T1200 370V600H0Z" fill="#2f555c"/><path d="M0 496Q220 408 430 482T850 460T1200 440V600H0Z" fill="#173e42"/>
+<path d="M230 325h78v150h-78zM320 287h52v188h-52zM390 349h115v126H390zM564 311h75v164h-75zM670 350h115v125H670z" fill="#183a44"/><path d="M314 284h61l-30-48zM560 308h84l-42-38z" fill="#183a44"/>
+<text x="65" y="75" fill="#fff" font-family="Arial,sans-serif" font-size="22" letter-spacing="5">AURELIA TRAVEL</text><text x="65" y="190" fill="#fff" font-family="Georgia,serif" font-size="68">Winter, differently.</text><text x="68" y="230" fill="#e8f1ed" font-family="Arial,sans-serif" font-size="23">Curated city breaks for the season ahead</text>
+</svg>

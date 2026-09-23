@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1920" viewBox="0 0 1080 1920">
+<defs><linearGradient id="sky" x2="0" y2="1"><stop stop-color="#102f46"/><stop offset=".56" stop-color="#568ca4"/><stop offset="1" stop-color="#edbd91"/></linearGradient></defs>
+<rect width="1080" height="1920" fill="url(#sky)"/><circle cx="815" cy="400" r="116" fill="#f6d6ab" opacity=".75"/>
+<path d="M0 1350Q230 1160 420 1300T800 1240T1080 1200V1920H0Z" fill="#385e68"/><path d="M0 1530Q220 1360 470 1460T1080 1380V1920H0Z" fill="#143c48"/>
+<path d="M90 1070h150v470H90zM280 970h115v570H280zM440 1115h170v425H440zM650 1015h135v525H650zM825 1115h150v425H825z" fill="#173d4b"/><path d="M280 970h115l-57-85zM645 1015h145l-72-70z" fill="#173d4b"/>
+<text x="85" y="150" fill="#fff" font-family="Arial,sans-serif" font-size="39" letter-spacing="8">AURELIA TRAVEL</text><text x="85" y="600" fill="#fff" font-family="Georgia,serif" font-size="130">Winter,</text><text x="85" y="740" fill="#fff" font-family="Georgia,serif" font-size="130">differently.</text><text x="90" y="825" fill="#eaf1ef" font-family="Arial,sans-serif" font-size="43">Curated city breaks</text><text x="90" y="1790" fill="#fff" font-family="Arial,sans-serif" font-size="29" letter-spacing="5">PARTNER REEL · APPROVED</text>
+</svg>

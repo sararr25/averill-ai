@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Averill</title><link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="agent-controls.css"></head>
+<body class="agent-body">
+  <header class="agent-header">
+    <div class="brand-mark">✳</div><div><div class="eyebrow">DESKTOP ASSISTANT · DEMO</div><h1>Averill</h1></div>
+    <span class="live-pill" id="sharing-status">NOT SHARING</span>
+  </header>
+  <main class="agent-main">
+    <section class="campaign-banner"><div class="eyebrow">CURRENT CAMPAIGN</div><h2>Winter Escapes 2027</h2><p>Aurelia Travel · Marketing workspace</p></section>
+    <section class="section"><div class="section-head"><h2>Shared work windows</h2><span id="shared-count">0 shared</span></div><p class="section-note">Open a demo work window, then choose what this assistant can observe.</p><div id="window-list" class="window-list"></div></section>
+    <section class="section"><div class="section-head"><h2>Observations</h2><span id="finding-count">No issues</span></div><div id="findings" class="findings"><div class="empty-state">Share a work window to receive feedback as you work.</div></div></section>
+    <section class="section ask-section"><div class="section-head"><h2>Ask about this campaign</h2><span id="answer-mode">Local source answers</span></div><div id="conversation" class="conversation"><div class="assistant-message">I can find approved files, explain campaign rules, and compare the current brief with the old one.</div></div><form id="ask-form" class="ask-form"><input id="question" aria-label="Ask a campaign question" placeholder="Where are the approved files?" autocomplete="off"><button type="submit" aria-label="Send question">↗</button></form><div class="ai-control"><button id="ai-toggle" type="button" class="secondary-button">Enable Nebius AI</button><span>When enabled, your questions and these campaign source documents are sent to Nebius.</span></div></section>
+  </main>
+  <dialog id="source-dialog" class="source-dialog"><div class="dialog-head"><div><div class="eyebrow">CONNECTED SOURCE</div><h2 id="source-title"></h2></div><button id="close-source" class="icon-button" aria-label="Close source">×</button></div><pre id="source-content"></pre><button id="open-source" class="secondary-button">Open file on this computer ↗</button></dialog>
+  <script src="agent.js"></script>
+</body></html>
