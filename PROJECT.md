@@ -30,14 +30,14 @@ Approved launch email: 15 October 2026 at 10:00 Copenhagen time. Approved paid c
 - The employee opens and explicitly shares each work window. A shared window sends structured field state via Electron IPC. Checks run after blur or selection change. Closing or unsharing stops its findings.
 - Deterministic rules detect the supplied campaign problems. Findings cite real local source files that can be opened.
 - Campaign questions use constrained local source lookup by default. Nebius AI is optional and user-enabled. The prompt includes the question and four synthetic source documents; responses without valid source IDs fall back to the local answer.
-- The assistant now applies the approved colors and font families. The reference image remains a visual specification; the new tabbed UI is its practical desktop adaptation.
+- The assistant now applies the approved colors, font families, aperture, outline icons, focused Review hierarchy and bottom question composer. Work controls, research and setup use separate tabs. The reference image remains a visual specification; the app uses separate desktop windows.
 - A live Nebius check on 23 September 2026 returned the approved assets and citations. The automated tests cover all three workflows, source existence, unsupported questions, and model citation validation. These checks do not establish behavior with arbitrary external apps.
 - A local company workspace can now be created on one Mac. An administrator adds people; the role switcher demonstrates administrator, department lead, and employee permissions on that same computer. It is explicitly not authentication or multi-device synchronization.
 - People can import individual files or a folder (up to 100 supported files per selection). Imported copies and workspace metadata persist under Electron user data. Private files must be proposed before a lead can approve them for a department. A lead can set priority or supersede a source. Different approved files with the same title and different hashes cause a conflict; both are excluded from company answers until resolved.
 - Markdown, plain text, CSV, JSON, and SVG text is indexed locally. On macOS, PDF text and image OCR use a local Swift helper; an unreadable file is marked as such. Imported Canva exports can be opened and their extracted text reviewed. This is not structural Canva document access or full visual analysis.
-- The Work tab includes a company marketing draft review path. With explicit consent, relevant approved source text and a draft are sent to Nebius. A separate Research tab calls Tavily for a user-entered public query only. Tavily results are not company-approved sources.
+- The Work tab includes a company marketing draft review path. With explicit consent, relevant approved source text and a draft are sent to Nebius. The Review composer answers questions about the shared synthetic campaign from its fixed source pack; when no demo window is shared it uses the company workspace. A separate Research tab calls Tavily for a user-entered public query only. Tavily results are not company-approved sources.
 - A Canva browser/app window can be explicitly selected for a one-frame OCR review and unselected with Stop sharing. The current code does not continuously monitor an arbitrary external window or infer design geometry. macOS Screen Recording permission is required for capture.
-- The Averill assistant uses the approved Petrol / Coral / Ice color system and bundled Geologica, Spline Sans, and Fragment Mono font packages. The separate Aurelia sample work windows retain their existing demo styling.
+- The Averill assistant and supplied Aurelia work windows use the approved Petrol / Coral / Ice color system and bundled Geologica, Spline Sans, and Fragment Mono font packages. The social creative preview renders the actual supplied SVG asset.
 
 ## Explicit non-goals for this prototype
 
@@ -64,7 +64,7 @@ No arbitrary macOS window capture, screenshot reading, external app control, bac
 2. Verify the new company-source Nebius request live after explicit approval for the synthetic test payload. The previous live check covers only the fixed Aurelia source pack.
 3. Add real authentication and sync before describing the role switcher as a multi-employee product. Extend specialized checks to other departments only after their source and workflow requirements are defined.
 4. Improve conflict detection beyond different files sharing one title, and independently verify model claims against cited passages.
-5. Package the app, including the macOS text-extraction helper, and rehearse restart, permission denial, offline fallback, and the full demo.
+5. Rehearse permission denial, offline fallback, and the full demo on the packaged macOS app. The package includes the macOS text-extraction helper.
 
 ## Where to look
 

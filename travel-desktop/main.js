@@ -188,6 +188,10 @@ app.whenReady().then(async () => {
     }
     return aiEnabled ? answerQuestion(question, runtimeKeys.nebius) : { ...localAnswer(String(question || '').slice(0, 1000)), mode: 'local' };
   });
+  ipcMain.handle('agent:ask-demo', (event, question) => {
+    fromAgent(event);
+    return aiEnabled ? answerQuestion(question, runtimeKeys.nebius) : { ...localAnswer(String(question || '').slice(0, 1000)), mode: 'local' };
+  });
   ipcMain.handle('agent:web-search', (event, query) => { fromAgent(event); return searchPublicWeb(query, runtimeKeys.tavily); });
   ipcMain.handle('agent:external-windows', async (event) => {
     fromAgent(event);

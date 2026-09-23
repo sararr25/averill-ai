@@ -3,7 +3,8 @@ document.body.classList.add(kind || 'unknown');
 const titles = { email: 'Email Studio', social: 'Social Publisher', handover: 'Campaign Files' };
 document.title = `${titles[kind] || 'Workspace'} · Aurelia Travel`;
 document.getElementById('tool-title').textContent = titles[kind] || 'Workspace';
-document.getElementById('sidebar-links').innerHTML = `<div class="sidebar-link ${kind === 'email' ? 'active' : ''}">✉ &nbsp; Email Studio</div><div class="sidebar-link ${kind === 'social' ? 'active' : ''}">▣ &nbsp; Social Publisher</div><div class="sidebar-link ${kind === 'handover' ? 'active' : ''}">▤ &nbsp; Campaign Files</div>`;
+const sideIcon = (path) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${path}</svg>`;
+document.getElementById('sidebar-links').innerHTML = `<div class="sidebar-link ${kind === 'email' ? 'active' : ''}">${sideIcon('<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 7 8 6 8-6"/>')}Email Studio</div><div class="sidebar-link ${kind === 'social' ? 'active' : ''}">${sideIcon('<rect x="3" y="3" width="18" height="18" rx="2"/><path d="m4 18 5-5 3 3 3-4 5 6"/>')}Social Publisher</div><div class="sidebar-link ${kind === 'handover' ? 'active' : ''}">${sideIcon('<path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/>')}Campaign Files</div>`;
 
 const defaults = {
   email: { subject: 'Winter city breaks are calling', body: 'Discover curated winter city breaks in Copenhagen, Vienna and Prague.', audience: 'Travel subscribers — Denmark', footer: true },
@@ -38,7 +39,7 @@ function readForm() {
 function preview() {
   if (kind === 'social') {
     const isOld = state.asset === 'winter-square-old.svg';
-    document.getElementById('asset-preview').innerHTML = `<div class="asset-art ${isOld ? 'square' : 'vertical'}"><span>AURELIA TRAVEL</span><strong>${isOld ? 'WINTER CITY BREAKS' : 'WINTER, DIFFERENTLY'}</strong><small>${isOld ? 'OLD SQUARE CREATIVE' : 'PARTNER REEL · VERTICAL'}</small></div>`;
+    document.getElementById('asset-preview').innerHTML = `<img class="asset-image ${isOld ? 'square' : 'vertical'}" src="../assets/${isOld ? 'winter-square-old.svg' : 'winter-reel-vertical.svg'}" alt="${isOld ? 'Superseded square creative' : 'Approved vertical Reel creative'}">`;
   }
   if (kind === 'handover') {
     document.getElementById('brief-v1').classList.toggle('selected', state.brief === 'v1');

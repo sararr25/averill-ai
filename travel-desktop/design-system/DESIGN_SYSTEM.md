@@ -1,6 +1,6 @@
 # Averill design system — v1
 
-**Status:** approved visual direction and design specification for Averill. The assistant window now imports these tokens and uses the specified local font packages. The separate Aurelia sample work windows retain their own styling.
+**Status:** approved visual direction and design specification for Averill. The Review pane follows the reference hierarchy; setup, work controls, and web research live in separate tabs. The supplied work windows use the same palette and locally bundled fonts.
 
 **Reference image:** [reference-petrol-coral-ice.png](reference-petrol-coral-ice.png). The palette below is the implementation source of truth, not the image's approximate pixels.
 
@@ -103,7 +103,7 @@ No shared windows: explain how to open and share a supplied work window. No find
 
 Use **Phosphor Light** (or regular at small sizes), 1.5px-equivalent stroke, rounded joins, 16px inline and 20px for actions. Candidate glyphs: document, folder, magnifier, arrow up-right, warning circle, check circle, eye, monitor, link, close. The product aperture is custom SVG and must not be substituted with a library icon. Keep icons monochrome using `currentColor`; coral only for attention and ice only for sources/verified states. Avoid thick Lucide, filled Material, emoji, and arbitrary icon mixes.
 
-The Better Icons CLI was available but its remote search endpoint failed in this environment. Exact Phosphor icon IDs and SVG files should be verified before implementation; this document specifies their visual role, not an unverified asset inventory.
+The current UI uses one set of local 1.5px outline SVGs for mail, image, folder, document, arrow and attachment. Phosphor is the intended production icon family; its exact asset set still needs licensing and visual review before substitution. No emoji or font-symbol stand-ins are used for these controls.
 
 ## Motion and accessibility
 

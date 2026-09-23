@@ -52,3 +52,40 @@
 .handover button:focus-visible{outline:2px solid #a8dbde;outline-offset:2px}
 @media(max-width:830px){.handover .work-shell{grid-template-columns:120px minmax(0,1fr)}.handover .work-sidebar{padding:24px 10px}.version-stage{grid-template-columns:120px minmax(50px,1fr) 120px}.brief-file{height:195px;padding:12px}.brief-file strong{font-size:47px}.version-connection div{font-size:7px}}
 @media(prefers-reduced-motion:reduce){.handover *{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+/* The supplied work tools share Averill's visual language while remaining separate apps. */
+.work-body.email,.work-body.social{background:#08282e;color:#f5f1ea;font-family:'Spline Sans',sans-serif}
+.email .work-header,.social .work-header{background:#08282e;border-color:#31545c;color:#f5f1ea}
+.email .work-brand strong,.social .work-brand strong{font-family:Geologica,sans-serif}
+.email .work-header .eyebrow,.social .work-header .eyebrow{color:#a8dbde}
+.email .travel-mark,.social .travel-mark{background:#174852;color:#f5f1ea;font-family:Geologica,sans-serif}
+.email .share-indicator,.social .share-indicator{border-color:#31545c;color:#92aeb6}
+.email .share-indicator.active,.social .share-indicator.active{background:#0d353d;border-color:#a8dbde;color:#a8dbde}
+.email .work-sidebar,.social .work-sidebar{background:#071e25;border-right:1px solid #31545c}
+.email .work-sidebar .eyebrow,.social .work-sidebar .eyebrow,.email .sidebar-label,.social .sidebar-label{color:#92aeb6;font-family:'Fragment Mono',monospace}
+.email .work-sidebar h2,.social .work-sidebar h2{font-family:Geologica,sans-serif;font-weight:600}
+.email .work-sidebar p,.social .work-sidebar p,.email .sidebar-link,.social .sidebar-link{color:#aec4ca}
+.email .sidebar-rule,.social .sidebar-rule{background:#31545c}
+.email .sidebar-link.active,.social .sidebar-link.active{background:none;color:#f5f1ea;border-left:3px solid #ff705e;border-radius:0}
+.email .sidebar-bottom,.social .sidebar-bottom{color:#92aeb6}
+.email .work-content,.social .work-content{background:#08282e}
+.email .content-top h1,.social .content-top h1{font-family:Geologica,sans-serif;font-weight:600;color:#f5f1ea}
+.email .content-top p,.social .content-top p{color:#aec4ca}
+.email .draft-badge,.social .draft-badge{color:#ff8d7f;background:#0d353d;border:1px solid #31545c;font-family:'Fragment Mono',monospace}
+.email .work-card,.social .work-card{background:#0d353d;border:1px solid #31545c;box-shadow:none;border-radius:10px}
+.email .card-heading,.social .card-heading{border-color:#31545c}
+.email .card-heading h2,.social .card-heading h2{font-family:Geologica,sans-serif;color:#f5f1ea}
+.email .card-heading p,.social .card-heading p,.email .field-hint,.social .field-hint{color:#92aeb6}
+.email .text-button,.social .text-button{color:#ff8d7f}
+.email .work-card input[type=text],.email .work-card input[type=date],.email .work-card select,.email .work-card textarea,.social .work-card input[type=text],.social .work-card input[type=date],.social .work-card select,.social .work-card textarea{background:#08282e;color:#f5f1ea;border-color:#31545c;border-radius:6px}
+.email .work-card input:focus,.email .work-card textarea:focus,.email .work-card select:focus,.social .work-card input:focus,.social .work-card textarea:focus,.social .work-card select:focus{border-color:#a8dbde;box-shadow:0 0 0 2px #a8dbde35}
+.email .check-row,.social .check-row{border-color:#31545c}
+.email .check-row input,.social .check-row input{accent-color:#ff705e}
+.email .primary-button,.social .primary-button{background:#ff705e;color:#08282e;border-radius:6px;font-weight:700}
+.email .primary-button:hover,.social .primary-button:hover{background:#ff8d7f}
+.email .work-actions span,.social .work-actions span{color:#92aeb6}
+.social .asset-preview{background:#08282e;border-color:#31545c}
+.social .asset-image{display:block;max-height:230px;max-width:100%;object-fit:contain;border:1px solid #31545c}
+.social .asset-image.vertical{height:230px}.social .asset-image.square{width:190px;height:190px}
+.work-sidebar .sidebar-link{display:flex;align-items:center;gap:10px}
+.work-sidebar .sidebar-link svg{width:17px;height:17px;flex:none}
+.work-body button:focus-visible{outline:2px solid #a8dbde;outline-offset:2px}

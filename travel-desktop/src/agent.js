@@ -1,8 +1,16 @@
 const kinds = [
-  { id: 'email', title: 'Email Studio', detail: 'Draft, audience and footer', icon: '✉' },
-  { id: 'social', title: 'Social Publisher', detail: 'Partner Reel and schedule', icon: '▣' },
-  { id: 'handover', title: 'Campaign Files', detail: 'Brief versions and handover', icon: '▤' },
+  { id: 'email', title: 'Email Studio', detail: 'Draft, audience and footer', icon: 'mail' },
+  { id: 'social', title: 'Social Publisher', detail: 'Partner Reel and schedule', icon: 'image' },
+  { id: 'handover', title: 'Campaign Files', detail: 'Brief versions and handover', icon: 'folder' },
 ];
+const iconPaths = {
+  mail: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 7 8 6 8-6"/>',
+  image: '<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8" cy="8" r="1.5"/><path d="m4 18 5-5 3 3 3-4 5 6"/>',
+  folder: '<path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/>',
+  document: '<path d="M6 2h8l4 4v16H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Z"/><path d="M14 2v5h4M8 12h7M8 16h7"/>',
+  arrow: '<path d="M5 19 19 5M9 5h10v10"/>',
+};
+function icon(name) { return `<svg class="line-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${iconPaths[name]}</svg>`; }
 let current = { open: [], shared: [], findings: [] };
 let activeSourceId = null;
 
@@ -23,7 +31,8 @@ function sourceButton(source) {
   const button = document.createElement('button');
   button.type = 'button';
   button.className = 'source-link';
-  button.textContent = `${source.title} ↗`;
+  button.innerHTML = `${icon('document')}<span></span>${icon('arrow')}`;
+  button.querySelector('span').textContent = source.title;
   button.addEventListener('click', () => source.kind === 'asset' ? window.desktop.openSource(source.id) : showSource(source.id));
   return button;
 }
@@ -46,8 +55,8 @@ function render() {
   for (const kind of kinds) {
     const row = document.createElement('div');
     row.className = 'window-row';
-    const icon = document.createElement('div');
-    icon.className = 'window-icon'; icon.textContent = kind.icon;
+    const iconElement = document.createElement('div');
+    iconElement.className = 'window-icon'; iconElement.innerHTML = icon(kind.icon);
     const text = document.createElement('div');
     text.className = 'window-text';
     const title = document.createElement('strong'); title.textContent = kind.title;
@@ -58,14 +67,14 @@ function render() {
     const isOpen = current.open.includes(kind.id);
     const isShared = current.shared.includes(kind.id);
     button.className = isShared ? 'share-button shared' : 'share-button';
-    button.textContent = isShared ? 'Sharing ✓' : isOpen ? 'Share window' : 'Open';
+    button.textContent = isShared ? 'Stop sharing' : isOpen ? 'Share' : 'Open';
     button.setAttribute('aria-label', `${button.textContent} ${kind.title}`);
     button.addEventListener('click', async () => {
       if (!isOpen) current = await window.desktop.openWork(kind.id);
       else current = await window.desktop.share(kind.id, !isShared);
       render();
     });
-    row.append(icon, text, button); list.append(row);
+    row.append(iconElement, text, button); list.append(row);
   }
   const findings = el('findings');
   findings.replaceChildren();
@@ -90,11 +99,13 @@ function renderHero() {
   el('hero-label').textContent = item ? 'FINDING' : 'READY';
   el('hero-title').textContent = item ? item.title : 'Ready when you are.';
   el('hero-body').textContent = item ? item.body : 'Share a work window or review a marketing draft to see source-backed guidance here.';
+  const selected = el('hero-selected'); selected.replaceChildren();
+  if (item?.kind === 'handover') selected.append(node('div', 'SELECTED FILE', 'eyebrow'), node('div', 'Winter Escapes 2027 / brief v1', 'selected-file'), node('small', '12 Sep 2026 · Superseded'));
   const source = el('hero-source'); source.replaceChildren();
   if (item?.source) {
-    source.append(node('div', 'CURRENT SOURCE', 'eyebrow'), node('strong', item.source.title), sourceButton(item.source));
+    source.append(node('div', 'CURRENT SOURCE', 'eyebrow'), sourceButton(item.source));
   } else {
-    source.append(node('p', current.shared?.length ? 'No issues found in the shared work right now.' : 'No work window is shared. Open a sample window below, then choose Share.'));
+    source.append(node('p', current.shared?.length ? 'No issues found in the shared work right now.' : 'No work window is shared. Open Work to choose a window, then select Share.'));
   }
 }
 
@@ -234,6 +245,7 @@ function addMessage(text, role, sources = []) {
   for (const source of sources) message.append(sourceButton(source));
   el('conversation').append(message);
   el('conversation').scrollTop = el('conversation').scrollHeight;
+  document.querySelector('.agent-main').scrollTop = document.querySelector('.agent-main').scrollHeight;
 }
 
 el('ask-form').addEventListener('submit', async (event) => {
@@ -242,7 +254,7 @@ el('ask-form').addEventListener('submit', async (event) => {
   if (!question) return;
   addMessage(question, 'user');
   el('question').value = '';
-  const response = await window.desktop.ask(question);
+  const response = current.shared?.length ? await window.desktop.askDemo(question) : await window.desktop.ask(question);
   addMessage(response.text, 'assistant', response.sources);
 });
 el('web-form').addEventListener('submit', async (event) => {

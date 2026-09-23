@@ -5,6 +5,7 @@ contextBridge.exposeInMainWorld('desktop', {
   openWork: (kind) => ipcRenderer.invoke('agent:open-work', kind),
   share: (kind, enable) => ipcRenderer.invoke('agent:share', kind, enable),
   ask: (question) => ipcRenderer.invoke('agent:ask', question),
+  askDemo: (question) => ipcRenderer.invoke('agent:ask-demo', question),
   aiMode: (enabled) => ipcRenderer.invoke('agent:ai-mode', enabled),
   source: (id) => ipcRenderer.invoke('agent:source', id),
   openSource: (id) => ipcRenderer.invoke('agent:open-source', id),

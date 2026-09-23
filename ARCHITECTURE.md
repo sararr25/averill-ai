@@ -84,7 +84,7 @@ Electron `desktopCapturer` lists windows. The user chooses a Canva-titled window
 - Structured work-window state is reliable but does not prove real desktop perception.
 - Static local sources enable transparent citations but do not handle company-wide retrieval or live document changes.
 - AI citations are checked for known IDs, not full factual entailment. Claims remain reviewable by the employee.
-- The assistant uses Petrol / Coral / Ice; the supplied Aurelia work windows still use their earlier separate styling.
+- The assistant and supplied Aurelia work windows use Petrol / Coral / Ice, bundled fonts and matching outline icons. The Review pane has a focused finding and source hierarchy; operational controls are in Work.
 
 ## Extension sequence
 

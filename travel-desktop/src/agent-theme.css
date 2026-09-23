@@ -50,6 +50,55 @@
 .agent-body button:focus-visible,.agent-body input:focus-visible,.agent-body select:focus-visible,.agent-body textarea:focus-visible{outline:2px solid var(--ds-color-focus);outline-offset:2px}
 @media(max-width:480px){.agent-main{padding:16px}.agent-header{padding:12px 16px}.agent-nav{padding:0 16px}.ai-control{align-items:flex-start;flex-direction:column}}
 @media(prefers-reduced-motion:reduce){.agent-body *{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+/* Review is a focused companion pane; setup and integrations live in their own areas. */
+.agent-main{padding:0}
+.agent-tab:not([data-tab="review"]){padding:24px}
+.agent-tab.active[data-tab="review"]{display:flex;flex-direction:column;min-height:100%;padding:0 24px}
+.review-hero{padding-top:22px;margin-bottom:0;border-bottom:0;flex:1}
+.aperture-wrap{height:92px}
+.aperture-mark{width:64px;height:64px;filter:drop-shadow(0 0 9px #ff705e64)}
+.hero-tagline{font-size:9px;letter-spacing:.21em;margin:0 0 22px}
+.hero-rule{margin-bottom:24px}
+.review-hero h2{font-size:25px;line-height:1.18}
+.review-hero p{margin-bottom:22px}
+.hero-selected{margin:0 0 22px}
+.hero-selected:empty{display:none}
+.hero-selected .eyebrow{color:var(--ds-color-text-muted);margin-bottom:9px}
+.selected-file{position:relative;padding-left:30px;color:var(--ds-color-text);font-weight:600;font-size:13px}
+.selected-file:before{content:'';position:absolute;left:2px;top:0;width:17px;height:21px;border:1.5px solid var(--ds-color-verified);border-radius:2px}
+.hero-selected small{display:block;margin:5px 0 0 30px;color:var(--ds-color-text-muted);font:10px/15px var(--ds-font-mono)}
+.hero-source{border-top:0;padding-top:0}
+.hero-source .eyebrow{margin-bottom:10px}
+.hero-source .source-link{display:inline-flex;align-items:center;gap:9px;color:var(--ds-color-signal);font-size:13px;font-weight:600;text-decoration:none}
+.hero-source .source-link .line-icon:first-child{color:var(--ds-color-signal)}
+.hero-source .source-link .line-icon:last-child{width:15px;height:15px}
+.line-icon{display:inline-block;width:19px;height:19px;flex:none;vertical-align:middle}
+.window-icon{border-radius:5px;background:none;width:25px;height:25px;color:var(--ds-color-verified)}
+.window-icon .line-icon{width:21px;height:21px}
+.source-link{display:inline-flex;align-items:center;gap:7px;text-decoration:none}
+.source-link .line-icon{width:15px;height:15px}
+.review-conversation{display:none;border-top:1px solid var(--ds-color-border);padding:14px 0}
+.review-conversation:has(.user-message){display:block}
+.review-conversation .conversation{border:0;background:transparent;height:auto;max-height:160px;padding:0;gap:8px}
+.review-conversation .assistant-message,.review-conversation .user-message{padding:8px 10px;font-size:12px}
+.review-composer{position:sticky;bottom:0;z-index:2;background:var(--ds-color-window);border-top:1px solid var(--ds-color-border);padding:18px 0 22px}
+.composer-label{color:var(--ds-color-text-secondary);font-size:13px;margin-bottom:10px}
+.review-composer .ask-form{height:54px;border:1px solid var(--ds-color-border);border-radius:11px;background:var(--ds-color-panel);padding:5px 6px 5px 12px}
+.review-composer .ask-form:focus-within{border-color:var(--ds-color-verified)}
+.review-composer .ask-form input{font-size:12px}
+.composer-attach svg,.ask-form button svg{display:block;width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.composer-attach{color:var(--ds-color-verified);padding-right:5px}
+.ask-form button{width:42px;height:42px;display:grid;place-items:center;border-radius:50%;background:var(--ds-color-verified);color:var(--ds-color-window)}
+.ask-form button:disabled{opacity:.45;cursor:not-allowed}
+.review-composer .ai-control{margin-top:8px;gap:7px}
+.review-composer .ai-control span{color:var(--ds-color-text-muted);font-size:10px;line-height:1.3}
+.review-composer .ai-control .secondary-button{color:var(--ds-color-verified);border:0;padding:2px 0;font-size:10px}
+.agent-nav{justify-content:space-between;gap:0}
+.agent-nav button{padding:0 7px;font-size:12px}
+.secondary-button,.share-button{min-height:36px;font-weight:600}
+.secondary-button:hover,.share-button:hover{border-color:var(--ds-color-verified)}
+.visually-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media(max-width:480px){.agent-tab.active[data-tab="review"]{padding:0 16px}.agent-tab:not([data-tab="review"]){padding:16px}}
 .window-drag{height:38px;background:var(--ds-color-window);border-bottom:1px solid var(--ds-color-border);-webkit-app-region:drag;app-region:drag}
 .agent-header{height:56px;padding:8px 24px}
 .brand-mark{width:26px;height:26px;border:0;color:var(--ds-color-signal);border-radius:0}
