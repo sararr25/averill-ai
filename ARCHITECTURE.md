@@ -2,7 +2,7 @@
 
 ## Purpose and status
 
-This document describes the implemented hackathon prototype and the boundaries for extending it. The current app is an Electron desktop demo with three supplied Aurelia Travel work windows. General external application observation is a future milestone.
+This document describes the implemented hackathon prototype and the boundaries for extending it. The current app is an Electron desktop demo with three supplied Aurelia Travel work windows, a local company workspace, and explicit one-frame OCR of a selected external Canva window. General continuous external application observation remains a future milestone.
 
 ## Requirements
 
@@ -25,7 +25,11 @@ This document describes the implemented hackathon prototype and the boundaries f
 | Rule engine | `travel-desktop/src/engine.js` | Pure issue checks and local campaign answers |
 | AI adapter | `travel-desktop/src/assistant.js` | Nebius model discovery, answer request, citation ID validation, local fallback |
 | Source registry | `travel-desktop/src/campaign.js` | Maps fixed source IDs to local source files and assets |
-| Design system | `travel-desktop/design-system/` | Approved visual tokens and component specification; implementation pending |
+| Design system | `travel-desktop/design-system/` and `src/agent-theme.css` | Approved visual tokens and implemented assistant styling |
+| Company workspace | `travel-desktop/src/workspace.js` | Local people, role switching, imported copies, approval, priority, and conflict detection |
+| Company answers | `travel-desktop/src/workspace-answer.js` | Approved-source retrieval, Nebius request, citation ID validation, local fallback |
+| Public search | `travel-desktop/src/web-search.js` | Tavily search with a user-entered public query only |
+| macOS extraction | `travel-desktop/scripts/extract-text.swift` | PDF text and image OCR for imported files and selected-window frames |
 
 ## Data flow
 
@@ -68,13 +72,19 @@ The public repository must never contain `.env.local` or credentials. `.env.exam
 
 The supplied work windows save draft form state in renderer `localStorage` only when the employee selects **Save draft**. There is no account, cloud database, migration, or deployment pipeline. The app is run locally with `npm ci` and `npm start`; `npm test` runs Node's test runner. The current prototype has no telemetry or crash reporting. Any future packaging and distribution must define update, signing, permissions, and data retention behavior before use with real company content.
 
+The company workspace is now stored as JSON in Electron's user-data directory, with imported copies and extracted text in an adjacent private local folder. Role switching is a one-computer demonstration of authorization rules, not account authentication. The assistant main process enforces file visibility and source approval before answering. An administrator or department lead can approve proposed department sources. Private files remain visible only to their owner until proposed. The conflict detector currently catches different approved files sharing the same department and title; it cannot detect all semantic contradictions.
+
+Nebius receives only a question/draft and relevant approved text sources after session opt-in; draft and OCR review also prompt before sending. Tavily receives only the explicit web query and returns external URLs. The new Nebius company-source path has not passed a live request in this session because automated computer-use approval rejected that data transfer. Do not infer success from the older fixed-source Nebius check.
+
+Electron `desktopCapturer` lists windows. The user chooses a Canva-titled window; pressing Review captures one thumbnail frame, extracts visible text locally, and deletes the temporary PNG. Stop sharing clears the selected window. No continuous capture runs. A screenshot can miss hidden text or visual issues; the app labels the review as OCR.
+
 ## Known gaps and tradeoffs
 
 - Deterministic checks make the demo repeatable but cover only explicit campaign errors.
 - Structured work-window state is reliable but does not prove real desktop perception.
 - Static local sources enable transparent citations but do not handle company-wide retrieval or live document changes.
 - AI citations are checked for known IDs, not full factual entailment. Claims remain reviewable by the employee.
-- The approved Petrol / Coral / Ice system is documented and previewed; the running app still uses earlier styles.
+- The assistant uses Petrol / Coral / Ice; the supplied Aurelia work windows still use their earlier separate styling.
 
 ## Extension sequence
 

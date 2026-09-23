@@ -1,6 +1,6 @@
 # Averill design system — v1
 
-**Status:** approved visual direction and design specification for Averill. The running UI has not yet been restyled.
+**Status:** approved visual direction and design specification for Averill. The assistant window now imports these tokens and uses the specified local font packages. The separate Aurelia sample work windows retain their own styling.
 
 **Reference image:** [reference-petrol-coral-ice.png](reference-petrol-coral-ice.png). The palette below is the implementation source of truth, not the image's approximate pixels.
 

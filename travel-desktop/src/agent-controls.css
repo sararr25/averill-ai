@@ -15,3 +15,28 @@
   font-size: 10px;
   line-height: 1.4;
 }
+.workspace-section{background:#0d353d;color:#f5f1ea;padding:16px;border-radius:12px}
+.workspace-section .section-head span,.workspace-section p,.workspace-section small{color:#aec4ca}
+.workspace-section strong{display:block;margin-bottom:8px}
+.workspace-section select,.workspace-section input{width:100%;min-height:36px;border:1px solid #31545c;border-radius:7px;background:#08282e;color:#f5f1ea;padding:7px 9px}
+.workspace-section input::placeholder{color:#92aeb6}
+.workspace-section select:focus-visible,.workspace-section input:focus-visible,.workspace-section button:focus-visible{outline:2px solid #a8dbde;outline-offset:2px}
+.workspace-section .secondary-button{background:#174852;color:#f5f1ea;border-color:#31545c}
+.workspace-form{display:grid;gap:8px;margin:12px 0}
+.workspace-actions{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.workspace-sources{display:grid;gap:8px;max-height:230px;overflow:auto}
+.workspace-source{border-top:1px solid #31545c;padding:8px 0}
+.workspace-source small{display:block;margin-bottom:7px}
+.workspace-source button{margin-right:6px}
+#workspace-feedback{color:#ff705e;margin:7px 0 0}
+.workspace-section .workspace-conflict{color:#ff8d7f}
+.workspace-section .priority-input{width:64px;margin-right:6px}
+.external-controls{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:9px}
+.external-controls button:disabled{opacity:.45;cursor:not-allowed}
+#external-list{display:grid;gap:7px}
+#external-result{font-size:12px;line-height:1.5;color:var(--muted)}
+#external-result pre{white-space:pre-wrap;max-height:180px;overflow:auto;background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px}
+#company-draft{display:block;width:100%;resize:vertical;padding:10px;border:1px solid #31545c;border-radius:8px;margin-bottom:8px;background:#0d353d;color:#f5f1ea}
+#company-draft::placeholder{color:#92aeb6}
+#company-draft:focus-visible{outline:2px solid #a8dbde;outline-offset:2px}
+#draft-result{font-size:12px;line-height:1.5;margin-top:8px}

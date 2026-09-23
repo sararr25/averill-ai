@@ -11,3 +11,4 @@ node_modules/
 dist/
 build/
 coverage/
+travel-desktop/scripts/extract-text-macos-arm64

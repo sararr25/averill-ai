@@ -29,18 +29,18 @@ function parseModelAnswer(raw) {
   } catch { return null; }
 }
 
-async function answerQuestion(question) {
+async function answerQuestion(question, key = process.env.NEBIUS_API_KEY) {
   const input = String(question || '').trim().slice(0, 1000);
   const fallback = { ...localAnswer(input), mode: 'local' };
-  if (!input || !process.env.NEBIUS_API_KEY) return fallback;
+  if (!input || !key) return fallback;
   try {
-    modelPromise ||= discoverModel(process.env.NEBIUS_API_KEY);
+    modelPromise ||= discoverModel(key);
     const model = await modelPromise;
     if (!model) return fallback;
     const sourceText = Object.entries(sources).filter(([, item]) => item.kind !== 'asset').map(([id, item]) => `SOURCE ${id} (${item.title}):\n${fs.readFileSync(sourceFor(id).path, 'utf8')}`).join('\n\n');
     const response = await fetch(`${API}/chat/completions`, {
       method: 'POST',
-      headers: { Authorization: `Bearer ${process.env.NEBIUS_API_KEY}`, 'Content-Type': 'application/json' },
+      headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model,
         temperature: 0.1,

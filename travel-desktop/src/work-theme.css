@@ -1,0 +1,54 @@
+@font-face{font-family:Geologica;src:url('../node_modules/@fontsource/geologica/files/geologica-latin-600-normal.woff2') format('woff2');font-weight:600;font-display:swap}
+@font-face{font-family:Spline Sans;src:url('../node_modules/@fontsource/spline-sans/files/spline-sans-latin-400-normal.woff2') format('woff2');font-weight:400;font-display:swap}
+@font-face{font-family:Spline Sans;src:url('../node_modules/@fontsource/spline-sans/files/spline-sans-latin-600-normal.woff2') format('woff2');font-weight:600;font-display:swap}
+@font-face{font-family:Fragment Mono;src:url('../node_modules/@fontsource/fragment-mono/files/fragment-mono-latin-400-normal.woff2') format('woff2');font-weight:400;font-display:swap}
+.work-drag{height:38px;background:#08282e;border-bottom:1px solid #31545c;-webkit-app-region:drag;app-region:drag}
+.work-body .work-shell{height:calc(100vh - 112px)}
+.work-body.handover{background:#08282e;color:#f5f1ea;font-family:'Spline Sans',sans-serif}
+.handover .work-header{height:74px;background:#08282e;border-bottom:1px solid #31545c;color:#f5f1ea}
+.handover .work-brand strong{font-family:Geologica,sans-serif}
+.handover .work-header .eyebrow{color:#a8dbde}
+.handover .share-indicator{border-color:#31545c;color:#92aeb6}
+.handover .share-indicator.active{background:#0d353d;border-color:#a8dbde;color:#a8dbde}
+.handover .travel-mark{background:#174852;color:#f5f1ea;font-family:Geologica,sans-serif}
+.handover .work-shell{grid-template-columns:165px minmax(0,1fr)}
+.handover .work-sidebar{background:#071e25;border-right:1px solid #31545c;padding:35px 18px}
+.handover .work-sidebar .eyebrow{color:#92aeb6;font-family:'Fragment Mono',monospace}
+.handover .work-sidebar h2{font:600 17px/1.25 Geologica,sans-serif;margin:14px 0}
+.handover .work-sidebar p{color:#aec4ca}
+.handover .sidebar-rule{background:#31545c}
+.handover .sidebar-label{color:#92aeb6}
+.handover .sidebar-link{color:#aec4ca;font-size:12px;padding:10px 8px}
+.handover .sidebar-link.active{background:none;color:#f5f1ea;border-left:3px solid #ff705e;border-radius:0;padding-left:9px}
+.handover .sidebar-bottom{color:#92aeb6;font-size:11px;line-height:1.5}
+.handover .work-content{padding:30px clamp(25px,4vw,50px) 34px;background:#08282e}
+.file-breadcrumb{color:#a8dbde;font-size:12px;margin-bottom:43px}.file-breadcrumb span{padding:0 8px;color:#92aeb6}
+.file-heading h1{font:600 clamp(28px,3vw,39px)/1.1 Geologica,sans-serif;color:#f5f1ea;margin:0 0 8px}
+.file-heading p{font:20px/1.4 'Spline Sans',sans-serif;color:#aec4ca;margin:0}
+.version-stage{display:grid;grid-template-columns:minmax(120px,170px) minmax(90px,1fr) minmax(120px,170px);align-items:center;gap:8px;margin:38px 0 26px}
+.version-column .eyebrow{font:10px/16px 'Fragment Mono',monospace;color:#aec4ca;letter-spacing:.17em;margin:0 0 12px}
+.version-column .approved-label{color:#ff8d7f}
+.brief-file{width:100%;height:210px;text-align:left;display:flex;flex-direction:column;align-items:flex-start;padding:17px 16px;border:1px solid #31545c;border-radius:8px;background:linear-gradient(145deg,#174852,#0d353d 55%,#08282e);color:#f5f1ea;position:relative;overflow:hidden}
+.brief-file:after{content:'';position:absolute;right:-1px;top:-1px;border-width:0 0 26px 26px;border-style:solid;border-color:transparent transparent #31545c transparent}
+.brief-file:hover,.brief-file.selected{border-color:#ff705e;box-shadow:0 0 0 1px #ff705e2d}
+.brief-file span{color:#aec4ca;font-size:14px}
+.brief-file strong{font:600 55px/1 Geologica,sans-serif;margin:6px 0;color:#f5f1ea}
+.version-column:last-child .brief-file strong{color:#ff8d7f}
+.brief-file small{font:11px/16px 'Fragment Mono',monospace;color:#f5f1ea}
+.brief-file em{font:12px/1.45 'Spline Sans',sans-serif;color:#aec4ca;margin-top:auto}
+.version-connection{align-self:center;color:#ff705e;margin-top:20px;text-align:center}
+.version-connection svg{width:100%;height:70px;filter:drop-shadow(0 0 5px #ff705e80)}
+.version-connection div{font:9px/14px 'Fragment Mono',monospace;letter-spacing:.14em}
+.file-actions{border-top:1px solid #31545c;padding-top:12px}
+.file-actions .text-button{color:#ff8d7f;padding:0;font-size:12px}
+.handover .brief-preview{background:none;border:0;border-radius:0;padding:5px 0 14px;margin:0}
+.handover .brief-preview p{border:0;padding:0;color:#aec4ca;font-size:12px}
+.handover .preview-status{font:10px/16px 'Fragment Mono',monospace;letter-spacing:.12em;color:#a8dbde;margin:4px 0}
+.handover .preview-status.old{color:#ff705e}
+.other-files{border-top:1px solid #31545c;margin-top:18px}
+.other-files h2{font:600 14px/20px Geologica,sans-serif;margin:13px 0 2px}
+.other-files button{display:flex;justify-content:space-between;width:100%;border:0;border-bottom:1px solid #31545c;background:none;color:#c8eaeb;padding:11px 2px;text-align:left;font-size:12px}
+.other-files button:hover{color:#ff8d7f}
+.handover button:focus-visible{outline:2px solid #a8dbde;outline-offset:2px}
+@media(max-width:830px){.handover .work-shell{grid-template-columns:120px minmax(0,1fr)}.handover .work-sidebar{padding:24px 10px}.version-stage{grid-template-columns:120px minmax(50px,1fr) 120px}.brief-file{height:195px;padding:12px}.brief-file strong{font-size:47px}.version-connection div{font-size:7px}}
+@media(prefers-reduced-motion:reduce){.handover *{animation-duration:.01ms!important;transition-duration:.01ms!important}}

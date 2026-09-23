@@ -30,8 +30,14 @@ Approved launch email: 15 October 2026 at 10:00 Copenhagen time. Approved paid c
 - The employee opens and explicitly shares each work window. A shared window sends structured field state via Electron IPC. Checks run after blur or selection change. Closing or unsharing stops its findings.
 - Deterministic rules detect the supplied campaign problems. Findings cite real local source files that can be opened.
 - Campaign questions use constrained local source lookup by default. Nebius AI is optional and user-enabled. The prompt includes the question and four synthetic source documents; responses without valid source IDs fall back to the local answer.
-- The reference image and design system are approved specifications. The current running assistant UI has **not yet been restyled** to the approved design system.
+- The assistant now applies the approved colors and font families. The reference image remains a visual specification; the new tabbed UI is its practical desktop adaptation.
 - A live Nebius check on 23 September 2026 returned the approved assets and citations. The automated tests cover all three workflows, source existence, unsupported questions, and model citation validation. These checks do not establish behavior with arbitrary external apps.
+- A local company workspace can now be created on one Mac. An administrator adds people; the role switcher demonstrates administrator, department lead, and employee permissions on that same computer. It is explicitly not authentication or multi-device synchronization.
+- People can import individual files or a folder (up to 100 supported files per selection). Imported copies and workspace metadata persist under Electron user data. Private files must be proposed before a lead can approve them for a department. A lead can set priority or supersede a source. Different approved files with the same title and different hashes cause a conflict; both are excluded from company answers until resolved.
+- Markdown, plain text, CSV, JSON, and SVG text is indexed locally. On macOS, PDF text and image OCR use a local Swift helper; an unreadable file is marked as such. Imported Canva exports can be opened and their extracted text reviewed. This is not structural Canva document access or full visual analysis.
+- The Work tab includes a company marketing draft review path. With explicit consent, relevant approved source text and a draft are sent to Nebius. A separate Research tab calls Tavily for a user-entered public query only. Tavily results are not company-approved sources.
+- A Canva browser/app window can be explicitly selected for a one-frame OCR review and unselected with Stop sharing. The current code does not continuously monitor an arbitrary external window or infer design geometry. macOS Screen Recording permission is required for capture.
+- The Averill assistant uses the approved Petrol / Coral / Ice color system and bundled Geologica, Spline Sans, and Fragment Mono font packages. The separate Aurelia sample work windows retain their existing demo styling.
 
 ## Explicit non-goals for this prototype
 
@@ -49,16 +55,16 @@ No arbitrary macOS window capture, screenshot reading, external app control, bac
 | Human-owned edits and publishing | Averill advises; the employee changes work and makes final decisions. |
 | Deterministic demo checks with optional Nebius answers | The supplied scenarios remain reliable offline, while AI answers are a controlled opt-in. |
 | Petrol / Coral / Ice design direction | Petrol keeps the workspace calm; coral marks attention; ice marks verified evidence. See the design system for exact tokens. |
-| Geologica, Spline Sans, Fragment Mono | Approved typography; font files and licenses still need bundling before the UI restyle. |
+| Geologica, Spline Sans, Fragment Mono | The assistant loads local font files from the three `@fontsource` packages, which include their licenses. |
 | Keep old brief v1 and old square creative | They are intentional fixtures that make version and asset checks demonstrable. |
 
 ## Next work
 
-1. Implement the approved design system in the Averill window, bundle the specified fonts and licenses, and verify responsive width, keyboard focus, contrast, and reduced motion.
-2. Replace the supplied demo bridge with explicit macOS window selection and permission-aware observation of real external applications. Test stop-sharing behavior.
-3. Ground perception and retrieval in selected company folders and versioned documents. Preserve exact citations and uncertainty when evidence is insufficient.
-4. Rehearse the complete demo, including issue resolution, source opening, offline behavior, AI fallback, and restart.
-5. Confirm official hackathon submission requirements before recording or publishing the final entry.
+1. Complete native desktop verification of Canva window capture, review, and Stop sharing with a real Canva window; test image import in the running app.
+2. Verify the new company-source Nebius request live after explicit approval for the synthetic test payload. The previous live check covers only the fixed Aurelia source pack.
+3. Add real authentication and sync before describing the role switcher as a multi-employee product. Extend specialized checks to other departments only after their source and workflow requirements are defined.
+4. Improve conflict detection beyond different files sharing one title, and independently verify model claims against cited passages.
+5. Package the app, including the macOS text-extraction helper, and rehearse restart, permission denial, offline fallback, and the full demo.
 
 ## Where to look
 
