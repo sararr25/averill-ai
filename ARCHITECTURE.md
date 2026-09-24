@@ -42,35 +42,36 @@ Employee edits supplied work window
   -> main process sends snapshot to Averill window
   -> finding shows cited local source
 
-Employee asks a campaign question
-  -> local source lookup by default
-  -> if Nebius AI was explicitly enabled and key exists:
-       send question + four synthetic text sources to Nebius
+Employee asks in Review
+  -> if a supplied work window is shared, use the fixed synthetic campaign pack
+  -> otherwise use approved, visible company workspace sources
+  -> if Nebius AI was explicitly enabled and a key exists:
+       send question + relevant approved text sources to Nebius
        validate returned source IDs
-       fall back to local answer on failure or invalid citation
+       fall back to a local answer on failure or invalid citation
 ```
 
 The work window calls `work:update` even when unshared; the main process stores the state but does not produce findings until the window is shared. This is a boundary of the current implementation to consider during the future external-app integration. Closing a work window removes its state and sharing status.
 
 ## IPC contracts
 
-The preload exposes `snapshot()`, `openWork(kind)`, `share(kind, enabled)`, `aiMode(enabled)`, `ask(question)`, `source(id)`, `openSource(id)`, `updateWork(kind, data)`, `onSnapshot(callback)`, and `onSharing(callback)`. `kind` is limited to `email`, `social`, or `handover`. Main-process `work:update` accepts only events from the corresponding open work window and a plain object payload. The bridge uses context isolation, disables Node integration, and enables renderer sandboxing.
+The preload exposes `snapshot()`, `openWork(kind)`, `share(kind, enabled)`, `aiMode(enabled)`, `ask(question)`, `askDemo(question)`, `source(id)`, `openSource(id)`, `updateWork(kind, data)`, and snapshot/sharing listeners. It also exposes narrow workspace, Tavily, and external-window methods. `kind` is limited to `email`, `social`, or `handover`. Main-process `work:update` accepts only events from the corresponding open work window and a plain object payload. The bridge uses context isolation, disables Node integration, and enables renderer sandboxing.
 
 The snapshot contains `open`, `shared`, `aiEnabled`, and `findings`. A finding has an ID, title, explanation, suggested user action, source, and work kind. Source IDs resolve only through the fixed registry; arbitrary paths are not accepted through `agent:source` or `agent:open-source`.
 
 ## Source and version model
 
-The source pack is static and synthetic. `current-brief.md` is the approved v2. `old-brief.md` is v1 and intentionally superseded. `brand-and-legal.md` controls copy and disclosures. `content-calendar.md` controls dates. Approved assets are the email hero and vertical Reel; the old square creative is an intentional wrong choice. Future folder ingestion needs an explicit version model, conflict handling, and provenance rather than assuming that a filename implies approval.
+The fixed campaign source pack is static and synthetic. `current-brief.md` is the approved v2. `old-brief.md` is v1 and intentionally superseded. `brand-and-legal.md` controls copy and disclosures. `content-calendar.md` controls dates. Approved assets are the email hero and vertical Reel; the old square creative is an intentional wrong choice. The separate company workspace has local file/folder import, status, version, owner, department, priority, and same-title conflict detection. That detection does not establish full semantic consistency.
 
 ## AI and privacy boundary
 
-Local answers and deterministic findings need no network. Nebius mode requires `NEBIUS_API_KEY` supplied through the environment or a local `.env.local` in the repository root. The employee enables Nebius in the UI; the app then sends their question and the four synthetic text documents to the Nebius API. The API key remains in the main process. The app does not send image assets, saved drafts, or arbitrary desktop content. If the model cannot be reached, returns malformed output, or fails citation validation, the local answer is used. A cited ID is structurally validated against the registry; the current implementation does not perform independent semantic verification of each model sentence.
+Local answers and deterministic findings need no network. Nebius uses `NEBIUS_API_KEY` from the environment/root `.env.local` or encrypted local Setup storage. The employee enables Nebius for the session. A Review question with a shared demo window can send the question and fixed synthetic text pack; a company question can send relevant approved company text. Draft or OCR text is sent only after a separate confirmation in its review flow. The API key remains in the main process. The app does not send image binaries or perform continuous capture. If the model cannot be reached, returns malformed output, or fails citation validation, a local answer is used. Citation IDs are structurally validated; model sentences are not independently checked against passages.
 
 The public repository must never contain `.env.local` or credentials. `.env.example` lists variable names only. Do not log request headers, keys, or sensitive prompt content.
 
 ## Persistence and operations
 
-The supplied work windows save draft form state in renderer `localStorage` only when the employee selects **Save draft**. There is no account, cloud database, migration, or deployment pipeline. The app is run locally with `npm ci` and `npm start`; `npm test` runs Node's test runner. The current prototype has no telemetry or crash reporting. Any future packaging and distribution must define update, signing, permissions, and data retention behavior before use with real company content.
+The supplied work windows save draft form state in renderer `localStorage` only when the employee selects **Save draft**. There is no authenticated account, cloud database, migration, or deployment pipeline. The app runs locally with `npm ci` and `npm start`; `npm test` runs Node's test runner. `npm run package:mac` builds an unsigned arm64 demo `.app` with the Swift OCR helper. The current prototype has no telemetry or crash reporting. Distribution for real company content still needs signing, updates, permissions, and data retention design.
 
 The company workspace is now stored as JSON in Electron's user-data directory, with imported copies and extracted text in an adjacent private local folder. Role switching is a one-computer demonstration of authorization rules, not account authentication. The assistant main process enforces file visibility and source approval before answering. An administrator or department lead can approve proposed department sources. Private files remain visible only to their owner until proposed. The conflict detector currently catches different approved files sharing the same department and title; it cannot detect all semantic contradictions.
 
@@ -88,4 +89,4 @@ Electron `desktopCapturer` lists windows. The user chooses a Canva-titled window
 
 ## Extension sequence
 
-Implement the design system in the Averill window first. Next add explicit macOS window selection, OS permission handling, capture/accessibility adapters, and stop-sharing tests. Then add selected-folder indexing with source identity, version/approval metadata, citation verification, and deletion/revocation behavior. Keep work actions human-owned unless the product decision changes explicitly.
+Verify the existing one-frame macOS Canva selection, permission handling, OCR, and Stop sharing end to end. Rehearse the packaged app and approved company-source Nebius path. Then add authentication/synchronization, stronger source-conflict and citation checks, and deletion/revocation behavior. Keep work actions human-owned unless the product decision changes explicitly. See [docs/HANDOVER.md](docs/HANDOVER.md) for the current checks and their evidence boundaries.

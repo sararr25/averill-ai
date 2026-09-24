@@ -1,6 +1,6 @@
 # Averill project
 
-Updated 23 September 2026. This is the canonical handover for the public `averill-ai` repository.
+Updated 24 September 2026. This is the canonical product brief; [docs/HANDOVER.md](docs/HANDOVER.md) is the current execution handover for the public `averill-ai` repository.
 
 ## What Averill is
 
@@ -27,9 +27,9 @@ Approved launch email: 15 October 2026 at 10:00 Copenhagen time. Approved paid c
 ## Current product state
 
 - Electron opens an independent Averill window and three separate supplied work windows: Email Studio, Social Publisher, and Campaign Files.
-- The employee opens and explicitly shares each work window. A shared window sends structured field state via Electron IPC. Checks run after blur or selection change. Closing or unsharing stops its findings.
+- The employee opens and explicitly shares each work window. Work windows send structured field state via Electron IPC, but findings are produced only for shared windows. Checks run after blur or selection change. Closing or unsharing stops findings.
 - Deterministic rules detect the supplied campaign problems. Findings cite real local source files that can be opened.
-- Campaign questions use constrained local source lookup by default. Nebius AI is optional and user-enabled. The prompt includes the question and four synthetic source documents; responses without valid source IDs fall back to the local answer.
+- Campaign questions use constrained local source lookup by default. With a demo window shared, Review uses the fixed Aurelia source pack; otherwise it uses visible approved company sources. Nebius AI is optional and user-enabled. Responses without valid source IDs fall back to a local answer.
 - The assistant now applies the approved colors, font families, aperture, outline icons, focused Review hierarchy and bottom question composer. Work controls, research and setup use separate tabs. The reference image remains a visual specification; the app uses separate desktop windows.
 - A live Nebius check on 23 September 2026 returned the approved assets and citations. The automated tests cover all three workflows, source existence, unsupported questions, and model citation validation. These checks do not establish behavior with arbitrary external apps.
 - A local company workspace can now be created on one Mac. An administrator adds people; the role switcher demonstrates administrator, department lead, and employee permissions on that same computer. It is explicitly not authentication or multi-device synchronization.
@@ -41,7 +41,7 @@ Approved launch email: 15 October 2026 at 10:00 Copenhagen time. Approved paid c
 
 ## Explicit non-goals for this prototype
 
-No arbitrary macOS window capture, screenshot reading, external app control, background observation, automatic edit, email send, or post publication is implemented. Do not present those as current capabilities. The company source pack is synthetic; no real customer data is required for the demo.
+No continuous arbitrary macOS window capture, external app control, background observation, automatic edit, email send, or post publication is implemented. One explicitly selected Canva window can be captured on demand for visible-text OCR. Do not present that as full app understanding. The campaign source pack is synthetic; no real customer data is required for the demo.
 
 ## Product and design decisions
 

@@ -1,6 +1,6 @@
 # Averill product demo plan
 
-Decision record, 23 September 2026. The first complete product path is marketing. Aurelia Travel remains disposable sample data, not the product model.
+Decision record, 23 September 2026; implementation status updated 24 September 2026. The first specialized product path is marketing. Aurelia Travel remains disposable sample data, not the product model. See [HANDOVER.md](HANDOVER.md) for verified behavior and remaining gates.
 
 ## Buyer and employee journey
 
@@ -23,7 +23,19 @@ Decision record, 23 September 2026. The first complete product path is marketing
 
 The judges should see a fresh company setup, source import and approval, an employee entering the marketing workspace, a source-backed correction to a marketing draft, and an exported Canva design review. Then show explicit Canva window sharing and Stop sharing. An optional Nebius answer must disclose data transfer and cite the imported source. A Tavily result must display its public URL and remain separate from company policy.
 
-The demo is complete only when these paths survive app restart, role access is enforced in the main process, source status changes affect findings, and failures (missing key, denied screen permission, unsupported file, source conflict) are shown honestly in the UI.
+The intended demo is complete only when these paths survive app restart, role access is enforced in the main process, source status changes affect findings, and failures (missing key, denied screen permission, unsupported file, source conflict) are shown honestly in the UI. Several of these acceptance checks remain open.
+
+## Implementation status
+
+| Area | Current state | Remaining check or gap |
+| --- | --- | --- |
+| Local onboarding and people | Workspace, admin, lead and employee role switching persist on one Mac | No real sign-in, tenant isolation or synchronization |
+| Import and approval | File/folder import, private proposal, lead/admin approval, priority and supersession are implemented | Rehearse fresh packaged flow; UI does not expose a Reject action despite support in the source model |
+| Marketing work | Three supplied windows, explicit share/stop, fixed campaign findings and cited sources run locally | Only fixed scenarios have specialized rules; imported company sources do not generate continuous field-level findings |
+| Nebius | Fixed campaign pack previously passed a live answer; company path has opt-in and local fallback | Live company-source request was blocked pending specific approval of the test payload |
+| Tavily | A public-query search returned results in the dev app | Recheck in the packaged app with a configured key |
+| Canva | Exported file text import and one-frame window OCR are implemented | Real Canva-window capture, Screen Recording denial, and Stop sharing still need an end-to-end check |
+| Mac package and UI | Unsigned arm64 `.app` built; Review hierarchy and supplied windows visually checked | Owner acceptance of visual fidelity, signing/notarization and full demo rehearsal remain open |
 
 ## Implementation order
 
