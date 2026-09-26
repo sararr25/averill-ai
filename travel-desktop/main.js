@@ -7,6 +7,7 @@ const { inspect, answer: localAnswer } = require('./src/engine');
 const { answerQuestion } = require('./src/assistant');
 const { sourceFor } = require('./src/campaign');
 const workspace = require('./src/workspace');
+const learning = require('./src/learning');
 const { answerWorkspace, localWorkspaceAnswer } = require('./src/workspace-answer');
 const { searchPublicWeb } = require('./src/web-search');
 
@@ -47,6 +48,7 @@ async function saveSecret(service, value) {
 function snapshot() {
   return {
     workspace: workspace.publicSnapshot(companyWorkspace),
+    learning: learning.snapshot(companyWorkspace),
     externalWindow: selectedExternalWindow,
     services: { nebius: Boolean(runtimeKeys.nebius), tavily: Boolean(runtimeKeys.tavily) },
     shared: [...shared],
@@ -104,6 +106,19 @@ app.whenReady().then(async () => {
     if (event.sender !== agentWindow.webContents) throw new Error('Averill window required');
   };
   const persistWorkspace = () => { workspace.save(app.getPath('userData'), companyWorkspace); publish(); return snapshot(); };
+  ipcMain.handle('learning:action', (event, action, payload = {}) => {
+    fromAgent(event);
+    if (!companyWorkspace) throw new Error('Create a workspace first');
+    if (!payload || typeof payload !== 'object' || Array.isArray(payload)) throw new Error('Invalid learning action');
+    if (action === 'record') learning.record(companyWorkspace, payload);
+    else if (action === 'start') learning.start(companyWorkspace, payload.sourceId);
+    else if (action === 'confirm') learning.confirm(companyWorkspace, payload.sessionId, payload.stepId);
+    else if (action === 'exclude') learning.exclude(companyWorkspace, payload.sessionId);
+    else if (action === 'quiz') learning.beginQuiz(companyWorkspace);
+    else if (action === 'answer') learning.answer(companyWorkspace, payload.quizId, payload.questionId, payload.value);
+    else throw new Error('Unknown learning action');
+    return persistWorkspace();
+  });
   ipcMain.handle('workspace:create', (event, company, adminName) => {
     fromAgent(event);
     companyWorkspace = workspace.create(app.getPath('userData'), company, adminName);

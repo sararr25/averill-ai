@@ -45,3 +45,67 @@ The intended demo is complete only when these paths survive app restart, role ac
 4. Nebius consent and Tavily public-web search with clear boundaries.
 5. Exported Canva file review and explicit window capture with permission and stop controls.
 6. End-to-end rehearsal, packaging, and exact-boundary documentation.
+
+## Video programme — company onboarding, guided work and weekly learning
+
+Updated 26 September 2026 following the owner’s direction. The opening is company-data onboarding across departments, rather than a presentation of the travel website. Canva demonstrates learning the tool. A weekly employee test closes the learning loop. Elseweek is the fictional customer; Averill remains the product.
+
+### Narrative
+
+Company knowledge → department context → employee learns while working → employee applies the learning → weekly practice and feedback.
+
+Show one employee’s marketing week after establishing that the company workspace contains multiple departments. Marketing is the detailed example; other departments establish the organisation and access model, not unimplemented specialised capabilities. Working duration: about four minutes, adjustable once submission requirements are confirmed.
+
+| Time | Scene | Concrete screen action and outcome | Implementation boundary |
+| --- | --- | --- | --- |
+| 00:00–00:45 | Company and department onboarding | Administrator creates Elseweek and departments, adds people, imports a small synthetic source pack by department. Show company-wide brand guidance, a Marketing campaign brief and one Operations procedure. A lead approves a proposed source. Switch to the marketing employee and show their available context | Local workspace, import, approval and role switching exist. Prepare appropriate synthetic department sources; role switching is not real sign-in or multi-device collaboration. Verify actual visibility rules instead of assuming access |
+| 00:45–01:40 | Learn Canva while doing a real task | Employee shares a Canva window and asks “Help me turn this into a LinkedIn campaign visual.” Averill gives one step at a time: choose the agreed format, improve text hierarchy, align elements, then export. Employee performs the actions. Show one clarification and one confirmed learning step | The four-step guided lesson and learning records are implemented. Conversational tutoring and visual step verification remain future work. Current one-frame OCR reads visible text; it cannot reliably verify alignment, hidden layers or export settings. Validate each guidance source and observed state before recording |
+| 01:40–02:15 | Apply learning to a LinkedIn draft | Employee uses the creative and drafts a post. Averill helps apply approved tone/message and explains why a suggested change fits the brief. The employee makes the edit | LinkedIn-specific work path and source pack need implementation. Existing Social Publisher is Instagram; do not transfer its Reel date/disclosure rules to LinkedIn |
+| 02:15–02:50 | Prepare the newsletter | Employee selects audience and launch date. Averill highlights one mismatch, cites the current campaign source and explains the correction | Existing Email Studio supports the supplied campaign checks. Approved email is 15 October 2026 at 10:00 Europe/Copenhagen. Rehearse with coherent Elseweek sources |
+| 02:50–03:45 | Weekly employee practice | Open “Your week”, showing recorded activities and confirmed learning. Start a short personalised test: one Canva workflow question, one campaign audience decision and one practical copy exercise. Show an answer, explanation and a suggested next practice step | Confirmed activity history, weekly operation/source-version questions and reflection feedback are implemented. Campaign-audience assessment and automatic practical scoring are not. Use seeded synthetic records only if clearly labeled; do not describe them as automatically collected real history |
+| 03:45–04:00 | Close the loop | Show the next learning goal and Stop sharing. Close with the employee’s ability to work more independently with company context | A next-practice suggestion is implemented; editable long-term learning goals remain future work; the employee owns all work and publishing |
+
+### Weekly test specification for the demo
+
+- Input: employee-visible department sources, explicitly recorded work sessions, learning goals and steps the employee completed or confirmed. Distinguish “practised”, “help requested” and “demonstrated in an exercise”; observing a screen alone does not establish mastery.
+- Record scope: selected task, relevant approved source/version, learning topic, completed practice and employee confirmation. Do not require continuous background screen recording or storage of raw screenshots to create a learning record.
+- Preview: show what the week contains before starting the test. Let the employee correct or omit a misclassified activity.
+- Test: three short tasks tied to that week. One recall/workflow question, one decision scenario grounded in a source, and one practical application. The full test can take a few minutes; the video shows an edited excerpt.
+- Feedback: explain the expected reasoning, link the relevant approved company source or validated tool guidance, and offer a targeted follow-up exercise. Do not treat confidence in an AI answer as a verified skill score.
+- Completion: employee sees learning progress and chooses the next practice goal. Keep this demo about formative learning; manager reporting and employment evaluation are not defined by this plan.
+- Source changes: reference the current approved brief. If the week involved an older source, explain the version change rather than marking the employee wrong without context.
+
+### Canva learning specification
+
+The main value is guided learning, with campaign checks as supporting context. Show a small task that the employee finishes themselves, rather than a long tutorial or automatic editing.
+
+1. Employee states the goal and explicitly shares the Canva window.
+2. Averill identifies what it can actually inspect and gives the next supported step.
+3. Employee follows the step or asks “Where do I find that?”
+4. Averill explains the operation with validated guidance; any pointer must match the visible interface.
+5. Employee confirms completion; verification is only claimed where the implementation can establish it.
+6. Save the specific learning topic to the employee’s weekly record after confirmation.
+
+Tool guidance and company policy are different evidence types: Canva operation guidance comes from validated tool documentation; the campaign message/branding comes from approved company sources. Neither silently overrides the other.
+
+### Supporting scenes
+
+Version handover remains a strong optional scene: open brief v1, ask what changed, inspect v2. The current supplied path is verified and can replace a secondary scene if recording time is short. The website is optional context, not the opening or a claimed integrated review feature. Public research, extra social channels, booking and a long settings tour remain outside the main cut.
+
+### Preparation order
+
+1. Prepare a coherent Elseweek company pack across departments, with owners, visibility, approval and versions; retain the intentionally superseded campaign fixtures.
+2. Rehearse actual onboarding, import, approval and employee visibility in the packaged app.
+3. Implement the learning-session record and employee “Your week” view, with employee review of recorded topics.
+4. Build a bounded Canva tutoring path; verify real capture, validated guidance, step handling, permission denial and Stop sharing. Current OCR alone does not satisfy this feature.
+5. Add the LinkedIn-specific draft and approved source path; rehearse newsletter checks.
+6. Implement the weekly practice flow and feedback using confirmed sessions and accessible sources. Verify that activities from another employee/department do not enter the test.
+7. Rehearse the complete story with resettable synthetic state, then record working features. Label seeded history and conceptual screens honestly; a source review must not be presented as live Canva tutoring.
+
+### Recording acceptance
+
+Onboarding establishes company and department context. The employee visibly learns a Canva operation, applies it to marketing work, then receives relevant weekly practice and useful feedback. All demonstrated actions work and claims match implementation. Sharing is explicit, corrections are human-owned and no automatic send/publication is implied. The guided Learn path is implemented and verified as employee-confirmed practice; the broader conversational/visual tutoring shown in the target narrative remains future work.
+
+## Implementation update — guided practice v1
+
+The initial Learn flow is implemented: four-step Canva lesson with official references and help; confirmed session persistence; manual confirmed work records; source-linked weekly practice and feedback. The prototype can now demonstrate learning and a personalised weekly review using clearly identified synthetic test activity. Its tutoring is bounded and employee-confirmed. General conversation, visual verification of alignment/export, automatic work tracking and a LinkedIn editor remain outside the implemented path. See `LEARNING_IMPLEMENTATION_PLAN.md` and `HANDOVER.md` for checks.

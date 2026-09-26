@@ -9,3 +9,7 @@ Read `docs/HANDOVER.md`, `PROJECT.md`, `ARCHITECTURE.md`, and `travel-desktop/de
 - Use `travel-desktop/design-system/DESIGN_SYSTEM.md` and `tokens.css` as the visual source of truth. The preview is a review artifact, not proof that the running UI matches it.
 - Never commit `.env.local`, secrets, API keys, user data, or generated dependency folders. Use `.env.example` only for variable names.
 - Run `npm test` from `travel-desktop/` after changes to checks, sources, or IPC. State what was actually verified.
+
+- Learning records belong to the active person. Do not accept an owner ID from IPC or expose another person’s session/quiz. Preserve source approval/version/conflict checks, Copenhagen week keys and explicit employee confirmation.
+- Canva tutoring currently means a bounded guided lesson. Do not claim automatic geometry verification, conversational tool control or inferred mastery. Learn must work offline; network/AI use requires a separate product change.
+- Run the learning tests alongside existing tests when changing sessions, quiz eligibility or feedback. Keep `docs/HANDOVER.md` and `docs/LEARNING_IMPLEMENTATION_PLAN.md` current.

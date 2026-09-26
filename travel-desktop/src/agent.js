@@ -32,6 +32,7 @@ function sourceButton(source) {
 
 function render() {
   renderWorkspace();
+  renderLearning();
   renderHero();
   el('review-external').disabled = !current.externalWindow;
   el('stop-external').disabled = !current.externalWindow;

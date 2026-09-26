@@ -1,23 +1,34 @@
-# Averill handover
+# Averill execution handover
 
-Updated 26 September 2026. Start here when continuing the desktop product demo. Read [PROJECT.md](../PROJECT.md) for product decisions, [ARCHITECTURE.md](../ARCHITECTURE.md) for implementation boundaries, and the [design system](../travel-desktop/design-system/DESIGN_SYSTEM.md) before changing the UI.
+Updated 26 September 2026. Canonical entry point for continuing this repository. Read [PROJECT.md](../PROJECT.md), [ARCHITECTURE.md](../ARCHITECTURE.md), [AGENTS.md](../AGENTS.md) and the [desktop design system](../travel-desktop/design-system/DESIGN_SYSTEM.md) before changes.
 
-## Product and current demo
+## Product, identity and agreed demo
 
-Averill is a standalone desktop assistant for company work. Aurelia Travel and Winter Escapes 2027 are fictional fixtures. The product demo is focused on marketing, while local onboarding models company administrators, department leads, employees, source approval, and private proposals. Role switching on one Mac demonstrates permissions; it is not authentication or multi-device collaboration.
+Averill is a standalone company assistant. Elseweek is the proposed fictional travel customer with a separate website in `travel-site/`. The older desktop fixtures still say Aurelia Travel: that migration is pending. Preserve brief v1 and the old square asset because they are intentional outdated-material scenarios. Product, demo sources and developer documentation remain English.
 
-The packaged app has four areas:
+The owner’s video direction is: company data onboarding across departments → employee learns Canva → applies learning to LinkedIn and newsletter work → weekly personalised practice. Opening with a presentation of the website was rejected. Canva should demonstrate tool learning, with campaign correction as supporting context. See [PRODUCT_DEMO_PLAN.md](PRODUCT_DEMO_PLAN.md) for the target four-minute sequence and implementation gates; that duration is not a confirmed submission limit.
 
-- **Review:** one prominent finding, selected file, approved source, and a question composer. Questions about a shared Aurelia work window use its fixed local source pack. Without a shared demo window, questions use visible approved company sources.
-- **Work:** explicit Open / Share / Stop sharing controls for the three supplied windows, company marketing draft review, one-frame Canva-window OCR review, and the finding list.
-- **Research:** a user-entered public Tavily search. Results are external and never automatically become approved company sources.
-- **Setup:** create the local workspace, add demo people, switch role, import a file or folder, propose/approve/supersede sources, set priority, and configure service keys.
+## Current app areas
 
-Campaign Files has brief v1 and approved v2. Email Studio and Social Publisher have deliberately flawed incoming drafts. Findings come from deterministic rules after a field is completed or a selection changes, and they cite local files. The employee edits and saves; Averill never sends or publishes work. The design uses the approved Petrol / Coral / Ice palette, bundled fonts, outline SVGs, and the actual supplied Reel SVG in its preview.
+- **Review:** leading finding, selected/current source, inspectable source dialog and campaign question composer. Shared supplied windows use fixed campaign sources; otherwise company questions use visible approved sources.
+- **Work:** Open/Share/Stop for Email Studio, Social Publisher and Campaign Files; approved-source marketing draft review; separately selected Canva window with explicit one-frame OCR.
+- **Learn:** four-step Canva lesson (selection, Position, alignment, grouping), step help and official guide; optional linked approved company source; confirmed learning records and manual Canva/LinkedIn/newsletter practice; current-week questions, explanations and self-confirmed practical reflection.
+- **Research:** explicit public Tavily query, with results separated from company policy.
+- **Setup:** local company, people/departments, demo role switching, import, private proposals, lead/admin approval, priority/supersession/conflicts and encrypted service keys.
 
-## Run and package
+## Learn behaviour and boundaries
 
-Use Node.js 22 or newer. From `travel-desktop/`:
+`src/learning.js` owns sessions and quiz logic; `learning-ui.js` renders Learn. The main-process `learning:action` handler only accepts the Averill renderer and derives ownership from the active workspace person. Data is nested in the existing schema-1 workspace JSON. No destructive migration is required for older workspaces.
+
+Sessions resume after restart. Confirmations record a specific operation and timestamp; employee confirmation is not visual verification. Manual records describe confirmed work; they are not evidence of a LinkedIn integration. Exclusion removes practice eligibility while preserving local history. Snapshots expose only the active person’s sessions and current-week quiz. This is local demonstration isolation, not real authentication.
+
+Weekly eligibility uses Monday-based Europe/Copenhagen weeks and confirmed activities. Sets contain up to two learned-operation questions, a source/version check when linked evidence remains valid, the latest recorded-work reflection where applicable, and a practical operation reflection. Company evidence must remain visible/approved, match its original version/hash and not be in a source conflict. Invalid evidence/excluded activity blocks affected questions; changed records offer explicit practice refresh. Answer keys are omitted from renderer snapshots. Incorrect choices receive explanations; a missed operation informs the next-practice suggestion. Reflections are self-confirmed and not automatically graded.
+
+Learn makes no AI/network request or screenshot archive. Opening the official guide is an explicit action. General conversational Canva tutoring, automatic geometry/step assessment, export guidance, inferred mastery and automatic activity tracking are not implemented. Existing Canva OCR is a separate Work flow and does not establish these capabilities.
+
+## Run, artifacts and storage
+
+Node.js 22+. From `travel-desktop/`:
 
 ```sh
 npm ci
@@ -26,45 +37,41 @@ npm test
 npm run package:mac
 ```
 
-The macOS packaging script builds the Swift PDF/image text extractor and creates `travel-desktop/dist/Averill-darwin-arm64/Averill.app`. The local ZIP at `travel-desktop/dist/Averill-macOS-arm64.zip` is generated separately with `ditto`; neither artifact is tracked by Git. This is an unsigned arm64 demo package, not a notarized release. Restart a previously running app after rebuilding it.
+Packaged unsigned arm64 app: `travel-desktop/dist/Averill-darwin-arm64/Averill.app`. ZIP: `travel-desktop/dist/Averill-macOS-arm64.zip`, generated with `ditto`, not tracked by Git. Both were rebuilt after the Learn changes. Restart an older running app to load the new code. The native checks used `/tmp/averill-learning-preview` as a separate user-data profile with synthetic records; do not import those records into the normal employee workspace.
 
-Optional `NEBIUS_API_KEY`, `NEBIUS_MODEL`, and `TAVILY_API_KEY` are listed in [`.env.example`](../.env.example). Use a local root `.env.local` or enter Nebius/Tavily keys in Setup. Setup stores encrypted values under Electron user data using macOS secure storage. Never put keys, imported company files, Electron user data, or generated artifacts in Git.
+From the repository root, `npm --prefix travel-site start` serves Elseweek at `http://127.0.0.1:4173/`; gallery at `/design-system/index.html`. No install/build is needed for the dependency-free site. It includes city filters, native details/articles, local trip-brief generation and local photos/fonts. No bookings/payments/enquiry backend. Domain/trademark clearance is not established. Internal-browser desktop/mobile checks passed; download saving was not confirmed by the browser event.
 
-## Verified boundary
+Company copies and workspace JSON live in Electron user data. Optional Nebius/Tavily environment variables are listed in [`.env.example`](../.env.example). Keys entered in Setup use encrypted local storage; never commit keys, `.env.local`, imported user material, user-data folders or build dependencies.
 
-- `npm test`: eight passing deterministic tests for supplied findings, source-backed and unsupported answers, model citation IDs, local roles/source approval/conflict persistence, and folder import.
-- Native Electron review: Campaign Files v1 selected and shared produced the out-of-date finding with a link to v2. The packaged app answered “What changed from v1 to v2?” locally with citations to both brief versions. Email Studio and Social Publisher were opened and visually checked after the latest UI revision; Social rendered the supplied SVG asset.
-- A prior live Nebius request succeeded only for the fixed Aurelia source pack. Tavily returned live public search results in the dev app. The newer company-source Nebius request has **not** been verified live; automatic review blocked transmission of the test brief. A real Canva browser-window capture and Stop sharing path have **not** been verified end to end.
-- The demo package was launched and restarted on macOS. These checks do not prove a signed installer, Windows support, multi-device access, or arbitrary external app understanding.
+## Verified evidence
 
-## Known gaps and next actions
+- **12 Node tests pass:** original campaign findings/answers/citations, workspace roles/source approval/conflicts/import, plus learning persistence, ordered confirmations, person isolation, exclusion, stale/revoked/conflicting source evidence, Copenhagen week rollover and work reflections.
+- **Native dev app:** isolated workspace creation, Learn/help, step advancement, weekly generation, wrong-answer explanation and practical-reflection completion.
+- **Native packaged app:** restart resumed step 3 with two saved confirmations and earlier test answers/reflection. Manual LinkedIn activity was recorded through UI; refresh generated a prompt for that exact activity. These are synthetic test records, not proof of real employee learning or Canva operations. Final wording changes were syntax-tested and the app/ZIP rebuilt.
+- **Previous packaged campaign checks:** shared old brief yields current-source finding; v2 opens; Escape closes; local version comparison cites both briefs; Stop sharing clears findings. Email/Social visuals checked and actual SVG rendered.
+- **Services:** fixed campaign Nebius request previously succeeded; Tavily returned live results in the dev app. The company-source Nebius route is not live-verified; prior transfer was blocked pending specific payload consent. Real selected Canva capture/permission/Stop sharing remains unverified end to end.
 
-1. Rehearse fresh setup, import, lead approval, employee switch, company draft review, restart, and offline/error behavior in the packaged app.
-2. Test a real Canva window with macOS Screen Recording permission, one-frame OCR, and Stop sharing. OCR inspects visible text only; it cannot read hidden design layers or geometry.
-3. Obtain specific approval for the synthetic company-source payload before a live Nebius test. Keep source-backed citations and the local fallback visible.
-4. Add genuine authentication and synchronization before describing the role switcher as a multi-employee deployment. Define tenant isolation, revoke/delete behavior, and retention before using real company data.
-5. Expand conflict detection and independently check model claims against cited passages. Current conflicts detect different approved files with the same department and title; priority does not settle a contradiction.
-6. Review the updated native UI with the owner. The 26 September reference pass uses locally bundled Phosphor Light icons, cooler reference-derived colors, Spline Sans display typography, folded brief cards, and a six-blade custom aperture. Source/action/composer visibility was checked in the native 520 × 850 assistant and 930 × 850 Campaign Files windows. Exact generated-image font metadata and pixel parity are unavailable; the independent-window architecture remains.
+No signed/notarized release, Windows proof, real authentication/sync, external app control, automatic edit/send/publication, certified accessibility or live website review integration is claimed.
+
+## Next work, in order
+
+1. Owner acceptance of the bounded Learn experience. Rehearse with an actual Canva design and perform the operations; separately test explicit capture, Screen Recording denial, OCR and Stop sharing. Keep confirmation distinct from verified geometry.
+2. Create a coherent Elseweek company pack across departments and migrate desktop-company wording/assets without removing superseded fixtures. Verify person/source visibility through onboarding in the package.
+3. Implement a LinkedIn-specific supplied draft/editor and approved LinkedIn campaign source. Current Social Publisher is an Instagram Reel fixture; its dates/disclosures cannot be presented as LinkedIn policy. Approved historical email: 15 October 2026, 10:00 Copenhagen; paid Reel: 17 October, 18:00.
+4. If needed for the richer target video, add validated conversational Canva guidance/export steps and content-specific campaign exercises. Current weekly company question checks approval/version; it does not evaluate campaign audience or free-text copy.
+5. Rehearse the actual four-minute recording with resettable synthetic data and working source links. Use the existing source/version handover as an optional reliable scene. Label seeded activity and supplied editors honestly.
+6. Before real-company deployment: authentication/sync, tenant isolation, source revocation/deletion, retention, stronger semantic conflicts and claim-to-citation checks. Role switching and same-title conflict rules are limited prototypes.
 
 ## Repository map
 
-- `travel-desktop/main.js`, `preload.js`: windows, session sharing, IPC, secure keys, capture, and service calls.
-- `travel-desktop/src/agent.*`, `agent-theme.css`, `agent-controls.css`: desktop assistant UI.
-- `travel-desktop/src/work.*`, `work-theme.css`: supplied demo work windows.
-- `travel-desktop/src/workspace.js`, `workspace-answer.js`: persisted onboarding, sources, roles, conflicts, and company answers.
-- `travel-desktop/src/engine.js`, `assistant.js`, `campaign.js`: fixed campaign rules, local answers, Nebius adapter, and source registry.
-- `travel-desktop/src/web-search.js`: Tavily adapter.
-- `travel-desktop/scripts/extract-text.swift`: local PDF/image text extraction.
-- `travel-desktop/design-system/`: approved reference, tokens, and implementation guidance.
+- `travel-desktop/main.js`, `preload.js`: windows, sender checks, sharing, services, workspace and learning IPC.
+- `travel-desktop/src/learning.js`, `learning-ui.js`, `tests/learning.test.js`: Learn state/UI/tests.
+- `travel-desktop/src/agent.*`, `agent-theme.css`, `agent-controls.css`: assistant and tabs.
+- `travel-desktop/src/work.*`, `work-theme.css`: supplied campaign editors.
+- `travel-desktop/src/workspace.js`, `workspace-answer.js`: local sources, roles, approval and company answers.
+- `travel-desktop/src/engine.js`, `assistant.js`, `campaign.js`: campaign rules/local answers/Nebius.
+- `travel-desktop/src/web-search.js`, `scripts/extract-text.swift`: research and local extraction.
+- `travel-site/`: independent Elseweek website, design system, brand and asset provenance.
+- [LEARNING_IMPLEMENTATION_PLAN.md](LEARNING_IMPLEMENTATION_PLAN.md): plan and delivered boundary.
 
-Repository remote: `https://github.com/sararr25/averill-ai.git`, branch `main`. Check `git status` and the latest remote commit before starting new work; this document deliberately does not freeze a commit hash.
-
-## UI and UX reference pass — 26 September 2026
-
-Native packaged checks: Campaign Files v1 and v2 selection expose pressed state; Archived selects v1; explicit Share produces the out-of-date finding; Open approved brief displays actual v2 content; Escape closes the source dialog; the local version question returns v1/v2 citations; Stop sharing clears the finding. The question composer no longer overlays the source action, rejects empty submissions, exposes waiting/error feedback, and preserves a failed question. The attachment-shaped control opens current evidence rather than suggesting an unsupported upload. All eight existing tests pass. Rebuilt the unsigned macOS arm64 app and ZIP.
-
-Icon assets and MIT license are in `travel-desktop/assets/icons/`; the shared renderer is `src/icons.js`. The image determines visual treatment; file labels describe real fixture assets rather than invented folders or counts. No external AI/OCR/service request was used for this UI check. Other widths, actual macOS Canva capture and company-source AI retain the verification boundaries above.
-
-## Elseweek travel website (26 September 2026)
-
-The consumer travel agency now has a separate working UI in `travel-site/`. Proposed name: **Elseweek**, distinct from Averill. Editorial ivory/forest/clay system, local Fraunces and DM Sans fonts, credited Copenhagen/Vienna/Prague photos. Run `npm --prefix travel-site start` and open `http://127.0.0.1:4173/`; live design gallery at `/design-system/index.html`. See `travel-site/README.md`, `docs/BRAND.md`, `design-system/DESIGN_SYSTEM.md` and asset manifest. Filters, native detail/article dialogs and a local downloadable trip brief are implemented. No booking, payment, backend or enquiry transmission. Naming is a creative proposal without domain/trademark clearance. Existing Aurelia sources are retained as historical fixtures; a coordinated campaign rebrand and integration with the explicit window-sharing demo remain separate work.
+Remote: `https://github.com/sararr25/averill-ai.git`, branch `main`. Check current Git status/remote before continuing; this file deliberately does not embed its own commit hash. `ARCHITECTURE.md` is the canonical system design; the Word copy is a convenience export.

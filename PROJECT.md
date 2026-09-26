@@ -26,6 +26,8 @@ Approved launch email: 15 October 2026 at 10:00 Copenhagen time. Approved paid c
 
 ## Current product state
 
+- Learn provides four-step Canva practice, confirmed activity history and current-week questions/reflections. See the learning implementation section below.
+- Elseweek has an independent local consumer website in `travel-site/`; existing Aurelia campaign sources have not yet been migrated.
 - Electron opens an independent Averill window and three separate supplied work windows: Email Studio, Social Publisher, and Campaign Files.
 - The employee opens and explicitly shares each work window. Work windows send structured field state via Electron IPC, but findings are produced only for shared windows. Checks run after blur or selection change. Closing or unsharing stops findings.
 - Deterministic rules detect the supplied campaign problems. Findings cite real local source files that can be opened.
@@ -77,3 +79,7 @@ No continuous arbitrary macOS window capture, external app control, background o
 - `ARCHITECTURE.md`: data flow, boundaries, API contracts, and operational notes.
 
 The 26 September UI pass prioritizes the supplied image: deeper petrol, cooler ice, Spline Sans display reconstruction, genuine Phosphor Light assets and clearer selected/current source hierarchy. Native source viewing, local campaign answers and Stop sharing were checked after rebuilding the app. See the design-system verification section for exact parity limits.
+
+## Learning implementation — 26 September 2026
+
+The Learn area adds an offline, bounded Canva tutor (selection, Position, alignment, grouping), contextual help and official tool references. The employee performs and confirms each step. Owner-scoped sessions persist in the local company workspace. Employees can record other confirmed Canva/LinkedIn/newsletter practice and link visible approved sources. Weekly practice uses the current Europe/Copenhagen week, generates operation questions and activity reflections, and explains answers. Source/version questions require still-approved, visible, non-conflicting evidence. The practical exercise is self-confirmed, not visually assessed; no mastery score or manager evaluation is provided. This does not establish general conversational Canva tutoring or automatic activity tracking. See `docs/LEARNING_IMPLEMENTATION_PLAN.md` for plan and verification.

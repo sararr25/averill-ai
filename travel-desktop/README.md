@@ -24,9 +24,19 @@ Each work window has a **Load incoming draft** or **Open handed-over file** acti
 
 ## What the prototype actually does
 
-The three supplied work windows send structured field state to Electron; Averill produces findings only while a window is shared. Campaign checks use explicit rules and local sample documents. **Review** displays the leading finding and a question composer. **Setup** creates one local company workspace, adds demo people, imports files or a folder, and lets a lead approve department sources. **Work** reviews a marketing draft with approved sources and can capture one frame from a selected Canva window for local OCR. **Research** searches the public web through Tavily. Canva OCR reads visible text only; it cannot inspect design structure or hidden layers.
+The three supplied work windows send structured field state to Electron; Averill produces findings only while a window is shared. Campaign checks use explicit rules and local sample documents. **Review** displays the leading finding and a question composer. **Setup** creates one local company workspace, adds demo people, imports files or a folder, and lets a lead approve department sources. **Work** reviews a marketing draft with approved sources and can capture one frame from a selected Canva window for local OCR. **Learn** guides four Canva operations with contextual help, records confirmed practice and generates weekly questions/reflections. **Research** searches the public web through Tavily. Canva OCR reads visible text only; it cannot inspect design structure or hidden layers.
 
 Set `NEBIUS_API_KEY` and `TAVILY_API_KEY` in the local `../.env.local`, or enter them in Setup for encrypted local storage. Nebius requires explicit session opt-in; draft/image-text review asks for confirmation before sending relevant approved text. Tavily receives only the entered public query. A live Nebius test validated the fixed Aurelia source pack; the company-source path still needs a live check. No account authentication or multi-computer synchronization is implemented.
+
+## Learning demo path
+
+1. Create a workspace and select a person in Setup. Open Learn.
+2. Start Canva layout essentials, optionally linking an approved company source. Practise selection, Position, alignment and grouping in Canva; confirm each step yourself. Step help links to official guidance. There is no automatic visual verification.
+3. Record another confirmed Canva, LinkedIn or newsletter activity with a short description. Review Your week and exclude incorrect records before practice.
+4. Start weekly practice. Answer operation questions, open a linked current source and save a practical reflection. The next practice suggestion targets a missed operation when applicable.
+5. Restart: the active session and answers remain in the local workspace. Switching person shows that person’s records. Refresh practice after adding activities; unavailable sources or excluded records invalidate affected questions.
+
+The week starts Monday in Europe/Copenhagen. Practical work is self-confirmed, not scored as mastery. Learn makes no AI/network request. Historical records persist locally; exclusion removes eligibility rather than deleting history. See the [implementation plan](../docs/LEARNING_IMPLEMENTATION_PLAN.md).
 
 ## Package for macOS
 
@@ -44,4 +54,4 @@ The intentionally superseded campaign brief v1 and square creative are part of t
 npm test
 ```
 
-The eight tests cover issue detection and resolution for the supplied workflows, source file existence, uncertainty for unsupported questions, model citation IDs, local workspace persistence, and folder import. The packaged app was opened and verified for the shared brief finding and a locally answered, cited comparison. See the [handover](../docs/HANDOVER.md) for checks still pending.
+The 12 tests cover issue detection and resolution for the supplied workflows, source file existence, uncertainty for unsupported questions, model citation IDs, local workspace persistence, folder import, employee learning persistence/isolation, source invalidation, exclusion and Copenhagen week rollover. The packaged app was opened and verified for the shared brief finding and a locally answered, cited comparison. See the [handover](../docs/HANDOVER.md) for checks still pending.

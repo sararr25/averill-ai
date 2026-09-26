@@ -1,6 +1,7 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('desktop', {
+  learningAction: (action, payload) => ipcRenderer.invoke('learning:action', action, payload),
   snapshot: () => ipcRenderer.invoke('agent:snapshot'),
   openWork: (kind) => ipcRenderer.invoke('agent:open-work', kind),
   share: (kind, enable) => ipcRenderer.invoke('agent:share', kind, enable),

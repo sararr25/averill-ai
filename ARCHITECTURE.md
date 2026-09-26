@@ -2,7 +2,7 @@
 
 ## Purpose and status
 
-This document describes the implemented hackathon prototype and the boundaries for extending it. The current app is an Electron desktop demo with three supplied Aurelia Travel work windows, a local company workspace, and explicit one-frame OCR of a selected external Canva window. General continuous external application observation remains a future milestone.
+This document describes the implemented hackathon prototype and the boundaries for extending it. The current app is an Electron desktop demo with three supplied Aurelia Travel work windows, a local company workspace, owner-scoped guided learning and weekly practice, and explicit one-frame OCR of a selected external Canva window. General continuous external application observation remains a future milestone.
 
 ## Requirements
 
@@ -28,6 +28,8 @@ This document describes the implemented hackathon prototype and the boundaries f
 | Design system | `travel-desktop/design-system/` and `src/agent-theme.css` | Approved visual tokens and implemented assistant styling |
 | Company workspace | `travel-desktop/src/workspace.js` | Local people, role switching, imported copies, approval, priority, and conflict detection |
 | Company answers | `travel-desktop/src/workspace-answer.js` | Approved-source retrieval, Nebius request, citation ID validation, local fallback |
+| Learning engine | `travel-desktop/src/learning.js` | Owner-scoped sessions, ordered confirmation, weekly eligibility, practice and feedback |
+| Learning UI | `travel-desktop/src/learning-ui.js` | Learn lesson/help, activity recording, weekly review and answer forms |
 | Public search | `travel-desktop/src/web-search.js` | Tavily search with a user-entered public query only |
 | macOS extraction | `travel-desktop/scripts/extract-text.swift` | PDF text and image OCR for imported files and selected-window frames |
 
@@ -57,7 +59,7 @@ The work window calls `work:update` even when unshared; the main process stores 
 
 The preload exposes `snapshot()`, `openWork(kind)`, `share(kind, enabled)`, `aiMode(enabled)`, `ask(question)`, `askDemo(question)`, `source(id)`, `openSource(id)`, `updateWork(kind, data)`, and snapshot/sharing listeners. It also exposes narrow workspace, Tavily, and external-window methods. `kind` is limited to `email`, `social`, or `handover`. Main-process `work:update` accepts only events from the corresponding open work window and a plain object payload. The bridge uses context isolation, disables Node integration, and enables renderer sandboxing.
 
-The snapshot contains `open`, `shared`, `aiEnabled`, and `findings`. A finding has an ID, title, explanation, suggested user action, source, and work kind. Source IDs resolve only through the fixed registry; arbitrary paths are not accepted through `agent:source` or `agent:open-source`.
+The snapshot contains `open`, `shared`, `aiEnabled`, `findings`, `workspace`, `learning`, service availability and the selected external window. A finding has an ID, title, explanation, suggested user action, source, and work kind. Source IDs resolve only through the fixed registry; arbitrary paths are not accepted through `agent:source` or `agent:open-source`.
 
 ## Source and version model
 
@@ -90,3 +92,13 @@ Electron `desktopCapturer` lists windows. The user chooses a Canva-titled window
 ## Extension sequence
 
 Verify the existing one-frame macOS Canva selection, permission handling, OCR, and Stop sharing end to end. Rehearse the packaged app and approved company-source Nebius path. Then add authentication/synchronization, stronger source-conflict and citation checks, and deletion/revocation behavior. Keep work actions human-owned unless the product decision changes explicitly. See [docs/HANDOVER.md](docs/HANDOVER.md) for the current checks and their evidence boundaries.
+
+## Learning state and IPC
+
+`learningAction(action, payload)` invokes `learning:action`. Only the Averill renderer is accepted. The main process derives the active person from the workspace; payloads cannot choose another owner. Allowed actions: start, record, confirm, exclude, quiz and answer. The engine validates source eligibility, step order and answer shape before persistence and snapshot publication.
+
+State lives in the `learning` field of the existing schema-1 workspace: sessions and quizzes, each owner-scoped. Sessions carry creation time, confirmed operation timestamps/week keys, optional source ID/title/version/hash and exclusion/completion state. Manual work records contain a confirmed employee description. Quizzes persist prompts, deterministic answer keys and feedback; snapshots omit answer keys. Practical reflections are explicitly self-confirmed, not model-graded.
+
+Week keys are Monday-based in Europe/Copenhagen. Only confirmed current-week sessions are eligible. Company evidence must remain visible, approved, hash/version-matching and outside same-title conflicts. Excluding activity or invalidating evidence blocks affected questions. A fingerprint detects changed records so explicit refresh can create an updated set. Previous answers remain in local history; only the current person/current week is exposed by the learning snapshot.
+
+Learn is offline and stores no screenshots. The official guide opens only on an employee action. It neither connects to Canva’s document API nor proves element alignment. Existing Work capture is a separate explicit one-frame OCR route. Local role switching provides demonstration isolation, not authenticated security across devices.

@@ -2,7 +2,7 @@
 
 Averill is a source-grounded company agent assistant for people working across applications. The employee chooses what to share. Averill points out relevant inconsistencies after a field edit or asset selection, explains the issue, and links to the approved source. The employee decides what to change and whether to publish.
 
-This repository contains an **Electron hackathon prototype**, a local company onboarding path, its Aurelia Travel sample campaign, an approved design system, and handover documentation. Aurelia Travel is a fictional customer, not Averill's product name.
+This repository contains an **Electron hackathon prototype**, a local company onboarding path, its historical Aurelia Travel sample campaign, a Canva tutor and weekly learning flow, the Elseweek travel website, approved design systems, and handover documentation. Aurelia Travel is a fictional customer, not Averill's product name.
 
 ## Start here
 
@@ -25,6 +25,12 @@ npm start
 ```
 
 Run `npm test` from `travel-desktop/` for the deterministic checks.
+
+## Learn and Elseweek
+
+Open **Learn** after creating a workspace in Setup. Start the four-step Canva lesson, ask for step help, and confirm what you practised. Your week records confirmed steps and manually entered Canva/LinkedIn/newsletter activities. Weekly practice provides operation questions, source/version checks and practical reflections. It is offline and scoped to the active person; confirmation is not automatic visual assessment. See [learning plan](docs/LEARNING_IMPLEMENTATION_PLAN.md).
+
+Run `npm --prefix travel-site start` from the repository root for the fictional Elseweek site at `http://127.0.0.1:4173/`. The [site README](travel-site/README.md) covers the independent consumer design and demo limits.
 
 ## Security and scope
 
