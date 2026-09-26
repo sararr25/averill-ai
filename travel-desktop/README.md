@@ -69,3 +69,9 @@ The static fixture and imported workspace paths are separate. Switching people c
 Follow [the onboarding tutorial](../docs/ONBOARDING_TUTORIAL.md). Create the owner email/password account, upload the six mixed-format Elseweek intake files, optionally use explicitly disclosed Nebius analysis, review people/document assignments, approve selected sources and confirm the batch. Three Marketing accounts are created together. Use Account access → Open login documents to retrieve each email/password document and sign out/in to demonstrate owner, manager, strategist and creator. Restart requires login. Existing workspaces can enable owner login without losing data; existing people can receive separate accounts.
 
 XLSX/CSV staff tables are read locally. PDFs use PDFKit and scanned-page Vision OCR (first 30 pages); SVG onboarding extracts text/title/description. Unsupported/unreadable files are flagged. XLS needs a modern XLSX/CSV export. Brand context can be company-wide; personnel copies remain private. No cloud service, multi-device synchronization, invitations or password recovery is implemented.
+
+## Executable and development continuation
+
+On this Mac, open `travel-desktop/dist/Averill-darwin-arm64/Averill.app` from the repository folder. Shareable archive: `travel-desktop/dist/Averill-macOS-arm64.zip`. This unsigned build targets Apple Silicon macOS. Quit older running copies before launching it. Build outputs are ignored by Git.
+
+Start future development from `docs/HANDOVER.md`, then `AGENTS.md`, `PROJECT.md`, `ARCHITECTURE.md`, `docs/ONBOARDING_AUTH_PLAN.md` and `docs/ONBOARDING_TUTORIAL.md`. Run `npm test` in travel-desktop; `npm run package:mac` rebuilds the app. The website has its own travel-site documentation.

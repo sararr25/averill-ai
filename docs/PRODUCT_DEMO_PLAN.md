@@ -1,10 +1,10 @@
 # Averill product demo plan
 
-Decision record, 23 September 2026; implementation status updated 24 September 2026. The first specialized product path is marketing. Elseweek remains disposable sample data, not the product model. See [HANDOVER.md](HANDOVER.md) for verified behavior and remaining gates.
+Decision record, 23 September 2026; implementation status updated 26 September 2026. The first specialized product path is marketing. Elseweek remains disposable sample data, not the product model. See [HANDOVER.md](HANDOVER.md) for verified behavior and remaining gates.
 
 ## Buyer and employee journey
 
-1. An administrator creates a local company workspace and adds departments and people. The hackathon now demonstrates separate local email/password accounts on one computer; it does not claim network synchronization.
+1. An administrator creates a local company workspace with an owner login, uploads Excel/PDF/SVG company material together and reviews bulk employee accounts. The hackathon now demonstrates separate local email/password accounts on one computer; it does not claim network synchronization.
 2. The administrator imports a selected folder or files. Each imported file records its original path, checksum, owner, department, status, version, and approval time. Import does not silently make a document authoritative.
 3. A department lead reviews proposed sources, assigns source priority, approves or rejects them, and can supersede a version. An administrator can do the same across departments.
 4. An employee can add personal context, propose it for department sharing, and see which material is private, pending, approved, or superseded. Only approved department sources can justify a correction to shared work.
@@ -116,4 +116,8 @@ Preparation steps for department pack and LinkedIn supplied editor are delivered
 
 ## Updated onboarding and identity scene
 
-The owner now creates a local email/password account and uploads existing mixed-format company material in one batch. Nebius explicitly interprets extracted text; the owner reviews people and source metadata, confirms approval and receives one-time credentials. Demonstrate separate owner, Marketing manager, Marketing strategy employee and Content creator logins with Sign out/Sign in. Company brand sources are shared across departments; staff roster is private. This supersedes the earlier role-switching-only onboarding narrative. Roles/learning remain local to one Mac, not a synchronized multi-employee service.
+The owner now creates a local email/password account and uploads existing mixed-format company material in one batch. Nebius explicitly interprets extracted text; the owner reviews people and source metadata, confirms approval and receives generated credentials saved in separate local login documents. Demonstrate separate owner, Marketing manager, Marketing strategy employee and Content creator logins with Sign out/Sign in. Company brand sources are shared across departments; staff roster is private. This supersedes the earlier role-switching-only onboarding narrative. Roles/learning remain local to one Mac, not a synchronized multi-employee service.
+
+## Login documents and current continuation
+
+The user requested one retrievable document per demo login. These are saved automatically for owner setup and generated team accounts, outside the repository. See ONBOARDING_TUTORIAL.md. The normal Mac workspace currently remains Aurelia Demo with one legacy admin and no configured credentials. Activation in that workspace versus a separate Elseweek demo remains awaiting the user choice; do not confuse /tmp synthetic test profiles with the normal workspace. HANDOVER.md contains executable paths, verification and remaining checks.

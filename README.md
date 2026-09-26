@@ -49,3 +49,9 @@ Open **LinkedIn Draft** in Work, then Share. Load the incoming draft to review f
 ## Smooth onboarding and four local accounts
 
 Use [the updated onboarding tutorial](docs/ONBOARDING_TUTORIAL.md). Create your owner account, upload the mixed-format [intake pack](travel-desktop/demo-company/elseweek-intake/README.md), optionally let Nebius interpret extracted text, review the people/scopes/versions and confirm once. This creates Marketing manager, Marketing strategy employee and Content creator accounts in bulk with generated passwords saved in local login documents. Company brand guidance supports company-wide visibility; personnel files stay private to admin. The accounts are local to one Mac, not an online/synchronized service.
+
+## Executable and development continuation
+
+On this Mac, open `travel-desktop/dist/Averill-darwin-arm64/Averill.app` from the repository folder. Shareable archive: `travel-desktop/dist/Averill-macOS-arm64.zip`. This unsigned build targets Apple Silicon macOS. Quit older running copies before launching it. Build outputs are ignored by Git.
+
+Start future development from `docs/HANDOVER.md`, then `AGENTS.md`, `PROJECT.md`, `ARCHITECTURE.md`, `docs/ONBOARDING_AUTH_PLAN.md` and `docs/ONBOARDING_TUTORIAL.md`. Run `npm test` in travel-desktop; `npm run package:mac` rebuilds the app. The website has its own travel-site documentation.
