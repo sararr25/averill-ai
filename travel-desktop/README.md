@@ -1,6 +1,6 @@
-# Averill desktop — Aurelia Travel demo
+# Averill desktop — Elseweek demo
 
-Averill is a standalone company agent assistant prototype demonstrated with the fictional **Winter Escapes 2027** campaign. Aurelia Travel is the fictional test company. All product copy and campaign sources are in English. Read the [central handover](../docs/HANDOVER.md), [project brief](../PROJECT.md), and [system design](../ARCHITECTURE.md) before extending the app.
+Averill is a standalone company agent assistant prototype demonstrated with the fictional **Winter Escapes 2027** campaign. Elseweek is the fictional test company. All product copy and campaign sources are in English. Read the [central handover](../docs/HANDOVER.md), [project brief](../PROJECT.md), and [system design](../ARCHITECTURE.md) before extending the app.
 
 The selected visual direction and implementation specification live in [design-system/DESIGN_SYSTEM.md](design-system/DESIGN_SYSTEM.md). [Preview](design-system/preview.html) is a review artifact; the running app uses the Petrol / Coral / Ice system, but the preview is not proof of pixel parity.
 
@@ -11,7 +11,7 @@ npm ci
 npm start
 ```
 
-Node.js 22+ is recommended. The app opens one assistant window. In **Work**, use **Open** to launch the separate Email Studio, Social Publisher, and Campaign Files windows, then **Share** to let Averill inspect a selected supplied window. **Stop sharing** or closing the window removes its findings. More than one supplied work window can be shared at a time.
+Node.js 22+ is recommended. The app opens one assistant window. In **Work**, use **Open** to launch the separate Email Studio, LinkedIn Draft, Social Publisher, and Campaign Files windows, then **Share** to let Averill inspect a selected supplied window. **Stop sharing** or closing the window removes its findings. More than one supplied work window can be shared at a time.
 
 Each work window has a **Load incoming draft** or **Open handed-over file** action. Edit the real fields afterwards. Checks run when an input loses focus or a selection changes. The assistant cites local campaign documents, and **Open file on this computer** opens the actual source. Work drafts are saved locally only when **Save draft** is pressed. There is no send or publish action.
 
@@ -24,9 +24,9 @@ Each work window has a **Load incoming draft** or **Open handed-over file** acti
 
 ## What the prototype actually does
 
-The three supplied work windows send structured field state to Electron; Averill produces findings only while a window is shared. Campaign checks use explicit rules and local sample documents. **Review** displays the leading finding and a question composer. **Setup** creates one local company workspace, adds demo people, imports files or a folder, and lets a lead approve department sources. **Work** reviews a marketing draft with approved sources and can capture one frame from a selected Canva window for local OCR. **Learn** guides four Canva operations with contextual help, records confirmed practice and generates weekly questions/reflections. **Research** searches the public web through Tavily. Canva OCR reads visible text only; it cannot inspect design structure or hidden layers.
+The four supplied work windows send structured field state to Electron; Averill produces findings only while a window is shared. Campaign checks use explicit rules and local sample documents. **Review** displays the leading finding and a question composer. **Setup** creates one local company workspace, adds demo people, imports files or a folder, and lets a lead approve department sources. **Work** reviews a marketing draft with approved sources and can capture one frame from a selected Canva window for local OCR. **Learn** guides four Canva operations with contextual help, records confirmed practice and generates weekly questions/reflections. **Research** searches the public web through Tavily. Canva OCR reads visible text only; it cannot inspect design structure or hidden layers.
 
-Set `NEBIUS_API_KEY` and `TAVILY_API_KEY` in the local `../.env.local`, or enter them in Setup for encrypted local storage. Nebius requires explicit session opt-in; draft/image-text review asks for confirmation before sending relevant approved text. Tavily receives only the entered public query. A live Nebius test validated the fixed Aurelia source pack; the company-source path still needs a live check. No account authentication or multi-computer synchronization is implemented.
+Set `NEBIUS_API_KEY` and `TAVILY_API_KEY` in the local `../.env.local`, or enter them in Setup for encrypted local storage. Nebius requires explicit session opt-in; draft/image-text review asks for confirmation before sending relevant approved text. Tavily receives only the entered public query. A live Nebius test validated the fixed historical Aurelia source pack; the company-source path still needs a live check. No account authentication or multi-computer synchronization is implemented.
 
 ## Learning demo path
 
@@ -54,4 +54,12 @@ The intentionally superseded campaign brief v1 and square creative are part of t
 npm test
 ```
 
-The 12 tests cover issue detection and resolution for the supplied workflows, source file existence, uncertainty for unsupported questions, model citation IDs, local workspace persistence, folder import, employee learning persistence/isolation, source invalidation, exclusion and Copenhagen week rollover. The packaged app was opened and verified for the shared brief finding and a locally answered, cited comparison. See the [handover](../docs/HANDOVER.md) for checks still pending.
+The 14 tests cover issue detection and resolution for the supplied workflows, source file existence, uncertainty for unsupported questions, model citation IDs, local workspace persistence, folder import, employee learning persistence/isolation, source invalidation, exclusion and Copenhagen week rollover. The packaged app was opened and verified for the shared brief finding and a locally answered, cited comparison. See the [handover](../docs/HANDOVER.md) for checks still pending.
+
+## Company pack and LinkedIn demo
+
+Use [the Elseweek pack README](demo-company/elseweek/README.md) to create people and import Marketing, Operations and People documents at the correct versions. An administrator can choose department and source version in Setup; employee/lead imports stay in their own department. Imported documents arrive pending. Brand context is explicitly approved per department.
+
+Open LinkedIn Draft, Share, then Load incoming draft. Correct the guarantee phrase, editorial audience, selected creative, CTA and planned date/time. The correct slot is 16 October 2026 at 09:00 Europe/Copenhagen. Open the LinkedIn guidance from the draft or the finding citation. Save retains a local draft; Stop sharing clears findings. The editor is supplied synthetic work, not an external LinkedIn connection. Its limited copy checks do not establish a complete tone assessment.
+
+The static fixture and imported workspace paths are separate. Switching people clears sharing; source approval changes control company answers and learning evidence, not the supplied editor rules. Previous Aurelia drafts remain in their old localStorage keys and are not loaded into Elseweek drafts.

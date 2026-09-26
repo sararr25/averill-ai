@@ -6,7 +6,7 @@ Updated 26 September 2026. This is the canonical product brief; [docs/HANDOVER.m
 
 Averill is a standalone company agent assistant that helps an employee keep work aligned with current, approved company information. It watches only work the employee explicitly shares, notices a relevant problem at a natural pause after an edit or selection, and gives a concise correction with a source the employee can inspect. Employees can also ask where to find files, what changed between versions, and what copy or schedule is approved.
 
-The product identity is **Averill**. **Aurelia Travel** is the fictional travel company used in the hackathon demo. Its campaign documents and work windows are test material, not Averill branding. Product copy, demo content, and developer documentation are in English.
+The product identity is **Averill**. **Elseweek** is the fictional travel company used in the hackathon demo. Its campaign documents and work windows are test material, not Averill branding. Product copy, demo content, and developer documentation are in English.
 
 ## Why this exists
 
@@ -14,11 +14,12 @@ Campaign work crosses briefs, email, social scheduling, and handovers. A superse
 
 ## Demo narrative
 
-The synthetic company is Aurelia Travel. The campaign is **Winter Escapes 2027**. Brief v2 was approved on 22 September 2026; brief v1 and its square creative are intentionally retained as superseded material.
+The synthetic company is Elseweek. The campaign is **Winter Escapes 2027**. Brief v2 was approved on 22 September 2026; brief v1 and its square creative are intentionally retained as superseded material.
 
 | Chapter | Employee does | Averill finds | Source |
 | --- | --- | --- | --- |
 | Email | Opens a draft and edits subject, audience, footer | Unapproved price guarantee, broad audience, missing footer | Current brief and brand/legal guidance |
+| LinkedIn | Drafts an organic company post | Wrong claim, editorial audience, creative, missing CTA and planned slot | LinkedIn campaign guidance |
 | Social | Selects Reel creative, caption, partnership label, date | Old square asset, missing paid disclosure or platform label, wrong slot | Brief, brand/legal guidance, calendar |
 | Handover | Opens brief v1 from a teammate | v1 is superseded; v2 changed audience, claim, asset, and date | Both brief versions |
 
@@ -27,19 +28,19 @@ Approved launch email: 15 October 2026 at 10:00 Copenhagen time. Approved paid c
 ## Current product state
 
 - Learn provides four-step Canva practice, confirmed activity history and current-week questions/reflections. See the learning implementation section below.
-- Elseweek has an independent local consumer website in `travel-site/`; existing Aurelia campaign sources have not yet been migrated.
-- Electron opens an independent Averill window and three separate supplied work windows: Email Studio, Social Publisher, and Campaign Files.
+- Elseweek has an independent local consumer website in `travel-site/`; desktop company wording and current assets now use Elseweek. The old square remains deliberately historical.
+- Electron opens an independent Averill window and four separate supplied work windows: Email Studio, LinkedIn Draft, Social Publisher, and Campaign Files.
 - The employee opens and explicitly shares each work window. Work windows send structured field state via Electron IPC, but findings are produced only for shared windows. Checks run after blur or selection change. Closing or unsharing stops findings.
 - Deterministic rules detect the supplied campaign problems. Findings cite real local source files that can be opened.
-- Campaign questions use constrained local source lookup by default. With a demo window shared, Review uses the fixed Aurelia source pack; otherwise it uses visible approved company sources. Nebius AI is optional and user-enabled. Responses without valid source IDs fall back to a local answer.
+- Campaign questions use constrained local source lookup by default. With a demo window shared, Review uses the fixed Elseweek source pack; otherwise it uses visible approved company sources. Nebius AI is optional and user-enabled. Responses without valid source IDs fall back to a local answer.
 - The assistant now applies the approved colors, font families, aperture, outline icons, focused Review hierarchy and bottom question composer. Work controls, research and setup use separate tabs. The reference image remains a visual specification; the app uses separate desktop windows.
-- A live Nebius check on 23 September 2026 returned the approved assets and citations. The automated tests cover all three workflows, source existence, unsupported questions, and model citation validation. These checks do not establish behavior with arbitrary external apps.
+- A live Nebius check on 23 September 2026 returned the approved assets and citations. The automated tests cover all four supplied workflows, source existence, unsupported questions, and model citation validation. These checks do not establish behavior with arbitrary external apps.
 - A local company workspace can now be created on one Mac. An administrator adds people; the role switcher demonstrates administrator, department lead, and employee permissions on that same computer. It is explicitly not authentication or multi-device synchronization.
 - People can import individual files or a folder (up to 100 supported files per selection). Imported copies and workspace metadata persist under Electron user data. Private files must be proposed before a lead can approve them for a department. A lead can set priority or supersede a source. Different approved files with the same title and different hashes cause a conflict; both are excluded from company answers until resolved.
 - Markdown, plain text, CSV, JSON, and SVG text is indexed locally. On macOS, PDF text and image OCR use a local Swift helper; an unreadable file is marked as such. Imported Canva exports can be opened and their extracted text reviewed. This is not structural Canva document access or full visual analysis.
 - The Work tab includes a company marketing draft review path. With explicit consent, relevant approved source text and a draft are sent to Nebius. The Review composer answers questions about the shared synthetic campaign from its fixed source pack; when no demo window is shared it uses the company workspace. A separate Research tab calls Tavily for a user-entered public query only. Tavily results are not company-approved sources.
 - A Canva browser/app window can be explicitly selected for a one-frame OCR review and unselected with Stop sharing. The current code does not continuously monitor an arbitrary external window or infer design geometry. macOS Screen Recording permission is required for capture.
-- The Averill assistant and supplied Aurelia work windows use the approved Petrol / Coral / Ice color system and bundled Geologica, Spline Sans, and Fragment Mono font packages. The social creative preview renders the actual supplied SVG asset.
+- The Averill assistant and supplied Elseweek work windows use the approved Petrol / Coral / Ice color system and bundled Geologica, Spline Sans, and Fragment Mono font packages. The social creative preview renders the actual supplied SVG asset.
 
 ## Explicit non-goals for this prototype
 
@@ -49,7 +50,7 @@ No continuous arbitrary macOS window capture, external app control, background o
 
 | Decision | Reason and consequence |
 | --- | --- |
-| Averill is the agent product name; Aurelia Travel is the demo company | Keeps product identity separate from example customer branding. |
+| Averill is the agent product name; Elseweek is the demo company | Keeps product identity separate from example customer branding. |
 | Standalone desktop window | The employee can see the agent beside the work, across multiple work contexts. |
 | Explicit per-window sharing | Sharing is visible and reversible; no implied background surveillance. |
 | Feedback after completed field edit or selection | Corrections arrive at a useful moment without interrupting typing. |
@@ -63,7 +64,7 @@ No continuous arbitrary macOS window capture, external app control, background o
 ## Next work
 
 1. Complete native desktop verification of Canva window capture, review, and Stop sharing with a real Canva window; test image import in the running app.
-2. Verify the new company-source Nebius request live after explicit approval for the synthetic test payload. The previous live check covers only the fixed Aurelia source pack.
+2. Verify the new company-source Nebius request live after explicit approval for the synthetic test payload. The previous live check covers only the fixed historical Aurelia source pack.
 3. Add real authentication and sync before describing the role switcher as a multi-employee product. Extend specialized checks to other departments only after their source and workflow requirements are defined.
 4. Improve conflict detection beyond different files sharing one title, and independently verify model claims against cited passages.
 5. Rehearse permission denial, offline fallback, and the full demo on the packaged macOS app. The package includes the macOS text-extraction helper.
@@ -83,3 +84,11 @@ The 26 September UI pass prioritizes the supplied image: deeper petrol, cooler i
 ## Learning implementation — 26 September 2026
 
 The Learn area adds an offline, bounded Canva tutor (selection, Position, alignment, grouping), contextual help and official tool references. The employee performs and confirms each step. Owner-scoped sessions persist in the local company workspace. Employees can record other confirmed Canva/LinkedIn/newsletter practice and link visible approved sources. Weekly practice uses the current Europe/Copenhagen week, generates operation questions and activity reflections, and explains answers. Source/version questions require still-approved, visible, non-conflicting evidence. The practical exercise is self-confirmed, not visually assessed; no mastery score or manager evaluation is provided. This does not establish general conversational Canva tutoring or automatic activity tracking. See `docs/LEARNING_IMPLEMENTATION_PLAN.md` for plan and verification.
+
+## Elseweek and LinkedIn delivery — 26 September 2026
+
+The coherent synthetic company pack is in `travel-desktop/demo-company/elseweek/`, with Marketing, Operations and People, shared brand copies, owners, versions, a private proposal and an archived v1. Follow its README for imports: current campaign brief at metadata version 2, other documents at version 1. An admin selects department/version; non-admin imports are limited to their own department. Review and approval remain explicit.
+
+LinkedIn Draft is a fourth supplied window with organic company-post copy, editorial audience, asset, date/time, source action and local Save. Explicit Share enables checks for the unapproved price phrase, wrong audience, wrong creative, missing CTA and incorrect campaign slot. Planned LinkedIn slot is 16 October 2026, 09:00 Europe/Copenhagen. Guidance is synthetic company policy, not platform rules. Existing email and paid Instagram dates remain as previously approved. Current asset branding is Elseweek; the superseded square remains unchanged. Old Aurelia local draft keys are preserved and not loaded into the new Elseweek draft namespace.
+
+Imported sources do not drive the supplied deterministic editor findings. The four fixtures cite the static pack; unshared company questions use visible approved workspace sources. No external LinkedIn connection, Canva export integration, full tone assessment or publishing was added.

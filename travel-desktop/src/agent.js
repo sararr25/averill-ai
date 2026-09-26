@@ -1,5 +1,6 @@
 const kinds = [
   { id: 'email', title: 'Email Studio', detail: 'Draft, audience and footer', icon: 'mail' },
+  { id: 'linkedin', title: 'LinkedIn Draft', detail: 'Organic company post and campaign visual', icon: 'image' },
   { id: 'social', title: 'Social Publisher', detail: 'Partner Reel and schedule', icon: 'image' },
   { id: 'handover', title: 'Campaign Files', detail: 'Brief versions and handover', icon: 'folder' },
 ];
@@ -199,11 +200,21 @@ function renderWorkspace() {
   const scope = node('select'); scope.setAttribute('aria-label', 'Import visibility');
   for (const [value, label] of [['private', 'Private until proposed'], ['department', 'Propose to department']]) { const option = node('option', label); option.value = value; scope.append(option); }
   if (active.role === 'admin') scope.value = 'department';
-  importRow.append(scope, action('Import file or Canva export', () => window.desktop.importSources({ scope: scope.value, department: active.department || 'Marketing' })));
+  const targetDepartment = node('select'); targetDepartment.setAttribute('aria-label', 'Import department');
+  for (const department of (active.role === 'admin' ? data.departments : [active.department])) {
+    const option = node('option', department); option.value = department; targetDepartment.append(option);
+  }
+  const version = node('input'); version.value = '1'; version.maxLength = 30; version.setAttribute('aria-label', 'Imported source version');
+  const importOptions = () => ({ scope: scope.value, department: targetDepartment.value, version: version.value.trim() || '1' });
+  targetDepartment.id = 'import-department'; version.id = 'import-version';
+  const departmentLabel = node('label', 'Department'); departmentLabel.htmlFor = targetDepartment.id;
+  const versionLabel = node('label', 'Source version'); versionLabel.htmlFor = version.id;
+  importRow.append(departmentLabel, targetDepartment, versionLabel, version, scope,
+    action('Import file or Canva export', () => window.desktop.importSources(importOptions())));
   const folderButton = node('button', 'Import folder', 'secondary-button'); folderButton.type = 'button';
   folderButton.addEventListener('click', async () => {
     try {
-      const result = await window.desktop.importFolder({ scope: scope.value, department: active.department || 'Marketing' });
+      const result = await window.desktop.importFolder(importOptions());
       current = result; render();
       if (result.importSummary) el('workspace-feedback').textContent = `Imported ${result.importSummary.imported} of ${result.importSummary.scanned} supported files${result.importSummary.limited ? ' (100-file limit reached)' : ''}. Review and approve them before use.`;
     } catch (error) { el('workspace-feedback').textContent = error.message; }

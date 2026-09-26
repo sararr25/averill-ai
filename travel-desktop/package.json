@@ -2,7 +2,7 @@
   "name": "averill-ai-desktop",
   "version": "0.1.0",
   "private": true,
-  "description": "Averill company agent assistant desktop demo with fictional Aurelia Travel campaign",
+  "description": "Averill company agent assistant desktop demo with fictional Elseweek campaign",
   "main": "main.js",
   "scripts": {
     "start": "electron .",

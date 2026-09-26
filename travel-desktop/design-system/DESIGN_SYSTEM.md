@@ -6,7 +6,7 @@
 
 ## Product boundary
 
-This system belongs to the independent desktop assistant. Aurelia Travel is the fictional company in the demo work windows. The screenshot shows a visual composition, not a claim that the agent and Campaign Files are one application. The current prototype receives structured changes from the three supplied work windows after the user shares them. It cites local files, suggests corrections, and never edits, sends, or publishes on the user's behalf.
+This system belongs to the independent desktop assistant. Elseweek is the fictional company in the demo work windows. The screenshot shows a visual composition, not a claim that the agent and Campaign Files are one application. The current prototype receives structured changes from the four supplied work windows after the user shares them. It cites local files, suggests corrections, and never edits, sends, or publishes on the user's behalf.
 
 ## Design intent
 
@@ -73,7 +73,7 @@ Custom aperture mark (20–24px) + Averill wordmark + quiet live status. The hea
 
 ### 2. Shared window row
 
-App name, sharing state, and a user-controlled Share/Stop sharing button. Default = neutral outline; shared = ice indicator with text `Shared`; unavailable/closed = muted. Show each of Email Studio, Social Publisher, Campaign Files explicitly. Never imply arbitrary macOS window capture in this prototype.
+App name, sharing state, and a user-controlled Share/Stop sharing button. Default = neutral outline; shared = ice indicator with text `Shared`; unavailable/closed = muted. Show each of Email Studio, LinkedIn Draft, Social Publisher, Campaign Files explicitly. Never imply arbitrary macOS window capture in this prototype.
 
 ### 3. Finding
 

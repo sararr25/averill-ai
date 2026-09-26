@@ -2,7 +2,7 @@
 
 Averill is a source-grounded company agent assistant for people working across applications. The employee chooses what to share. Averill points out relevant inconsistencies after a field edit or asset selection, explains the issue, and links to the approved source. The employee decides what to change and whether to publish.
 
-This repository contains an **Electron hackathon prototype**, a local company onboarding path, its historical Aurelia Travel sample campaign, a Canva tutor and weekly learning flow, the Elseweek travel website, approved design systems, and handover documentation. Aurelia Travel is a fictional customer, not Averill's product name.
+This repository contains an **Electron hackathon prototype**, a local company onboarding path, its Elseweek sample campaign and department source pack, a Canva tutor and weekly learning flow, the Elseweek travel website, approved design systems, and handover documentation. Elseweek is a fictional customer, not Averill's product name.
 
 ## Start here
 
@@ -39,3 +39,9 @@ The supplied sample windows send **structured field state** through the app; Ave
 Never commit `.env.local` or a real API key. The app reads the local `.env.local` in the repository root, and administrators can configure encrypted keys in Setup; see [travel-desktop/README.md](travel-desktop/README.md). The root `.gitignore` excludes environment files at every depth.
 
 License: [MIT](LICENSE).
+
+## Elseweek onboarding and LinkedIn
+
+The [company pack](travel-desktop/demo-company/elseweek/README.md) provides Marketing, Operations and People documents, fictional people and explicit import/approval instructions. Setup lets administrators select the import department and source version. Department brand copies provide consistent context without claiming a company-wide authorization scope.
+
+Open **LinkedIn Draft** in Work, then Share. Load the incoming draft to review five source-backed campaign mismatches; correct copy, audience, visual and planned date/time. Save is local only. This is an organic company-post fixture with its own [approved guidance](travel-desktop/sources/linkedin-campaign.md), not a LinkedIn integration. Supplied checks remain independent of imported workspace approval.

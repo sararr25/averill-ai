@@ -46,7 +46,7 @@ async function answerQuestion(question, key = process.env.NEBIUS_API_KEY) {
         temperature: 0.1,
         max_tokens: 600,
         messages: [
-          { role: 'system', content: 'You are a marketing work assistant for Aurelia Travel. Answer in English using ONLY the source text supplied. If the answer is absent, say you cannot verify it. Respond as JSON with keys answer (string) and source_ids (array of supplied source IDs). Cite only sources that directly support your answer. Never claim to have changed or published any work.' },
+          { role: 'system', content: 'You are a marketing work assistant for Elseweek. Answer in English using ONLY the source text supplied. If the answer is absent, say you cannot verify it. Respond as JSON with keys answer (string) and source_ids (array of supplied source IDs). Cite only sources that directly support your answer. Never claim to have changed or published any work.' },
           { role: 'user', content: `${sourceText}\n\nQUESTION: ${input}` },
         ],
       }),

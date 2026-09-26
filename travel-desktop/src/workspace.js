@@ -81,6 +81,7 @@ function importFile(userData, data, sourcePath, options = {}) {
   const hash = crypto.createHash('sha256').update(content).digest('hex');
   const department = clean(options.department || active.department || 'Marketing');
   if (!data.departments.includes(department)) throw new Error('Unknown department');
+  if (active.role !== 'admin' && department !== active.department) throw new Error('Import into your own department only');
   const sourceId = id();
   const destination = path.join(fileStore(userData), `${sourceId}${extension}`);
   fs.mkdirSync(fileStore(userData), { recursive: true });

@@ -2,7 +2,7 @@
 
 ## Purpose and status
 
-This document describes the implemented hackathon prototype and the boundaries for extending it. The current app is an Electron desktop demo with three supplied Aurelia Travel work windows, a local company workspace, owner-scoped guided learning and weekly practice, and explicit one-frame OCR of a selected external Canva window. General continuous external application observation remains a future milestone.
+This document describes the implemented hackathon prototype and the boundaries for extending it. The current app is an Electron desktop demo with four supplied Elseweek work windows, a local company workspace, owner-scoped guided learning and weekly practice, and explicit one-frame OCR of a selected external Canva window. General continuous external application observation remains a future milestone.
 
 ## Requirements
 
@@ -57,7 +57,7 @@ The work window calls `work:update` even when unshared; the main process stores 
 
 ## IPC contracts
 
-The preload exposes `snapshot()`, `openWork(kind)`, `share(kind, enabled)`, `aiMode(enabled)`, `ask(question)`, `askDemo(question)`, `source(id)`, `openSource(id)`, `updateWork(kind, data)`, and snapshot/sharing listeners. It also exposes narrow workspace, Tavily, and external-window methods. `kind` is limited to `email`, `social`, or `handover`. Main-process `work:update` accepts only events from the corresponding open work window and a plain object payload. The bridge uses context isolation, disables Node integration, and enables renderer sandboxing.
+The preload exposes `snapshot()`, `openWork(kind)`, `share(kind, enabled)`, `aiMode(enabled)`, `ask(question)`, `askDemo(question)`, `source(id)`, `openSource(id)`, `updateWork(kind, data)`, and snapshot/sharing listeners. It also exposes narrow workspace, Tavily, and external-window methods. `kind` is limited to `email`, `linkedin`, `social`, or `handover`. Main-process `work:update` accepts only events from the corresponding open work window and a plain object payload. The bridge uses context isolation, disables Node integration, and enables renderer sandboxing.
 
 The snapshot contains `open`, `shared`, `aiEnabled`, `findings`, `workspace`, `learning`, service availability and the selected external window. A finding has an ID, title, explanation, suggested user action, source, and work kind. Source IDs resolve only through the fixed registry; arbitrary paths are not accepted through `agent:source` or `agent:open-source`.
 
@@ -87,7 +87,7 @@ Electron `desktopCapturer` lists windows. The user chooses a Canva-titled window
 - Structured work-window state is reliable but does not prove real desktop perception.
 - Static local sources enable transparent citations but do not handle company-wide retrieval or live document changes.
 - AI citations are checked for known IDs, not full factual entailment. Claims remain reviewable by the employee.
-- The assistant and supplied Aurelia work windows use Petrol / Coral / Ice, bundled fonts and matching outline icons. The Review pane has a focused finding and source hierarchy; operational controls are in Work.
+- The assistant and supplied Elseweek work windows use Petrol / Coral / Ice, bundled fonts and matching outline icons. The Review pane has a focused finding and source hierarchy; operational controls are in Work.
 
 ## Extension sequence
 
@@ -102,3 +102,9 @@ State lives in the `learning` field of the existing schema-1 workspace: sessions
 Week keys are Monday-based in Europe/Copenhagen. Only confirmed current-week sessions are eligible. Company evidence must remain visible, approved, hash/version-matching and outside same-title conflicts. Excluding activity or invalidating evidence blocks affected questions. A fingerprint detects changed records so explicit refresh can create an updated set. Previous answers remain in local history; only the current person/current week is exposed by the learning snapshot.
 
 Learn is offline and stores no screenshots. The official guide opens only on an employee action. It neither connects to Canva’s document API nor proves element alignment. Existing Work capture is a separate explicit one-frame OCR route. Local role switching provides demonstration isolation, not authenticated security across devices.
+
+## Elseweek department pack and organic LinkedIn — 26 September 2026
+
+`demo-company/elseweek/` is a synthetic manual-onboarding pack. Brand context is duplicated identically per department because source scope remains private/department. Admin imports accept a chosen department and version. Main-process workspace logic rejects non-admin imports to another department. Textual APPROVED does not approve an imported source. Imported company source records still drive workspace answers and learning evidence; they do not control static supplied-window findings.
+
+`linkedin` is a fourth work kind, validated by the same sender/Share boundary as email/social/handover. Its source ID `linkedin` resolves to `linkedin-campaign.md`; `linkedinAsset` resolves to `winter-linkedin-landscape.svg`. Its deterministic rules check the campaign's specific claim, editorial audience, visual, CTA and planned date/time. No Instagram disclosure/partnership rule is used for that organic fixture. Source-guidance tone needs human review beyond those checks. The visual derives from the existing supplied illustration. Local drafts now use `elseweek:v1:<kind>`; legacy `aurelia:<kind>` data is left untouched. External-window selection excludes LinkedIn Draft as another supplied window.

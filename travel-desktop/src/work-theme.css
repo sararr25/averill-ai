@@ -53,39 +53,39 @@
 @media(max-width:830px){.handover .work-shell{grid-template-columns:120px minmax(0,1fr)}.handover .work-sidebar{padding:24px 10px}.version-stage{grid-template-columns:120px minmax(50px,1fr) 120px}.brief-file{height:195px;padding:12px}.brief-file strong{font-size:47px}.version-connection div{font-size:7px}}
 @media(prefers-reduced-motion:reduce){.handover *{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 /* The supplied work tools share Averill's visual language while remaining separate apps. */
-.work-body.email,.work-body.social{background:#002129;color:#f4f5f3;font-family:'Spline Sans',sans-serif}
-.email .work-header,.social .work-header{background:#002129;border-color:#20515f;color:#f4f5f3}
-.email .work-brand strong,.social .work-brand strong{font-family:var(--ds-font-display)}
-.email .work-header .eyebrow,.social .work-header .eyebrow{color:#8acfe3}
-.email .travel-mark,.social .travel-mark{background:#153f4a;color:#f4f5f3;font-family:var(--ds-font-display)}
-.email .share-indicator,.social .share-indicator{border-color:#20515f;color:#91b2bf}
-.email .share-indicator.active,.social .share-indicator.active{background:#0c303a;border-color:#8acfe3;color:#8acfe3}
-.email .work-sidebar,.social .work-sidebar{background:#00171d;border-right:1px solid #20515f}
-.email .work-sidebar .eyebrow,.social .work-sidebar .eyebrow,.email .sidebar-label,.social .sidebar-label{color:#91b2bf;font-family:'Fragment Mono',monospace}
-.email .work-sidebar h2,.social .work-sidebar h2{font-family:var(--ds-font-display);font-weight:600}
-.email .work-sidebar p,.social .work-sidebar p,.email .sidebar-link,.social .sidebar-link{color:#bdd5df}
-.email .sidebar-rule,.social .sidebar-rule{background:#20515f}
-.email .sidebar-link.active,.social .sidebar-link.active{background:none;color:#f4f5f3;border-left:3px solid #ff705e;border-radius:0}
-.email .sidebar-bottom,.social .sidebar-bottom{color:#91b2bf}
-.email .work-content,.social .work-content{background:#002129}
-.email .content-top h1,.social .content-top h1{font-family:var(--ds-font-display);font-weight:600;color:#f4f5f3}
-.email .content-top p,.social .content-top p{color:#bdd5df}
-.email .draft-badge,.social .draft-badge{color:#ff8d7f;background:#0c303a;border:1px solid #20515f;font-family:'Fragment Mono',monospace}
-.email .work-card,.social .work-card{background:#0c303a;border:1px solid #20515f;box-shadow:none;border-radius:10px}
-.email .card-heading,.social .card-heading{border-color:#20515f}
-.email .card-heading h2,.social .card-heading h2{font-family:var(--ds-font-display);color:#f4f5f3}
-.email .card-heading p,.social .card-heading p,.email .field-hint,.social .field-hint{color:#91b2bf}
-.email .text-button,.social .text-button{color:#ff8d7f}
-.email .work-card input[type=text],.email .work-card input[type=date],.email .work-card select,.email .work-card textarea,.social .work-card input[type=text],.social .work-card input[type=date],.social .work-card select,.social .work-card textarea{background:#002129;color:#f4f5f3;border-color:#20515f;border-radius:6px}
-.email .work-card input:focus,.email .work-card textarea:focus,.email .work-card select:focus,.social .work-card input:focus,.social .work-card textarea:focus,.social .work-card select:focus{border-color:#8acfe3;box-shadow:0 0 0 2px #8acfe335}
-.email .check-row,.social .check-row{border-color:#20515f}
-.email .check-row input,.social .check-row input{accent-color:#ff705e}
-.email .primary-button,.social .primary-button{background:#ff705e;color:#002129;border-radius:6px;font-weight:700}
-.email .primary-button:hover,.social .primary-button:hover{background:#ff8d7f}
-.email .work-actions span,.social .work-actions span{color:#91b2bf}
-.social .asset-preview{background:#002129;border-color:#20515f}
-.social .asset-image{display:block;max-height:230px;max-width:100%;object-fit:contain;border:1px solid #20515f}
-.social .asset-image.vertical{height:230px}.social .asset-image.square{width:190px;height:190px}
+.work-body.email,.work-body.social,.work-body.linkedin{background:#002129;color:#f4f5f3;font-family:'Spline Sans',sans-serif}
+.email .work-header,.social .work-header,.linkedin .work-header{background:#002129;border-color:#20515f;color:#f4f5f3}
+.email .work-brand strong,.social .work-brand strong,.linkedin .work-brand strong{font-family:var(--ds-font-display)}
+.email .work-header .eyebrow,.social .work-header .eyebrow,.linkedin .work-header .eyebrow{color:#8acfe3}
+.email .travel-mark,.social .travel-mark,.linkedin .travel-mark{background:#153f4a;color:#f4f5f3;font-family:var(--ds-font-display)}
+.email .share-indicator,.social .share-indicator,.linkedin .share-indicator{border-color:#20515f;color:#91b2bf}
+.email .share-indicator.active,.social .share-indicator.active,.linkedin .share-indicator.active{background:#0c303a;border-color:#8acfe3;color:#8acfe3}
+.email .work-sidebar,.social .work-sidebar,.linkedin .work-sidebar{background:#00171d;border-right:1px solid #20515f}
+.email .work-sidebar .eyebrow,.social .work-sidebar .eyebrow,.linkedin .work-sidebar .eyebrow,.email .sidebar-label,.social .sidebar-label,.linkedin .sidebar-label{color:#91b2bf;font-family:'Fragment Mono',monospace}
+.email .work-sidebar h2,.social .work-sidebar h2,.linkedin .work-sidebar h2{font-family:var(--ds-font-display);font-weight:600}
+.email .work-sidebar p,.social .work-sidebar p,.linkedin .work-sidebar p,.email .sidebar-link,.social .sidebar-link,.linkedin .sidebar-link{color:#bdd5df}
+.email .sidebar-rule,.social .sidebar-rule,.linkedin .sidebar-rule{background:#20515f}
+.email .sidebar-link.active,.social .sidebar-link.active,.linkedin .sidebar-link.active{background:none;color:#f4f5f3;border-left:3px solid #ff705e;border-radius:0}
+.email .sidebar-bottom,.social .sidebar-bottom,.linkedin .sidebar-bottom{color:#91b2bf}
+.email .work-content,.social .work-content,.linkedin .work-content{background:#002129}
+.email .content-top h1,.social .content-top h1,.linkedin .content-top h1{font-family:var(--ds-font-display);font-weight:600;color:#f4f5f3}
+.email .content-top p,.social .content-top p,.linkedin .content-top p{color:#bdd5df}
+.email .draft-badge,.social .draft-badge,.linkedin .draft-badge{color:#ff8d7f;background:#0c303a;border:1px solid #20515f;font-family:'Fragment Mono',monospace}
+.email .work-card,.social .work-card,.linkedin .work-card{background:#0c303a;border:1px solid #20515f;box-shadow:none;border-radius:10px}
+.email .card-heading,.social .card-heading,.linkedin .card-heading{border-color:#20515f}
+.email .card-heading h2,.social .card-heading h2,.linkedin .card-heading h2{font-family:var(--ds-font-display);color:#f4f5f3}
+.email .card-heading p,.social .card-heading p,.linkedin .card-heading p,.email .field-hint,.social .field-hint,.linkedin .field-hint{color:#91b2bf}
+.email .text-button,.social .text-button,.linkedin .text-button{color:#ff8d7f}
+.email .work-card input[type=text],.email .work-card input[type=date],.email .work-card select,.email .work-card textarea,.social .work-card input[type=text],.linkedin .work-card input[type=text],.social .work-card input[type=date],.linkedin .work-card input[type=date],.social .work-card select,.linkedin .work-card select,.social .work-card textarea,.linkedin .work-card textarea{background:#002129;color:#f4f5f3;border-color:#20515f;border-radius:6px}
+.email .work-card input:focus,.email .work-card textarea:focus,.email .work-card select:focus,.social .work-card input:focus,.linkedin .work-card input:focus,.social .work-card textarea:focus,.linkedin .work-card textarea:focus,.social .work-card select:focus,.linkedin .work-card select:focus{border-color:#8acfe3;box-shadow:0 0 0 2px #8acfe335}
+.email .check-row,.social .check-row,.linkedin .check-row{border-color:#20515f}
+.email .check-row input,.social .check-row input,.linkedin .check-row input{accent-color:#ff705e}
+.email .primary-button,.social .primary-button,.linkedin .primary-button{background:#ff705e;color:#002129;border-radius:6px;font-weight:700}
+.email .primary-button:hover,.social .primary-button:hover,.linkedin .primary-button:hover{background:#ff8d7f}
+.email .work-actions span,.social .work-actions span,.linkedin .work-actions span{color:#91b2bf}
+.social .asset-preview,.linkedin .asset-preview{background:#002129;border-color:#20515f}
+.social .asset-image,.linkedin .asset-image{display:block;max-height:230px;max-width:100%;object-fit:contain;border:1px solid #20515f}
+.social .asset-image.vertical,.linkedin .asset-image.vertical{height:230px}.social .asset-image.square,.linkedin .asset-image.square{width:190px;height:190px}
 .work-sidebar .sidebar-link{display:flex;align-items:center;gap:10px}
 .work-sidebar .sidebar-link svg{width:17px;height:17px;flex:none}
 .work-body button:focus-visible{outline:2px solid #8acfe3;outline-offset:2px}
@@ -118,12 +118,12 @@
 .file-actions{border:0;padding:0;margin-bottom:24px}.handover .brief-preview{padding:6px 0}.handover .preview-status{font-family:var(--ds-font-body)}
 .other-files{margin-top:auto;border:0;padding-top:22px}.other-files h2{font:400 14px/20px var(--ds-font-body);padding-bottom:8px;border-bottom:1px solid var(--ds-divider);margin:0}
 .other-files button{justify-content:flex-start;gap:18px;padding:16px 0;min-height:70px;font-size:14px}.other-files .line-icon{width:28px;height:28px;color:var(--ds-color-verified)}.other-files button>span{flex:1}.other-files small{display:block;font-size:12px;color:var(--ds-color-text-muted);margin-top:5px}.other-files button>.line-icon:last-child{width:16px;height:16px}
-.email .work-shell,.social .work-shell{grid-template-columns:165px minmax(0,1fr)}
+.email .work-shell,.social .work-shell,.linkedin .work-shell{grid-template-columns:165px minmax(0,1fr)}
 .work-sidebar button.sidebar-link{border:0;background:transparent;text-align:left;width:100%;font:inherit;color:var(--ds-color-text-secondary);min-height:44px;display:flex;gap:8px}
 .work-sidebar button.sidebar-link.active{color:var(--ds-color-text);border-left:3px solid var(--ds-color-signal)}
 .line-icon{fill:currentColor;width:20px;height:20px;flex:none;vertical-align:middle}
 @media(max-width:830px){.handover .work-shell{grid-template-columns:130px minmax(0,1fr)}.handover .work-sidebar{padding:28px 18px}.handover .work-content{padding:28px}.version-stage{grid-template-columns:140px minmax(50px,1fr) 140px}.file-heading h1{font-size:38px}.brief-file{padding:34px 18px 20px}.version-connection div{font-size:8px;margin-left:12px}}
-@media(max-width:650px){.handover .work-shell,.email .work-shell,.social .work-shell{grid-template-columns:1fr}.handover .work-sidebar{display:none}.handover .work-content{padding:24px}.version-stage{margin-top:32px;grid-template-columns:minmax(100px,1fr) 60px minmax(100px,1fr)}.brief-file{height:220px;padding:32px 14px 16px}.brief-file strong{font-size:60px}.brief-file em{font-size:12px}.version-connection div{display:none}.file-heading h1{font-size:32px}.field-grid,.asset-chooser{grid-template-columns:1fr}.card-heading{flex-wrap:wrap}}
+@media(max-width:650px){.handover .work-shell,.email .work-shell,.social .work-shell,.linkedin .work-shell{grid-template-columns:1fr}.handover .work-sidebar{display:none}.handover .work-content{padding:24px}.version-stage{margin-top:32px;grid-template-columns:minmax(100px,1fr) 60px minmax(100px,1fr)}.brief-file{height:220px;padding:32px 14px 16px}.brief-file strong{font-size:60px}.brief-file em{font-size:12px}.version-connection div{display:none}.file-heading h1{font-size:32px}.field-grid,.asset-chooser{grid-template-columns:1fr}.card-heading{flex-wrap:wrap}}
 
 .handover .work-sidebar button.sidebar-link.active{border:0;font-weight:400}
 .handover .file-actions{display:none}
@@ -131,3 +131,6 @@
 .brief-file:before{border-radius:8px}
 
 .text-button .line-icon{width:16px;height:16px;margin-left:4px}
+
+.linkedin .work-card input[type=time]{background:var(--ds-color-window);color:var(--ds-color-text);border:1px solid var(--ds-color-border);border-radius:6px;padding:12px;width:100%;font:inherit}
+.linkedin .asset-image{display:block;max-height:230px;max-width:100%;object-fit:contain}

@@ -7,6 +7,8 @@ const sources = {
   oldBrief: { title: 'Campaign brief · v1 (superseded)', file: 'old-brief.md', section: 'Original plan' },
   legal: { title: 'Brand & legal guidance', file: 'brand-and-legal.md', section: 'Claims, email footer and partner disclosure' },
   calendar: { title: 'Content calendar', file: 'content-calendar.md', section: 'Approved publishing slots' },
+  linkedin: { title: 'Elseweek LinkedIn campaign guidance · v1', file: 'linkedin-campaign.md', section: 'Organic company post: audience, message, CTA, visual and slot' },
+  linkedinAsset: { title: 'Approved LinkedIn campaign visual', file: 'winter-linkedin-landscape.svg', section: 'Organic LinkedIn artwork', kind: 'asset' },
   emailAsset: { title: 'Approved email hero', file: 'winter-email-hero.svg', section: 'Email artwork', kind: 'asset' },
   reelAsset: { title: 'Approved vertical Reel artwork', file: 'winter-reel-vertical.svg', section: 'Partner Reel artwork', kind: 'asset' },
 };

@@ -14,7 +14,7 @@ test('email findings appear for an incoming draft and disappear after correction
 test('social findings cover asset, disclosure and date and disappear after correction', () => {
   const incoming = { caption: 'Winter in Vienna', asset: 'winter-square-old.svg', date: '2026-10-21', partnershipLabel: false };
   assert.deepEqual(inspect('social', incoming).map((item) => item.id), ['wrong-format', 'missing-disclosure', 'calendar-conflict']);
-  const fixed = { caption: 'Winter in Vienna. Paid partnership with Aurelia Travel', asset: 'winter-reel-vertical.svg', date: '2026-10-17', partnershipLabel: true };
+  const fixed = { caption: 'Winter in Vienna. Paid partnership with Elseweek', asset: 'winter-reel-vertical.svg', date: '2026-10-17', partnershipLabel: true };
   assert.deepEqual(inspect('social', fixed), []);
 });
 
@@ -44,4 +44,23 @@ test('model output must cite a connected source', () => {
   const parsed = parseModelAnswer('{"answer":"Use the current brief.","source_ids":["brief","missing"]}');
   assert.equal(parsed.sources.length, 1);
   assert.equal(parsed.sources[0].id, 'brief');
+});
+
+
+test('LinkedIn uses its own organic campaign rules and all corrections clear findings', () => {
+  const incoming = { caption: 'Lowest prices guaranteed. Book now!', audience: 'Everyone in Europe', asset: 'winter-square-old.svg', date: '2026-10-17', time: '18:00' };
+  const issues = inspect('linkedin', incoming);
+  assert.deepEqual(issues.map(item => item.id), ['linkedin-claim', 'linkedin-audience', 'linkedin-asset', 'linkedin-cta', 'linkedin-slot']);
+  for (const item of issues) {
+    assert.equal(item.source.id, 'linkedin');
+    assert.ok(fs.existsSync(item.source.path));
+  }
+  const fixed = { caption: 'Discover curated winter city breaks. Explore the winter collection.', audience: 'Denmark-based professionals', asset: 'winter-linkedin-landscape.svg', date: '2026-10-16', time: '09:00', partnershipLabel: false };
+  assert.deepEqual(inspect('linkedin', fixed), []);
+  assert.equal(inspect('linkedin', { ...fixed, time: '18:00' })[0].id, 'linkedin-slot');
+  assert.equal(inspect('linkedin', { ...fixed, asset: 'winter-reel-vertical.svg' })[0].id, 'linkedin-asset');
+  const response = answer('Which LinkedIn asset and date are approved?');
+  assert.match(response.text, /16 October 2026 at 09:00/);
+  assert.match(response.text, /winter-linkedin-landscape/);
+  assert.deepEqual(response.sources.map(item => item.id), ['linkedin', 'linkedinAsset']);
 });

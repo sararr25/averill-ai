@@ -11,7 +11,7 @@ const learning = require('./src/learning');
 const { answerWorkspace, localWorkspaceAnswer } = require('./src/workspace-answer');
 const { searchPublicWeb } = require('./src/web-search');
 
-const workKinds = ['email', 'social', 'handover'];
+const workKinds = ['email', 'linkedin', 'social', 'handover'];
 const workWindows = new Map();
 const workState = new Map();
 const shared = new Set();
@@ -86,11 +86,11 @@ function openWork(kind) {
   if (!workKinds.includes(kind)) return;
   const existing = workWindows.get(kind);
   if (existing && !existing.isDestroyed()) { existing.focus(); return; }
-  const titles = { email: 'Email Studio', social: 'Social Publisher', handover: 'Campaign Files' };
+  const titles = { email: 'Email Studio', linkedin: 'LinkedIn Draft', social: 'Social Publisher', handover: 'Campaign Files' };
   const area = screen.getPrimaryDisplay().workArea;
   const width = Math.max(760, Math.min(980, area.width - 540));
   const height = Math.min(850, area.height - 24);
-  const window = createWindow('work.html', { x: area.x + 12, y: area.y + 12, width, height, minWidth: 760, minHeight: 620, title: `${titles[kind]} · Aurelia Travel` }, { kind });
+  const window = createWindow('work.html', { x: area.x + 12, y: area.y + 12, width, height, minWidth: 760, minHeight: 620, title: `${titles[kind]} · Elseweek` }, { kind });
   workWindows.set(kind, window);
   window.on('closed', () => { workWindows.delete(kind); workState.delete(kind); shared.delete(kind); publish(); });
   publish();
@@ -212,7 +212,7 @@ app.whenReady().then(async () => {
     fromAgent(event);
     const permission = process.platform === 'darwin' ? systemPreferences.getMediaAccessStatus('screen') : 'granted';
     const sources = await desktopCapturer.getSources({ types: ['window'], thumbnailSize: { width: 0, height: 0 } });
-    return { permission, windows: sources.filter((source) => source.name && !/Averill|Email Studio|Social Publisher|Campaign Files/.test(source.name)).map((source) => ({ id: source.id, name: source.name })) };
+    return { permission, windows: sources.filter((source) => source.name && !/Averill|Email Studio|LinkedIn Draft|Social Publisher|Campaign Files/.test(source.name)).map((source) => ({ id: source.id, name: source.name })) };
   });
   ipcMain.handle('agent:external-share', (event, id, name) => {
     fromAgent(event);
