@@ -19,7 +19,7 @@ function onboardingButton(parent,label,callback) {
 function showAccountReceipt(accounts) {
  onboardingReceipt=accounts;
  const host=el('account-receipt');host.replaceChildren();
- host.append(node('h3','Team account access'),node('p','Save these temporary passwords now. They are shown once; only password hashes are stored. Share them yourself. No invitation emails have been sent.'));
+ host.append(node('h3','Team account access'),node('p','An account and password document is saved on this Mac for each login. Reopen it from Account access → Open login documents. No invitation emails have been sent.'));
  for(const account of accounts) {
   const row=node('div',undefined,'account-credential');row.append(node('strong',account.name||account.profile),node('code',account.email),node('code',account.password));host.append(row);
  }
@@ -109,6 +109,7 @@ function renderAccountAccess(panel){
  const active=data.people?.find(p=>p.id===data.activePersonId);
  if(active?.role!=='admin')return;
  const host=node('section',undefined,'account-management');host.append(node('h3','Account access'));
+ onboardingButton(host,'Open login documents',async()=>{await window.desktop.openAccountDocuments();});
  if(!current.auth?.enabled){
   host.append(node('p','Create the owner login to replace the legacy role switcher. Existing people, documents and learning are preserved.'));
   const form=node('form',undefined,'workspace-form');const email=onboardingField(form,'Owner email','','email');email.required=true;const password=onboardingField(form,'Owner password','','password');password.required=true;password.minLength=10;password.autocomplete='new-password';

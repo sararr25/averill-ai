@@ -8,6 +8,7 @@ const { answerQuestion } = require('./src/assistant');
 const { sourceFor } = require('./src/campaign');
 const workspace = require('./src/workspace');
 const accounts = require('./src/accounts');
+const accountDocuments = require('./src/account-documents');
 const onboarding = require('./src/onboarding');
 const learning = require('./src/learning');
 const { answerWorkspace, localWorkspaceAnswer } = require('./src/workspace-answer');
@@ -155,6 +156,7 @@ app.whenReady().then(async () => {
     const owner = workspace.person(companyWorkspace);
     Object.assign(owner, { email: accounts.email(email), profile: 'owner', jobTitle: accounts.profiles.owner.label, credential: hashed });
     companyWorkspace.authEnabled = true; authenticatedPersonId = owner.id;
+    accountDocuments.save(app.getPath('userData'), companyWorkspace, [{ email: owner.email, password }]);
     return persistWorkspace();
   });
   ipcMain.handle('account:login', async (event, email, password) => {
@@ -178,6 +180,7 @@ app.whenReady().then(async () => {
     fromAgent(event);
     if (companyWorkspace.authEnabled || workspace.person(companyWorkspace)?.role !== 'admin') throw new Error('Only the current legacy administrator can enable accounts.');
     await accounts.configure(companyWorkspace, companyWorkspace.activePersonId, email, password, 'owner');
+    accountDocuments.save(app.getPath('userData'), companyWorkspace, [{ email: accounts.email(email), password }]);
     authenticatedPersonId = companyWorkspace.activePersonId; clearSessionWork(); return persistWorkspace();
   });
   ipcMain.handle('account:create', async (event, personId, email, profile) => {
@@ -189,7 +192,17 @@ app.whenReady().then(async () => {
     await accounts.configure(next, personId, email, password, profile);
     fromAgent(event); if (companyWorkspace.activePersonId !== actor) throw new Error('Account changed. Retry as the owner.');
     companyWorkspace = next; persistWorkspace();
+    accountDocuments.save(app.getPath('userData'), companyWorkspace, [{ email: accounts.email(email), password }]);
     return { snapshot: snapshot(), account: { email: accounts.email(email), profile, password } };
+  });
+  ipcMain.handle('account:documents', async (event) => {
+    fromAgent(event);
+    if (workspace.person(companyWorkspace)?.role !== 'admin') throw new Error('Administrator access required.');
+    const folder = accountDocuments.directory(app.getPath('userData'));
+    fs.mkdirSync(folder, { recursive: true, mode: 0o700 });
+    const error = await shell.openPath(folder);
+    if (error) throw new Error(error);
+    return true;
   });
   ipcMain.handle('onboarding:upload', async (event) => {
     fromAgent(event);
@@ -219,6 +232,7 @@ app.whenReady().then(async () => {
     onboardingBusy = true;
     try {
       const result = await onboarding.apply(app.getPath('userData'), companyWorkspace, review);
+      accountDocuments.save(app.getPath('userData'), companyWorkspace, result.receipt);
       publish(); return { ...result, snapshot: snapshot() };
     } finally { onboardingBusy = false; }
   });

@@ -5,6 +5,7 @@ contextBridge.exposeInMainWorld('desktop', {
   logout: () => ipcRenderer.invoke('account:logout'),
   enableAccounts: (email, password) => ipcRenderer.invoke('account:enable', email, password),
   createAccount: (id, email, profile) => ipcRenderer.invoke('account:create', id, email, profile),
+  openAccountDocuments: () => ipcRenderer.invoke('account:documents'),
   uploadOnboarding: () => ipcRenderer.invoke('onboarding:upload'),
   analyzeOnboarding: (consent) => ipcRenderer.invoke('onboarding:analyze', consent),
   applyOnboarding: (review) => ipcRenderer.invoke('onboarding:apply', review),

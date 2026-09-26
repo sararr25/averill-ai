@@ -47,7 +47,7 @@ Review the document summaries. Personnel records stay private to the owner. Bran
 
 After reading the knowledge files, tick the collective approval checkbox, or approve only chosen files individually. Approval is your explicit decision, not something extracted from an APPROVED label in a document. Archived files are never approved by this batch flow.
 
-Choose **Confirm company onboarding**. Three separate accounts are created together. Save the temporary passwords shown in **Team account access** immediately, using Copy account access or your own password manager. They are shown once and are not recoverable from the saved hashes. No invitation email is sent. The app has no password-reset flow yet; keep these credentials for the demo.
+Choose **Confirm company onboarding**. Three separate accounts are created together. Each login, including the owner, receives a separate Markdown document containing its email and password. Choose **Account access → Open login documents** to find them again after a restart. They are saved locally under `~/Library/Application Support/averill-ai-desktop/Averill-login-documents/`, outside the repository. You can copy these documents for your demo. No invitation email is sent. Existing accounts created before this feature have only hashes; their original passwords cannot be reconstructed. The app has no password-reset flow yet.
 
 ## 5. Demonstrate the four people
 

@@ -101,3 +101,7 @@ The owner first requested preparation steps 2 and 3, then a stop. Those were del
 - [LEARNING_IMPLEMENTATION_PLAN.md](LEARNING_IMPLEMENTATION_PLAN.md): plan and delivered boundary.
 
 Remote: `https://github.com/sararr25/averill-ai.git`, branch `main`. Check current Git status/remote before continuing; this file deliberately does not embed its own commit hash. `ARCHITECTURE.md` is the canonical system design; the Word copy is a convenience export.
+
+## Local login documents — 26 September 2026
+
+User explicitly requested retrievable demo passwords. New owner setup, legacy owner activation, manual employee accounts and bulk onboarding now save one Markdown login document per account in userData/Averill-login-documents. The owner can reopen the folder from Account access. This folder stays outside Git, company sources, snapshots and Nebius input. Existing pre-feature account hashes cannot recover passwords. Normal user workspace inspected: Aurelia Demo, one legacy administrator, no credential-bearing accounts. No existing password was reset.
