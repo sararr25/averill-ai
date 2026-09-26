@@ -3,20 +3,13 @@ const kinds = [
   { id: 'social', title: 'Social Publisher', detail: 'Partner Reel and schedule', icon: 'image' },
   { id: 'handover', title: 'Campaign Files', detail: 'Brief versions and handover', icon: 'folder' },
 ];
-const iconPaths = {
-  mail: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 7 8 6 8-6"/>',
-  image: '<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8" cy="8" r="1.5"/><path d="m4 18 5-5 3 3 3-4 5 6"/>',
-  folder: '<path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/>',
-  document: '<path d="M6 2h8l4 4v16H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Z"/><path d="M14 2v5h4M8 12h7M8 16h7"/>',
-  arrow: '<path d="M5 19 19 5M9 5h10v10"/>',
-};
-function icon(name) { return `<svg class="line-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${iconPaths[name]}</svg>`; }
 let current = { open: [], shared: [], findings: [] };
 let activeSourceId = null;
 
 const el = (id) => document.getElementById(id);
 
 function showTab(name) {
+  document.body.dataset.area = name;
   for (const button of document.querySelectorAll('[data-tab-button]')) {
     const active = button.dataset.tabButton === name;
     button.classList.toggle('active', active);
@@ -97,13 +90,30 @@ function render() {
 function renderHero() {
   const item = current.findings?.[0];
   el('hero-label').textContent = item ? 'FINDING' : 'READY';
-  el('hero-title').textContent = item ? item.title : 'Ready when you are.';
-  el('hero-body').textContent = item ? item.body : 'Share a work window or review a marketing draft to see source-backed guidance here.';
+  el('hero-title').textContent = item?.kind === 'handover' ? 'This brief is out of date.' : item ? item.title : 'Ready when you are.';
+  el('hero-body').textContent = item?.kind === 'handover' ? 'You’re looking at an older version of this brief. A newer, approved version is available.' : item ? item.body : 'Share a work window or review a marketing draft to see source-backed guidance here.';
   const selected = el('hero-selected'); selected.replaceChildren();
-  if (item?.kind === 'handover') selected.append(node('div', 'SELECTED FILE', 'eyebrow'), node('div', 'Winter Escapes 2027 / brief v1', 'selected-file'), node('small', '12 Sep 2026 · Superseded'));
+  if (item?.kind === 'handover') {
+    const row = node('div', undefined, 'source-detail selected-detail');
+    const mark = node('span', undefined, 'source-file-icon'); mark.innerHTML = icon('file');
+    const text = node('div'); text.append(node('strong', 'Winter Escapes 2027 / brief v1'), node('small', '12 Sep 2026 · Superseded'));
+    row.append(mark, text); selected.append(node('div', 'SELECTED FILE', 'eyebrow'), row);
+  }
   const source = el('hero-source'); source.replaceChildren();
   if (item?.source) {
-    source.append(node('div', 'CURRENT SOURCE', 'eyebrow'), sourceButton(item.source));
+    source.append(node('div', 'CURRENT SOURCE', 'eyebrow'));
+    const row = node('div', undefined, 'source-detail');
+    const mark = node('span', undefined, 'source-file-icon'); mark.innerHTML = icon('file');
+    const text = node('div');
+    if (item.kind === 'handover') {
+      text.append(node('strong', 'brief v2 · approved 22 Sep 2026'), node('small', 'This is the latest approved brief for production.'));
+    } else text.append(node('strong', item.source.title), node('small', item.source.section));
+    row.append(mark, text); source.append(row);
+    const open = node('button', undefined, 'approved-action'); open.type = 'button';
+    open.append(node('span', item.kind === 'handover' ? 'Open approved brief' : 'Open current source'));
+    const arrow = node('span'); arrow.innerHTML = icon('arrow-right'); open.append(arrow);
+    open.addEventListener('click', () => item.source.kind === 'asset' ? window.desktop.openSource(item.source.id) : showSource(item.source.id));
+    source.append(open);
   } else {
     source.append(node('p', current.shared?.length ? 'No issues found in the shared work right now.' : 'No work window is shared. Open Work to choose a window, then select Share.'));
   }
@@ -248,14 +258,25 @@ function addMessage(text, role, sources = []) {
   document.querySelector('.agent-main').scrollTop = document.querySelector('.agent-main').scrollHeight;
 }
 
+let asking = false;
+function updateSend() { el('ask-form').querySelector('[type=submit]').disabled = asking || !el('question').value.trim(); }
+el('question').addEventListener('input', updateSend);
+updateSend();
 el('ask-form').addEventListener('submit', async (event) => {
   event.preventDefault();
   const question = el('question').value.trim();
-  if (!question) return;
-  addMessage(question, 'user');
-  el('question').value = '';
-  const response = current.shared?.length ? await window.desktop.askDemo(question) : await window.desktop.ask(question);
-  addMessage(response.text, 'assistant', response.sources);
+  if (!question || asking) return;
+  asking = true; updateSend();
+  addMessage(question, 'user'); el('question').value = '';
+  el('answer-status').textContent = 'Checking approved sources…';
+  try {
+    const response = current.shared?.length ? await window.desktop.askDemo(question) : await window.desktop.ask(question);
+    addMessage(response.text, 'assistant', response.sources);
+    el('answer-status').textContent = '';
+  } catch (error) {
+    el('question').value = question;
+    el('answer-status').textContent = 'Could not answer. Your question is kept here; try again.';
+  } finally { asking = false; updateSend(); }
 });
 el('web-form').addEventListener('submit', async (event) => {
   event.preventDefault();
@@ -319,3 +340,11 @@ el('ai-toggle').addEventListener('click', async () => {
 el('open-source').addEventListener('click', () => { if (activeSourceId) window.desktop.openSource(activeSourceId); });
 window.desktop.onSnapshot((value) => { current = value; render(); });
 window.desktop.snapshot().then((value) => { current = value; render(); showTab(value.workspace?.configured ? 'review' : 'setup'); });
+
+for (const target of document.querySelectorAll('[data-icon]')) target.innerHTML = icon(target.dataset.icon);
+el('ask-form').querySelector('.composer-attach').innerHTML = icon('paperclip');
+el('ask-form').querySelector('.composer-attach').addEventListener('click', () => {
+  const source = current.findings?.[0]?.source;
+  if (source) source.kind === 'asset' ? window.desktop.openSource(source.id) : showSource(source.id);
+  else showTab('work');
+});

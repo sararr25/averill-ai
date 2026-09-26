@@ -66,7 +66,7 @@ function publish() {
 function createWindow(file, options, query) {
   const window = new BrowserWindow({
     ...options,
-    backgroundColor: '#08282e',
+    backgroundColor: '#002129',
     titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'default',
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),

@@ -1,6 +1,6 @@
 # Averill handover
 
-Updated 24 September 2026. Start here when continuing the desktop product demo. Read [PROJECT.md](../PROJECT.md) for product decisions, [ARCHITECTURE.md](../ARCHITECTURE.md) for implementation boundaries, and the [design system](../travel-desktop/design-system/DESIGN_SYSTEM.md) before changing the UI.
+Updated 26 September 2026. Start here when continuing the desktop product demo. Read [PROJECT.md](../PROJECT.md) for product decisions, [ARCHITECTURE.md](../ARCHITECTURE.md) for implementation boundaries, and the [design system](../travel-desktop/design-system/DESIGN_SYSTEM.md) before changing the UI.
 
 ## Product and current demo
 
@@ -44,7 +44,7 @@ Optional `NEBIUS_API_KEY`, `NEBIUS_MODEL`, and `TAVILY_API_KEY` are listed in [`
 3. Obtain specific approval for the synthetic company-source payload before a live Nebius test. Keep source-backed citations and the local fallback visible.
 4. Add genuine authentication and synchronization before describing the role switcher as a multi-employee deployment. Define tenant isolation, revoke/delete behavior, and retention before using real company data.
 5. Expand conflict detection and independently check model claims against cited passages. Current conflicts detect different approved files with the same department and title; priority does not settle a contradiction.
-6. Compare the running UI with the approved image with the owner. The current local outline SVGs are visually consistent but are not the specified Phosphor asset set, and the mockup is a visual direction rather than proof of pixel parity.
+6. Review the updated native UI with the owner. The 26 September reference pass uses locally bundled Phosphor Light icons, cooler reference-derived colors, Spline Sans display typography, folded brief cards, and a six-blade custom aperture. Source/action/composer visibility was checked in the native 520 × 850 assistant and 930 × 850 Campaign Files windows. Exact generated-image font metadata and pixel parity are unavailable; the independent-window architecture remains.
 
 ## Repository map
 
@@ -58,3 +58,9 @@ Optional `NEBIUS_API_KEY`, `NEBIUS_MODEL`, and `TAVILY_API_KEY` are listed in [`
 - `travel-desktop/design-system/`: approved reference, tokens, and implementation guidance.
 
 Repository remote: `https://github.com/sararr25/averill-ai.git`, branch `main`. Check `git status` and the latest remote commit before starting new work; this document deliberately does not freeze a commit hash.
+
+## UI and UX reference pass — 26 September 2026
+
+Native packaged checks: Campaign Files v1 and v2 selection expose pressed state; Archived selects v1; explicit Share produces the out-of-date finding; Open approved brief displays actual v2 content; Escape closes the source dialog; the local version question returns v1/v2 citations; Stop sharing clears the finding. The question composer no longer overlays the source action, rejects empty submissions, exposes waiting/error feedback, and preserves a failed question. The attachment-shaped control opens current evidence rather than suggesting an unsupported upload. All eight existing tests pass. Rebuilt the unsigned macOS arm64 app and ZIP.
+
+Icon assets and MIT license are in `travel-desktop/assets/icons/`; the shared renderer is `src/icons.js`. The image determines visual treatment; file labels describe real fixture assets rather than invented folders or counts. No external AI/OCR/service request was used for this UI check. Other widths, actual macOS Canva capture and company-source AI retain the verification boundaries above.

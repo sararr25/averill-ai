@@ -2,7 +2,7 @@
 
 **Status:** approved visual direction and design specification for Averill. The Review pane follows the reference hierarchy; setup, work controls, and web research live in separate tabs. The supplied work windows use the same palette and locally bundled fonts.
 
-**Reference image:** [reference-petrol-coral-ice.png](reference-petrol-coral-ice.png). The palette below is the implementation source of truth, not the image's approximate pixels.
+**Reference image:** [reference-petrol-coral-ice.png](reference-petrol-coral-ice.png). The supplied image is the visual target. The shared tokens were retuned on 26 September 2026 to its deeper petrol, cooler ice and lighter text. All work tools use these tokens; the reference is not used as a flattened interactive screen.
 
 ## Product boundary
 
@@ -16,30 +16,30 @@ This system belongs to the independent desktop assistant. Aurelia Travel is the 
 
 | Role | Token | Hex | Use |
 |---|---|---:|---|
-| Canvas | `--ds-color-canvas` | `#071E25` | Desktop surround and deepest layer |
-| Window | `--ds-color-window` | `#08282E` | Agent window |
-| Raised surface | `--ds-color-panel` | `#0D353D` | Input and selective grouping |
-| Hover surface | `--ds-color-panel-hover` | `#174852` | Interactive row hover |
-| Primary text | `--ds-color-text` | `#F5F1EA` | Headings, finding, values |
-| Secondary text | `--ds-color-text-secondary` | `#AEC4CA` | Explanation, timestamps |
-| Muted text | `--ds-color-text-muted` | `#92AEB6` | Labels and placeholders |
+| Canvas | `--ds-color-canvas` | `#00171D` | Desktop surround and deepest layer |
+| Window | `--ds-color-window` | `#002129` | Agent window |
+| Raised surface | `--ds-color-panel` | `#0C303A` | Input and selective grouping |
+| Hover surface | `--ds-color-panel-hover` | `#153F4A` | Interactive row hover |
+| Primary text | `--ds-color-text` | `#F4F5F3` | Headings, finding, values |
+| Secondary text | `--ds-color-text-secondary` | `#BDD5DF` | Explanation, timestamps |
+| Muted text | `--ds-color-text-muted` | `#91B2BF` | Labels and placeholders |
 | Coral signal | `--ds-color-signal` | `#FF705E` | Finding marker, unresolved emphasis, primary text action |
 | Coral hover | `--ds-color-signal-hover` | `#FF8D7F` | Hover on coral text action |
-| Ice verified | `--ds-color-verified` | `#A8DBDE` | Approved version, source icon, citation state |
-| Ice soft | `--ds-color-verified-soft` | `#C8EAEB` | Source link and quiet selected state |
-| Hairline | `--ds-color-border` | `#31545C` | Separators and input outline |
+| Ice verified | `--ds-color-verified` | `#8ACFE3` | Approved version, source icon, citation state |
+| Ice soft | `--ds-color-verified-soft` | `#C5E6EF` | Source link and quiet selected state |
+| Hairline | `--ds-color-border` | `#20515F` | Separators and input outline |
 
 Coral and ice encode **different meanings**; never use them interchangeably as decoration. Error text keeps a verbal label, because color alone cannot explain a finding. Avoid using coral as a full window background or covering long text in ice.
 
-Calculated contrast on the window surface: ivory 13.78:1, secondary slate 8.53:1, coral 5.71:1, ice 10.24:1. These cover normal text in the core palette; still verify rendered weights, smaller labels, disabled states, and focus in Electron.
+The window, labels, source metadata, coral actions and ice focus states use the shared reference-derived palette. These cover normal text in the core palette; still verify rendered weights, smaller labels, disabled states, and focus in Electron.
 
 ### Typography
 
 | Job | Family | Treatment |
 |---|---|---|
-| Display and finding title | **Geologica** variable | 600–650 weight; slightly tight tracking; compact without looking like a terminal |
+| Display and finding title | **Spline Sans** | 600 weight; slightly tight tracking; compact without looking like a terminal |
 | Product UI and reading | **Spline Sans** | 400–600; open counters, readable at 13–16px |
-| Version IDs and metadata | **Fragment Mono** | 400; only short labels, dates, index numbers, and technical metadata |
+| Short technical metadata | **Fragment Mono** | 400; only short labels, dates, index numbers, and technical metadata |
 
 Use font files hosted with the app for offline desktop reliability. The three families are available from their upstream projects under OFL; include the license files when bundled. Do not replace them with Inter, Arial, Roboto, or Helvetica. Fallbacks in CSS exist only for failed font loading, not as a design choice.
 
@@ -53,7 +53,7 @@ Use font files hosted with the app for offline desktop reliability. The three fa
 | Label | 11 / 16 | 600, +0.14em | `FINDING`, `CURRENT SOURCE`, `SHARED WINDOWS` |
 | Meta | 11 / 16 | 400 | Version, date, count; Fragment Mono |
 
-The existing desktop window is narrow. Long finding titles wrap naturally; no 32px display text inside a 400–480px window. Do not use all caps for sentences.
+The desktop window is narrow. Finding titles use 28px at reduced width and scale up to 36px; long titles wrap naturally. Do not use all caps for sentences.
 
 ### Geometry and layout
 
@@ -81,7 +81,7 @@ Order: coral marker and `FINDING` label → plain-language title → observed va
 
 ### 4. Version comparison
 
-Two labeled values, `SUPERSEDED` and `APPROVED`, connected by a thin coral path/arrow. Old version stays muted; approved version uses ice. This large comparison belongs in Campaign Files or an expanded finding, not in every small alert. The source remains a separate cited object.
+Two labeled values, `SUPERSEDED` and `APPROVED`, connected by a thin coral path/arrow. Old version stays muted; the approved document uses coral as in the supplied image. This large comparison belongs in Campaign Files or an expanded finding, not in every small alert. The source remains a separate cited object.
 
 ### 5. Source citation / viewer
 
@@ -103,7 +103,7 @@ No shared windows: explain how to open and share a supplied work window. No find
 
 Use **Phosphor Light** (or regular at small sizes), 1.5px-equivalent stroke, rounded joins, 16px inline and 20px for actions. Candidate glyphs: document, folder, magnifier, arrow up-right, warning circle, check circle, eye, monitor, link, close. The product aperture is custom SVG and must not be substituted with a library icon. Keep icons monochrome using `currentColor`; coral only for attention and ice only for sources/verified states. Avoid thick Lucide, filled Material, emoji, and arbitrary icon mixes.
 
-The current UI uses one set of local 1.5px outline SVGs for mail, image, folder, document, arrow and attachment. Phosphor is the intended production icon family; its exact asset set still needs licensing and visual review before substitution. No emoji or font-symbol stand-ins are used for these controls.
+The UI bundles Phosphor Light SVGs retrieved using Better Icons in `assets/icons/`, with the upstream MIT license. `src/icons.js` exposes one monochrome icon renderer for both agent and work screens. The custom aperture uses six blades and a peach opening. No icon network request occurs at runtime.
 
 ## Motion and accessibility
 
@@ -130,3 +130,9 @@ The current UI is **plain Electron HTML/CSS/JavaScript**, so React AI Elements i
 - Selected colorway: [reference-petrol-coral-ice.png](reference-petrol-coral-ice.png) (concept art, not production UI).
 - Font projects: https://github.com/googlefonts/geologica · https://github.com/SorkinType/SplineSans · https://github.com/weiweihuanghuang/fragment-mono
 - AI Elements: https://elements.ai-sdk.dev/ and https://elements.ai-sdk.dev/components/sources
+
+## Reference alignment verification — 26 September 2026
+
+Compared the native packaged Review and Campaign Files windows with the supplied image. Updated petrol/ice/text values, display typography, six-blade aperture, source hierarchy, folded document silhouettes, version arrow, navigation, file rows and question composer. Removed the composer overlap over the source action. Campaign navigation opens real sources; Archived selects the intentional v1 fixture. The attachment-shaped composer action opens the current source or Work. Empty submissions are disabled and answer failure preserves the question.
+
+Verified natively: v1 selection, explicit Share, finding with v2 source, source dialog and Escape, local version question with both citations, and Stop sharing clearing findings. Eight existing tests pass. The generated image provides no original font metadata; locally bundled Spline Sans is the chosen visual reconstruction. Averill and its supplied work tools remain independent native windows. The rocky surround in the reference is desktop scenery, not interactive application content. Pixel-for-pixel equality to generated concept art is not claimed.

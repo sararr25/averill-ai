@@ -1,20 +1,20 @@
 /* Averill — Petrol / Coral / Ice design tokens imported by the assistant window. */
 :root {
   /* 1. Primitives */
-  --ds-petrol-950: #071e25;
-  --ds-petrol-900: #08282e;
-  --ds-petrol-800: #0d353d;
-  --ds-petrol-700: #174852;
+  --ds-petrol-950: #00171d;
+  --ds-petrol-900: #002129;
+  --ds-petrol-800: #0c303a;
+  --ds-petrol-700: #153f4a;
   --ds-coral-500: #ff705e;
   --ds-coral-400: #ff8d7f;
-  --ds-ice-300: #a8dbde;
-  --ds-ice-200: #c8eaeb;
-  --ds-ivory-100: #f5f1ea;
-  --ds-slate-300: #aec4ca;
-  --ds-slate-400: #92aeb6;
-  --ds-outline: #31545c;
+  --ds-ice-300: #8acfe3;
+  --ds-ice-200: #c5e6ef;
+  --ds-ivory-100: #f4f5f3;
+  --ds-slate-300: #bdd5df;
+  --ds-slate-400: #91b2bf;
+  --ds-outline: #20515f;
 
-  --ds-font-display: 'Geologica', sans-serif;
+  --ds-font-display: 'Spline Sans', sans-serif;
   --ds-font-body: 'Spline Sans', sans-serif;
   --ds-font-mono: 'Fragment Mono', monospace;
 

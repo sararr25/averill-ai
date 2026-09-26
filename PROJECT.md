@@ -1,6 +1,6 @@
 # Averill project
 
-Updated 24 September 2026. This is the canonical product brief; [docs/HANDOVER.md](docs/HANDOVER.md) is the current execution handover for the public `averill-ai` repository.
+Updated 26 September 2026. This is the canonical product brief; [docs/HANDOVER.md](docs/HANDOVER.md) is the current execution handover for the public `averill-ai` repository.
 
 ## What Averill is
 
@@ -55,7 +55,7 @@ No continuous arbitrary macOS window capture, external app control, background o
 | Human-owned edits and publishing | Averill advises; the employee changes work and makes final decisions. |
 | Deterministic demo checks with optional Nebius answers | The supplied scenarios remain reliable offline, while AI answers are a controlled opt-in. |
 | Petrol / Coral / Ice design direction | Petrol keeps the workspace calm; coral marks attention; ice marks verified evidence. See the design system for exact tokens. |
-| Geologica, Spline Sans, Fragment Mono | The assistant loads local font files from the three `@fontsource` packages, which include their licenses. |
+| Spline Sans display/body; Fragment Mono metadata | The assistant loads local font files from the three `@fontsource` packages, which include their licenses. |
 | Keep old brief v1 and old square creative | They are intentional fixtures that make version and asset checks demonstrable. |
 
 ## Next work
@@ -75,3 +75,5 @@ No continuous arbitrary macOS window capture, external app control, background o
 - `travel-desktop/src/work.js`: synthetic workspaces and field update timing.
 - `travel-desktop/design-system/`: visual specification, CSS tokens, reference and preview.
 - `ARCHITECTURE.md`: data flow, boundaries, API contracts, and operational notes.
+
+The 26 September UI pass prioritizes the supplied image: deeper petrol, cooler ice, Spline Sans display reconstruction, genuine Phosphor Light assets and clearer selected/current source hierarchy. Native source viewing, local campaign answers and Stop sharing were checked after rebuilding the app. See the design-system verification section for exact parity limits.
