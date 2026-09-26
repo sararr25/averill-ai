@@ -1,6 +1,13 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('desktop', {
+  login: (email, password) => ipcRenderer.invoke('account:login', email, password),
+  logout: () => ipcRenderer.invoke('account:logout'),
+  enableAccounts: (email, password) => ipcRenderer.invoke('account:enable', email, password),
+  createAccount: (id, email, profile) => ipcRenderer.invoke('account:create', id, email, profile),
+  uploadOnboarding: () => ipcRenderer.invoke('onboarding:upload'),
+  analyzeOnboarding: (consent) => ipcRenderer.invoke('onboarding:analyze', consent),
+  applyOnboarding: (review) => ipcRenderer.invoke('onboarding:apply', review),
   learningAction: (action, payload) => ipcRenderer.invoke('learning:action', action, payload),
   snapshot: () => ipcRenderer.invoke('agent:snapshot'),
   openWork: (kind) => ipcRenderer.invoke('agent:open-work', kind),
@@ -13,7 +20,7 @@ contextBridge.exposeInMainWorld('desktop', {
   updateWork: (kind, data) => ipcRenderer.send('work:update', kind, data),
   onSnapshot: (callback) => { ipcRenderer.on('agent:snapshot', (_, value) => callback(value)); },
   onSharing: (callback) => { ipcRenderer.on('work:sharing', (_, value) => callback(value)); },
-  createWorkspace: (company, adminName) => ipcRenderer.invoke('workspace:create', company, adminName),
+  createWorkspace: (company, adminName, email, password) => ipcRenderer.invoke('workspace:create', company, adminName, email, password),
   addPerson: (name, role, department) => ipcRenderer.invoke('workspace:add-person', name, role, department),
   switchPerson: (id) => ipcRenderer.invoke('workspace:switch-person', id),
   importSources: (options) => ipcRenderer.invoke('workspace:import', options),

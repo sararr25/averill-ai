@@ -4,7 +4,7 @@ Decision record, 23 September 2026; implementation status updated 24 September 2
 
 ## Buyer and employee journey
 
-1. An administrator creates a local company workspace and adds departments and people. The hackathon demonstrates role switching on one computer; it does not claim network synchronization.
+1. An administrator creates a local company workspace and adds departments and people. The hackathon now demonstrates separate local email/password accounts on one computer; it does not claim network synchronization.
 2. The administrator imports a selected folder or files. Each imported file records its original path, checksum, owner, department, status, version, and approval time. Import does not silently make a document authoritative.
 3. A department lead reviews proposed sources, assigns source priority, approves or rejects them, and can supersede a version. An administrator can do the same across departments.
 4. An employee can add personal context, propose it for department sharing, and see which material is private, pending, approved, or superseded. Only approved department sources can justify a correction to shared work.
@@ -29,7 +29,7 @@ The intended demo is complete only when these paths survive app restart, role ac
 
 | Area | Current state | Remaining check or gap |
 | --- | --- | --- |
-| Local onboarding and people | Workspace, admin, lead and employee role switching persist on one Mac | No real sign-in, tenant isolation or synchronization |
+| Local onboarding and people | Owner, manager and employee accounts plus workspace data persist on one Mac | Separate local email/password accounts; no cloud/tenant isolation or synchronization |
 | Import and approval | File/folder import, private proposal, lead/admin approval, priority and supersession are implemented | Rehearse fresh packaged flow; UI does not expose a Reject action despite support in the source model |
 | Marketing work | Three supplied windows, explicit share/stop, fixed campaign findings and cited sources run locally | Only fixed scenarios have specialized rules; imported company sources do not generate continuous field-level findings |
 | Nebius | Fixed campaign pack previously passed a live answer; company path has opt-in and local fallback | Live company-source request was blocked pending specific approval of the test payload |
@@ -58,7 +58,7 @@ Show one employee’s marketing week after establishing that the company workspa
 
 | Time | Scene | Concrete screen action and outcome | Implementation boundary |
 | --- | --- | --- | --- |
-| 00:00–00:45 | Company and department onboarding | Administrator creates Elseweek and departments, adds people, imports a small synthetic source pack by department. Show company-wide brand guidance, a Marketing campaign brief and one Operations procedure. A lead approves a proposed source. Switch to the marketing employee and show their available context | Local workspace, import, approval and role switching exist. Prepare appropriate synthetic department sources; role switching is not real sign-in or multi-device collaboration. Verify actual visibility rules instead of assuming access |
+| 00:00–00:45 | Company and department onboarding | Administrator creates Elseweek and departments, adds people, imports a small synthetic source pack by department. Show company-wide brand guidance, a Marketing campaign brief and one Operations procedure. A lead approves a proposed source. Switch to the marketing employee and show their available context | Local accounts, bulk file onboarding, Nebius interpretation and source approval exist. Use the mixed-format Elseweek intake. Accounts are local to one Mac, not multi-device collaboration. Verify actual visibility rules instead of assuming access |
 | 00:45–01:40 | Learn Canva while doing a real task | Employee shares a Canva window and asks “Help me turn this into a LinkedIn campaign visual.” Averill gives one step at a time: choose the agreed format, improve text hierarchy, align elements, then export. Employee performs the actions. Show one clarification and one confirmed learning step | The four-step guided lesson and learning records are implemented. Conversational tutoring and visual step verification remain future work. Current one-frame OCR reads visible text; it cannot reliably verify alignment, hidden layers or export settings. Validate each guidance source and observed state before recording |
 | 01:40–02:15 | Apply learning to a LinkedIn draft | Employee uses the creative and drafts a post. Averill helps apply approved tone/message and explains why a suggested change fits the brief. The employee makes the edit | LinkedIn-specific supplied editor and approved synthetic source pack are implemented. Explicit sharing checks the listed campaign requirements; it is not an external LinkedIn integration. Existing Social Publisher is Instagram; do not transfer its Reel date/disclosure rules to LinkedIn |
 | 02:15–02:50 | Prepare the newsletter | Employee selects audience and launch date. Averill highlights one mismatch, cites the current campaign source and explains the correction | Existing Email Studio supports the supplied campaign checks. Approved email is 15 October 2026 at 10:00 Europe/Copenhagen. Rehearse with coherent Elseweek sources |
@@ -113,3 +113,7 @@ The initial Learn flow is implemented: four-step Canva lesson with official refe
 ## Elseweek pack / LinkedIn update — 26 September 2026
 
 Preparation steps for department pack and LinkedIn supplied editor are delivered. Import follows `travel-desktop/demo-company/elseweek/README.md` with explicit department, version, review and approval. Company-wide brand context is copied consistently into each department; no company-wide scope or authentication was added. The organic LinkedIn slot is 16 October, 09:00 Copenhagen, with its own landscape creative and CTA. The bounded editor checks five specific requirements, not general audience/copy reasoning. Canva capture/acceptance, richer weekly assessment and the full recording remain open; no work on those paths is included in this delivery.
+
+## Updated onboarding and identity scene
+
+The owner now creates a local email/password account and uploads existing mixed-format company material in one batch. Nebius explicitly interprets extracted text; the owner reviews people and source metadata, confirms approval and receives one-time credentials. Demonstrate separate owner, Marketing manager, Marketing strategy employee and Content creator logins with Sign out/Sign in. Company brand sources are shared across departments; staff roster is private. This supersedes the earlier role-switching-only onboarding narrative. Roles/learning remain local to one Mac, not a synchronized multi-employee service.

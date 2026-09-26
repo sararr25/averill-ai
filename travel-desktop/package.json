@@ -14,10 +14,16 @@
     "@fontsource/fragment-mono": "^5.3.0",
     "@fontsource/geologica": "^5.3.0",
     "@fontsource/spline-sans": "^5.3.0",
-    "dotenv": "^17.2.3"
+    "dotenv": "^17.2.3",
+    "exceljs": "^4.4.0"
   },
   "devDependencies": {
     "@electron/packager": "^20.3.0",
     "electron": "^44.4.4"
+  },
+  "overrides": {
+    "exceljs": {
+      "uuid": "11.1.1"
+    }
   }
 }

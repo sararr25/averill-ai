@@ -26,7 +26,7 @@ Each work window has a **Load incoming draft** or **Open handed-over file** acti
 
 The four supplied work windows send structured field state to Electron; Averill produces findings only while a window is shared. Campaign checks use explicit rules and local sample documents. **Review** displays the leading finding and a question composer. **Setup** creates one local company workspace, adds demo people, imports files or a folder, and lets a lead approve department sources. **Work** reviews a marketing draft with approved sources and can capture one frame from a selected Canva window for local OCR. **Learn** guides four Canva operations with contextual help, records confirmed practice and generates weekly questions/reflections. **Research** searches the public web through Tavily. Canva OCR reads visible text only; it cannot inspect design structure or hidden layers.
 
-Set `NEBIUS_API_KEY` and `TAVILY_API_KEY` in the local `../.env.local`, or enter them in Setup for encrypted local storage. Nebius requires explicit session opt-in; draft/image-text review asks for confirmation before sending relevant approved text. Tavily receives only the entered public query. A live Nebius test validated the fixed historical Aurelia source pack; the company-source path still needs a live check. No account authentication or multi-computer synchronization is implemented.
+Set `NEBIUS_API_KEY` and `TAVILY_API_KEY` in the local `../.env.local`, or enter them in Setup for encrypted local storage. Nebius requires explicit session opt-in; draft/image-text review asks for confirmation before sending relevant approved text. Tavily receives only the entered public query. A live Nebius test validated the fixed historical Aurelia source pack; the company-source path still needs a live check. Separate local account authentication is implemented; no online account service or multi-computer synchronization is provided.
 
 ## Learning demo path
 
@@ -54,7 +54,7 @@ The intentionally superseded campaign brief v1 and square creative are part of t
 npm test
 ```
 
-The 14 tests cover issue detection and resolution for the supplied workflows, source file existence, uncertainty for unsupported questions, model citation IDs, local workspace persistence, folder import, employee learning persistence/isolation, source invalidation, exclusion and Copenhagen week rollover. The packaged app was opened and verified for the shared brief finding and a locally answered, cited comparison. See the [handover](../docs/HANDOVER.md) for checks still pending.
+The 18 tests cover issue detection and resolution for the supplied workflows, source file existence, uncertainty for unsupported questions, model citation IDs, local workspace persistence, folder import, employee learning persistence/isolation, source invalidation, exclusion and Copenhagen week rollover. The packaged app was opened and verified for the shared brief finding and a locally answered, cited comparison. See the [handover](../docs/HANDOVER.md) for checks still pending.
 
 ## Company pack and LinkedIn demo
 
@@ -63,3 +63,9 @@ Use [the Elseweek pack README](demo-company/elseweek/README.md) to create people
 Open LinkedIn Draft, Share, then Load incoming draft. Correct the guarantee phrase, editorial audience, selected creative, CTA and planned date/time. The correct slot is 16 October 2026 at 09:00 Europe/Copenhagen. Open the LinkedIn guidance from the draft or the finding citation. Save retains a local draft; Stop sharing clears findings. The editor is supplied synthetic work, not an external LinkedIn connection. Its limited copy checks do not establish a complete tone assessment.
 
 The static fixture and imported workspace paths are separate. Switching people clears sharing; source approval changes control company answers and learning evidence, not the supplied editor rules. Previous Aurelia drafts remain in their old localStorage keys and are not loaded into Elseweek drafts.
+
+## File onboarding and local account demo
+
+Follow [the onboarding tutorial](../docs/ONBOARDING_TUTORIAL.md). Create the owner email/password account, upload the six mixed-format Elseweek intake files, optionally use explicitly disclosed Nebius analysis, review people/document assignments, approve selected sources and confirm the batch. Three Marketing accounts are created together. Save the one-time temporary passwords and sign out/in to demonstrate owner, manager, strategist and creator. Restart requires login. Existing workspaces can enable owner login without losing data; existing people can receive separate accounts.
+
+XLSX/CSV staff tables are read locally. PDFs use PDFKit and scanned-page Vision OCR (first 30 pages); SVG onboarding extracts text/title/description. Unsupported/unreadable files are flagged. XLS needs a modern XLSX/CSV export. Brand context can be company-wide; personnel copies remain private. No cloud service, multi-device synchronization, invitations or password recovery is implemented.

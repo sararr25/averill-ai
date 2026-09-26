@@ -3,7 +3,7 @@ const path = require('node:path');
 const crypto = require('node:crypto');
 const { execFileSync } = require('node:child_process');
 
-const allowedExtensions = new Set(['.md', '.txt', '.csv', '.json', '.pdf', '.png', '.jpg', '.jpeg', '.webp', '.svg']);
+const allowedExtensions = new Set(['.md', '.txt', '.csv', '.json', '.xlsx', '.pdf', '.png', '.jpg', '.jpeg', '.webp', '.svg']);
 const MAX_FILE_BYTES = 20 * 1024 * 1024;
 
 function id() { return crypto.randomUUID(); }
@@ -14,6 +14,10 @@ function fileStore(userData) { return path.join(userData, 'averill-sources'); }
 function extractText(filePath) {
   const extension = path.extname(filePath).toLowerCase();
   if (['.md', '.txt', '.csv', '.json', '.svg'].includes(extension)) return fs.readFileSync(filePath, 'utf8').slice(0, 100000);
+  if (extension === '.xlsx') {
+    try { return execFileSync(process.execPath, ['--max-old-space-size=256', path.join(__dirname, '..', 'scripts', 'extract-spreadsheet.cjs'), filePath], { timeout: 30000, maxBuffer: 1024 * 1024, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], env: { ...process.env, ELECTRON_RUN_AS_NODE: '1' } }).slice(0, 100000); }
+    catch { return ''; }
+  }
   if (process.platform !== 'darwin') return '';
   const binary = path.join(__dirname, '..', 'scripts', 'extract-text-macos-arm64');
   const command = fs.existsSync(binary) ? binary : '/usr/bin/swift';
@@ -79,8 +83,9 @@ function importFile(userData, data, sourcePath, options = {}) {
   if (!stat.isFile() || stat.isSymbolicLink() || !allowedExtensions.has(extension) || stat.size > MAX_FILE_BYTES) throw new Error('Unsupported file or file exceeds 20 MB');
   const content = fs.readFileSync(sourcePath);
   const hash = crypto.createHash('sha256').update(content).digest('hex');
-  const department = clean(options.department || active.department || 'Marketing');
-  if (!data.departments.includes(department)) throw new Error('Unknown department');
+  const department = options.scope === 'company' ? 'Company' : clean(options.department || active.department || 'Marketing');
+  if (options.scope === 'company' && active.role !== 'admin') throw new Error('Administrator access required for company-wide sources');
+  if (department !== 'Company' && !data.departments.includes(department)) throw new Error('Unknown department');
   if (active.role !== 'admin' && department !== active.department) throw new Error('Import into your own department only');
   const sourceId = id();
   const destination = path.join(fileStore(userData), `${sourceId}${extension}`);
@@ -93,7 +98,7 @@ function importFile(userData, data, sourcePath, options = {}) {
     id: sourceId, title: clean(options.title || path.basename(sourcePath)), department,
     originalPath: sourcePath, storedPath: destination, sha256: hash,
     textPath: extractedText ? textPath : null, extractionStatus: extractedText ? 'text available' : 'no readable text',
-    ownerId: active.id, scope: options.scope === 'private' ? 'private' : 'department',
+    ownerId: active.id, scope: ['private', 'company'].includes(options.scope) ? options.scope : 'department',
     status: 'pending', priority: 0, version: clean(options.version || '1', 30),
     createdAt: new Date().toISOString(), approvedAt: null, approvedBy: null,
   };
@@ -125,7 +130,7 @@ function updateSource(data, sourceId, action, priority = 0) {
   const source = data.sources.find((entry) => entry.id === sourceId);
   if (!source) throw new Error('Unknown source');
   if (source.scope === 'private') throw new Error('Private files must be proposed before approval');
-  if (!canManage(data, source.department)) throw new Error('Department lead or administrator access required');
+  if (source.scope === 'company' ? person(data)?.role !== 'admin' : !canManage(data, source.department)) throw new Error('Department lead or administrator access required');
   if (!['approved', 'rejected', 'superseded'].includes(action)) throw new Error('Invalid source status');
   source.status = action;
   source.priority = Math.max(0, Math.min(100, Number(priority) || 0));
@@ -145,13 +150,13 @@ function proposeSource(data, sourceId) {
 function visibleSources(data) {
   const active = person(data);
   if (!active) return [];
-  return data.sources.filter((source) => source.ownerId === active.id || (source.scope === 'department' && (active.role === 'admin' || (source.department === active.department && (source.status === 'approved' || active.role === 'lead')))));
+  return data.sources.filter((source) => source.ownerId === active.id || ((source.scope === 'company' && source.status === 'approved') || (source.scope === 'company' && active.role === 'admin') || (source.scope === 'department' && (active.role === 'admin' || (source.department === active.department && (source.status === 'approved' || active.role === 'lead'))))));
 }
 
 function approvedSources(data) {
   const active = person(data);
   if (!active) return [];
-  return visibleSources(data).filter((source) => source.status === 'approved' && (active.role === 'admin' || source.department === active.department));
+  return visibleSources(data).filter((source) => source.status === 'approved' && (source.scope === 'company' || active.role === 'admin' || source.department === active.department));
 }
 
 function conflicts(data) {
@@ -168,7 +173,7 @@ function publicSnapshot(data) {
   if (!data) return { configured: false };
   const visible = visibleSources(data);
   const visibleIds = new Set(visible.map((source) => source.id));
-  return { configured: true, company: data.company, departments: data.departments, people: data.people, activePersonId: data.activePersonId, conflicts: conflicts(data).filter((group) => group.every((id) => visibleIds.has(id))), sources: visible.map(({ storedPath, textPath, ...source }) => source) };
+  return { configured: true, company: data.company, departments: data.departments, people: data.people.map(({ credential, onboardingEvidence, ...entry }) => entry), activePersonId: data.activePersonId, conflicts: conflicts(data).filter((group) => group.every((id) => visibleIds.has(id))), sources: visible.map(({ storedPath, textPath, ...source }) => source) };
 }
 
 module.exports = { load, save, create, person, addPerson, switchPerson, importFile, importFolder, updateSource, proposeSource, visibleSources, approvedSources, conflicts, publicSnapshot, extractText };

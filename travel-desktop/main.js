@@ -7,6 +7,8 @@ const { inspect, answer: localAnswer } = require('./src/engine');
 const { answerQuestion } = require('./src/assistant');
 const { sourceFor } = require('./src/campaign');
 const workspace = require('./src/workspace');
+const accounts = require('./src/accounts');
+const onboarding = require('./src/onboarding');
 const learning = require('./src/learning');
 const { answerWorkspace, localWorkspaceAnswer } = require('./src/workspace-answer');
 const { searchPublicWeb } = require('./src/web-search');
@@ -18,6 +20,9 @@ const shared = new Set();
 let agentWindow;
 let aiEnabled = false;
 let companyWorkspace = null;
+let authenticatedPersonId = null;
+let loginFailures = { count: 0, until: 0 };
+let onboardingBusy = false;
 let selectedExternalWindow = null;
 const runtimeKeys = { nebius: process.env.NEBIUS_API_KEY || '', tavily: process.env.TAVILY_API_KEY || '' };
 
@@ -45,10 +50,22 @@ async function saveSecret(service, value) {
   runtimeKeys[service] = key;
 }
 
+function signedIn() {
+  return Boolean(companyWorkspace && (!companyWorkspace.authEnabled || authenticatedPersonId === companyWorkspace.activePersonId));
+}
+function requireSession() { if (!signedIn()) throw new Error('Sign in to your account first.'); }
+function clearSessionWork() {
+  shared.clear(); aiEnabled = false; selectedExternalWindow = null;
+  workState.clear();
+  for (const window of workWindows.values()) if (!window.isDestroyed()) window.close();
+  workWindows.clear();
+}
 function snapshot() {
   return {
-    workspace: workspace.publicSnapshot(companyWorkspace),
-    learning: learning.snapshot(companyWorkspace),
+    auth: { enabled: Boolean(companyWorkspace?.authEnabled), signedIn: signedIn(), accounts: accounts.publicAccounts(companyWorkspace), person: signedIn() ? accounts.publicAccounts(companyWorkspace).find(p => p.id === companyWorkspace.activePersonId) || null : null },
+    onboarding: signedIn() ? onboarding.snapshot(companyWorkspace) : null,
+    workspace: signedIn() ? workspace.publicSnapshot(companyWorkspace) : { configured: Boolean(companyWorkspace), company: companyWorkspace?.company },
+    learning: learning.snapshot(signedIn() ? companyWorkspace : null),
     externalWindow: selectedExternalWindow,
     services: { nebius: Boolean(runtimeKeys.nebius), tavily: Boolean(runtimeKeys.tavily) },
     shared: [...shared],
@@ -83,6 +100,7 @@ function createWindow(file, options, query) {
 }
 
 function openWork(kind) {
+  requireSession();
   if (!workKinds.includes(kind)) return;
   const existing = workWindows.get(kind);
   if (existing && !existing.isDestroyed()) { existing.focus(); return; }
@@ -102,8 +120,16 @@ app.whenReady().then(async () => {
   const agentWidth = Math.min(520, area.width - 40);
   agentWindow = createWindow('agent.html', { x: area.x + area.width - agentWidth - 12, y: area.y + 12, width: agentWidth, height: Math.min(850, area.height - 24), minWidth: 440, minHeight: 660, title: 'Averill' });
   loadSecrets().then(publish).catch(() => {});
-  const fromAgent = (event) => {
+  const fromAgent = (event, allowAnonymous = false) => {
     if (event.sender !== agentWindow.webContents) throw new Error('Averill window required');
+    if (!allowAnonymous) {
+      requireSession();
+      if (onboardingBusy) throw new Error('Wait for the current onboarding operation to finish.');
+    }
+  };
+  const fromApp = (event) => {
+    if (event.sender !== agentWindow.webContents && ![...workWindows.values()].some(w => w.webContents === event.sender)) throw new Error('Averill application window required');
+    requireSession();
   };
   const persistWorkspace = () => { workspace.save(app.getPath('userData'), companyWorkspace); publish(); return snapshot(); };
   ipcMain.handle('learning:action', (event, action, payload = {}) => {
@@ -119,10 +145,82 @@ app.whenReady().then(async () => {
     else throw new Error('Unknown learning action');
     return persistWorkspace();
   });
-  ipcMain.handle('workspace:create', (event, company, adminName) => {
-    fromAgent(event);
+  ipcMain.handle('workspace:create', async (event, company, adminName, email, password) => {
+    fromAgent(event, true);
+    if (!accounts.validEmail(email)) throw new Error('Enter your account email.');
+    accounts.validatePassword(password);
+    // Hash before writing the workspace: validation failures cannot strand first-run setup.
+    const hashed = await accounts.credential(password);
     companyWorkspace = workspace.create(app.getPath('userData'), company, adminName);
-    publish(); return snapshot();
+    const owner = workspace.person(companyWorkspace);
+    Object.assign(owner, { email: accounts.email(email), profile: 'owner', jobTitle: accounts.profiles.owner.label, credential: hashed });
+    companyWorkspace.authEnabled = true; authenticatedPersonId = owner.id;
+    return persistWorkspace();
+  });
+  ipcMain.handle('account:login', async (event, email, password) => {
+    fromAgent(event, true);
+    if (onboardingBusy) throw new Error('Wait for onboarding to finish before changing accounts.');
+    if (Date.now() < loginFailures.until) throw new Error('Too many attempts. Wait a minute and retry.');
+    try {
+      const person = await accounts.authenticate(companyWorkspace, email, password);
+      clearSessionWork(); authenticatedPersonId = person.id; workspace.switchPerson(companyWorkspace, person.id);
+      loginFailures = { count: 0, until: 0 }; return persistWorkspace();
+    } catch (error) {
+      loginFailures.count++; if (loginFailures.count >= 5) { loginFailures.until = Date.now() + 60000; loginFailures.count = 0; }
+      throw error;
+    }
+  });
+  ipcMain.handle('account:logout', (event) => {
+    fromAgent(event); if (onboardingBusy) throw new Error('Wait for onboarding to finish before signing out.');
+    clearSessionWork(); authenticatedPersonId = null; publish(); return snapshot();
+  });
+  ipcMain.handle('account:enable', async (event, email, password) => {
+    fromAgent(event);
+    if (companyWorkspace.authEnabled || workspace.person(companyWorkspace)?.role !== 'admin') throw new Error('Only the current legacy administrator can enable accounts.');
+    await accounts.configure(companyWorkspace, companyWorkspace.activePersonId, email, password, 'owner');
+    authenticatedPersonId = companyWorkspace.activePersonId; clearSessionWork(); return persistWorkspace();
+  });
+  ipcMain.handle('account:create', async (event, personId, email, profile) => {
+    fromAgent(event);
+    if (workspace.person(companyWorkspace)?.role !== 'admin' || !companyWorkspace.authEnabled) throw new Error('Sign in as the owner to create accounts.');
+    const actor = companyWorkspace.activePersonId;
+    const password = accounts.temporaryPassword();
+    const next = structuredClone(companyWorkspace);
+    await accounts.configure(next, personId, email, password, profile);
+    fromAgent(event); if (companyWorkspace.activePersonId !== actor) throw new Error('Account changed. Retry as the owner.');
+    companyWorkspace = next; persistWorkspace();
+    return { snapshot: snapshot(), account: { email: accounts.email(email), profile, password } };
+  });
+  ipcMain.handle('onboarding:upload', async (event) => {
+    fromAgent(event);
+    if (workspace.person(companyWorkspace)?.role !== 'admin') throw new Error('Administrator access required.');
+    if (onboardingBusy) throw new Error('An onboarding operation is already running.');
+    const personId = companyWorkspace.activePersonId;
+    const selection = await dialog.showOpenDialog(agentWindow, { properties: ['openFile', 'multiSelections'], filters: [{ name: 'Company files — Excel, PDF, SVG and documents', extensions: [...onboarding.EXTENSIONS].map(e => e.slice(1)) }] });
+    fromAgent(event);
+    if (personId !== companyWorkspace.activePersonId) throw new Error('Account changed. Upload the files again.');
+    if (!selection.canceled) onboarding.stage(app.getPath('userData'), companyWorkspace, selection.filePaths);
+    return persistWorkspace();
+  });
+  ipcMain.handle('onboarding:analyze', async (event, consent) => {
+    fromAgent(event);
+    if (onboardingBusy) throw new Error('An onboarding operation is already running.');
+    const personId = companyWorkspace.activePersonId;
+    onboardingBusy = true;
+    try {
+      await onboarding.analyze(companyWorkspace, runtimeKeys.nebius, { consent: consent === true, authorize: () => { requireSession(); if (personId !== companyWorkspace.activePersonId) throw new Error('Account changed.'); } });
+      return persistWorkspace();
+    } finally { onboardingBusy = false; }
+  });
+  ipcMain.handle('onboarding:apply', async (event, review) => {
+    fromAgent(event);
+    if (onboardingBusy) throw new Error('An onboarding operation is already running.');
+    if (!companyWorkspace.authEnabled) throw new Error('Enable the owner account before creating employee accounts.');
+    onboardingBusy = true;
+    try {
+      const result = await onboarding.apply(app.getPath('userData'), companyWorkspace, review);
+      publish(); return { ...result, snapshot: snapshot() };
+    } finally { onboardingBusy = false; }
   });
   ipcMain.handle('workspace:add-person', (event, name, role, department) => {
     fromAgent(event);
@@ -133,14 +231,15 @@ app.whenReady().then(async () => {
   ipcMain.handle('workspace:switch-person', (event, personId) => {
     fromAgent(event);
     if (!companyWorkspace) throw new Error('Create a workspace first');
+    if (companyWorkspace.authEnabled) throw new Error('Sign out and use the other account email/password.');
     workspace.switchPerson(companyWorkspace, personId);
-    shared.clear(); aiEnabled = false; selectedExternalWindow = null;
+    clearSessionWork();
     return persistWorkspace();
   });
   ipcMain.handle('workspace:import', async (event, options) => {
     fromAgent(event);
     if (!companyWorkspace) throw new Error('Create a workspace first');
-    const selection = await dialog.showOpenDialog(agentWindow, { properties: ['openFile', 'multiSelections'], filters: [{ name: 'Documents and exported designs', extensions: ['md', 'txt', 'csv', 'json', 'pdf', 'png', 'jpg', 'jpeg', 'webp', 'svg'] }] });
+    const selection = await dialog.showOpenDialog(agentWindow, { properties: ['openFile', 'multiSelections'], filters: [{ name: 'Documents and exported designs', extensions: ['md', 'txt', 'csv', 'json', 'xlsx', 'pdf', 'png', 'jpg', 'jpeg', 'webp', 'svg'] }] });
     if (selection.canceled) return snapshot();
     for (const file of selection.filePaths) workspace.importFile(app.getPath('userData'), companyWorkspace, file, options || {});
     return persistWorkspace();
@@ -182,9 +281,10 @@ app.whenReady().then(async () => {
     await saveSecret(service, value);
     publish(); return snapshot();
   });
-  ipcMain.handle('agent:snapshot', () => snapshot());
-  ipcMain.handle('agent:open-work', (_, kind) => { openWork(kind); return snapshot(); });
-  ipcMain.handle('agent:share', (_, kind, enable) => {
+  ipcMain.handle('agent:snapshot', (event) => { fromAgent(event, true); return snapshot(); });
+  ipcMain.handle('agent:open-work', (event, kind) => { fromAgent(event); openWork(kind); return snapshot(); });
+  ipcMain.handle('agent:share', (event, kind, enable) => {
+    fromAgent(event);
     if (!workKinds.includes(kind) || !workWindows.has(kind)) return snapshot();
     if (enable) shared.add(kind); else shared.delete(kind);
     publish();
@@ -241,7 +341,8 @@ app.whenReady().then(async () => {
       return true;
     } catch { return false; }
   });
-  ipcMain.handle('agent:source', (_, id) => {
+  ipcMain.handle('agent:source', (event, id) => {
+    fromApp(event);
     if (companyWorkspace) {
       const item = workspace.visibleSources(companyWorkspace).find((source) => source.id === id && source.status === 'approved');
       if (item) return { id, title: item.title, kind: 'workspace', content: item.textPath ? fs.readFileSync(item.textPath, 'utf8') : 'No readable text was extracted. Open the file on this computer.' };
@@ -249,7 +350,8 @@ app.whenReady().then(async () => {
     const source = sourceFor(id);
     return source ? { ...source, content: fs.readFileSync(source.path, 'utf8') } : null;
   });
-  ipcMain.handle('agent:open-source', async (_, id) => {
+  ipcMain.handle('agent:open-source', async (event, id) => {
+    fromApp(event);
     if (companyWorkspace) {
       const item = workspace.visibleSources(companyWorkspace).find((source) => source.id === id && source.status === 'approved');
       if (item) return (await shell.openPath(item.storedPath)) === '';
@@ -259,6 +361,7 @@ app.whenReady().then(async () => {
     return (await shell.openPath(source.path)) === '';
   });
   ipcMain.on('work:update', (event, kind, data) => {
+    if (!signedIn()) return;
     const window = workWindows.get(kind);
     if (!window || event.sender !== window.webContents || !workKinds.includes(kind)) return;
     if (!data || typeof data !== 'object' || Array.isArray(data)) return;

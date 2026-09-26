@@ -32,6 +32,7 @@ function sourceButton(source) {
 }
 
 function render() {
+  if (!renderSession()) return;
   renderWorkspace();
   renderLearning();
   renderHero();
@@ -144,30 +145,38 @@ function renderWorkspace() {
   const data = current.workspace || { configured: false };
   if (!data.configured) {
     const form = node('form'); form.className = 'workspace-form';
-    const company = node('input'); company.placeholder = 'Company name'; company.required = true; company.maxLength = 120;
-    const admin = node('input'); admin.placeholder = 'Administrator name'; admin.required = true; admin.maxLength = 120;
-    const submit = node('button', 'Create company workspace', 'secondary-button'); submit.type = 'submit';
-    form.append(company, admin, submit);
+    form.append(node('h3', 'Create your company and owner account'), node('p', 'Start with your account, then import existing company files to add the team.'));
+    const company = onboardingField(form, 'Company name', ''); company.placeholder = 'Elseweek'; company.required = true; company.maxLength = 120;
+    const admin = onboardingField(form, 'Your name', ''); admin.required = true; admin.maxLength = 120;
+    const email = onboardingField(form, 'Your work email', '', 'email'); email.required = true; email.autocomplete = 'username';
+    const password = onboardingField(form, 'Create a password', '', 'password'); password.required = true; password.minLength = 10; password.maxLength = 128; password.autocomplete = 'new-password';
+    const submit = node('button', 'Create company and sign in', 'secondary-button'); submit.type = 'submit';form.append(submit);
     form.addEventListener('submit', async (event) => {
-      event.preventDefault();
-      try { current = await window.desktop.createWorkspace(company.value, admin.value); render(); }
+      event.preventDefault(); submit.disabled = true;
+      try { current = await window.desktop.createWorkspace(company.value, admin.value, email.value, password.value); password.value = ''; render(); }
       catch (error) { el('workspace-feedback').textContent = error.message; }
+      finally { submit.disabled = false; }
     });
-    panel.append(node('p', 'Create a company workspace to add people and approved sources.'), form);
+    panel.append(form);
     return;
   }
   const active = data.people.find((entry) => entry.id === data.activePersonId);
   panel.append(node('strong', data.company));
-  panel.append(node('p', `Departments: ${data.departments.join(', ')}. Marketing review is the implemented workflow; other departments can have people and sources but no specialized checks yet.`));
-  const select = node('select'); select.setAttribute('aria-label', 'Demo role');
-  for (const person of data.people) {
-    const option = node('option', `${person.name} · ${person.role}${person.department ? ` · ${person.department}` : ''}`);
-    option.value = person.id; option.selected = person.id === data.activePersonId; select.append(option);
+  panel.append(node('p', `Departments: ${data.departments.join(', ')}.`));
+  if (!current.auth?.enabled) {
+    const select = node('select'); select.setAttribute('aria-label', 'Legacy demo role');
+    for (const person of data.people) {
+      const option = node('option', `${person.name} · ${person.role}${person.department ? ` · ${person.department}` : ''}`);
+      option.value = person.id; option.selected = person.id === data.activePersonId; select.append(option);
+    }
+    select.addEventListener('change', async () => { current = await window.desktop.switchPerson(select.value); render(); });
+    panel.append(node('p', 'Legacy workspace: enable the owner account below to replace role switching with separate logins.'), select);
   }
-  select.addEventListener('change', async () => { current = await window.desktop.switchPerson(select.value); render(); });
-  panel.append(node('p', 'Switching roles on this computer demonstrates permissions. It is not user authentication.'), select);
+  renderOnboarding(panel);
+  renderAccountAccess(panel);
   if (data.conflicts?.length) panel.append(node('p', `${data.conflicts.length} source conflict(s) need a lead decision. Averill will not use either conflicting version for answers.`, 'workspace-conflict'));
   if (active.role === 'admin') {
+    panel.append(node('h3', 'Advanced: add a person manually'));
     const form = node('form'); form.className = 'workspace-form';
     const name = node('input'); name.placeholder = 'Person name'; name.required = true;
     const role = node('select'); for (const value of ['employee', 'lead', 'admin']) { const option = node('option', value); option.value = value; role.append(option); }
@@ -196,9 +205,10 @@ function renderWorkspace() {
     }
     panel.append(keySection);
   }
+  panel.append(node('h3', active.role === 'admin' ? 'Advanced: import individual sources' : 'Your department sources'));
   const importRow = node('div'); importRow.className = 'workspace-actions';
   const scope = node('select'); scope.setAttribute('aria-label', 'Import visibility');
-  for (const [value, label] of [['private', 'Private until proposed'], ['department', 'Propose to department']]) { const option = node('option', label); option.value = value; scope.append(option); }
+  for (const [value, label] of (active.role === 'admin' ? [['private', 'Private until proposed'], ['department', 'Propose to department'], ['company', 'Company-wide guidance']] : [['private', 'Private until proposed'], ['department', 'Propose to department']])) { const option = node('option', label); option.value = value; scope.append(option); }
   if (active.role === 'admin') scope.value = 'department';
   const targetDepartment = node('select'); targetDepartment.setAttribute('aria-label', 'Import department');
   for (const department of (active.role === 'admin' ? data.departments : [active.department])) {
@@ -225,7 +235,7 @@ function renderWorkspace() {
   if (!data.sources.length) list.append(node('p', 'No sources yet. Import a file, then approve it as a department lead or administrator.'));
   for (const source of data.sources) {
     const row = node('div'); row.className = 'workspace-source';
-    row.append(node('strong', source.title), node('small', `${source.department} · ${source.status} · v${source.version} · priority ${source.priority} · ${source.extractionStatus}`));
+    row.append(node('strong', source.title), node('small', `${source.scope === 'company' ? 'Company-wide' : source.department} · ${source.status} · v${source.version} · priority ${source.priority} · ${source.extractionStatus}`));
     row.append(action('Open', () => window.desktop.openWorkspaceSource(source.id).then(() => current)));
     if (source.scope === 'private' && source.ownerId === active.id) row.append(action('Propose to department', () => window.desktop.proposeSource(source.id)));
     if (source.extractionStatus === 'text available') row.append(action('Review text', async () => {
@@ -237,7 +247,7 @@ function renderWorkspace() {
       addMessage(`${response.mode === 'local' ? 'Local fallback: ' : ''}${response.text}`, 'assistant', response.sources);
       return current;
     }));
-    if (active.role === 'admin' || (active.role === 'lead' && active.department === source.department)) {
+    if (active.role === 'admin' || (source.scope !== 'company' && active.role === 'lead' && active.department === source.department)) {
       if (source.status !== 'approved') row.append(action('Approve', () => window.desktop.updateSource(source.id, 'approved', source.priority)));
       if (source.status === 'approved') row.append(action('Supersede', () => window.desktop.updateSource(source.id, 'superseded', source.priority)));
       if (source.status === 'approved') {
@@ -350,6 +360,13 @@ el('ai-toggle').addEventListener('click', async () => {
   current = await window.desktop.aiMode(!current.aiEnabled); render();
 });
 el('open-source').addEventListener('click', () => { if (activeSourceId) window.desktop.openSource(activeSourceId); });
+el('login-account').addEventListener('change', () => { el('login-email').value = el('login-account').value; el('login-password').value = ''; el('login-password').focus(); });
+el('login-form').addEventListener('submit', async (event) => {
+  event.preventDefault(); const submit = el('login-form').querySelector('button'); submit.disabled = true; el('login-feedback').textContent = 'Signing in…';
+  try { current = await window.desktop.login(el('login-email').value, el('login-password').value); el('login-password').value = ''; el('login-feedback').textContent = ''; render(); showTab(current.auth.person?.profile === 'owner' ? 'setup' : 'review'); }
+  catch (error) { el('login-feedback').textContent = error.message; }
+  finally { submit.disabled = false; }
+});
 window.desktop.onSnapshot((value) => { current = value; render(); });
 window.desktop.snapshot().then((value) => { current = value; render(); showTab(value.workspace?.configured ? 'review' : 'setup'); });
 
