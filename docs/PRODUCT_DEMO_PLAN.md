@@ -120,4 +120,4 @@ The owner now creates a local email/password account and uploads existing mixed-
 
 ## Login documents and current continuation
 
-The user requested one retrievable document per demo login. These are saved automatically for owner setup and generated team accounts, outside the repository. See ONBOARDING_TUTORIAL.md. The normal Mac workspace currently remains Aurelia Demo with one legacy admin and no configured credentials. Activation in that workspace versus a separate Elseweek demo remains awaiting the user choice; do not confuse /tmp synthetic test profiles with the normal workspace. HANDOVER.md contains executable paths, verification and remaining checks.
+The user requested one retrievable document per demo login. These are saved automatically for owner setup and generated team accounts, outside the repository. See ONBOARDING_TUTORIAL.md. The normal Mac workspace is now Aurelia Demo with four prepared logins and locally encrypted service keys; do not confuse /tmp synthetic test profiles with the normal workspace. HANDOVER.md contains executable paths, verification and remaining checks.

@@ -2,6 +2,17 @@
 
 26 September 2026. All sample identities and sources are fictional. These are separate email/password accounts on one Mac; no online accounts, synchronization or invitation emails are provided.
 
+
+## Prepared local demo accounts and services
+
+On this Mac, the existing Aurelia Demo workspace now provides four working logins: Demo Admin / alex@elseweek.example (Owner / CEO / admin), Maya Jensen / maya@elseweek.example (Marketing manager), Emma Larsen / emma@elseweek.example (Marketing strategy employee), Oscar Lind / oscar@elseweek.example (Content creator). Company name and original administrator ID are preserved. No existing password was reset. A timestamped pre-login workspace backup is adjacent to averill-workspace.json.
+
+Actual emails/passwords are in separate documents under repository-root demo-login-documents, ignored by Git. Originals are in userData/Averill-login-documents. Open the owner document, then use its email/password on the packaged app sign-in screen. The owner can reopen the original folder from Account access. Never substitute /tmp synthetic test credentials.
+
+Nebius and Tavily keys from the existing local .env.local were encrypted with Electron safeStorage into userData/averill-secrets.enc.json. The packaged app automatically loads them on this Mac. No key is embedded in Git, source or the distributable. Another Mac needs local key provisioning. No manual key entry is needed here.
+
+For the prepared demo, sign in as owner and proceed to step 2. Existing roster emails are excluded as duplicates; preserve those exclusions. Review and approve source imports explicitly. Steps below also cover a fresh workspace on another Mac.
+
 ## 1. Create the company and owner login
 
 Quit an older running Averill and open the rebuilt app. In Setup, enter:

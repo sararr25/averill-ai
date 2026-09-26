@@ -104,7 +104,7 @@ Remote: `https://github.com/sararr25/averill-ai.git`, branch `main`. Check curre
 
 ## Local login documents — 26 September 2026
 
-User explicitly requested retrievable demo passwords. New owner setup, legacy owner activation, manual employee accounts and bulk onboarding now save one Markdown login document per account in userData/Averill-login-documents. The owner can reopen the folder from Account access. This folder stays outside Git, company sources, snapshots and Nebius input. Existing pre-feature account hashes cannot recover passwords. Normal user workspace inspected: Aurelia Demo, one legacy administrator, no credential-bearing accounts. No existing password was reset.
+User explicitly requested retrievable demo passwords. New owner setup, legacy owner activation, manual employee accounts and bulk onboarding now save one Markdown login document per account in userData/Averill-login-documents. The owner can reopen the folder from Account access. This folder stays outside Git, company sources, snapshots and Nebius input. Existing pre-feature account hashes cannot recover passwords. Initial inspection found Aurelia Demo with one legacy administrator and no credentials. The later user correction is resolved by the prepared local demo section below; no existing password was reset.
 
 ## Next developer entry point
 
@@ -112,6 +112,22 @@ User explicitly requested retrievable demo passwords. New owner setup, legacy ow
 - Executable: travel-desktop/dist/Averill-darwin-arm64/Averill.app. Archive: travel-desktop/dist/Averill-macOS-arm64.zip. Both are unsigned Apple Silicon macOS artifacts, ignored by Git. Quit older copies before opening the build.
 - Rebuild: cd travel-desktop, npm ci, npm test, npm run package:mac. Archive with ditto -c -k --sequesterRsrc --keepParent Averill-darwin-arm64/Averill.app Averill-macOS-arm64.zip from dist. Environment keys remain local; never print or commit them.
 - Latest verification: 19 Node tests pass; JS syntax and git diff whitespace checks pass. Rebuilt app includes account-documents.js and guarded account:documents IPC. The new folder-opening action has not been manually rehearsed in the final app. Prior native onboarding evidence above remains valid for the previous build.
-- Pending user choice: enable four logins in existing Aurelia Demo or a separate Elseweek demo. Normal workspace has only Demo Admin without credentials. Do not export /tmp test credentials as normal app accounts, silently reset passwords, or replace user data. New account creation will automatically produce documents.
-- Next acceptance: open the final app, choose workspace/account setup, upload six intake files with the real chooser, review/approve, confirm four login documents including owner, switch through four accounts and reopen documents after restart.
+- Resolved: the user reported no usable login and missing service keys. The normal Aurelia Demo is now prepared with four working accounts and encrypted local keys; see below. Do not reset existing accounts or reuse /tmp test credentials. New account creation will automatically produce documents.
+- Next acceptance: open the final app, sign in using the saved owner document, upload six intake files with the real chooser, review/approve, verify existing account email exclusions and document access, switch through four accounts and reopen documents after restart.
 - Product gaps: cloud authentication/sync, password reset, invitation delivery, signed distribution, live social publication and structural Canva integration remain unimplemented. Local source data and local login documents are separate from approved company knowledge.
+
+## Prepared local demo accounts and services
+
+On this Mac, the existing Aurelia Demo workspace now provides four working logins: Demo Admin / alex@elseweek.example (Owner / CEO / admin), Maya Jensen / maya@elseweek.example (Marketing manager), Emma Larsen / emma@elseweek.example (Marketing strategy employee), Oscar Lind / oscar@elseweek.example (Content creator). Company name and original administrator ID are preserved. No existing password was reset. A timestamped pre-login workspace backup is adjacent to averill-workspace.json.
+
+Actual emails/passwords are in separate documents under repository-root demo-login-documents, ignored by Git. Originals are in userData/Averill-login-documents. Open the owner document, then use its email/password on the packaged app sign-in screen. The owner can reopen the original folder from Account access. Never substitute /tmp synthetic test credentials.
+
+Nebius and Tavily keys from the existing local .env.local were encrypted with Electron safeStorage into userData/averill-secrets.enc.json. The packaged app automatically loads them on this Mac. No key is embedded in Git, source or the distributable. Another Mac needs local key provisioning. No manual key entry is needed here.
+
+### Preparation and verification
+
+Quit Averill, then run ./node_modules/.bin/electron scripts/prepare-local-demo.cjs from travel-desktop only for a legacy workspace without credentials. The helper requires local .env.local and encrypted OS storage; it preserves company/admin identity, verifies all four generated passwords, backs up the workspace, saves documents and encrypted keys. It refuses auth-enabled/credential-bearing workspaces, so do not rerun it on the prepared normal workspace.
+
+Verification used normal workspace data and final bundle main/preload/renderers in the installed Electron runtime with environment keys removed: four distinct logins and logout passed, employee/manager access to account documents was denied, both services loaded from encrypted storage and Setup showed configured labels. The actual final .app was directly launched through native computer use and visibly showed the login screen. Nineteen Node tests pass. The real final-bundle chooser rehearsal and company-document AI request remain separate acceptance checks.
+
+Provider authentication checks also passed: Nebius /v1/models returned HTTP 200; Tavily returned five results for the public query Canva Position alignment tools official help. No company document content was sent by these checks. Final native login picker visibly listed all four profiles, and the owner email was prefilled for the user.

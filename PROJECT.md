@@ -96,3 +96,11 @@ Imported sources do not drive the supplied deterministic editor findings. The fo
 ## File-based onboarding and separate local logins
 
 The later owner request adds an owner email/password account, batch file intake, explicit Nebius interpretation and four profiles: owner/CEO/admin, Marketing manager, Marketing strategy employee and Content creator. Marketing manager maps to lead; the latter two are distinct employees. Read `docs/ONBOARDING_TUTORIAL.md` for the demo. Local roster extraction and review remove one-by-one entry. Company-wide brand sources and private personnel files have distinct visibility. Owner and generated credentials are saved in separate local login documents, accessible to the owner from Account access. A live Nemotron check extracted three people from unstructured prose with exact evidence; a separate mixed-file check validated company/document assignments. No cloud authentication/sync or password recovery is claimed.
+
+## Prepared local demo accounts and services
+
+On this Mac, the existing Aurelia Demo workspace now provides four working logins: Demo Admin / alex@elseweek.example (Owner / CEO / admin), Maya Jensen / maya@elseweek.example (Marketing manager), Emma Larsen / emma@elseweek.example (Marketing strategy employee), Oscar Lind / oscar@elseweek.example (Content creator). Company name and original administrator ID are preserved. No existing password was reset. A timestamped pre-login workspace backup is adjacent to averill-workspace.json.
+
+Actual emails/passwords are in separate documents under repository-root demo-login-documents, ignored by Git. Originals are in userData/Averill-login-documents. Open the owner document, then use its email/password on the packaged app sign-in screen. The owner can reopen the original folder from Account access. Never substitute /tmp synthetic test credentials.
+
+Nebius and Tavily keys from the existing local .env.local were encrypted with Electron safeStorage into userData/averill-secrets.enc.json. The packaged app automatically loads them on this Mac. No key is embedded in Git, source or the distributable. Another Mac needs local key provisioning. No manual key entry is needed here.
