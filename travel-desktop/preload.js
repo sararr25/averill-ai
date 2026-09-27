@@ -1,4 +1,4 @@
-const { contextBridge, ipcRenderer } = require('electron');
+const { contextBridge, ipcRenderer, webUtils } = require('electron');
 
 contextBridge.exposeInMainWorld('desktop', {
   login: (email, password) => ipcRenderer.invoke('account:login', email, password),
@@ -6,8 +6,18 @@ contextBridge.exposeInMainWorld('desktop', {
   enableAccounts: (email, password) => ipcRenderer.invoke('account:enable', email, password),
   createAccount: (id, email, profile) => ipcRenderer.invoke('account:create', id, email, profile),
   openAccountDocuments: () => ipcRenderer.invoke('account:documents'),
+  dropOnboarding: (files) => ipcRenderer.invoke('onboarding:drop', Array.from(files).map(file=>webUtils.getPathForFile(file))),
+  linkOnboarding: (links) => ipcRenderer.invoke('onboarding:links', links),
+  syncedOnboarding: () => ipcRenderer.invoke('onboarding:synced'),
+  companyPrivacy: (enabled) => ipcRenderer.invoke('company:privacy', enabled),
+  cloudConfigure: (provider,id,secret) => ipcRenderer.invoke('cloud:configure',provider,id,secret),
+  cloudConnect: (provider) => ipcRenderer.invoke('cloud:connect',provider),
+  cloudCancel: () => ipcRenderer.invoke('cloud:cancel'),
+  cloudDisconnect: (provider) => ipcRenderer.invoke('cloud:disconnect',provider),
+  cloudList: (provider,folder,cursor) => ipcRenderer.invoke('cloud:list',provider,folder,cursor),
+  cloudImport: (provider,ids) => ipcRenderer.invoke('cloud:import',provider,ids),
   uploadOnboarding: () => ipcRenderer.invoke('onboarding:upload'),
-  analyzeOnboarding: (consent) => ipcRenderer.invoke('onboarding:analyze', consent),
+  analyzeOnboarding: (consent, selections) => ipcRenderer.invoke('onboarding:analyze', consent, selections),
   applyOnboarding: (review) => ipcRenderer.invoke('onboarding:apply', review),
   learningAction: (action, payload) => ipcRenderer.invoke('learning:action', action, payload),
   snapshot: () => ipcRenderer.invoke('agent:snapshot'),

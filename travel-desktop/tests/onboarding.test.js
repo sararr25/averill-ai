@@ -37,6 +37,7 @@ test('Nebius analysis requires explicit consent, sends bounded text without cred
  try{
   const data=await owner(root);onboarding.stage(root,data,[path.join(pack,'elseweek-team.xlsx')]);
   await assert.rejects(onboarding.analyze(data,'test-key',{consent:false}),/Confirm sending/);
+  data.privacy={companyAI:true};for(const file of data.onboarding.files){file.aiAllowed=true;file.confidentiality='internal';}
   let sent;
   await onboarding.analyze(data,'test-key',{consent:true,model:'test-nemotron',fetcher:async(url,options)=>{sent=JSON.parse(options.body);return {ok:true,json:async()=>({choices:[{message:{content:JSON.stringify({company:null,people:[],documents:[]})}}]})};}});
   assert.ok(!JSON.stringify(sent).includes('credential'));assert.ok(!JSON.stringify(sent).includes('Demo-owner-test-123'));assert.ok(JSON.stringify(sent).includes('maya@elseweek.example'));assert.equal(data.onboarding.mode,'nebius');

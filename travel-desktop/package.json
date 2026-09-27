@@ -8,7 +8,8 @@
     "start": "electron .",
     "test": "node --test tests/*.test.js",
     "build:ocr": "sh scripts/build-ocr.sh",
-    "package:mac": "npm run build:ocr && electron-packager . Averill --platform=darwin --arch=arm64 --out=dist --overwrite --prune --no-asar --ignore=^/dist$"
+    "package:mac": "npm run build:ocr && electron-packager . Averill --platform=darwin --arch=arm64 --out=dist --overwrite --prune --no-asar --ignore=^/dist$",
+    "verify:intake": "electron scripts/verify-multisource.cjs"
   },
   "dependencies": {
     "@fontsource/fragment-mono": "^5.3.0",

@@ -32,9 +32,9 @@ function renderOnboarding(panel) {
  if(active?.role!=='admin') return;
  const section=node('section',undefined,'onboarding-section');section.append(node('h3','Bring your company into Averill'),node('p','Upload existing files once. Review the people and company knowledge, then create your team accounts together.'));
  onboardingButton(section,'Add company files',async()=>{
-  if(current.onboarding&&!current.onboarding.applied&&!window.confirm('Replace the current onboarding proposal with a new file selection?')) return;
   current=await window.desktop.uploadOnboarding();render();
  });
+ renderIntakeOptions(section);
  section.append(node('p','Excel .xlsx, CSV, PDF, SVG, text and images · up to 30 files. Legacy .xls needs an XLSX/CSV export.'));
  const draft=current.onboarding;
  if(!draft){panel.append(section);return;}
@@ -50,15 +50,23 @@ function renderOnboarding(panel) {
  section.append(node('p',draft.mode==='nebius'?`Interpreted with Nebius · ${draft.model}`:'Readable staff tables were extracted locally. Use Nebius for company context and less structured documents.'));
  for(const warning of draft.warnings) section.append(node('p',warning,'onboarding-warning'));
  const files=node('details',undefined,'onboarding-files');files.append(node('summary',`${draft.files.length} uploaded files · inspect extracted text`));
- for(const file of draft.files){const detail=node('details');detail.append(node('summary',`${file.name} · ${file.readable?'Text ready':'Needs a readable export'}`),node('pre',file.preview||'No readable text'));files.append(detail);}
+ for(const file of draft.files){
+  const detail=node('details');detail.append(node('summary',`${file.name} · ${file.origin?.kind||'local'} · ${file.readable?'Text ready':'Needs a readable export'}`),node('pre',file.preview||'No readable text'));
+  const label=node('label','Confidentiality');const level=node('select');for(const [value,text]of [['internal','Internal · local by default'],['restricted','Restricted · always local'],['public','Public']]){const option=node('option',text);option.value=value;level.append(option);}level.value=file.confidentiality||'internal';label.append(level);detail.append(label);
+  const allow=node('label','Allow this document in the next Nebius request');const check=node('input');check.type='checkbox';check.checked=file.aiAllowed===true;check.disabled=level.value==='restricted'||file.containsCredentials;allow.prepend(check);detail.append(allow);
+  level.addEventListener('change',()=>{file.confidentiality=level.value;check.disabled=level.value==='restricted'||file.containsCredentials;if(check.disabled){check.checked=false;file.aiAllowed=false;}});check.addEventListener('change',()=>{file.aiAllowed=check.checked;});
+  files.append(detail);
+ }
  section.append(files);
  const analyze=onboardingButton(section,'Interpret with Nebius',async()=>{
   if(!current.services?.nebius){el('workspace-feedback').textContent='Add the Nebius key under Service keys, then retry. Your proposal is kept.';return;}
-  const selected=draft.files.filter(f=>f.readable);
+  if(!current.privacy?.companyAI){el('workspace-feedback').textContent='Enable company AI only after verifying the provider terms and settings in Company confidentiality.';return;}
+  const selected=draft.files.filter(f=>f.readable&&f.aiAllowed&&f.confidentiality!=='restricted'&&!f.containsCredentials);
+  if(!selected.length){el('workspace-feedback').textContent='Choose permitted documents under uploaded files. Restricted documents always stay local.';return;}
   const chars=Math.min(60000,selected.reduce((total,f)=>total+f.sentCharacters,0));
   if(!window.confirm(`Send extracted text from these files to Nebius for company/personnel interpretation?\n\n${selected.map(f=>f.name).join('\n')}\n\nUp to ${chars.toLocaleString()} characters. Personnel names and email addresses may be included. Passwords, keys and file binaries are not sent.`))return;
   el('workspace-feedback').textContent='Nebius is reading the company files. Your local proposal is kept…';
-  current=await window.desktop.analyzeOnboarding(true);el('workspace-feedback').textContent='Proposal ready. Review all assignments before confirming.';render();
+  current=await window.desktop.analyzeOnboarding(true,draft.files.map(f=>({id:f.id,confidentiality:f.confidentiality||'internal',aiAllowed:f.aiAllowed===true})));el('workspace-feedback').textContent='Proposal ready. Review all assignments before confirming.';render();
  });analyze.disabled=onboardingWorking;
  if(draft.company){
   const label=node('label',`Use company name and context: ${draft.company.name}`);const checkbox=node('input');checkbox.type='checkbox';checkbox.checked=onboardingReview.useCompany;checkbox.addEventListener('change',()=>{onboardingReview.useCompany=checkbox.checked;});label.prepend(checkbox);section.append(label,node('p',draft.company.description));
@@ -98,7 +106,7 @@ function renderOnboarding(panel) {
  }
  onboardingButton(section,'Confirm company onboarding',async()=>{
   if(!current.auth?.enabled){el('workspace-feedback').textContent='Create your owner login first, then confirm this batch.';return;}
-  const result=await window.desktop.applyOnboarding(onboardingReview);current=result.snapshot;onboardingReview=null;render();
+  const result=await window.desktop.applyOnboarding({...onboardingReview,filePermissions:draft.files.map(f=>({id:f.id,confidentiality:f.confidentiality||'internal',aiAllowed:f.aiAllowed===true}))});current=result.snapshot;onboardingReview=null;render();
   if(result.receipt.length)showAccountReceipt(result.receipt);
   el('workspace-feedback').textContent=`Added ${result.peopleAdded} accounts and ${result.documentsAdded} sources.${result.duplicates.length?` Existing accounts skipped: ${result.duplicates.join(', ')}.`:''}`;
  });
@@ -136,7 +144,7 @@ function renderSession(){
  const session=el('session-bar');session.replaceChildren();
  if(locked){
   el('learning-panel').replaceChildren(); el('workspace-panel').replaceChildren();
-  onboardingReceipt=null;el('account-receipt').replaceChildren();
+  intakeCloudBrowser={};onboardingReceipt=null;el('account-receipt').replaceChildren();
   el('login-company').textContent=current.workspace?.company||'Your company';
   const accounts=el('login-account');const old=accounts.value;accounts.replaceChildren();
   const placeholder=node('option','Choose an account or enter your email');placeholder.value='';accounts.append(placeholder);

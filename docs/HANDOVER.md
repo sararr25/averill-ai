@@ -1,6 +1,6 @@
 # Averill execution handover
 
-Updated 26 September 2026. Canonical entry point for continuing this repository. Read [PROJECT.md](../PROJECT.md), [ARCHITECTURE.md](../ARCHITECTURE.md), [AGENTS.md](../AGENTS.md) and the [desktop design system](../travel-desktop/design-system/DESIGN_SYSTEM.md) before changes.
+Updated 27 September 2026. Canonical entry point for continuing this repository. Read [PROJECT.md](../PROJECT.md), [ARCHITECTURE.md](../ARCHITECTURE.md), [AGENTS.md](../AGENTS.md) and the [desktop design system](../travel-desktop/design-system/DESIGN_SYSTEM.md) before changes.
 
 ## Product, identity and agreed demo
 
@@ -45,7 +45,7 @@ Company copies and workspace JSON live in Electron user data. Optional Nebius/Ta
 
 ## Verified evidence
 
-- **18 Node tests pass:** original campaign findings/answers/citations, workspace roles/source approval/conflicts/import, plus onboarding bulk accounts/privacy/company scope, model evidence/consent/failure/rollback, organic LinkedIn findings/resolution/citations, Elseweek department-pack approval/visibility/version persistence and learning persistence, ordered confirmations, person isolation, exclusion, stale/revoked/conflicting source evidence, Copenhagen week rollover and work reflections.
+- **25 Node tests pass (current suite):** original campaign findings/answers/citations, workspace roles/source approval/conflicts/import, plus onboarding bulk accounts/privacy/company scope, model evidence/consent/failure/rollback, organic LinkedIn findings/resolution/citations, Elseweek department-pack approval/visibility/version persistence and learning persistence, ordered confirmations, person isolation, exclusion, stale/revoked/conflicting source evidence, Copenhagen week rollover and work reflections.
 - **Native dev app:** isolated workspace creation, Learn/help, step advancement, weekly generation, wrong-answer explanation and practical-reflection completion.
 - **Native packaged app:** restart resumed step 3 with two saved confirmations and earlier test answers/reflection. Manual LinkedIn activity was recorded through UI; refresh generated a prompt for that exact activity. These are synthetic test records, not proof of real employee learning or Canva operations. Final wording changes were syntax-tested and the app/ZIP rebuilt.
 - **Previous packaged campaign checks:** shared old brief yields current-source finding; v2 opens; Escape closes; local version comparison cites both briefs; Stop sharing clears findings. Email/Social visuals checked and actual SVG rendered.
@@ -131,3 +131,15 @@ Quit Averill, then run ./node_modules/.bin/electron scripts/prepare-local-demo.c
 Verification used normal workspace data and final bundle main/preload/renderers in the installed Electron runtime with environment keys removed: four distinct logins and logout passed, employee/manager access to account documents was denied, both services loaded from encrypted storage and Setup showed configured labels. The actual final .app was directly launched through native computer use and visibly showed the login screen. Nineteen Node tests pass. The real final-bundle chooser rehearsal and company-document AI request remain separate acceptance checks.
 
 Provider authentication checks also passed: Nebius /v1/models returned HTTP 200; Tavily returned five results for the public query Canva Position alignment tools official help. No company document content was sent by these checks. Final native login picker visibly listed all four profiles, and the owner email was prefilled for the user.
+
+## Multisource intake and confidentiality — 27 September 2026
+
+Implemented Desktop/Finder drag-and-drop, local picker, synced Drive/OneDrive files, HTTPS links and registered-client Google Drive/OneDrive OAuth with selected-file browsing. All inputs merge into the local review; adding files re-extracts the unapplied batch. Direct cloud authentication remains unverified and requires client registration. See [CLOUD_CONNECTIONS.md](CLOUD_CONNECTIONS.md).
+
+Company AI defaults off. Owner policy plus explicit per-file permission is required; restricted/credential-looking files and legacy sources without permission are excluded from Nebius. Connecting a drive does not authorize AI. See [COMPANY_CONFIDENTIALITY.md](COMPANY_CONFIDENTIALITY.md) for provider terms and production storage gaps. Local copies are not application-encrypted; do not promise enterprise secrecy, NDA, zero retention or verified opt-out.
+
+New modules: `company-privacy.js`, `remote-import.js`, `cloud-import.js`, `intake-ui.js`; IPC bridges in main/preload. Safe HTTPS resolves and pins public addresses, validates redirects, strips bearer credentials on redirect and bounds files. Cloud tokens/configuration are safeStorage encrypted, scoped to owner/workspace, read-only, expire without refresh and disconnect locally.
+
+25 Node tests pass, including mocked providers and a real local OAuth callback. Native packaged-resource checks passed a real disk-backed File through the drop event/preload, appended a synced XLSX, imported a live public HTTPS demo document, blocked private-network links and unconfigured cloud clients, and verified Setup without horizontal overflow. No live Google/Microsoft authorization or real confidential document transfer was tested. Preserve prepared normal-profile accounts and encrypted service keys. Rebuild app/ZIP after changing sources; app artifact remains `travel-desktop/dist/Averill-darwin-arm64/Averill.app`.
+
+Reproduce the native multisource smoke check with `npm run verify:intake` in `travel-desktop` (GUI and network required); set `AVERILL_NATIVE_APP` to bundled Resources/app to check packaged resources. It creates an isolated temporary profile and uses synthetic/public demo documents, never normal employee data.

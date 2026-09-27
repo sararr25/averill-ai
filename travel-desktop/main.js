@@ -10,6 +10,10 @@ const workspace = require('./src/workspace');
 const accounts = require('./src/accounts');
 const accountDocuments = require('./src/account-documents');
 const onboarding = require('./src/onboarding');
+const privacy = require('./src/company-privacy');
+const remoteImport = require('./src/remote-import');
+const { CloudImports } = require('./src/cloud-import');
+const cloud = new CloudImports({root:()=>app.getPath('userData'),secure:safeStorage,open:url=>shell.openExternal(url)});
 const learning = require('./src/learning');
 const { answerWorkspace, localWorkspaceAnswer } = require('./src/workspace-answer');
 const { searchPublicWeb } = require('./src/web-search');
@@ -64,6 +68,8 @@ function clearSessionWork() {
 function snapshot() {
   return {
     auth: { enabled: Boolean(companyWorkspace?.authEnabled), signedIn: signedIn(), accounts: accounts.publicAccounts(companyWorkspace), person: signedIn() ? accounts.publicAccounts(companyWorkspace).find(p => p.id === companyWorkspace.activePersonId) || null : null },
+    privacy: {companyAI:privacy.allowed(companyWorkspace)},
+    cloud: signedIn() && workspace.person(companyWorkspace)?.role==='admin' ? cloud.status(companyWorkspace) : [],
     onboarding: signedIn() ? onboarding.snapshot(companyWorkspace) : null,
     workspace: signedIn() ? workspace.publicSnapshot(companyWorkspace) : { configured: Boolean(companyWorkspace), company: companyWorkspace?.company },
     learning: learning.snapshot(signedIn() ? companyWorkspace : null),
@@ -117,6 +123,7 @@ function openWork(kind) {
 
 app.whenReady().then(async () => {
   companyWorkspace = workspace.load(app.getPath('userData'));
+  await cloud.load();
   const area = screen.getPrimaryDisplay().workArea;
   const agentWidth = Math.min(520, area.width - 40);
   agentWindow = createWindow('agent.html', { x: area.x + area.width - agentWidth - 12, y: area.y + 12, width: agentWidth, height: Math.min(850, area.height - 24), minWidth: 440, minHeight: 660, title: 'Averill' });
@@ -204,6 +211,51 @@ app.whenReady().then(async () => {
     if (error) throw new Error(error);
     return true;
   });
+  const admin = (event) => { fromAgent(event); if(workspace.person(companyWorkspace)?.role!=='admin')throw new Error('Administrator access required.'); };
+  const addIntake = (selected) => {
+    const previous = companyWorkspace.onboarding;
+    const existing = previous && !previous.applied ? previous.files.map(f=>({path:f.storedPath,name:f.name,origin:f.origin,confidentiality:f.confidentiality})) : [];
+    if(existing.length+selected.length>30)throw new Error('Choose up to 30 files per onboarding batch. Confirm the current batch first.');
+    onboarding.stage(app.getPath('userData'),companyWorkspace,[...existing,...selected]);
+  };
+  const remoteBatch = async (event,loader) => {
+    admin(event); const actor=companyWorkspace.activePersonId;
+    onboardingBusy=true; const temporary=fs.mkdtempSync(path.join(os.tmpdir(),'averill-download-'));
+    try {
+      const entries=await loader(temporary);requireSession();if(actor!==companyWorkspace.activePersonId)throw new Error('Account changed. Retry import.');
+      addIntake(entries);return persistWorkspace();
+    } finally {onboardingBusy=false;fs.rmSync(temporary,{recursive:true,force:true});}
+  };
+  ipcMain.handle('company:privacy',(event,enabled)=>{admin(event);privacy.configure(companyWorkspace,enabled);if(!enabled)aiEnabled=false;return persistWorkspace();});
+  ipcMain.handle('onboarding:drop',(event,files)=>{admin(event);if(!Array.isArray(files)||!files.length||files.some(f=>typeof f!=='string'||!path.isAbsolute(f)))throw new Error('Drop local files from Finder or the Desktop.');addIntake(files);return persistWorkspace();});
+  ipcMain.handle('onboarding:synced',async(event)=>{
+    admin(event);const actor=companyWorkspace.activePersonId;
+    const result=await dialog.showOpenDialog(agentWindow,{title:'Choose files from a synced Google Drive or OneDrive folder',properties:['openFile','multiSelections']});
+    admin(event);if(actor!==companyWorkspace.activePersonId)throw new Error('Account changed.');if(!result.canceled)addIntake(result.filePaths.map(file=>({path:file,origin:{kind:'synced-folder'}})));return persistWorkspace();
+  });
+  ipcMain.handle('onboarding:links',async(event,links)=>remoteBatch(event,async(temporary)=>{
+    if(!Array.isArray(links)||!links.length||links.length>30||links.some(l=>typeof l!=='string'||l.length>4000))throw new Error('Enter up to 30 HTTPS document links.');
+    const entries=[];
+    for(const link of links){
+      let linked;try{linked=new URL(link);}catch{throw new Error('Enter valid HTTPS document links.');}
+      if(linked.protocol!=='https:'||linked.username||linked.password)throw new Error('Use HTTPS links without embedded credentials.');
+      if(['drive.google.com','docs.google.com'].includes(linked.hostname)){const id=linked.pathname.match(/\/d\/([\w-]+)/)?.[1]||linked.searchParams.get('id');if(id){const file=await cloud.fileDownload(companyWorkspace,'google',id);entries.push({path:remoteImport.save(temporary,file.response,file.name,onboarding.EXTENSIONS),origin:file.origin});continue;}}
+      const response=await remoteImport.download(link);const host=new URL(response.url).hostname;let name;try{name=decodeURIComponent(new URL(response.url).pathname.split('/').pop());}catch{name='linked-document';}
+      const file=remoteImport.save(temporary,response,name||'linked-document',onboarding.EXTENSIONS);entries.push({path:file,origin:{kind:'link',host}});}
+    return entries;
+  }));
+  ipcMain.handle('cloud:configure',async(event,provider,id,secret)=>{admin(event);onboardingBusy=true;try{await cloud.configure(provider,id,secret);return snapshot();}finally{onboardingBusy=false;publish();}});
+  ipcMain.handle('cloud:connect',async(event,provider)=>{
+    admin(event);const actor=companyWorkspace.activePersonId;onboardingBusy=true;
+    try{await cloud.connect(companyWorkspace,provider,()=>{requireSession();if(actor!==companyWorkspace.activePersonId)throw new Error('Account changed.');});return snapshot();}finally{onboardingBusy=false;publish();}
+  });
+  ipcMain.handle('cloud:cancel',event=>{fromAgent(event,true);requireSession();if(workspace.person(companyWorkspace)?.role!=='admin')throw new Error('Administrator access required.');cloud.cancel?.();return true;});
+  ipcMain.handle('cloud:disconnect',async(event,provider)=>{admin(event);onboardingBusy=true;try{await cloud.disconnect(companyWorkspace,provider);return snapshot();}finally{onboardingBusy=false;publish();}});
+  ipcMain.handle('cloud:list',async(event,provider,folder,cursor)=>{admin(event);const actor=companyWorkspace.activePersonId;const result=await cloud.list(companyWorkspace,provider,folder,cursor||'');admin(event);if(actor!==companyWorkspace.activePersonId)throw new Error('Account changed.');return result;});
+  ipcMain.handle('cloud:import',async(event,provider,ids)=>remoteBatch(event,async(temporary)=>{
+    if(!Array.isArray(ids)||!ids.length||ids.length>30)throw new Error('Select up to 30 cloud files.');
+    const entries=[];for(const id of [...new Set(ids)]){const file=await cloud.fileDownload(companyWorkspace,provider,id);entries.push({path:remoteImport.save(temporary,file.response,file.name,onboarding.EXTENSIONS),origin:file.origin});}return entries;
+  }));
   ipcMain.handle('onboarding:upload', async (event) => {
     fromAgent(event);
     if (workspace.person(companyWorkspace)?.role !== 'admin') throw new Error('Administrator access required.');
@@ -212,15 +264,20 @@ app.whenReady().then(async () => {
     const selection = await dialog.showOpenDialog(agentWindow, { properties: ['openFile', 'multiSelections'], filters: [{ name: 'Company files — Excel, PDF, SVG and documents', extensions: [...onboarding.EXTENSIONS].map(e => e.slice(1)) }] });
     fromAgent(event);
     if (personId !== companyWorkspace.activePersonId) throw new Error('Account changed. Upload the files again.');
-    if (!selection.canceled) onboarding.stage(app.getPath('userData'), companyWorkspace, selection.filePaths);
+    if (!selection.canceled) addIntake(selection.filePaths);
     return persistWorkspace();
   });
-  ipcMain.handle('onboarding:analyze', async (event, consent) => {
+  ipcMain.handle('onboarding:analyze', async (event, consent, selections) => {
     fromAgent(event);
     if (onboardingBusy) throw new Error('An onboarding operation is already running.');
     const personId = companyWorkspace.activePersonId;
     onboardingBusy = true;
     try {
+      if(consent!==true)throw new Error('Authorize the selected files before external AI analysis.');
+      if(workspace.person(companyWorkspace)?.role!=='admin')throw new Error('Administrator access required.');
+      privacy.requireAI(companyWorkspace);
+      privacy.permissions(companyWorkspace.onboarding?.files||[],selections);
+      workspace.save(app.getPath('userData'),companyWorkspace);
       await onboarding.analyze(companyWorkspace, runtimeKeys.nebius, { consent: consent === true, authorize: () => { requireSession(); if (personId !== companyWorkspace.activePersonId) throw new Error('Account changed.'); } });
       return persistWorkspace();
     } finally { onboardingBusy = false; }
@@ -306,20 +363,23 @@ app.whenReady().then(async () => {
   });
   ipcMain.handle('agent:ai-mode', (event, enabled) => {
     fromAgent(event);
+    if (enabled) privacy.requireAI(companyWorkspace);
     aiEnabled = Boolean(enabled) && Boolean(runtimeKeys.nebius);
     publish();
     return snapshot();
   });
   ipcMain.handle('agent:ask', (event, question) => {
     fromAgent(event);
+    if(aiEnabled&&privacy.credentials(question))throw new Error('Remove credentials before using external AI.');
     if (companyWorkspace && workspace.approvedSources(companyWorkspace).length) {
-      return aiEnabled ? answerWorkspace(companyWorkspace, question, runtimeKeys.nebius) : localWorkspaceAnswer(companyWorkspace, question);
+      return aiEnabled && privacy.allowed(companyWorkspace) ? answerWorkspace(companyWorkspace, question, runtimeKeys.nebius) : localWorkspaceAnswer(companyWorkspace, question);
     }
-    return aiEnabled ? answerQuestion(question, runtimeKeys.nebius) : { ...localAnswer(String(question || '').slice(0, 1000)), mode: 'local' };
+    return aiEnabled && privacy.allowed(companyWorkspace) ? answerQuestion(question, runtimeKeys.nebius) : { ...localAnswer(String(question || '').slice(0, 1000)), mode: 'local' };
   });
   ipcMain.handle('agent:ask-demo', (event, question) => {
     fromAgent(event);
-    return aiEnabled ? answerQuestion(question, runtimeKeys.nebius) : { ...localAnswer(String(question || '').slice(0, 1000)), mode: 'local' };
+    if(aiEnabled&&privacy.credentials(question))throw new Error('Remove credentials before using external AI.');
+    return aiEnabled && privacy.allowed(companyWorkspace) ? answerQuestion(question, runtimeKeys.nebius) : { ...localAnswer(String(question || '').slice(0, 1000)), mode: 'local' };
   });
   ipcMain.handle('agent:web-search', (event, query) => { fromAgent(event); return searchPublicWeb(query, runtimeKeys.tavily); });
   ipcMain.handle('agent:external-windows', async (event) => {

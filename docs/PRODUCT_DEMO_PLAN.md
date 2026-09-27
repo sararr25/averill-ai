@@ -121,3 +121,7 @@ The owner now creates a local email/password account and uploads existing mixed-
 ## Login documents and current continuation
 
 The user requested one retrievable document per demo login. These are saved automatically for owner setup and generated team accounts, outside the repository. See ONBOARDING_TUTORIAL.md. The normal Mac workspace is now Aurelia Demo with four prepared logins and locally encrypted service keys; do not confuse /tmp synthetic test profiles with the normal workspace. HANDOVER.md contains executable paths, verification and remaining checks.
+
+## Multisource onboarding update — 27 September 2026
+
+Desktop/Finder drop, local/synced files, HTTPS links and Google Drive/OneDrive selected-file OAuth import now feed the local review. Direct cloud use requires registered OAuth clients and remains live-unverified. Company AI defaults off; owner authorization and per-file selection are required. Restricted files are blocked. Local company copies are not application-encrypted; provider confidentiality/no-training/retention settings remain unverified. See [cloud setup](CLOUD_CONNECTIONS.md), [company confidentiality](COMPANY_CONFIDENTIALITY.md) and [handover](HANDOVER.md) for implementation, verification and remaining gates.

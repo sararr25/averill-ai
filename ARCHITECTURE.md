@@ -120,3 +120,7 @@ Learn is offline and stores no screenshots. The official guide opens only on an 
 ## Prepared local demo provisioning
 
 The normal Aurelia Demo workspace was explicitly prepared after the user reported no usable login and missing keys. scripts/prepare-local-demo.cjs runs under Electron on this Mac, only against a legacy workspace without credentials. It preserves the existing admin ID/company, creates four accounts, validates generated passwords, backs up the old workspace and exports local login documents. It encrypts existing .env.local Nebius/Tavily keys with safeStorage into userData/averill-secrets.enc.json, which main.js already loads. Keys are never embedded in the distributable. An already authenticated workspace is refused; there is no password-reset mechanism. See HANDOVER.md for exact normal-workspace and provider verification.
+
+## Multisource onboarding update — 27 September 2026
+
+Desktop/Finder drop, local/synced files, HTTPS links and Google Drive/OneDrive selected-file OAuth import now feed the local review. Direct cloud use requires registered OAuth clients and remains live-unverified. Company AI defaults off; owner authorization and per-file selection are required. Restricted files are blocked. Local company copies are not application-encrypted; provider confidentiality/no-training/retention settings remain unverified. See [cloud setup](docs/CLOUD_CONNECTIONS.md), [company confidentiality](docs/COMPANY_CONFIDENTIALITY.md) and [handover](docs/HANDOVER.md) for implementation, verification and remaining gates.

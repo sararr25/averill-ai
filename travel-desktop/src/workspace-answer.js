@@ -1,4 +1,5 @@
 const fs = require('node:fs');
+const privacy = require('./company-privacy');
 const { approvedSources, conflicts } = require('./workspace');
 
 const NEBIUS_API = 'https://api.tokenfactory.nebius.com/v1';
@@ -24,7 +25,8 @@ async function answerWorkspace(data, question, key = process.env.NEBIUS_API_KEY,
   const input = String(question || '').trim().slice(0, 5000);
   const fallback = localWorkspaceAnswer(data, input);
   if (!input || !key) return fallback;
-  const matches = relevantSources(data, input);
+  if (!privacy.allowed(data)) return { ...fallback, text: 'Company AI is disabled by the owner. Local source lookup remains available.' };
+  const matches = relevantSources(data, input).filter(({source})=>privacy.eligible(source));
   if (!matches.length) return fallback;
   try {
     if (!model) {

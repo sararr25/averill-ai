@@ -73,3 +73,15 @@ Restart Averill: you must sign in again. Accounts, approved sources and each per
 If a person already exists from the manual pack without login access, the owner can use **Account access → Create account access** to attach an email/profile to their existing record. The manual pack remains supported. The new intake uses a real company-wide source scope, so you do not need to duplicate brand guidance per department.
 
 The app stores this local workspace on this Mac. These checks protect application routes; they do not provide cloud/tenant security against someone who can directly read/edit its local files. Do not present the demo as remote multi-device authentication.
+
+## Multiple company data locations — 27 September 2026
+
+Log in as Owner and open Setup. Drop one or several files from Desktop/Finder into **Drop company files here**, click that area to choose local files, or choose files from a synced Google Drive/OneDrive folder. Excel, PDF, SVG and other supported documents enter the same local review.
+
+Use **Import from links** for HTTPS files or public pages, one link per line. Private login pages are not downloadable documents. Use the Google Drive/Microsoft OneDrive sections to configure and connect cloud accounts, browse folders and import selected files. See [cloud setup](CLOUD_CONNECTIONS.md): registered OAuth client IDs are required before direct connections work.
+
+Adding files rebuilds the combined unapplied proposal: review people/source settings again. Nothing is automatically sent to Nebius. For each file choose Internal, Public or Restricted. Restricted files and detected credentials are excluded from AI. In Company confidentiality, the owner can authorize external AI only after checking the provider terms/settings. Then select specific eligible files and confirm their transfer before Analyze with Nebius. Local import and account creation continue without AI.
+
+Check the proposed employees, departments, profiles and evidence, exclude unwanted entries, confirm the local import and approve sources separately. Source approval does not grant AI permission. Accounts and password documents remain available through the existing login-document action.
+
+[Company confidentiality and production limitations](COMPANY_CONFIDENTIALITY.md).

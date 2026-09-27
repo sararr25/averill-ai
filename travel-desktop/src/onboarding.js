@@ -3,6 +3,7 @@ const path = require('node:path');
 const crypto = require('node:crypto');
 const workspace = require('./workspace');
 const accounts = require('./accounts');
+const privacy = require('./company-privacy');
 const API = 'https://api.tokenfactory.nebius.com/v1';
 const EXTENSIONS = new Set(['.xlsx', '.csv', '.pdf', '.svg', '.md', '.txt', '.json', '.png', '.jpg', '.jpeg', '.webp']);
 const clean = (v, max = 120) => String(v || '').trim().slice(0, max);
@@ -64,9 +65,10 @@ function stage(userData, data, selected) {
  const batchId = crypto.randomUUID();
  const root = path.join(userData, 'averill-onboarding', batchId);fs.mkdirSync(root, { recursive: true, mode: 0o700 });
  const files = [], warnings = [];
- for(const originalPath of selected) {
+ for(const entry of selected) {
+  const originalPath = typeof entry === 'string' ? entry : entry.path;
   const extension = path.extname(originalPath).toLowerCase();
-  const name = path.basename(originalPath);
+  const name = typeof entry === 'string' ? path.basename(originalPath) : path.basename(entry.name || originalPath);
   try {
    const stat = fs.lstatSync(originalPath);
    if (!stat.isFile() || stat.isSymbolicLink() || !EXTENSIONS.has(extension) || stat.size > 20 * 1024 * 1024) { warnings.push(`${name}: unsupported or larger than 20 MB. For legacy XLS, export as XLSX or CSV.`); continue; }
@@ -74,12 +76,13 @@ function stage(userData, data, selected) {
    const content = fs.readFileSync(originalPath);fs.writeFileSync(storedPath, content, { mode: 0o600 });
    let text = workspace.extractText(storedPath);
    if (extension === '.svg') text = [...text.matchAll(/<(?:text|title|desc)\b[^>]*>([\s\S]*?)<\/(?:text|title|desc)>/gi)].map(match=>match[1].replace(/<[^>]*>/g,' ').replace(/&amp;/g,'&').replace(/&quot;/g,'"').replace(/&lt;/g,'<').replace(/&gt;/g,'>').trim()).join('\n');
-   files.push({ id, name, originalPath, storedPath, sha256: crypto.createHash('sha256').update(content).digest('hex'), text, readable: Boolean(text.trim()), truncated: text.length >= 100000 || /extraction limited to/i.test(text) });
+   files.push({ id, name, originalPath, storedPath, containsCredentials: privacy.credentials(text), confidentiality: typeof entry === 'object' && entry.confidentiality === 'restricted' ? 'restricted' : 'internal', aiAllowed: false, origin: typeof entry === 'object' ? entry.origin || {kind:'local'} : {kind:'local'}, sha256: crypto.createHash('sha256').update(content).digest('hex'), text, readable: Boolean(text.trim()), truncated: text.length >= 100000 || /extraction limited to/i.test(text) });
   } catch { warnings.push(`${name}: could not read file. Retry with an exported copy.`); }
  }
  const people = files.flatMap(file => { const parsed = parseRoster(file); if (parsed.length >= 200) warnings.push(`${file.name}: staff extraction is limited to 200 people per file. Split larger rosters into smaller batches.`); return parsed; });
  for(const file of files) {
   Object.assign(file, classify(file, people.some(p=>p.sourceId===file.id)));
+  if(file.containsCredentials){file.confidentiality='restricted';warnings.push(`${file.name}: possible credentials detected; AI processing is blocked.`);}
   file.included = file.readable; file.approve = false;
   if(!file.readable) warnings.push(`${file.name}: no readable text; excluded by default. You can keep it as an unapproved file or provide a readable export.`);
   if(file.truncated) warnings.push(`${file.name}: extraction is limited; check the original file.`);
@@ -132,6 +135,9 @@ async function analyze(data, key, options={}) {
  if(!draft || draft.applied) throw new Error('Upload company files first.');
  if(!key) throw new Error('Configure your Nebius API key, or complete the locally extracted draft.');
  if(options.consent !== true) throw new Error('Confirm sending extracted file text to Nebius first.');
+ privacy.requireAI(data);
+ const files=draft.files.filter(f=>f.readable && privacy.eligible(f));
+ if(!files.length) throw new Error('Select permitted files for Nebius. Restricted files always stay local.');
  const fetcher=options.fetcher || fetch;
  let model=options.model || process.env.NEBIUS_MODEL;
  if(!model) {
@@ -141,7 +147,6 @@ async function analyze(data, key, options={}) {
   model=ids.find(id=>/nemotron/i.test(id)&&/super/i.test(id)) || ids.find(id=>/nemotron/i.test(id));
  }
  if(!model) throw new Error('No NVIDIA Nemotron model is available for this key.');
- const files=draft.files.filter(f=>f.readable);
  let remaining=60000;
  const payload=files.map(f=>{const text=f.text.slice(0,Math.min(12000,remaining));remaining-=text.length;return {sourceId:f.id,name:f.name,text};}).filter(f=>f.text);
  const response=await fetcher(`${API}/chat/completions`,{method:'POST',headers:{Authorization:`Bearer ${key}`,'Content-Type':'application/json'},body:JSON.stringify({model,temperature:0.1,max_tokens:6000,messages:[
@@ -149,7 +154,7 @@ async function analyze(data, key, options={}) {
   {role:'user',content:JSON.stringify(payload)}
  ]}),signal:AbortSignal.timeout(90000)});
  if(!response.ok) throw new Error(`Nebius analysis failed (${response.status}). Your local draft is preserved.`);
- const body=await response.json(); if(options.authorize) options.authorize(); const result=parseModel(body.choices?.[0]?.message?.content,draft);
+ const body=await response.json(); if(options.authorize) options.authorize(); const result=parseModel(body.choices?.[0]?.message?.content,{...draft,files:files.filter(f=>payload.some(p=>p.sourceId===f.id))});
  const existing=new Map(draft.people.map(p=>[p.email,p]));
  for(const person of result.people) if(!existing.has(person.email)) existing.set(person.email,person);
  for(const doc of result.documents) Object.assign(draft.files.find(f=>f.id===doc.id),doc);
@@ -162,6 +167,7 @@ async function apply(userData,data,review) {
  if(!draft || draft.applied || review.batchId !== draft.id) throw new Error('This onboarding batch is unavailable or already applied.');
  if(!Array.isArray(review.people)||!Array.isArray(review.documents)) throw new Error('Review people and documents first.');
  const next=structuredClone(data);const receipt=[];const duplicates=[];
+ if(review.filePermissions)privacy.permissions(next.onboarding.files,review.filePermissions);
  for(const p of review.people.filter(p=>p.included)) {
   if(!draft.people.some(entry=>entry.id===p.id)) throw new Error('Unknown proposed person.');
   if(!clean(p.name)||!accounts.validEmail(p.email)||!clean(p.department)) throw new Error('Each selected person needs a name, valid email and department.');
@@ -176,7 +182,7 @@ async function apply(userData,data,review) {
  const created=[];
  try {
   for(const document of review.documents.filter(d=>d.included)) {
-   const file=draft.files.find(f=>f.id===document.id);
+   const file=next.onboarding.files.find(f=>f.id===document.id);
    if(!file) throw new Error('Unknown uploaded document.');
    const personnel=file.category==='personnel'||draft.people.some(p=>p.sourceId===file.id);
    const scope=personnel ? 'private' : ['company','department','private'].includes(document.scope) ? document.scope : 'department';
@@ -185,6 +191,7 @@ async function apply(userData,data,review) {
    if(!next.departments.includes(department)&&department!=='Company') next.departments.push(department);
    const source=workspace.importFile(userData,next,file.storedPath,{title:file.name,scope,department,version:clean(document.version||'1',30)});created.push(source);
    source.originalPath=file.originalPath;source.onboardingBatch=draft.id;
+   source.origin=file.origin; source.confidentiality=file.confidentiality||'internal'; source.aiAllowed=privacy.eligible(file); source.containsCredentials=Boolean(file.containsCredentials);
    if(!personnel && document.approve && file.readable && scope !== 'private' && file.category!=='archive') workspace.updateSource(next,source.id,'approved',80);
    if(file.category==='archive' && scope !== 'private') workspace.updateSource(next,source.id,'superseded');
   }
