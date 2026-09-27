@@ -1,6 +1,6 @@
 # Averill execution handover
 
-Updated 27 September 2026. Canonical entry point for continuing this repository. Read [PROJECT.md](../PROJECT.md), [ARCHITECTURE.md](../ARCHITECTURE.md), [AGENTS.md](../AGENTS.md) and the [desktop design system](../travel-desktop/design-system/DESIGN_SYSTEM.md) before changes.
+Updated 28 September 2026. Canonical entry point for continuing this repository. Read [PROJECT.md](../PROJECT.md), [ARCHITECTURE.md](../ARCHITECTURE.md), [AGENTS.md](../AGENTS.md) and the [desktop design system](../travel-desktop/design-system/DESIGN_SYSTEM.md) before changes.
 
 ## Product, identity and agreed demo
 
@@ -37,7 +37,7 @@ npm test
 npm run package:mac
 ```
 
-Packaged unsigned arm64 app: `travel-desktop/dist/Averill-darwin-arm64/Averill.app`. ZIP: `travel-desktop/dist/Averill-macOS-arm64.zip`, generated with `ditto`, not tracked by Git. Both were rebuilt after the Elseweek / LinkedIn changes. Restart an older running app to load the new code. The native checks used `/tmp/averill-learning-preview` as a separate user-data profile with synthetic records; do not import those records into the normal employee workspace.
+Packaged unsigned arm64 app: `travel-desktop/dist/Averill-darwin-arm64/Averill.app`. ZIP: `travel-desktop/dist/Averill-macOS-arm64.zip`, generated with `ditto`, not tracked by Git. Both were rebuilt after the 28 September UI refinement. Restart an older running app to load the new code. Recent native checks used separate synthetic user-data profiles; do not import those records into the normal employee workspace.
 
 From the repository root, `npm --prefix travel-site start` serves Elseweek at `http://127.0.0.1:4173/`; gallery at `/design-system/index.html`. No install/build is needed for the dependency-free site. It includes city filters, native details/articles, local trip-brief generation and local photos/fonts. No bookings/payments/enquiry backend. Domain/trademark clearance is not established. Internal-browser desktop/mobile checks passed; download saving was not confirmed by the browser event.
 
@@ -148,8 +148,12 @@ Reproduce the native multisource smoke check with `npm run verify:intake` in `tr
 
 The desktop has a persistent action banner beneath navigation. Preload emits operation ID/channel/status and sanitized outcome text, with no IPC arguments, keys, tokens, passwords or document text in feedback events. Explicit IPC actions show pending, completion or failure. Local selection cancellation is identified; intake reports received/readable files and warnings, then links to Knowledge. Snapshot refreshes and automatic knowledge queries do not generate action notifications. There is no invented upload percentage: local extraction is synchronous in the main process, preceded by a renderer paint opportunity.
 
+UI refinement: compact header and session strip remain visible in Review; the aperture shrinks for findings; source state uses muted old evidence and ice approved evidence across Review/Campaign Files. Work draft review, Learn starts and Setup onboarding confirmation have a filled primary action. Routine success banners clear after 5.5 seconds; pending, errors and onboarding approval outcomes remain dismissible. The composer document button has a state-specific accessible name. `src/ui-refinements.css` is loaded last in the agent renderer.
+
 Knowledge is a separate tab. Uploaded proposals appear immediately for their owning admin; saved sources obey existing person/department/private visibility. Search covers extracted text and titles; status filters distinguish uploaded, approved, pending, private and superseded. Cards expose local excerpts, readable/unreadable state, version, visibility and AI permission. Full bounded extracted text opens locally in a dialog; saved originals can be opened. Saving and approving sources remain separate from AI permission. Excerpts and search are deterministic local document access, not an AI summary. Logout invalidates in-flight library requests and clears the library and search; backend queries reject unauthenticated callers.
+
+Knowledge previews now strip simple Markdown heading/backtick markers for reading, highlight the query using text nodes, and start on the matching line where possible. The count shows matching documents against the visible total; approval/review counts remain totals for all visible documents.
 
 Modules: knowledge.js (role-filtered local query), knowledge-ui.js and feedback-ui.js; preload operation notifications and main-process knowledge/read-upload IPC. Existing work sharing, learning and external AI boundaries are preserved. Avoid restoring the old silent callbacks or re-enabling intrinsically disabled cloud buttons after onboarding operations.
 
-26 Node tests pass, including upload visibility, text search and exclusion of another person's private personnel evidence. `npm run verify:feedback` checks native pending/success/error/cancel, pre-confirmation and approved library, local text reading/search, viewport bounds and logout cleanup in an isolated synthetic profile. `AVERILL_NATIVE_APP` can select final bundle Resources/app. The normal user profile is preserved.
+26 Node tests pass, including upload visibility, text search and exclusion of another person's private personnel evidence. `npm run verify:feedback` passes against source and rebuilt bundle resources: native pending/success/error/cancel, pre-confirmation and approved library, local text reading/search, viewport bounds and logout cleanup in an isolated synthetic profile. `AVERILL_NATIVE_APP` selects final bundle Resources/app. The 28 September source renderer was visually checked in Review (ready/finding), Work, Knowledge search, and Campaign Files v1/v2. This is not a direct launch of the final `.app` executable; the normal user profile is preserved.

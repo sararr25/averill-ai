@@ -17,7 +17,7 @@ function renderLearning(){
   lesson.append(node('p','Practise selecting, positioning, aligning and grouping elements. Start with an open Canva design. A shared window is optional; use Work for explicit OCR capture.'));
   const label=node('label','Optional company context');label.htmlFor='learning-source';const select=node('select');select.id='learning-source';select.append(new Option('Tool practice only',''));
   const conflicts=new Set((current.workspace.conflicts||[]).flat());for(const source of current.workspace.sources.filter(s=>s.status==='approved'&&!conflicts.has(s.id)))select.append(new Option(`${source.title} · v${source.version}`,source.id));
-  const start=node('button','Start Canva lesson','secondary-button');start.type='button';start.addEventListener('click',()=>learnAction('start',{sourceId:select.value||null}));lesson.append(label,select,start);
+  const start=node('button','Start Canva lesson','agent-primary');start.type='button';start.addEventListener('click',()=>learnAction('start',{sourceId:select.value||null}));lesson.append(label,select,start);
  }else{
   const step=data.steps[active.confirmed.length];lesson.append(node('p',`Step ${active.confirmed.length+1} of ${data.steps.length} · Confirmed by you, not automatically verified.`,'section-note'),node('h4',step.title),node('p',step.instruction));
   const help=node('details');help.append(node('summary','I need help with this step'),node('p',step.help));lesson.append(help,guideLink(data.guide));
@@ -35,7 +35,7 @@ function renderLearning(){
  const sessions=data.sessions.filter(s=>s.confirmed.some(c=>c.week===data.week)||!s.finishedAt);
  if(!sessions.length)week.append(node('p','No learning recorded this week. Start a lesson and confirm a step.'));
  for(const s of sessions){const row=node('div',undefined,'learning-record');row.append(node('strong',s.title),node('p',`${s.note?'Activity confirmed this week':`${s.confirmed.filter(c=>c.week===data.week).length} steps confirmed this week`}${s.finishedAt&&!s.note?' · lesson finished':''}${s.excluded?' · excluded':''}`));if(s.note)row.append(node('p',s.note));if(!s.excluded)row.append(learningButton('Exclude this session','exclude',{sessionId:s.id}));week.append(row);}
- const begin=learningButton(data.quiz?'Resume or refresh weekly practice':'Start weekly practice','quiz');begin.disabled=!sessions.some(s=>!s.excluded&&s.confirmed.some(c=>c.week===data.week));week.append(begin);panel.append(week);
+ const begin=learningButton(data.quiz?'Resume or refresh weekly practice':'Start weekly practice','quiz');begin.classList.add('agent-primary');begin.disabled=!sessions.some(s=>!s.excluded&&s.confirmed.some(c=>c.week===data.week));week.append(begin);panel.append(week);
  const quiz=data.quiz;if(!quiz)return;
  if(quiz.outdated)panel.append(node('p','Your learning record changed. Refresh weekly practice to include the latest confirmed activities.','section-note'));
  const practice=node('article',undefined,'learning-card');practice.append(node('h3',quiz.finishedAt?'Weekly practice complete':'Weekly practice'),node('p','Feedback supports learning. It is not an employee performance or mastery score.'));

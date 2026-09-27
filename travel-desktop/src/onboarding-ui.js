@@ -31,12 +31,14 @@ function renderOnboarding(panel) {
  const active=current.workspace.people?.find(p=>p.id===current.workspace.activePersonId);
  if(active?.role!=='admin') return;
  const section=node('section',undefined,'onboarding-section');section.append(node('h3','Bring your company into Averill'),node('p','Upload existing files once. Review the people and company knowledge, then create your team accounts together.'));
- onboardingButton(section,'Add company files',async()=>{
+ const addFiles=onboardingButton(section,'Add company files',async()=>{
   current=await window.desktop.uploadOnboarding();render();
  });
+ addFiles.classList.add('agent-primary');
  renderIntakeOptions(section);
  section.append(node('p','Excel .xlsx, CSV, PDF, SVG, text and images · up to 30 files. Legacy .xls needs an XLSX/CSV export.'));
  const draft=current.onboarding;
+ if(draft&&!draft.applied)addFiles.classList.remove('agent-primary');
  if(!draft){panel.append(section);return;}
  if(draft.applied){section.append(node('p','Onboarding completed. Your team and sources are saved. Add another batch whenever company material changes.'));panel.append(section);return;}
  if(!onboardingReview||onboardingReview.batchId!==draft.id) onboardingReview={batchId:draft.id,useCompany:false,people:structuredClone(draft.people),documents:draft.files.map(f=>({id:f.id,included:f.included,scope:f.scope,department:f.department,version:f.version,approve:false}))};
@@ -104,12 +106,13 @@ function renderOnboarding(panel) {
   if(file.category==='archive')row.append(node('p','Archived/superseded material is retained without approval.'));
   const detail=node('details',undefined,'onboarding-edit');detail.append(node('summary',`${file.name} · ${personnel?'Private personnel record':d.scope==='company'?'Company-wide':d.department} · v${d.version}`),row);section.append(detail);
  }
- onboardingButton(section,'Confirm company onboarding',async()=>{
+ const confirm=onboardingButton(section,'Confirm company onboarding',async()=>{
   if(!current.auth?.enabled){el('workspace-feedback').textContent='Create your owner login first, then confirm this batch.';return;}
   const result=await window.desktop.applyOnboarding({...onboardingReview,filePermissions:draft.files.map(f=>({id:f.id,confidentiality:f.confidentiality||'internal',aiAllowed:f.aiAllowed===true}))});current=result.snapshot;onboardingReview=null;render();
   if(result.receipt.length)showAccountReceipt(result.receipt);
   el('workspace-feedback').textContent=`Added ${result.peopleAdded} accounts and ${result.documentsAdded} sources.${result.duplicates.length?` Existing accounts skipped: ${result.duplicates.join(', ')}.`:''}`;
  });
+ confirm.classList.add('agent-primary');
  panel.append(section);
 }
 function renderAccountAccess(panel){

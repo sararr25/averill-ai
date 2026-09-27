@@ -1,0 +1,70 @@
+/* Compact desktop chrome keeps source evidence visible in the narrow assistant. */
+.agent-body .agent-header,
+.agent-body[data-area="review"] .agent-header {
+  display:flex;
+  height:44px;
+  min-height:44px;
+  align-items:center;
+  padding:0 24px;
+  border-bottom:1px solid var(--ds-color-border);
+}
+.agent-body .agent-header h1{font-size:16px;margin:0}
+.agent-body .live-pill{font-size:10px;letter-spacing:.04em}
+.agent-body .session-bar{min-height:42px;padding:4px 24px;gap:6px;flex-wrap:nowrap}
+.agent-body .session-bar strong,.agent-body .session-bar span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.agent-body .session-bar span{font-size:11px}
+.agent-body .session-bar button{min-height:32px;padding:5px 9px;white-space:nowrap}
+.agent-body .agent-nav,.agent-body[data-area="review"] .agent-nav{height:42px;min-height:42px;padding:0 24px;border-bottom:1px solid var(--ds-color-border)}
+.agent-body .agent-nav button{font-size:12px;min-width:0}
+
+/* Keep the mark as an identity cue while making room for the current decision. */
+.agent-body[data-area="review"] .aperture-wrap{height:70px}
+.agent-body[data-area="review"] .aperture-mark{width:48px;height:48px}
+.agent-body[data-area="review"] .hero-tagline{font-size:9px;margin-bottom:14px}
+.agent-body[data-area="review"] .hero-rule{margin-bottom:20px}
+.agent-body[data-area="review"] .review-hero{padding-bottom:14px}
+.agent-body[data-area="review"] .review-hero p{font-size:14px;margin-bottom:18px}
+.agent-body[data-area="review"] .review-composer{padding:16px 0 14px}
+.agent-body[data-area="review"] .composer-label{margin-bottom:8px}
+.agent-body[data-area="review"] .review-composer .ask-form{height:52px}
+.agent-body[data-area="review"].has-finding .aperture-wrap{height:52px}
+.agent-body[data-area="review"].has-finding .aperture-mark{width:38px;height:38px}
+.agent-body[data-area="review"].has-finding .hero-tagline{margin-bottom:8px}
+.agent-body[data-area="review"].has-finding .hero-rule{margin-bottom:14px}
+.agent-body[data-area="review"] .ai-control .secondary-button,.agent-body[data-area="review"] .ai-control span{font-size:11px;line-height:1.4}
+.agent-body[data-area="review"] .composer-attach{min-width:44px;width:44px;margin-right:0}
+.agent-body[data-area="review"] .hero-selected .eyebrow,
+.agent-body[data-area="review"] .selected-detail .source-file-icon,
+.agent-body[data-area="review"] .selected-detail small{color:var(--ds-color-text-muted)}
+.agent-body[data-area="review"] .hero-source .eyebrow,
+.agent-body[data-area="review"] .hero-source .source-file-icon{color:var(--ds-color-verified)}
+.agent-body[data-area="review"] .hero-source .source-file-icon{filter:none}
+
+.agent-body .agent-primary{min-height:44px;border:1px solid var(--ds-color-signal);border-radius:8px;background:var(--ds-color-signal);color:var(--ds-color-canvas);padding:9px 14px;font:600 13px/1.3 var(--ds-font-body)}
+.agent-body .agent-primary:hover{background:var(--ds-color-signal-hover);border-color:var(--ds-color-signal-hover)}
+.agent-body .agent-primary:disabled{opacity:.55;cursor:not-allowed}
+.agent-body .agent-primary:focus-visible{outline:2px solid var(--ds-color-focus);outline-offset:2px}
+
+.agent-body .operation-feedback{padding:8px 24px;gap:10px;max-height:140px}
+.agent-body .operation-feedback strong{font-size:12px}
+.agent-body .operation-feedback p{font-size:12px;line-height:1.35;margin:2px 0}
+.agent-body .operation-feedback #operation-dismiss{min-width:36px;min-height:36px;padding:4px}
+.agent-body .operation-feedback #operation-knowledge{font-size:12px;margin-top:6px}
+.agent-body .operation-feedback[data-state="error"]{border-left:3px solid var(--ds-color-signal)}
+
+.agent-body #knowledge-summary{font-size:12px;color:var(--ds-color-text-secondary);margin:12px 0}
+.agent-body .knowledge-card{margin-top:12px;padding:14px}
+.agent-body .knowledge-card h3{font-size:16px;line-height:1.3;margin:0 0 6px}
+.agent-body .knowledge-state{display:block;font-size:12px;line-height:1.35;color:var(--ds-color-verified)}
+.agent-body .knowledge-state[data-state="uploaded"],.agent-body .knowledge-state[data-state="pending"]{color:var(--ds-color-signal)}
+.agent-body .knowledge-state[data-state="superseded"]{color:var(--ds-color-text-muted)}
+.agent-body .knowledge-meta{font-size:11px;line-height:1.45;color:var(--ds-color-text-muted);margin:4px 0 9px}
+.agent-body .knowledge-preview{font:400 13px/1.5 var(--ds-font-body);color:var(--ds-color-text-secondary);white-space:pre-line;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:4;line-clamp:4;max-height:none;margin:10px 0;overflow:hidden}
+.agent-body .knowledge-preview mark{color:var(--ds-color-canvas);background:var(--ds-color-verified);border-radius:2px;padding:0 2px}
+.agent-body .knowledge-card button{margin-top:6px}
+
+@media(max-width:480px){
+  .agent-body .agent-header,.agent-body[data-area="review"] .agent-header,.agent-body .session-bar,.agent-body .agent-nav,.agent-body[data-area="review"] .agent-nav{padding-left:16px;padding-right:16px}
+  .agent-body .agent-nav button{font-size:11px;padding:0 3px}
+  .agent-body .operation-feedback{padding-left:16px;padding-right:16px}
+}

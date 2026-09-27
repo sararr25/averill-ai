@@ -81,7 +81,7 @@ Order: coral marker and `FINDING` label → plain-language title → observed va
 
 ### 4. Version comparison
 
-Two labeled values, `SUPERSEDED` and `APPROVED`, connected by a thin coral path/arrow. Old version stays muted; the approved document uses coral as in the supplied image. This large comparison belongs in Campaign Files or an expanded finding, not in every small alert. The source remains a separate cited object.
+Two labeled values, `SUPERSEDED` and `APPROVED`, connected by a thin coral path/arrow. Old version stays muted; the approved document uses ice for its label and version number. This large comparison belongs in Campaign Files or an expanded finding, not in every small alert. The source remains a separate cited object.
 
 ### 5. Source citation / viewer
 
@@ -93,7 +93,7 @@ Composer: 48px minimum height, full width, border on the petrol panel, clear foc
 
 ### 7. Actions
 
-Primary action for the assistant is a **text link** in coral with a fine arrow; it describes what the user can do (`Open approved brief`, `Review audience`). Secondary actions are quiet outlines. The agent must not show `Fix automatically`, `Send`, or `Publish` in this demo. Hover increases contrast; focus uses a visible ice outline; disabled actions retain readable text and explain why unavailable.
+Primary action in Review is a **text link** in coral with a fine arrow; it describes what the user can do (`Open approved brief`, `Review audience`). Task starting actions in Work, Learn, and Setup use one filled coral button per local section. Secondary actions are quiet outlines. The agent must not show `Fix automatically`, `Send`, or `Publish` in this demo. Hover increases contrast; focus uses a visible ice outline; disabled actions retain readable text and explain why unavailable.
 
 ### 8. Empty states and feedback
 
@@ -140,3 +140,7 @@ Verified natively: v1 selection, explicit Share, finding with v2 source, source 
 ## Learn area
 
 Learn uses the existing Petrol / Coral / Ice tokens, fonts and secondary controls. Lesson, activity history and practice are separated into bordered panels. Labels explain employee confirmation; feedback uses ice with explanatory text. Forms have visible labels, native required validation and keyboard controls. The lesson help is a native details/summary disclosure. No completion badge implies automatic visual assessment or mastery. Native UI and restart flow were checked in the Mac arm64 app on 26 September 2026.
+
+## UI refinement — 28 September 2026
+
+The assistant now keeps a compact header and sharing state visible in Review. The aperture is smaller when a finding is present, leaving room for evidence and the composer. Approved evidence uses ice; superseded material uses muted text; coral marks findings, transitions and the next action. The composer source control uses a document icon and names its current action for assistive technology. Knowledge cards show short, searchable excerpts with highlighted matches and separate status and metadata lines. Routine success feedback clears after 5.5 seconds; pending actions, errors and approval outcomes remain until dismissed.

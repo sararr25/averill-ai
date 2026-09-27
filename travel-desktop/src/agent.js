@@ -93,6 +93,11 @@ function render() {
 
 function renderHero() {
   const item = current.findings?.[0];
+  document.body.classList.toggle('has-finding', Boolean(item));
+  const sourceAction = el('ask-form').querySelector('.composer-attach');
+  const sourceLabel = item?.source ? 'Open current source' : 'Open Work to choose a window';
+  sourceAction.setAttribute('aria-label', sourceLabel);
+  sourceAction.title = sourceLabel;
   el('hero-label').textContent = item ? 'FINDING' : 'READY';
   el('hero-title').textContent = item?.kind === 'handover' ? 'This brief is out of date.' : item ? item.title : 'Ready when you are.';
   el('hero-body').textContent = item?.kind === 'handover' ? 'You’re looking at an older version of this brief. A newer, approved version is available.' : item ? item.body : 'Share a work window or review a marketing draft to see source-backed guidance here.';
@@ -373,7 +378,7 @@ window.desktop.onSnapshot((value) => { current = value; render(); });
 window.desktop.snapshot().then((value) => { current = value; render(); showTab(value.workspace?.configured ? 'review' : 'setup'); });
 
 for (const target of document.querySelectorAll('[data-icon]')) target.innerHTML = icon(target.dataset.icon);
-el('ask-form').querySelector('.composer-attach').innerHTML = icon('paperclip');
+el('ask-form').querySelector('.composer-attach').innerHTML = icon('document');
 el('ask-form').querySelector('.composer-attach').addEventListener('click', () => {
   const source = current.findings?.[0]?.source;
   if (source) source.kind === 'asset' ? window.desktop.openSource(source.id) : showSource(source.id);
