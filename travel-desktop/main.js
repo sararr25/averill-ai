@@ -116,7 +116,7 @@ function openWork(kind) {
   const area = screen.getPrimaryDisplay().workArea;
   const width = Math.max(760, Math.min(980, area.width - 540));
   const height = Math.min(850, area.height - 24);
-  const window = createWindow('work.html', { x: area.x + 12, y: area.y + 12, width, height, minWidth: 760, minHeight: 620, title: `${titles[kind]} · Elseweek` }, { kind });
+  const window = createWindow('work.html', { x: area.x + 12, y: area.y + 12, width, height, minWidth: 760, minHeight: 620, title: `${titles[kind]} · Elseweek` }, { kind, person: companyWorkspace.activePersonId });
   workWindows.set(kind, window);
   window.on('closed', () => { workWindows.delete(kind); workState.delete(kind); shared.delete(kind); publish(); });
   publish();
@@ -362,7 +362,7 @@ app.whenReady().then(async () => {
     publish(); return snapshot();
   });
   ipcMain.handle('agent:snapshot', (event) => { fromAgent(event, true); return snapshot(); });
-  ipcMain.handle('agent:open-work', (event, kind) => { fromAgent(event); openWork(kind); return snapshot(); });
+  ipcMain.handle('agent:open-work', (event, kind) => { fromApp(event); if (!workKinds.includes(kind)) throw new Error('Unknown work window'); openWork(kind); return snapshot(); });
   ipcMain.handle('agent:share', (event, kind, enable) => {
     fromAgent(event);
     if (!workKinds.includes(kind) || !workWindows.has(kind)) return snapshot();
@@ -380,7 +380,7 @@ app.whenReady().then(async () => {
   ipcMain.handle('agent:ask', (event, question) => {
     fromAgent(event);
     if(aiEnabled&&privacy.credentials(question))throw new Error('Remove credentials before using external AI.');
-    if (companyWorkspace && workspace.approvedSources(companyWorkspace).length) {
+    if (companyWorkspace) {
       return aiEnabled && privacy.allowed(companyWorkspace) ? answerWorkspace(companyWorkspace, question, runtimeKeys.nebius) : localWorkspaceAnswer(companyWorkspace, question);
     }
     return aiEnabled && privacy.allowed(companyWorkspace) ? answerQuestion(question, runtimeKeys.nebius) : { ...localAnswer(String(question || '').slice(0, 1000)), mode: 'local' };

@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 const workspace = require('../src/workspace');
-const { relevantSources } = require('../src/workspace-answer');
+const { relevantSources, localWorkspaceAnswer } = require('../src/workspace-answer');
 
 test('local company setup, lead approval, employee visibility and source conflict survive reload', () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'averill-test-'));
@@ -24,6 +24,8 @@ test('local company setup, lead approval, employee visibility and source conflic
     workspace.switchPerson(data, employee.id);
     assert.equal(workspace.approvedSources(data).length, 1);
     assert.equal(relevantSources(data, 'launch date').length, 1);
+    assert.equal(relevantSources(data, 'zyxwvuts qqqrrrttt').length, 0);
+    assert.deepEqual(localWorkspaceAnswer(data, 'zyxwvuts qqqrrrttt').sources, []);
     const privateFile = path.join(root, 'notes.md');
     fs.writeFileSync(privateFile, 'Personal campaign note.');
     const personal = workspace.importFile(root, data, privateFile, { title: 'Personal note', department: 'Marketing', scope: 'private' });

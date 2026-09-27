@@ -29,7 +29,7 @@ function renderIntakeOptions(section) {
    cancel=node('button','Cancel cloud sign-in','secondary-button');cancel.type='button';cancel.disabled=true;cancel.addEventListener('click',()=>window.desktop.cloudCancel());host.append(cancel);
   }else{
    const state=intakeCloudBrowser[connection.provider]||(intakeCloudBrowser[connection.provider]={folder:'root',trail:[],items:[],cursor:'',selected:new Set()});
-   const load=async(folder,cursor='',append=false)=>{const result=await window.desktop.cloudList(connection.provider,folder,cursor);state.folder=folder;state.items=append?[...state.items,...result.items]:result.items;state.cursor=result.cursor;render();};
+   const load=async(folder,cursor='',append=false)=>{const result=await window.desktop.cloudList(connection.provider,folder,cursor);state.folder=folder;state.items=append?[...state.items,...result.items]:result.items;state.cursor=result.cursor;workspaceRenderKey=null;render();};
    onboardingButton(host,'Browse files',()=>load(state.folder));
    if(state.trail.length)onboardingButton(host,'Back to parent folder',async()=>{const previous=state.trail.pop();await load(previous);});
    const list=node('div',undefined,'cloud-file-list');

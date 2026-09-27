@@ -6,11 +6,23 @@ const kinds = [
 ];
 let current = { open: [], shared: [], findings: [] };
 let activeSourceId = null;
+let selectedFindingId = null;
+let reviewContextKey = null;
+let workspaceRenderKey = null;
 
 const el = (id) => document.getElementById(id);
+const areas=new Set(['review','work','learn','research','knowledge','setup']);
+function preferredArea(){
+  if(!current.workspace?.configured||current.onboarding&&!current.onboarding.applied)return 'setup';
+  const id=current.auth?.person?.id;
+  const saved=id?localStorage.getItem(`averill:last-area:${id}`):null;
+  return areas.has(saved)?saved:'review';
+}
 
 function showTab(name) {
+  if(!areas.has(name))return;
   document.body.dataset.area = name;
+  if(current.auth?.signedIn&&current.auth.person?.id)localStorage.setItem(`averill:last-area:${current.auth.person.id}`,name);
   for (const button of document.querySelectorAll('[data-tab-button]')) {
     const active = button.dataset.tabButton === name;
     button.classList.toggle('active', active);
@@ -43,9 +55,14 @@ function render() {
   el('answer-mode').textContent = current.aiEnabled ? 'Nebius AI enabled' : 'Local source answers';
   el('ai-toggle').textContent = current.aiEnabled ? 'Disable Nebius AI' : current.services?.nebius ? 'Enable Nebius AI' : 'Nebius key needed in Setup';
   el('ai-toggle').disabled = !current.services?.nebius && !current.aiEnabled;
+  const admin=current.workspace?.people?.find(person=>person.id===current.workspace.activePersonId)?.role==='admin';
+  el('ai-setup').hidden=Boolean(current.services?.nebius)||!admin;
   el('web-form').querySelector('button').disabled = !current.services?.tavily;
+  el('web-unavailable').hidden=Boolean(current.services?.tavily);
+  el('web-unavailable').textContent=admin?'Public research is not configured. Add a Tavily key in Setup to search.':'Public research is not configured. Ask your administrator to add a Tavily key.';
+  el('web-setup').hidden=Boolean(current.services?.tavily)||!admin;
   el('shared-count').textContent = `${current.shared.length} shared`;
-  el('sharing-status').textContent = current.shared.length ? 'LIVE' : 'NOT SHARING';
+  el('sharing-status').textContent = current.shared.length ? `${current.shared.length} SHARED` : current.externalWindow ? 'CANVA SELECTED' : 'NOT SHARING';
   el('finding-count').textContent = current.findings.length ? `${current.findings.length} to review` : 'No issues';
   const list = el('window-list');
   list.replaceChildren();
@@ -87,20 +104,48 @@ function render() {
     const title = document.createElement('h3'); title.textContent = item.title;
     const body = document.createElement('p'); body.textContent = item.body;
     const source = sourceButton(item.source);
-    card.append(context, title, body, source); findings.append(card);
+    const review = node('button', 'Review this finding', 'secondary-button');review.type='button';
+    review.addEventListener('click',()=>{selectedFindingId=`${item.kind}:${item.id}`;showTab('review');renderHero();el('hero-title').focus();});
+    card.append(context, title, body, source, review); findings.append(card);
   }
 }
 
 function renderHero() {
-  const item = current.findings?.[0];
+  const findings=current.findings||[];
+  let index=findings.findIndex(item=>`${item.kind}:${item.id}`===selectedFindingId);
+  if(index<0)index=0;
+  const item=findings[index];
+  selectedFindingId=item?`${item.kind}:${item.id}`:null;
+  const context=el('review-context');context.replaceChildren();
+  const sharedNames=(current.shared||[]).map(id=>kinds.find(kind=>kind.id===id)?.title||id);
+  const contextKey=sharedNames.length?`demo:${[...current.shared].sort().join(',')}`:'company';
+  document.querySelector('.composer-label').textContent=sharedNames.length?'Ask about the shared campaign…':'Ask about approved company sources…';
+  el('question').setAttribute('aria-label',sharedNames.length?'Ask about the shared campaign':'Ask about approved company sources');
+  if(reviewContextKey!==null&&reviewContextKey!==contextKey&&el('conversation').querySelector('.user-message')){
+    el('conversation').append(node('div',contextKey==='company'?'Context changed: answers now use your accessible approved company sources.':'Context changed: answers now use the fixed sources for the shared demo work. Earlier answers belong to their previous context.','conversation-context'));
+  }
+  reviewContextKey=contextKey;
+  if(sharedNames.length){
+    const label=node('span',`Demo work shared: ${sharedNames.join(', ')}`);context.append(label);
+    for(const id of current.shared){const kind=kinds.find(entry=>entry.id===id);const stop=node('button',`Stop ${kind?.title||id}`,'secondary-button');stop.type='button';stop.setAttribute('aria-label',`Stop sharing ${kind?.title||id}`);stop.addEventListener('click',async()=>{current=await window.desktop.share(id,false);render();});context.append(stop);}
+  }else context.append(node('span','Company sources · no demo window shared'));
+  if(current.externalWindow){context.append(node('span',`Canva selected: ${current.externalWindow.name} · capture only on Review`));const stop=node('button','Clear Canva selection','secondary-button');stop.type='button';stop.addEventListener('click',async()=>{current=await window.desktop.shareExternal(null,null);render();});context.append(stop);}
+  const navigation=el('finding-navigation');navigation.replaceChildren();
+  if(findings.length>1){
+    navigation.append(node('span',`Finding ${index+1} of ${findings.length}`));
+    for(const [label,next] of [['Previous',(index-1+findings.length)%findings.length],['Next',(index+1)%findings.length]]){
+      const button=node('button',label,'secondary-button');button.type='button';button.addEventListener('click',()=>{selectedFindingId=`${findings[next].kind}:${findings[next].id}`;renderHero();el('hero-title').focus();});navigation.append(button);
+    }
+  }
   document.body.classList.toggle('has-finding', Boolean(item));
+  document.body.classList.toggle('has-shared',sharedNames.length>0);
   const sourceAction = el('ask-form').querySelector('.composer-attach');
   const sourceLabel = item?.source ? 'Open current source' : 'Open Work to choose a window';
   sourceAction.setAttribute('aria-label', sourceLabel);
   sourceAction.title = sourceLabel;
-  el('hero-label').textContent = item ? 'FINDING' : 'READY';
-  el('hero-title').textContent = item?.kind === 'handover' ? 'This brief is out of date.' : item ? item.title : 'Ready when you are.';
-  el('hero-body').textContent = item?.kind === 'handover' ? 'You’re looking at an older version of this brief. A newer, approved version is available.' : item ? item.body : 'Share a work window or review a marketing draft to see source-backed guidance here.';
+  el('hero-label').textContent = item ? 'FINDING' : sharedNames.length ? 'CHECKED' : 'READY';
+  el('hero-title').textContent = item?.kind === 'handover' ? 'This brief is out of date.' : item ? item.title : sharedNames.length ? 'No issues found.' : 'Ready when you are.';
+  el('hero-body').textContent = item?.kind === 'handover' ? 'You’re looking at an older version of this brief. A newer, approved version is available.' : item ? item.body : sharedNames.length ? 'The supported campaign fields have been checked. Keep editing to see new findings.' : 'Share a work window or review a marketing draft to see source-backed guidance here.';
   const selected = el('hero-selected'); selected.replaceChildren();
   if (item?.kind === 'handover') {
     const row = node('div', undefined, 'source-detail selected-detail');
@@ -124,7 +169,7 @@ function renderHero() {
     open.addEventListener('click', () => item.source.kind === 'asset' ? window.desktop.openSource(item.source.id) : showSource(item.source.id));
     source.append(open);
   } else {
-    source.append(node('p', current.shared?.length ? 'No issues found in the shared work right now.' : 'No work window is shared. Open Work to choose a window, then select Share.'));
+    if(!sharedNames.length)source.append(node('p','No work window is shared. Open Work to choose a window, then select Share.'));
   }
 }
 
@@ -147,6 +192,9 @@ function action(label, callback) {
 
 function renderWorkspace() {
   const panel = el('workspace-panel');
+  const renderKey=JSON.stringify([current.workspace,current.onboarding,current.auth,current.services,current.cloud,current.privacy]);
+  if(renderKey===workspaceRenderKey)return;
+  workspaceRenderKey=renderKey;
   panel.replaceChildren();
   const data = current.workspace || { configured: false };
   if (!data.configured) {
@@ -241,6 +289,7 @@ function renderWorkspace() {
   if (!data.sources.length) list.append(node('p', 'No sources yet. Import a file, then approve it as a department lead or administrator.'));
   for (const source of data.sources) {
     const row = node('div'); row.className = 'workspace-source';
+    row.dataset.sourceId=source.id;
     row.append(node('strong', source.title), node('small', `${source.scope === 'company' ? 'Company-wide' : source.department} · ${source.status} · v${source.version} · priority ${source.priority} · ${source.extractionStatus}`));
     row.append(action('Open', () => window.desktop.openWorkspaceSource(source.id).then(() => current)));
     if (source.scope === 'private' && source.ownerId === active.id) row.append(action('Propose to department', () => window.desktop.proposeSource(source.id)));
@@ -284,7 +333,7 @@ function addMessage(text, role, sources = []) {
   for (const source of sources) message.append(sourceButton(source));
   el('conversation').append(message);
   el('conversation').scrollTop = el('conversation').scrollHeight;
-  document.querySelector('.agent-main').scrollTop = document.querySelector('.agent-main').scrollHeight;
+  const feed=document.querySelector('.review-feed');feed.scrollTop=feed.scrollHeight;
 }
 
 let asking = false;
@@ -366,21 +415,23 @@ el('ai-toggle').addEventListener('click', async () => {
   if (!current.aiEnabled && !window.confirm('Enable Nebius for this session? Your questions and relevant approved company text sources will be sent to Nebius. Images and window captures are not sent by this control.')) return;
   current = await window.desktop.aiMode(!current.aiEnabled); render();
 });
+el('ai-setup').addEventListener('click',()=>showTab('setup'));
+el('web-setup').addEventListener('click',()=>showTab('setup'));
 el('open-source').addEventListener('click', () => { if (activeSourceId) window.desktop.openSource(activeSourceId); });
 el('login-account').addEventListener('change', () => { el('login-email').value = el('login-account').value; el('login-password').value = ''; el('login-password').focus(); });
 el('login-form').addEventListener('submit', async (event) => {
   event.preventDefault(); const submit = el('login-form').querySelector('button'); submit.disabled = true; el('login-feedback').textContent = 'Signing in…';
-  try { current = await window.desktop.login(el('login-email').value, el('login-password').value); el('login-password').value = ''; el('login-feedback').textContent = ''; render(); showTab(current.auth.person?.profile === 'owner' ? 'setup' : 'review'); }
+  try { current = await window.desktop.login(el('login-email').value, el('login-password').value); el('login-password').value = ''; el('login-feedback').textContent = ''; render(); showTab(preferredArea()); }
   catch (error) { el('login-feedback').textContent = error.message; }
   finally { submit.disabled = false; }
 });
 window.desktop.onSnapshot((value) => { current = value; render(); });
-window.desktop.snapshot().then((value) => { current = value; render(); showTab(value.workspace?.configured ? 'review' : 'setup'); });
+window.desktop.snapshot().then((value) => { current = value; render(); showTab(preferredArea()); });
 
 for (const target of document.querySelectorAll('[data-icon]')) target.innerHTML = icon(target.dataset.icon);
 el('ask-form').querySelector('.composer-attach').innerHTML = icon('document');
 el('ask-form').querySelector('.composer-attach').addEventListener('click', () => {
-  const source = current.findings?.[0]?.source;
+  const source = (current.findings?.find(item=>`${item.kind}:${item.id}`===selectedFindingId)||current.findings?.[0])?.source;
   if (source) source.kind === 'asset' ? window.desktop.openSource(source.id) : showSource(source.id);
   else showTab('work');
 });

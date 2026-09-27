@@ -131,6 +131,9 @@
 .brief-file:before{border-radius:8px}
 
 .text-button .line-icon{width:16px;height:16px;margin-left:4px}
+#work-feedback:not(:empty){margin:12px 0;color:var(--ds-color-verified-soft);font-size:12px;line-height:1.4}
+#load-flawed+button[hidden]{display:none}
+#load-flawed+button{margin-left:12px}
 
 .linkedin .work-card input[type=time]{background:var(--ds-color-window);color:var(--ds-color-text);border:1px solid var(--ds-color-border);border-radius:6px;padding:12px;width:100%;font:inherit}
 .linkedin .asset-image{display:block;max-height:230px;max-width:100%;object-fit:contain}

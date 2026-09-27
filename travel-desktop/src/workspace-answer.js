@@ -6,13 +6,14 @@ const NEBIUS_API = 'https://api.tokenfactory.nebius.com/v1';
 
 function relevantSources(data, question) {
   const excluded = new Set(conflicts(data).flat());
-  const words = String(question || '').toLowerCase().match(/[a-z0-9]{3,}/g) || [];
+  const stopWords = new Set(['about', 'and', 'are', 'can', 'come', 'con', 'della', 'delle', 'does', 'for', 'from', 'how', 'non', 'per', 'that', 'the', 'this', 'una', 'what', 'when', 'where', 'which', 'who', 'why', 'with']);
+  const words = [...new Set((String(question || '').toLowerCase().match(/[a-z0-9]{3,}/g) || []).filter((word) => !stopWords.has(word)))];
   return approvedSources(data).filter((source) => !excluded.has(source.id) && source.textPath).map((source) => {
     const content = fs.readFileSync(source.textPath, 'utf8').slice(0, 12000);
     const haystack = `${source.title} ${content}`.toLowerCase();
-    const score = words.filter((word) => haystack.includes(word)).length + source.priority / 100;
-    return { source, content, score };
-  }).filter((item) => item.score > 0).sort((a, b) => b.score - a.score).slice(0, 4);
+    const matches = words.filter((word) => haystack.includes(word)).length;
+    return { source, content, score: matches + source.priority / 100, matches };
+  }).filter((item) => item.matches > 0).sort((a, b) => b.score - a.score).slice(0, 4);
 }
 
 function localWorkspaceAnswer(data, question) {

@@ -1,7 +1,10 @@
 let learningRenderKey;
 async function learnAction(kind,payload={}) {
  const status=el('learning-status');status.textContent='Saving…';
- try {current=await window.desktop.learningAction(kind,payload);render();status.textContent='Saved on this computer.';}
+ try {current=await window.desktop.learningAction(kind,payload);render();status.textContent='Saved on this computer.';
+  const next=kind==='confirm'?el('learning-panel').querySelector('.learning-card h4')||el('learning-panel').querySelector('.learning-card h3'):['quiz','answer'].includes(kind)?el('learning-panel').querySelector('.learning-question form')?.closest('.learning-question')?.querySelector('h4')||el('learning-panel').querySelector('.learning-question h4'):null;
+  if(next){next.tabIndex=-1;next.focus();}
+ }
  catch(error){status.textContent=error.message;}
 }
 function learningButton(label,kind,payload){const b=node('button',label,'secondary-button');b.type='button';b.addEventListener('click',()=>learnAction(kind,payload));return b;}

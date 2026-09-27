@@ -49,7 +49,7 @@ function renderOnboarding(panel) {
   if(document && !document.edited) Object.assign(document,{scope:file.scope,department:file.department,version:file.version});
  }
  section.append(node('p',`${draft.people.filter(p=>p.included).length} people ready to review · ${draft.files.length} files`));
- section.append(node('p',draft.mode==='nebius'?`Interpreted with Nebius · ${draft.model}`:'Readable staff tables were extracted locally. Use Nebius for company context and less structured documents.'));
+ section.append(node('p',draft.mode==='nebius'?`Interpreted with Nebius · ${draft.model}`:'Files were read locally. Nebius is optional for company context or less structured staff records.'));
  for(const warning of draft.warnings) section.append(node('p',warning,'onboarding-warning'));
  const files=node('details',undefined,'onboarding-files');files.open=true;files.append(node('summary',`${draft.files.length} uploaded files · inspect extracted text`));
  for(const file of draft.files){
@@ -74,7 +74,7 @@ function renderOnboarding(panel) {
   const label=node('label',`Use company name and context: ${draft.company.name}`);const checkbox=node('input');checkbox.type='checkbox';checkbox.checked=onboardingReview.useCompany;checkbox.addEventListener('change',()=>{onboardingReview.useCompany=checkbox.checked;});label.prepend(checkbox);section.append(label,node('p',draft.company.description));
  }
  section.append(node('h3',`People to add · ${onboardingReview.people.filter(p=>p.included).length}`));
- if(!draft.people.length)section.append(node('p','No staff rows detected. Try Nebius for a PDF or export a table with Name, Email, Job title and Department columns.'));
+ if(!draft.people.length)section.append(node('p','No people were found in this batch. You can continue with knowledge files only. To add team accounts, upload a staff table with Name, Email, Job title and Department.'));
  for(const p of onboardingReview.people){
   const row=node('fieldset',undefined,'onboarding-person');row.append(node('legend',p.name||'Proposed person'));
   const includeLabel=node('label','Create this account');const include=node('input');include.type='checkbox';include.checked=p.included;include.addEventListener('change',()=>{p.included=include.checked;});includeLabel.prepend(include);row.append(includeLabel);
@@ -89,7 +89,7 @@ function renderOnboarding(panel) {
  }
  section.append(node('h3','Company knowledge'));
  const approveAllLabel=node('label','I have reviewed the knowledge files: approve the readable company/department sources');const approveAll=node('input');approveAll.type='checkbox';
- approveAll.addEventListener('change',()=>{for(const d of onboardingReview.documents){const file=draft.files.find(f=>f.id===d.id);if(file.readable&&file.category!=='personnel'&&file.category!=='archive'&&d.scope!=='private'&&!draft.people.some(p=>p.sourceId===file.id)){d.approve=approveAll.checked;d.edited=true;}}render();});
+ approveAll.addEventListener('change',()=>{for(const d of onboardingReview.documents){const file=draft.files.find(f=>f.id===d.id);if(file.readable&&file.category!=='personnel'&&file.category!=='archive'&&d.scope!=='private'&&!draft.people.some(p=>p.sourceId===file.id)){d.approve=approveAll.checked;d.edited=true;}}workspaceRenderKey=null;render();});
  approveAll.checked=onboardingReview.documents.filter(d=>{const f=draft.files.find(f=>f.id===d.id);return f.readable&&f.category!=='personnel'&&f.category!=='archive'&&d.scope!=='private';}).every(d=>d.approve);approveAllLabel.prepend(approveAll);section.append(approveAllLabel);
  for(const d of onboardingReview.documents){
   const file=draft.files.find(f=>f.id===d.id);const row=node('fieldset',undefined,'onboarding-document');row.append(node('legend',file.name));
@@ -104,7 +104,7 @@ function renderOnboarding(panel) {
   }
   const version=onboardingField(row,'Source version',d.version);version.addEventListener('input',()=>{d.version=version.value;d.edited=true;});
   if(file.category==='archive')row.append(node('p','Archived/superseded material is retained without approval.'));
-  const detail=node('details',undefined,'onboarding-edit');detail.append(node('summary',`${file.name} · ${personnel?'Private personnel record':d.scope==='company'?'Company-wide':d.department} · v${d.version}`),row);section.append(detail);
+  const detail=node('details',undefined,'onboarding-edit');detail.dataset.fileId=file.id;detail.append(node('summary',`${file.name} · ${personnel?'Private personnel record':d.scope==='company'?'Company-wide':d.department} · v${d.version}`),row);section.append(detail);
  }
  const confirm=onboardingButton(section,'Confirm company onboarding',async()=>{
   if(!current.auth?.enabled){el('workspace-feedback').textContent='Create your owner login first, then confirm this batch.';return;}
@@ -146,6 +146,7 @@ function renderSession(){
  const panel=el('login-panel');panel.hidden=!locked;
  const session=el('session-bar');session.replaceChildren();
  if(locked){
+  workspaceRenderKey=null;learningRenderKey=null;reviewContextKey=null;selectedFindingId=null;
   el('learning-panel').replaceChildren(); el('workspace-panel').replaceChildren();
   knowledgeRequest++;el('knowledge-list').replaceChildren();el('knowledge-summary').replaceChildren();el('knowledge-search').value='';
   intakeCloudBrowser={};onboardingReceipt=null;el('account-receipt').replaceChildren();

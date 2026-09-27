@@ -5,16 +5,16 @@ document.title = `${titles[kind] || 'Workspace'} · Elseweek`;
 document.getElementById('tool-title').textContent = titles[kind] || 'Workspace';
 const navigation = kind === 'handover' ? [
   ['Campaigns', () => document.getElementById('work-content').scrollTo({top:0}), true],
-  ['Brand', () => window.desktop.openSource('legal')],
-  ['Assets', () => window.desktop.openSource('reelAsset')],
-  ['Research', () => window.desktop.openSource('calendar')],
+  ['Brand guide ↗', () => window.desktop.openSource('legal')],
+  ['Reel artwork ↗', () => window.desktop.openSource('reelAsset')],
+  ['Content calendar ↗', () => window.desktop.openSource('calendar')],
   ['Archived', () => { state.brief = 'v1'; commit(); }],
 ] : [['Email Studio', () => window.desktop.openWork('email'), kind === 'email'], ['LinkedIn Draft', () => window.desktop.openWork('linkedin'), kind === 'linkedin'], ['Social Publisher', () => window.desktop.openWork('social'), kind === 'social'], ['Campaign Files', () => window.desktop.openWork('handover')]];
 for (const [label, onClick, active] of navigation) {
   const button = document.createElement('button'); button.type = 'button'; button.textContent = label;
   button.className = `sidebar-link${active ? ' active' : ''}`;
   if (active) button.setAttribute('aria-current', 'page');
-  button.addEventListener('click', onClick); document.getElementById('sidebar-links').append(button);
+  button.addEventListener('click', async()=>{try{await onClick();document.getElementById('work-feedback').textContent='';}catch(error){document.getElementById('work-feedback').textContent=`Could not open ${label}. ${error.message}`;}}); document.getElementById('sidebar-links').append(button);
 }
 if (kind === 'handover') document.querySelector('.sidebar-bottom').innerHTML = 'Sharper<br>work.<br>Brighter<br>brands.';
 
@@ -31,7 +31,9 @@ const flawed = {
   handover: { brief: 'v1' },
 };
 
-const stored = localStorage.getItem(`elseweek:v1:${kind}`);
+const personId = new URLSearchParams(location.search).get('person');
+const draftKey = personId ? `elseweek:v1:${kind}:person:${personId}` : null;
+const stored = draftKey ? localStorage.getItem(draftKey) : null;
 let state;
 try { state = stored ? { ...defaults[kind], ...JSON.parse(stored) } : { ...defaults[kind] }; }
 catch { state = { ...defaults[kind] }; }
@@ -44,6 +46,12 @@ const templates = {
   handover: `<div class="file-breadcrumb">Campaigns ${icon("caret-right")} Winter Escapes 2027</div><div class="file-heading"><h1>Winter Escapes 2027</h1><p>A warmer way out.</p></div><div class="version-stage"><div class="version-column"><div class="eyebrow">SUPERSEDED</div><button id="brief-v1" class="brief-file" type="button"><i class="file-fold" aria-hidden="true"></i><span>Brief</span><strong>v1</strong><small>12 Sep 2026</small><em>Initial brief<br>and concepts.</em></button></div><div class="version-connection"><svg viewBox="0 0 260 90" aria-hidden="true"><path d="M4 51 C54 9 91 24 132 50 S218 75 251 42" fill="none" stroke="currentColor" stroke-width="2"/><path d="m239 35 12 7-6 13" fill="none" stroke="currentColor" stroke-width="2"/></svg><div>REFINED<br>AND APPROVED</div></div><div class="version-column"><div class="eyebrow approved-label">APPROVED</div><button id="brief-v2" class="brief-file" type="button"><i class="file-fold" aria-hidden="true"></i><span>Brief</span><strong>v2</strong><small>22 Sep 2026</small><em>Final brief<br>for production.</em></button></div></div><div class="file-actions"><button id="load-flawed" class="text-button" type="button">Open handed-over brief v1 ${icon("arrow-up-right")}</button><div id="brief-preview" class="brief-preview"></div></div><div class="other-files"><h2>Other files</h2><button id="open-email-art" type="button">${icon("folder")}<span>Approved email hero<small>Current campaign artwork</small></span>${icon("caret-right")}</button><button id="open-reel-art" type="button">${icon("folder")}<span>Partner Reel artwork<small>Approved vertical creative</small></span>${icon("caret-right")}</button></div>`,
 };
 content.innerHTML = templates[kind] || '<p>Unknown workspace.</p>';
+let savedState = JSON.stringify(state);
+let previousIncomingState = null;
+const incoming = document.getElementById('load-flawed');
+const undoIncoming = document.createElement('button');undoIncoming.type='button';undoIncoming.className='text-button';undoIncoming.textContent='Undo incoming draft';undoIncoming.hidden=true;
+incoming.after(undoIncoming);
+function draftStatus(message){const status=document.getElementById('save-status');if(status)status.textContent=message;else document.getElementById('work-feedback').textContent=message;}
 
 function readForm() {
   if (kind === 'email') return { subject: document.getElementById('subject').value, body: document.getElementById('body').value, audience: document.getElementById('audience').value, footer: document.getElementById('footer').checked };
@@ -84,13 +92,15 @@ function commit() {
   state = readForm();
   preview();
   window.desktop.updateWork(kind, state);
+  if(kind!=='handover'&&JSON.stringify(state)!==savedState)draftStatus('Unsaved changes · only Save draft keeps them after closing this window.');
 }
 
 fill();
 window.desktop.updateWork(kind, state);
 content.addEventListener('focusout', (event) => { if (event.target.matches('input,textarea')) commit(); });
 content.addEventListener('change', (event) => { if (event.target.matches('select,input[type="checkbox"],input[type="date"],input[type="time"]')) commit(); });
-document.getElementById('load-flawed').addEventListener('click', () => { state = { ...flawed[kind] }; fill(); commit(); });
+incoming.addEventListener('click', () => { previousIncomingState=readForm();state={...flawed[kind]};fill();commit();undoIncoming.hidden=false;draftStatus('Incoming demo draft loaded. You can undo this change.'); });
+undoIncoming.addEventListener('click',()=>{if(!previousIncomingState)return;state=previousIncomingState;previousIncomingState=null;fill();commit();undoIncoming.hidden=true;draftStatus(kind==='handover'?'Previous brief selection restored.':'Previous draft restored. Save it if you want to keep it after closing.');});
 if (kind === 'handover') {
   for (const version of ['v1', 'v2']) document.getElementById(`brief-${version}`).addEventListener('click', () => { state.brief = version; commit(); });
   document.getElementById('open-email-art').addEventListener('click', () => window.desktop.openSource('emailAsset'));
@@ -98,7 +108,7 @@ if (kind === 'handover') {
 }
 if (kind === 'linkedin') document.getElementById('open-linkedin-guide').addEventListener('click', () => window.desktop.openSource('linkedin'));
 const save = document.getElementById('save');
-if (save) save.addEventListener('click', () => { commit(); localStorage.setItem(`elseweek:v1:${kind}`, JSON.stringify(state)); document.getElementById('save-status').textContent = 'Draft saved on this computer.'; });
+if (save) save.addEventListener('click', () => { commit(); if(!draftKey){draftStatus('Sign in to save this draft for your account.');return;}localStorage.setItem(draftKey, JSON.stringify(state));savedState=JSON.stringify(state);draftStatus('Draft saved on this computer for your account.'); });
 window.desktop.onSharing((isShared) => {
   const indicator = document.getElementById('share-indicator');
   indicator.textContent = isShared ? '● Shared with assistant' : 'Not shared with assistant';

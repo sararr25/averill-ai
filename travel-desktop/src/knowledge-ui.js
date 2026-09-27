@@ -27,8 +27,10 @@ async function renderKnowledge(){
    card.append(knowledgeExcerpt(file.excerpt,el('knowledge-search').value));
    const read=node('button','Read extracted text','secondary-button');read.type='button';read.disabled=!file.readable;
    read.addEventListener('click',async()=>{read.disabled=true;try{const content=await(file.kind==='uploaded'?window.desktop.readOnboardingFile(file.id):window.desktop.readWorkspaceFile(file.id));activeSourceId=null;el('open-source').hidden=true;el('source-title').textContent=content.title;el('source-content').textContent=content.text||'No readable text.';el('source-dialog').showModal();}catch{}finally{read.disabled=!file.readable;}});card.append(read);
-   if(file.kind==='saved'){const open=node('button','Open original file','secondary-button');open.type='button';open.addEventListener('click',()=>window.desktop.openWorkspaceSource(file.id).catch(()=>{}));card.append(open);}
-   else{const review=node('button','Review in Setup','secondary-button');review.type='button';review.addEventListener('click',()=>showTab('setup'));card.append(review);}
+   if(file.kind==='saved'){
+    const open=node('button','Open original file','secondary-button');open.type='button';open.addEventListener('click',()=>window.desktop.openWorkspaceSource(file.id).catch(()=>{}));card.append(open);
+    if(file.status!=='approved'){const manage=node('button','Manage in Setup','secondary-button');manage.type='button';manage.addEventListener('click',()=>{showTab('setup');const target=[...document.querySelectorAll('[data-source-id]')].find(element=>element.dataset.sourceId===file.id);if(target){target.scrollIntoView({block:'center'});target.tabIndex=-1;target.focus();}});card.append(manage);}
+   }else{const review=node('button','Review this file in Setup','secondary-button');review.type='button';review.addEventListener('click',()=>{showTab('setup');const target=[...document.querySelectorAll('[data-file-id]')].find(element=>element.dataset.fileId===file.id);if(target){target.open=true;target.scrollIntoView({block:'center'});target.querySelector('summary')?.focus();}});card.append(review);}
    host.append(card);
   }
  }catch(error){if(request===knowledgeRequest){summary.textContent=`Could not load knowledge: ${error.message}`;host.replaceChildren();}}

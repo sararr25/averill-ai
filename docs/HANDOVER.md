@@ -16,6 +16,15 @@ The owner’s video direction is: company data onboarding across departments →
 - **Research:** explicit public Tavily query, with results separated from company policy.
 - **Setup:** owner account/company, mixed-file onboarding with Nebius interpretation, bulk team accounts, people/departments, company/department import, private proposals, lead/admin approval, priority/supersession/conflicts and encrypted service keys.
 
+## UX continuity pass — 28 September 2026
+
+- Review names the exact shared demo windows and offers Stop for each. A selected Canva window is labelled as selection for one-frame Review, with a separate clear action. Review distinguishes no shared context from supported checks with no findings, and lets the employee browse findings one at a time. The evidence and conversation scroll above a visible composer. Changing between company-source and demo-source answers adds a context note to the conversation.
+- Company-source lookup now requires an actual query-term match before priority influences ordering. A question with no matching approved source returns uncertainty and no citation. With no demo window shared, a configured company workspace no longer falls back to the fixed campaign pack when it has zero approved sources. This is a retrieval guard, not independent claim-to-passage verification for Nebius output.
+- Registered work editor windows can open another supplied editor through the narrow `agent:open-work` IPC handler; the destination kind is validated and a failed navigation shows an error in the editor. Campaign Files sidebar labels describe the local file opened.
+- Setup retains its unsaved form while unrelated snapshots arrive; its local approval and cloud-browser actions force a targeted rerender. Learn moves keyboard focus to the next step or unanswered question after saving. Knowledge opens the exact uploaded proposal or pending source in Setup. Research and AI controls explain missing configuration and send an administrator to Setup.
+- Supplied editor draft saves are now keyed to the signed-in local person. The former shared `elseweek:v1:<kind>` keys are preserved but not silently assigned to a person. Work editors label unsaved changes; loading the flawed demonstration draft can be undone. The assistant remembers the last visited area for each local person and resumes it after login unless onboarding is pending. These are local UX states, not cloud sync.
+- A knowledge-only onboarding batch explains that zero team accounts is normal; Nebius interpretation remains optional and consent-gated.
+
 ## Learn behaviour and boundaries
 
 `src/learning.js` owns sessions and quiz logic; `learning-ui.js` renders Learn. The main-process `learning:action` handler only accepts the Averill renderer and derives ownership from the active workspace person. Data is nested in the existing schema-1 workspace JSON. No destructive migration is required for older workspaces.
@@ -37,7 +46,7 @@ npm test
 npm run package:mac
 ```
 
-Packaged unsigned arm64 app: `travel-desktop/dist/Averill-darwin-arm64/Averill.app`. ZIP: `travel-desktop/dist/Averill-macOS-arm64.zip`, generated with `ditto`, not tracked by Git. Both were rebuilt after the 28 September UI refinement. Restart an older running app to load the new code. Recent native checks used separate synthetic user-data profiles; do not import those records into the normal employee workspace.
+Packaged unsigned arm64 app: `travel-desktop/dist/Averill-darwin-arm64/Averill.app`. ZIP: `travel-desktop/dist/Averill-macOS-arm64.zip`, generated with `ditto`, not tracked by Git. Both were rebuilt after the 28 September UX continuity pass. Restart an older running app to load the new code. Recent native checks used separate synthetic user-data profiles; do not import those records into the normal employee workspace.
 
 From the repository root, `npm --prefix travel-site start` serves Elseweek at `http://127.0.0.1:4173/`; gallery at `/design-system/index.html`. No install/build is needed for the dependency-free site. It includes city filters, native details/articles, local trip-brief generation and local photos/fonts. No bookings/payments/enquiry backend. Domain/trademark clearance is not established. Internal-browser desktop/mobile checks passed; download saving was not confirmed by the browser event.
 
@@ -46,6 +55,7 @@ Company copies and workspace JSON live in Electron user data. Optional Nebius/Ta
 ## Verified evidence
 
 - **26 Node tests pass (current suite):** original campaign findings/answers/citations, workspace roles/source approval/conflicts/import, plus onboarding bulk accounts/privacy/company scope, model evidence/consent/failure/rollback, organic LinkedIn findings/resolution/citations, Elseweek department-pack approval/visibility/version persistence and learning persistence, ordered confirmations, person isolation, exclusion, stale/revoked/conflicting source evidence, Copenhagen week rollover and work reflections.
+- **UX continuity check:** native source app with an isolated synthetic owner verified zero-citation no-evidence answers, editor-to-editor navigation, unsaved Setup input retention, undo of a loaded flawed draft, five-finding Review navigation, Stop from Review, direct Knowledge-to-Setup proposal opening and Learn focus advancement. Review was visually rechecked after giving its feed an independent scroll region. `npm run verify:feedback` passed for source and bundled app resources. The final `.app` executable was packaged but not directly launched for this pass.
 - **Native dev app:** isolated workspace creation, Learn/help, step advancement, weekly generation, wrong-answer explanation and practical-reflection completion.
 - **Native packaged app:** restart resumed step 3 with two saved confirmations and earlier test answers/reflection. Manual LinkedIn activity was recorded through UI; refresh generated a prompt for that exact activity. These are synthetic test records, not proof of real employee learning or Canva operations. Final wording changes were syntax-tested and the app/ZIP rebuilt.
 - **Previous packaged campaign checks:** shared old brief yields current-source finding; v2 opens; Escape closes; local version comparison cites both briefs; Stop sharing clears findings. Email/Social visuals checked and actual SVG rendered.
