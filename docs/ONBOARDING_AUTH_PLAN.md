@@ -31,3 +31,7 @@ Nebius and Tavily keys from the existing local .env.local were encrypted with El
 ## Multisource onboarding update — 27 September 2026
 
 Desktop/Finder drop, local/synced files, HTTPS links and Google Drive/OneDrive selected-file OAuth import now feed the local review. Direct cloud use requires registered OAuth clients and remains live-unverified. Company AI defaults off; owner authorization and per-file selection are required. Restricted files are blocked. Local company copies are not application-encrypted; provider confidentiality/no-training/retention settings remain unverified. See [cloud setup](CLOUD_CONNECTIONS.md), [company confidentiality](COMPANY_CONFIDENTIALITY.md) and [handover](HANDOVER.md) for implementation, verification and remaining gates.
+
+## Feedback and know-how library — 27 September 2026
+
+A persistent status banner reports pending, completed, cancelled and failed explicit actions. Knowledge provides local document/text search, uploaded proposals, approved/pending/private/superseded sources, extracted-text reading and original-file access under existing role visibility. Intake is visible before onboarding confirmation. The library does not send documents to external AI. See the handover and onboarding tutorial for current verification and workflow.

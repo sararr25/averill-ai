@@ -7,13 +7,13 @@ function onboardingField(parent, label, value, type = 'text') {
  wrapper.append(input);parent.append(wrapper);return input;
 }
 function onboardingButton(parent,label,callback) {
- const button=node('button',label,'secondary-button');button.type='button';button.disabled=onboardingWorking;
+ const button=node('button',label,'secondary-button');button.type='button';button.disabled=false;
  button.addEventListener('click',async()=>{
   if(onboardingWorking) return;onboardingWorking=true;button.disabled=true;
   el('workspace-feedback').textContent='';
-  for (const control of document.querySelectorAll('.onboarding-section button')) control.disabled=true;
+  const controls=[...document.querySelectorAll('.onboarding-section button')].filter(control=>!control.disabled);for(const control of controls)control.disabled=true;
   try{await callback();}catch(error){el('workspace-feedback').textContent=error.message;}
-  finally{onboardingWorking=false;button.disabled=false;for (const control of document.querySelectorAll('.onboarding-section button')) control.disabled=false;}
+  finally{onboardingWorking=false;button.disabled=false;for(const control of controls)if(control.isConnected)control.disabled=false;}
  });parent.append(button);return button;
 }
 function showAccountReceipt(accounts) {
@@ -49,7 +49,7 @@ function renderOnboarding(panel) {
  section.append(node('p',`${draft.people.filter(p=>p.included).length} people ready to review · ${draft.files.length} files`));
  section.append(node('p',draft.mode==='nebius'?`Interpreted with Nebius · ${draft.model}`:'Readable staff tables were extracted locally. Use Nebius for company context and less structured documents.'));
  for(const warning of draft.warnings) section.append(node('p',warning,'onboarding-warning'));
- const files=node('details',undefined,'onboarding-files');files.append(node('summary',`${draft.files.length} uploaded files · inspect extracted text`));
+ const files=node('details',undefined,'onboarding-files');files.open=true;files.append(node('summary',`${draft.files.length} uploaded files · inspect extracted text`));
  for(const file of draft.files){
   const detail=node('details');detail.append(node('summary',`${file.name} · ${file.origin?.kind||'local'} · ${file.readable?'Text ready':'Needs a readable export'}`),node('pre',file.preview||'No readable text'));
   const label=node('label','Confidentiality');const level=node('select');for(const [value,text]of [['internal','Internal · local by default'],['restricted','Restricted · always local'],['public','Public']]){const option=node('option',text);option.value=value;level.append(option);}level.value=file.confidentiality||'internal';label.append(level);detail.append(label);
@@ -67,7 +67,7 @@ function renderOnboarding(panel) {
   if(!window.confirm(`Send extracted text from these files to Nebius for company/personnel interpretation?\n\n${selected.map(f=>f.name).join('\n')}\n\nUp to ${chars.toLocaleString()} characters. Personnel names and email addresses may be included. Passwords, keys and file binaries are not sent.`))return;
   el('workspace-feedback').textContent='Nebius is reading the company files. Your local proposal is kept…';
   current=await window.desktop.analyzeOnboarding(true,draft.files.map(f=>({id:f.id,confidentiality:f.confidentiality||'internal',aiAllowed:f.aiAllowed===true})));el('workspace-feedback').textContent='Proposal ready. Review all assignments before confirming.';render();
- });analyze.disabled=onboardingWorking;
+ });analyze.disabled=false;
  if(draft.company){
   const label=node('label',`Use company name and context: ${draft.company.name}`);const checkbox=node('input');checkbox.type='checkbox';checkbox.checked=onboardingReview.useCompany;checkbox.addEventListener('change',()=>{onboardingReview.useCompany=checkbox.checked;});label.prepend(checkbox);section.append(label,node('p',draft.company.description));
  }
@@ -144,6 +144,7 @@ function renderSession(){
  const session=el('session-bar');session.replaceChildren();
  if(locked){
   el('learning-panel').replaceChildren(); el('workspace-panel').replaceChildren();
+  knowledgeRequest++;el('knowledge-list').replaceChildren();el('knowledge-summary').replaceChildren();el('knowledge-search').value='';
   intakeCloudBrowser={};onboardingReceipt=null;el('account-receipt').replaceChildren();
   el('login-company').textContent=current.workspace?.company||'Your company';
   const accounts=el('login-account');const old=accounts.value;accounts.replaceChildren();

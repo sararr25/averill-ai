@@ -11,6 +11,7 @@ const accounts = require('./src/accounts');
 const accountDocuments = require('./src/account-documents');
 const onboarding = require('./src/onboarding');
 const privacy = require('./src/company-privacy');
+const knowledge = require('./src/knowledge');
 const remoteImport = require('./src/remote-import');
 const { CloudImports } = require('./src/cloud-import');
 const cloud = new CloudImports({root:()=>app.getPath('userData'),secure:safeStorage,open:url=>shell.openExternal(url)});
@@ -227,11 +228,17 @@ app.whenReady().then(async () => {
     } finally {onboardingBusy=false;fs.rmSync(temporary,{recursive:true,force:true});}
   };
   ipcMain.handle('company:privacy',(event,enabled)=>{admin(event);privacy.configure(companyWorkspace,enabled);if(!enabled)aiEnabled=false;return persistWorkspace();});
+  ipcMain.handle('onboarding:read-file',(event,id)=>{
+    admin(event);const draft=companyWorkspace.onboarding;
+    if(!draft||draft.ownerId!==companyWorkspace.activePersonId)throw new Error('This upload is not available to this account.');
+    const file=draft.files.find(f=>f.id===id);if(!file)throw new Error('Uploaded document not found.');
+    return {title:file.name,text:file.text||'',readable:file.readable};
+  });
   ipcMain.handle('onboarding:drop',(event,files)=>{admin(event);if(!Array.isArray(files)||!files.length||files.some(f=>typeof f!=='string'||!path.isAbsolute(f)))throw new Error('Drop local files from Finder or the Desktop.');addIntake(files);return persistWorkspace();});
   ipcMain.handle('onboarding:synced',async(event)=>{
     admin(event);const actor=companyWorkspace.activePersonId;
     const result=await dialog.showOpenDialog(agentWindow,{title:'Choose files from a synced Google Drive or OneDrive folder',properties:['openFile','multiSelections']});
-    admin(event);if(actor!==companyWorkspace.activePersonId)throw new Error('Account changed.');if(!result.canceled)addIntake(result.filePaths.map(file=>({path:file,origin:{kind:'synced-folder'}})));return persistWorkspace();
+    admin(event);if(actor!==companyWorkspace.activePersonId)throw new Error('Account changed.');if(result.canceled)return {...snapshot(),operationNotice:'Selection cancelled. No files added.'};addIntake(result.filePaths.map(file=>({path:file,origin:{kind:'synced-folder'}})));return persistWorkspace();
   });
   ipcMain.handle('onboarding:links',async(event,links)=>remoteBatch(event,async(temporary)=>{
     if(!Array.isArray(links)||!links.length||links.length>30||links.some(l=>typeof l!=='string'||l.length>4000))throw new Error('Enter up to 30 HTTPS document links.');
@@ -264,7 +271,8 @@ app.whenReady().then(async () => {
     const selection = await dialog.showOpenDialog(agentWindow, { properties: ['openFile', 'multiSelections'], filters: [{ name: 'Company files — Excel, PDF, SVG and documents', extensions: [...onboarding.EXTENSIONS].map(e => e.slice(1)) }] });
     fromAgent(event);
     if (personId !== companyWorkspace.activePersonId) throw new Error('Account changed. Upload the files again.');
-    if (!selection.canceled) addIntake(selection.filePaths);
+    if(selection.canceled)return {...snapshot(),operationNotice:'Selection cancelled. No files added.'};
+    addIntake(selection.filePaths);
     return persistWorkspace();
   });
   ipcMain.handle('onboarding:analyze', async (event, consent, selections) => {
@@ -311,7 +319,7 @@ app.whenReady().then(async () => {
     fromAgent(event);
     if (!companyWorkspace) throw new Error('Create a workspace first');
     const selection = await dialog.showOpenDialog(agentWindow, { properties: ['openFile', 'multiSelections'], filters: [{ name: 'Documents and exported designs', extensions: ['md', 'txt', 'csv', 'json', 'xlsx', 'pdf', 'png', 'jpg', 'jpeg', 'webp', 'svg'] }] });
-    if (selection.canceled) return snapshot();
+    if (selection.canceled) return {...snapshot(),operationNotice:'Selection cancelled. No files added.'};
     for (const file of selection.filePaths) workspace.importFile(app.getPath('userData'), companyWorkspace, file, options || {});
     return persistWorkspace();
   });
@@ -340,11 +348,12 @@ app.whenReady().then(async () => {
     const source = workspace.visibleSources(companyWorkspace || { people: [], sources: [] }).find((entry) => entry.id === id);
     return source ? (await shell.openPath(source.storedPath)) === '' : false;
   });
+  ipcMain.handle('workspace:knowledge',(event,query,status)=>{fromAgent(event);return companyWorkspace?knowledge.list(companyWorkspace,query,status):{documents:[],total:0,approved:0,uploaded:0};});
   ipcMain.handle('workspace:read-file', (event, id) => {
     fromAgent(event);
     const source = workspace.visibleSources(companyWorkspace || { people: [], sources: [] }).find((entry) => entry.id === id);
     if (!source) throw new Error('File is not accessible');
-    return { title: source.title, text: source.textPath ? fs.readFileSync(source.textPath, 'utf8').slice(0, 5000) : '' };
+    return { title: source.title, text: source.textPath ? fs.readFileSync(source.textPath, 'utf8').slice(0, 100000) : '' };
   });
   ipcMain.handle('workspace:save-key', async (event, service, value) => {
     fromAgent(event);

@@ -34,6 +34,7 @@ function sourceButton(source) {
 function render() {
   if (!renderSession()) return;
   renderWorkspace();
+  renderKnowledge();
   renderLearning();
   renderHero();
   el('review-external').disabled = !current.externalWindow;
@@ -133,7 +134,7 @@ function action(label, callback) {
   const button = node('button', label, 'secondary-button');
   button.type = 'button';
   button.addEventListener('click', async () => {
-    try { current = await callback(); el('workspace-feedback').textContent = ''; render(); }
+    try { current = await callback(); render(); }
     catch (error) { el('workspace-feedback').textContent = error.message; }
   });
   return button;
@@ -264,6 +265,7 @@ async function showSource(id) {
   const item = await window.desktop.source(id);
   if (!item) return;
   activeSourceId = id;
+  el('open-source').hidden=false;
   el('source-title').textContent = item.title;
   el('source-content').textContent = item.content;
   el('source-dialog').showModal();

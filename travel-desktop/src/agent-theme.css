@@ -125,3 +125,6 @@ button{transition:color var(--ds-duration-fast),background-color var(--ds-durati
 .agent-body[data-area="review"] .hero-rule{margin-bottom:28px}
 .agent-body[data-area="review"] .review-hero{padding-bottom:24px}
 .agent-body[data-area="review"] .review-composer{position:static;flex-shrink:0;padding-top:22px}
+
+/* Feedback occupies its own row; the content remains scrollable inside the window. */
+.agent-body:not(.auth-locked){height:100vh;display:flex;flex-direction:column;overflow:hidden}.agent-header,.session-bar,.agent-nav{flex-shrink:0}.agent-body:not(.auth-locked) .agent-main{flex:1;min-height:0;height:auto!important}#knowledge-search,#knowledge-filter{padding:10px;border:1px solid var(--ds-color-border);border-radius:8px;background:var(--ds-color-panel);color:var(--ds-color-text)}

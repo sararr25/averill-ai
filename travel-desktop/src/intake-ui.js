@@ -2,7 +2,7 @@ let intakeCloudBrowser = {};
 function renderIntakeOptions(section) {
  const drop = node('div',undefined,'intake-drop');drop.tabIndex=0;drop.setAttribute('role','button');drop.setAttribute('aria-label','Drop company files here or press Enter to choose files');
  drop.append(node('strong','Drop company files here'),node('p','Drag files from your Desktop or Finder. Local extraction starts after import; nothing is sent to Nebius automatically.'));
- const choose=async()=>{current=await window.desktop.uploadOnboarding();render();};
+ const choose=async()=>{if(onboardingWorking)return;onboardingWorking=true;try{current=await window.desktop.uploadOnboarding();render();}finally{onboardingWorking=false;}};
  drop.addEventListener('click',()=>choose().catch(e=>{el('workspace-feedback').textContent=e.message;}));
  drop.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();choose().catch(e=>{el('workspace-feedback').textContent=e.message;});}});
  drop.addEventListener('dragover',e=>{e.preventDefault();drop.classList.add('drag-active');e.dataTransfer.dropEffect='copy';});

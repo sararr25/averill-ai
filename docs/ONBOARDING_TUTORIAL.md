@@ -85,3 +85,9 @@ Adding files rebuilds the combined unapplied proposal: review people/source sett
 Check the proposed employees, departments, profiles and evidence, exclude unwanted entries, confirm the local import and approve sources separately. Source approval does not grant AI permission. Accounts and password documents remain available through the existing login-document action.
 
 [Company confidentiality and production limitations](COMPANY_CONFIDENTIALITY.md).
+
+## Check that your files were received and consult know-how
+
+After an action, read the status banner directly below navigation: Working, Completed or Action failed. File intake reports how many documents have readable text and flags rejected/unreadable material. Cancellation is explicitly reported. Choose View company knowledge after upload, or open the Knowledge tab at any time.
+
+Uploaded files appear immediately as Uploaded · review needed, with local text previews. Use Search documents to find a title or words inside extracted text; filter by status. Read extracted text opens the local document text. For an uploaded proposal, Review in Setup returns to confirmation and approval. After confirmation, the same library contains saved sources; approved guidance is distinguished from private, pending and superseded records. Open original file is available for saved sources. Employees see only sources permitted by their role/department.
