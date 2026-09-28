@@ -1,3 +1,9 @@
+# Historical implementation plan
+
+This file documents the former Elseweek direction and is retained for provenance. The current Common Miles identity is specified in `BRAND.md` and `../design-system/DESIGN_SYSTEM.md`.
+
+---
+
 # Elseweek — travel studio UI plan
 
 26 September 2026. Working identity for the fictional travel company used by Averill. The website is a local, independently branded experience; Averill remains the assistant product.

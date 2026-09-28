@@ -13,4 +13,4 @@ createServer(async (req,res) => {
     const content = await readFile(file);
     res.writeHead(200,{'Content-Type':types[extname(file)] || 'application/octet-stream','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});res.end(content);
   } catch {res.writeHead(404,{'Content-Type':'text/plain'});res.end('Not found');}
-}).listen(Number(process.env.PORT || 4173),'127.0.0.1',() => console.log('Elseweek: http://127.0.0.1:4173'));
+}).listen(Number(process.env.PORT || 4173),'127.0.0.1',() => console.log('Common Miles: http://127.0.0.1:4173'));

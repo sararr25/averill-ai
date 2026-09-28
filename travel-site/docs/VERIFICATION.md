@@ -13,3 +13,11 @@
 - Design-system navigation and mobile gallery visually checked.
 - No warnings or errors were captured in the console during homepage interaction checks.
 - No production deployment, commercial transaction, booking backend or certified accessibility conformance is claimed.
+
+## Common Miles identity pass · 28 September 2026
+
+- `node --check travel-site/site.js` and `node --check travel-site/server.mjs` passed.
+- `tokens.json` parsed and `git diff --check` passed.
+- Local homepage and design-system gallery loaded in the in-app browser. The narrow viewport screenshot showed the new wordmark, hero, CTA and credited Copenhagen photo without visible horizontal overflow.
+- This pass changed labels and styling but not filter, dialog or planner algorithms. Chrome interaction checks passed for the Vienna filter and live count, destination dialog, trip selection and local brief result. The in-app browser did not activate controls reliably; Chrome provided the interaction proof.
+- The legacy Elseweek desktop source pack remains historical and requires a separate coordinated migration if the demo company is renamed there.

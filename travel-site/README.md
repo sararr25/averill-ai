@@ -1,4 +1,4 @@
-# Elseweek — travel studio website
+# Common Miles — travel studio website
 
 A working editorial website and design system for a fictional European city-break studio, independently branded from Averill.
 
@@ -14,7 +14,7 @@ Open http://127.0.0.1:4173/ and http://127.0.0.1:4173/design-system/index.html. 
 
 ## Included
 
-- Original Elseweek wordmark and departure mark; local Fraunces and DM Sans fonts.
+- Original Common Miles route mark and wordmark; locally bundled DM Sans fonts.
 - Responsive homepage, three destination stories, local city filters, editorial articles and FAQ.
 - Native dialogs and trip selection that preselects the planner.
 - Validated trip preferences and downloadable local text brief.
@@ -23,7 +23,7 @@ Open http://127.0.0.1:4173/ and http://127.0.0.1:4173/design-system/index.html. 
 
 ## Scope
 
-This is a fictional demo, not an operational agency. No backend, payment, live availability or external enquiry is provided. The brief is generated in the browser; no personal contact information is collected. Elseweek is a proposed creative name, not a cleared trademark/domain. The older Aurelia campaign sources remain historical fixtures in the Averill app.
+This is a fictional demo, not an operational agency. No backend, payment, live availability or external enquiry is provided. The brief is generated in the browser; no personal contact information is collected. Common Miles is a proposed creative name, not a cleared trademark/domain. The older Aurelia campaign sources remain historical fixtures in the Averill app.
 
 ## Design documentation
 

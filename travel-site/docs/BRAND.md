@@ -1,33 +1,35 @@
-# Elseweek — brand guidelines
+# Common Miles — brand guidelines
 
-Version 1.0 · 26 September 2026
+Version 2.0 · 28 September 2026
+
+## Relationship to Averill
+
+Common Miles is a fictional modern travel studio used to demonstrate Averill. Averill is the agent-assistant product presented at the hackathon. The two identities, interfaces and voices are independent. The legacy Elseweek documents inside the desktop demo are historical fixtures; rename them only in a coordinated source and approval migration.
 
 ## Name and positioning
 
-**Elseweek**: a little time, somewhere else. The name joins the idea of elsewhere with the short window available for a city escape. It is distinct from **Averill**, the assistant product. Elseweek is the consumer travel-studio identity proposed for this demo; the existing Aurelia campaign fixtures retain their historical names until a coordinated migration.
+**Common Miles** suggests shared discovery and a practical distance that fits a short escape. It is easy to say, visually compact and flexible beyond the initial winter collection. Audience: curious travellers choosing a short European city break. Promise: a clear starting point for a trip they can make their own.
 
-A fictional travel studio for thoughtful European city breaks. Audience: Denmark-based travellers considering Copenhagen, Vienna and Prague in winter. Promise: a considered starting point, with space to explore at your own pace.
-
-Initial name research found no obvious travel-company match. Domain ownership and trademark clearance have not been established. Do not present this as a registered or operating travel business.
+A web search on 28 September 2026 found no obvious travel agency with this exact name. This is only an initial collision check, not trademark, company or domain clearance. The demo must not present the name as registered or operational.
 
 ## Voice
 
-Calm, specific and inviting. Short sentences. English throughout the website. Describe what a visitor can actually do: explore, choose, keep a brief. Never imply guaranteed availability, bookings, agency services, reviews, prices or partnerships that the demo does not provide.
+Direct, curious and useful. Lead with the place or the choice a visitor can make. Avoid luxury clichés, fake personalisation, invented availability, testimonials and prices. Explain that the trip brief is local and does not book or send an enquiry.
 
-Hero: **A few days. A world away.**
-Campaign lead: **Discover curated winter city breaks.**
-Supporting idea: **Room to go elsewhere.**
+- Brand line: **Go further. Stay curious.**
+- Campaign line: **Three cities. Your way in.**
+- Short description: **City breaks for curious people.**
 
 ## Identity
 
-Fraunces Regular wordmark with a clay full stop; custom departure mark. Use the forest mark on paper or a white version on forest. Preserve proportions and leave at least half the mark’s width around it. Do not combine the Elseweek mark with Averill’s aperture logo.
+The mark is a route with three changes of direction and a lime destination point, held in a blue square. It works as a favicon, avatar and compact signature. The wordmark is DM Sans Semibold in lowercase, tightly tracked. Keep at least half the mark width as clear space. Do not combine it with Averill's aperture mark.
 
-Paper, forest, sage and clay form the core palette. Ochre supports editorial content. Forest is the default text and primary action colour. Reserve clay for a short italic highlight or focus treatment.
+Night blue `#10213E` grounds the system; electric blue `#2458F5` signals action; cloud `#F5F8FF` creates breathing room; mist `#E5ECFF` groups information; lime `#D8FA63` is a sparing highlight. The blue and lime pairing is a brand motif, not a status indicator. Use the palette through `design-system/tokens.css`.
 
-## Photography
+## Photography and composition
 
-Use recognizable destination photography with an honest location label. The current collection includes winter Nyhavn, a Vienna street with a tram, and Charles Bridge in Prague. Keep buildings and people legible. No AI location substitutes or unrelated aspirational imagery. Sources and license links are in ASSETS.md.
+Use real, credited images of the named cities. Crop for streets, human scale and recognisable place cues. Pair images with destination labels, coordinates or a short practical note. Avoid generic airport, suitcase or fabricated location imagery. Existing sources are listed in `ASSETS.md`.
 
-## Boundaries
+## Application
 
-The planner creates a local text brief. It does not transmit an enquiry or make a reservation. No personal contact data is collected. Before publishing as a real business, verify brand rights, legal identity, commercial content and the actual booking/enquiry flow.
+Large, bold sans headlines; compact navigation; strong primary actions; clear metadata. Blue blocks anchor editorial moments. Cards and inputs use restrained square-soft geometry. Mobile layouts stack cleanly, retain visible labels and preserve destination context. Social templates can inherit the mark, colours, type and route motif in the next phase; no social content is produced in this phase.
