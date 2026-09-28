@@ -11,6 +11,7 @@ let reviewContextKey = null;
 let workspaceRenderKey = null;
 let lastExternalText = '';
 let lastExternalWindowId = null;
+let lastObservationHash = null;
 
 const el = (id) => document.getElementById(id);
 const areas=new Set(['review','work','learn','research','knowledge','setup']);
@@ -46,18 +47,40 @@ function sourceButton(source) {
 }
 
 function render() {
-  if (!renderSession()) return;
+  if (!renderSession()) {
+    lastExternalText = ''; lastExternalWindowId = null; lastObservationHash = null;
+    el('context-question').value = ''; el('context-result').replaceChildren(); el('external-result').replaceChildren(); el('external-task-result').replaceChildren();
+    return;
+  }
   renderWorkspace();
   renderKnowledge();
   renderLearning();
   renderHero();
   el('review-external').disabled = !current.externalWindow;
+  el('watch-external').disabled = !current.externalWindow;
+  el('watch-external').textContent = current.externalWatching ? 'Pause observing' : 'Start observing';
   el('stop-external').disabled = !current.externalWindow;
+  el('external-task-review').disabled = !current.externalObservation;
   if (current.externalWindow?.id !== lastExternalWindowId) {
     lastExternalText = '';
     lastExternalWindowId = current.externalWindow?.id || null;
+    lastObservationHash = null;
     el('external-result').textContent = current.externalWindow ? `Selected: ${current.externalWindow.name}. Read visible text when you want Averill to inspect one frame.` : '';
     el('context-result').replaceChildren();
+    el('external-task-result').replaceChildren();
+  }
+  el('external-watch-status').textContent = current.externalError || (current.externalWatching ? 'Observing the selected window locally. Text updates after a pause; no automatic AI request.' : current.externalWindow ? 'Window selected. Observation is paused.' : 'No external work shared.');
+  if (current.externalObservation && current.externalObservation.contentHash !== lastObservationHash) {
+    lastObservationHash = current.externalObservation.contentHash;
+    lastExternalText = current.externalObservation.text;
+    el('external-task-result').replaceChildren();
+    const item = current.externalObservation;
+    el('external-result').replaceChildren(node('strong', `${item.method === 'accessibility' ? 'Accessible text' : 'Visible OCR text'} in ${item.windowName}`), node('small', `Read ${new Date(item.capturedAt).toLocaleTimeString()} · ${item.method === 'ocr' ? 'Only visible text; layout and hidden content are unverified.' : 'Text exposed by the selected app.'}${item.sensitiveRedacted ? ' Sensitive-looking text was redacted.' : ''}`), node('pre', item.text || 'No readable text detected.'));
+  }
+  if (!current.externalObservation && lastObservationHash) {
+    lastObservationHash = null; lastExternalText = '';
+    el('external-result').textContent = 'Captured text cleared. Read the selected window again to use its current content.';
+    el('external-task-result').replaceChildren();
   }
   el('answer-mode').textContent = current.aiEnabled ? 'Nebius AI enabled' : 'Local source answers';
   el('ai-toggle').textContent = current.aiEnabled ? 'Disable Nebius AI' : current.services?.nebius ? 'Enable Nebius AI' : 'Nebius key needed in Setup';
@@ -69,7 +92,7 @@ function render() {
   el('web-unavailable').textContent=admin?'Public research is not configured. Add a Tavily key in Setup to search.':'Public research is not configured. Ask your administrator to add a Tavily key.';
   el('web-setup').hidden=Boolean(current.services?.tavily)||!admin;
   el('shared-count').textContent = `${current.shared.length} shared`;
-  el('sharing-status').textContent = current.shared.length ? `${current.shared.length} SHARED` : current.externalWindow ? 'WINDOW SELECTED' : 'NOT SHARING';
+  el('sharing-status').textContent = current.externalWatching ? 'OBSERVING' : current.shared.length ? `${current.shared.length} SHARED` : current.externalWindow ? 'WINDOW SELECTED' : 'NOT SHARING';
   el('finding-count').textContent = current.findings.length ? `${current.findings.length} to review` : 'No issues';
   const list = el('window-list');
   list.replaceChildren();
@@ -426,10 +449,32 @@ el('review-external').addEventListener('click', async () => {
   try {
     const review = await window.desktop.reviewExternal();
     lastExternalText = review.text || '';
-    result.replaceChildren(node('strong', `Visible text in ${review.window}`), node('pre', review.text || 'No readable text detected in this frame.'));
+    result.replaceChildren(node('strong', `${review.method === 'accessibility' ? 'Accessible' : 'Visible OCR'} text in ${review.window}`), node('pre', review.text || 'No readable text detected in this frame.'));
   } catch (error) { result.textContent = error.message; }
 });
+el('watch-external').addEventListener('click', async () => {
+  try { current = await window.desktop.watchExternal(!current.externalWatching); render(); }
+  catch (error) { el('external-watch-status').textContent = error.message; }
+});
 el('stop-external').addEventListener('click', async () => { current = await window.desktop.shareExternal(null, null); el('external-result').textContent = 'Window sharing stopped.'; el('external-list').replaceChildren(); render(); });
+el('external-task-review').addEventListener('click', async () => {
+  const output = el('external-task-result'); output.textContent = 'Checking current approved sources…';
+  const task = el('external-task').value;
+  const useAI = Boolean(current.aiEnabled && current.privacy?.companyAI);
+  if (useAI && !window.confirm(`Send the observed text from ${current.externalWindow?.name || 'the selected window'} and eligible approved sources to Nebius for this review?`)) { output.textContent = 'Review cancelled.'; return; }
+  try {
+    const result = await window.desktop.reviewExternalTask(task, useAI);
+    if (result.contentHash !== current.externalObservation?.contentHash) { output.textContent = 'The visible work changed. Review the current text again.'; return; }
+    output.replaceChildren(node('p', `${result.status} ${result.mode === 'model' ? 'Nebius review completed.' : 'Local rule check.'}`));
+    for (const item of result.findings) {
+      const card = node('div', undefined, 'workspace-source');
+      card.append(node('strong', item.confidence === 'model-suggestion' ? 'AI suggestion' : 'Approved rule match'), node('p', item.suggestion));
+      if (item.observedExcerpt) card.append(node('small', `Observed: “${item.observedExcerpt}”`));
+      card.append(sourceButton(item.source), node('small', `Source v${item.source.version}: “${item.source.quote}”`));
+      output.append(card);
+    }
+  } catch (error) { output.textContent = error.message; }
+});
 el('context-form').addEventListener('submit', async (event) => {
   event.preventDefault();
   const question = el('context-question').value.trim();

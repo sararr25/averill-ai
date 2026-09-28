@@ -19,6 +19,9 @@ const cloud = new CloudImports({root:()=>app.getPath('userData'),secure:safeStor
 const learning = require('./src/learning');
 const { answerWorkspace, localWorkspaceAnswer } = require('./src/workspace-answer');
 const { searchPublicWeb, factCheckPublic } = require('./src/web-search');
+const { nativeWindow, observation, windowNumber } = require('./src/external-observation');
+const { clampCompanion } = require('./src/companion-position');
+const taskReview = require('./src/task-review');
 
 const workKinds = ['email', 'linkedin', 'social', 'handover'];
 const workWindows = new Map();
@@ -32,6 +35,12 @@ let authenticatedPersonId = null;
 let loginFailures = { count: 0, until: 0 };
 let onboardingBusy = false;
 let selectedExternalWindow = null;
+let externalObservation = null;
+let externalWatching = false;
+let externalWatchTimer = null;
+let externalCaptureBusy = false;
+let externalError = '';
+let externalEpoch = 0;
 const runtimeKeys = { nebius: process.env.NEBIUS_API_KEY || '', tavily: process.env.TAVILY_API_KEY || '' };
 
 function secretPath() { return path.join(app.getPath('userData'), 'averill-secrets.enc.json'); }
@@ -62,8 +71,20 @@ function signedIn() {
   return Boolean(companyWorkspace && (!companyWorkspace.authEnabled || authenticatedPersonId === companyWorkspace.activePersonId));
 }
 function requireSession() { if (!signedIn()) throw new Error('Sign in to your account first.'); }
+function stopExternal(clearSelection = true) {
+  externalEpoch += 1;
+  if (externalWatchTimer) clearInterval(externalWatchTimer);
+  externalWatchTimer = null;
+  externalWatching = false;
+  externalObservation = null;
+  externalError = '';
+  if (clearSelection) selectedExternalWindow = null;
+}
+function isOwnWindowSource(source) {
+  return [agentWindow, companionWindow, ...workWindows.values()].some(window => window && !window.isDestroyed() && window.getMediaSourceId() === source.id);
+}
 function clearSessionWork() {
-  shared.clear(); aiEnabled = false; selectedExternalWindow = null;
+  shared.clear(); aiEnabled = false; stopExternal();
   workState.clear();
   for (const window of workWindows.values()) if (!window.isDestroyed()) window.close();
   workWindows.clear();
@@ -77,7 +98,10 @@ function snapshot() {
     onboarding: signedIn() ? onboarding.snapshot(companyWorkspace) : null,
     workspace: signedIn() ? workspace.publicSnapshot(companyWorkspace) : { configured: Boolean(companyWorkspace), company: companyWorkspace?.company },
     learning: learning.snapshot(signedIn() ? companyWorkspace : null),
-    externalWindow: selectedExternalWindow,
+    externalWindow: signedIn() ? selectedExternalWindow : null,
+    externalWatching: signedIn() && externalWatching,
+    externalObservation: signedIn() ? externalObservation : null,
+    externalError: signedIn() ? externalError : '',
     services: { nebius: Boolean(runtimeKeys.nebius), tavily: Boolean(runtimeKeys.tavily) },
     shared: [...shared],
     open: [...workWindows.keys()],
@@ -89,11 +113,57 @@ function snapshot() {
 function publish() {
   if (agentWindow && !agentWindow.isDestroyed()) agentWindow.webContents.send('agent:snapshot', snapshot());
   if (companionWindow && !companionWindow.isDestroyed()) {
-    if (signedIn()) companionWindow.showInactive(); else companionWindow.hide();
+    if (signedIn() && !companionWindow.isVisible()) companionWindow.showInactive();
+    else if (!signedIn() && companionWindow.isVisible()) companionWindow.hide();
+    companionWindow.webContents.send('companion:status', { watching: externalWatching, window: selectedExternalWindow?.name || '', capturedAt: externalObservation?.capturedAt || null, error: externalError });
   }
   for (const [kind, window] of workWindows) {
     if (!window.isDestroyed()) window.webContents.send('work:sharing', shared.has(kind));
   }
+}
+
+async function captureExternal() {
+  requireSession();
+  if (!selectedExternalWindow) throw new Error('Choose a work window first.');
+  const chosen = selectedExternalWindow;
+  const personId = companyWorkspace.activePersonId;
+  const epoch = externalEpoch;
+  const sources = await desktopCapturer.getSources({ types: ['window'], thumbnailSize: { width: 1600, height: 1000 } });
+  const source = sources.find(item => item.id === chosen.id);
+  if (!source) { if (epoch === externalEpoch && selectedExternalWindow?.id === chosen.id) { stopExternal(); publish(); } throw new Error('The selected window closed. Choose it again.'); }
+  const identity = await nativeWindow('identity', chosen.id);
+  if (identity.status === 'gone' || chosen.pid && identity.pid && identity.pid !== chosen.pid) {
+    if (epoch === externalEpoch && selectedExternalWindow?.id === chosen.id) { stopExternal(); publish(); }
+    throw new Error('The selected window changed or closed. Choose it again.');
+  }
+  let method = 'accessibility';
+  const accessible = await nativeWindow('read', chosen.id);
+  let content = accessible.status === 'readable' && (!chosen.pid || accessible.pid === chosen.pid) ? accessible.text : '';
+  if (!content) {
+    method = 'ocr';
+    if (source.thumbnail.isEmpty()) throw new Error('Visible-text capture is unavailable. Check Screen Recording permission or select a different window.');
+    const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'averill-capture-'));
+    const imagePath = path.join(directory, 'capture.png');
+    try {
+      fs.writeFileSync(imagePath, source.thumbnail.toPNG(), { mode: 0o600 });
+      content = workspace.extractText(imagePath);
+    } finally { fs.rmSync(directory, { recursive: true, force: true }); }
+  }
+  if (!signedIn() || epoch !== externalEpoch || personId !== companyWorkspace.activePersonId || selectedExternalWindow?.id !== chosen.id) throw new Error('Sharing stopped before capture completed.');
+  const next = observation({ personId, windowId: chosen.id, windowName: source.name || chosen.name, method, text: content });
+  selectedExternalWindow = { ...chosen, name: source.name || chosen.name };
+  externalError = '';
+  if (!externalObservation || externalObservation.contentHash !== next.contentHash || externalObservation.method !== next.method) externalObservation = next;
+  publish();
+  return { window: next.windowName, text: next.text, method: next.method, confidence: next.confidence, capturedAt: next.capturedAt };
+}
+
+async function watchExternalTick() {
+  if (!externalWatching || externalCaptureBusy) return;
+  externalCaptureBusy = true;
+  try { await captureExternal(); }
+  catch (error) { if (externalWatching) { externalError = error.message; publish(); } }
+  finally { externalCaptureBusy = false; }
 }
 
 function createWindow(file, options, query) {
@@ -134,9 +204,19 @@ app.whenReady().then(async () => {
   const area = screen.getPrimaryDisplay().workArea;
   const agentWidth = Math.min(520, area.width - 40);
   agentWindow = createWindow('agent.html', { x: area.x + area.width - agentWidth - 12, y: area.y + 12, width: agentWidth, height: Math.min(850, area.height - 24), minWidth: 440, minHeight: 660, title: 'Averill' });
-  companionWindow = createWindow('companion.html', { x: area.x + area.width - 136, y: area.y + area.height - 94, width: 124, height: 56, minWidth: 124, minHeight: 56, frame: false, transparent: true, resizable: false, skipTaskbar: true, alwaysOnTop: true, show: false, title: 'Ask Averill' });
+  const companionPath = path.join(app.getPath('userData'), 'averill-companion-position.json');
+  let savedCompanion = null;
+  try { savedCompanion = JSON.parse(fs.readFileSync(companionPath, 'utf8')); } catch { /* First launch. */ }
+  const position = clampCompanion(savedCompanion, screen.getAllDisplays());
+  companionWindow = createWindow('companion.html', { ...position, minWidth: 210, minHeight: 84, frame: false, transparent: true, resizable: false, skipTaskbar: true, alwaysOnTop: true, show: false, title: 'Ask Averill' });
   companionWindow.setAlwaysOnTop(true, 'floating');
   companionWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
+  companionWindow.on('moved', () => { try { fs.writeFileSync(companionPath, JSON.stringify(companionWindow.getBounds()), { mode: 0o600 }); } catch { /* Position is optional. */ } });
+  const keepCompanionVisible = () => {
+    if (companionWindow && !companionWindow.isDestroyed()) companionWindow.setBounds(clampCompanion(companionWindow.getBounds(), screen.getAllDisplays()));
+  };
+  screen.on('display-removed', keepCompanionVisible);
+  screen.on('display-metrics-changed', keepCompanionVisible);
   companionWindow.on('closed', () => { companionWindow = null; });
   agentWindow.on('closed', () => { if (companionWindow && !companionWindow.isDestroyed()) companionWindow.close(); });
   loadSecrets().then(publish).catch(() => {});
@@ -157,6 +237,15 @@ app.whenReady().then(async () => {
     agentWindow.show(); agentWindow.focus();
     agentWindow.webContents.send('agent:open-context');
     return true;
+  });
+  ipcMain.handle('companion:snapshot', (event) => {
+    if (!companionWindow || event.sender !== companionWindow.webContents) throw new Error('Companion window required');
+    if (!signedIn()) return { watching: false, window: '', capturedAt: null, error: '' };
+    return { watching: externalWatching, window: selectedExternalWindow?.name || '', capturedAt: externalObservation?.capturedAt || null, error: externalError };
+  });
+  ipcMain.handle('companion:stop', (event) => {
+    if (!companionWindow || event.sender !== companionWindow.webContents) throw new Error('Companion window required');
+    requireSession(); stopExternal(); publish(); return true;
   });
   const persistWorkspace = () => { workspace.save(app.getPath('userData'), companyWorkspace); publish(); return snapshot(); };
   ipcMain.handle('learning:action', (event, action, payload = {}) => {
@@ -445,30 +534,47 @@ app.whenReady().then(async () => {
     fromAgent(event);
     const permission = process.platform === 'darwin' ? systemPreferences.getMediaAccessStatus('screen') : 'granted';
     const sources = await desktopCapturer.getSources({ types: ['window'], thumbnailSize: { width: 0, height: 0 } });
-    return { permission, windows: sources.filter((source) => source.name && !/Averill|Email Studio|LinkedIn Draft|Social Publisher|Campaign Files/.test(source.name)).map((source) => ({ id: source.id, name: source.name })) };
+    return { permission, windows: sources.filter((source) => source.name && !isOwnWindowSource(source)).map((source) => ({ id: source.id, name: source.name })) };
   });
   ipcMain.handle('agent:external-share', async (event, id, name) => {
     fromAgent(event);
     if (id) {
+      if (!windowNumber(id)) throw new Error('Choose a listed work window.');
       const available = await desktopCapturer.getSources({ types: ['window'], thumbnailSize: { width: 0, height: 0 } });
-      if (!available.some(source => source.id === id && source.name === name && source.name && !/Averill|Email Studio|LinkedIn Draft|Social Publisher|Campaign Files/.test(source.name))) throw new Error('Choose an available external window.');
+      if (!available.some(source => source.id === id && source.name === name && source.name && !isOwnWindowSource(source))) throw new Error('Choose an available external window.');
       fromAgent(event);
+      const identity = await nativeWindow('identity', id);
+      if (identity.status === 'gone') throw new Error('That window closed. Choose it again.');
+      fromAgent(event);
+      stopExternal();
+      selectedExternalWindow = { id: String(id), name: String(name).slice(0, 150), pid: Number(identity.pid) || null, app: String(identity.owner || 'External app').slice(0, 100) };
+    } else {
+      stopExternal();
     }
-    selectedExternalWindow = id ? { id: String(id), name: String(name).slice(0, 150) } : null;
     publish(); return snapshot();
   });
-  ipcMain.handle('agent:external-review', async (event) => {
+  ipcMain.handle('agent:external-review', async (event) => { fromAgent(event); return captureExternal(); });
+  ipcMain.handle('agent:external-task-review', async (event, task, useAI) => {
     fromAgent(event);
-    if (!selectedExternalWindow) throw new Error('Choose a window first');
-    const sources = await desktopCapturer.getSources({ types: ['window'], thumbnailSize: { width: 1600, height: 1000 } });
-    const selected = sources.find((source) => source.id === selectedExternalWindow.id);
-    if (!selected || selected.thumbnail.isEmpty()) throw new Error('Window capture is unavailable. Check macOS Screen Recording permission or choose the window again.');
-    const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'averill-capture-'));
-    const imagePath = path.join(directory, 'capture.png');
-    try {
-      fs.writeFileSync(imagePath, selected.thumbnail.toPNG(), { mode: 0o600 });
-      return { window: selectedExternalWindow.name, text: workspace.extractText(imagePath) };
-    } finally { fs.rmSync(directory, { recursive: true, force: true }); }
+    if (!taskReview.tasks[task]) throw new Error('Choose a supported work type.');
+    const observed = externalObservation;
+    if (!observed || !selectedExternalWindow || observed.windowId !== selectedExternalWindow.id) throw new Error('Read the selected window before reviewing its work.');
+    const personId = companyWorkspace.activePersonId;
+    const epoch = externalEpoch;
+    const result = await taskReview.reviewTask(companyWorkspace, task, observed.text, runtimeKeys.nebius, useAI === true && aiEnabled);
+    fromAgent(event);
+    if (epoch !== externalEpoch || personId !== companyWorkspace.activePersonId || observed.contentHash !== externalObservation?.contentHash) throw new Error('The work changed or sharing stopped. Read it again.');
+    const current = new Map(taskReview.currentSources(companyWorkspace, task).map(item => [item.source.id, item]));
+    if (result.findings.some(item => { const entry = current.get(item.source.id); return !entry || entry.source.version !== item.source.version || entry.source.approvedAt !== item.source.approvedAt || !entry.text.includes(item.source.quote); })) throw new Error('The approved company sources changed. Review again.');
+    return { ...result, observedAt: observed.capturedAt, method: observed.method, window: observed.windowName, contentHash: observed.contentHash };
+  });
+  ipcMain.handle('agent:external-watch', (event, enabled) => {
+    fromAgent(event);
+    if (enabled && !selectedExternalWindow) throw new Error('Choose a work window first.');
+    if (!enabled) { stopExternal(false); publish(); return snapshot(); }
+    externalWatching = true;
+    if (!externalWatchTimer) externalWatchTimer = setInterval(watchExternalTick, 6000);
+    watchExternalTick(); publish(); return snapshot();
   });
   ipcMain.handle('agent:open-web', async (event, url) => {
     fromAgent(event);

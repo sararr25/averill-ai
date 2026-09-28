@@ -2,7 +2,7 @@
 
 ## Purpose and status
 
-This document describes the implemented hackathon prototype and the boundaries for extending it. Elseweek is a separate demo company with a standalone website in `travel-site/`. Averill is the Electron companion for employees working in their usual tools. A floating Ask Averill button opens the assistant; the user can select an external app or browser window and request one-frame OCR of visible text. The four supplied Elseweek editor windows remain synthetic fixtures. Continuous external observation remains a future milestone.
+This document describes the implemented hackathon prototype and the boundaries for extending it. Elseweek is a separate demo company with a standalone website in `travel-site/`. Averill is the Electron companion for employees working in their usual tools. A floating Ask Averill button opens the assistant; the user can select one external app or browser window for a one-time read or explicit six-second local observation. macOS Accessibility text is preferred, with visible-text OCR fallback. The four supplied Elseweek editor windows remain synthetic fixtures. Browser DOM fields and platform APIs remain future adapters.
 
 ## Requirements
 
@@ -21,7 +21,7 @@ This document describes the implemented hackathon prototype and the boundaries f
 | Main process | `travel-desktop/main.js` | Creates windows, tracks open/shared state, computes snapshots, registers IPC handlers |
 | Preload bridge | `travel-desktop/preload.js` | Exposes narrow `window.desktop` methods to sandboxed renderers |
 | Averill renderer | `travel-desktop/src/agent.html`, `agent.js` | Window list, findings, question composer, source viewer, AI opt-in |
-| Floating companion | `travel-desktop/src/companion.html` | Always-on-top Ask Averill entry point; focuses Work without reading the desktop |
+| Floating companion | `travel-desktop/src/companion.html`, `src/companion-position.js` | Movable always-on-top entry point, selected-window/last-read status and Stop |
 | Work renderer | `travel-desktop/src/work.html`, `work.js` | Synthetic email, social, handover fields and explicit draft save |
 | Rule engine | `travel-desktop/src/engine.js` | Pure issue checks and local campaign answers |
 | AI adapter | `travel-desktop/src/assistant.js` | Nebius model discovery, answer request, citation ID validation, local fallback |
@@ -29,6 +29,8 @@ This document describes the implemented hackathon prototype and the boundaries f
 | Design system | `travel-desktop/design-system/` and `src/agent-theme.css` | Approved visual tokens and implemented assistant styling |
 | Company workspace | `travel-desktop/src/workspace.js` | Local people, role switching, imported copies, approval, priority, and conflict detection |
 | Company answers | `travel-desktop/src/workspace-answer.js` | Approved-source retrieval, Nebius request, citation ID validation, local fallback |
+| External observation | `travel-desktop/src/external-observation.js`, `scripts/window-context.swift` | Selected-window ID/PID check, bounded Accessibility text and OCR fallback |
+| External task review | `travel-desktop/src/task-review.js` | Exact approved-rule checks and optional bounded Nebius suggestions |
 | Evidence extraction | `travel-desktop/src/evidence.js` | Exact matching lines and PDF page markers for new imports |
 | Source comparison | `travel-desktop/src/source-review.js` | Bounded line diff of two visible extracted documents |
 | Learning engine | `travel-desktop/src/learning.js` | Owner-scoped sessions, ordered confirmation, weekly eligibility, practice and feedback |
@@ -62,7 +64,7 @@ Employee asks in Review
        fall back to a local answer on failure or invalid citation
 ```
 
-The work window calls `work:update` even when unshared; the main process stores the state but does not produce findings until the window is shared. This is a boundary of the current implementation to consider during the future external-app integration. Closing a work window removes its state and sharing status.
+The supplied work window calls `work:update` even when unshared; the main process stores the state but does not produce findings until the window is shared. Closing a work window removes its state and sharing status. External-window observation is a separate path: the selected source ID and native owner PID are rechecked before each local read, the latest bounded text/hash/timestamp stay in memory for the signed-in person, and Stop increments an epoch so in-flight reads cannot restore cleared context. The employee chooses a task type and requests a review; no automatic provider request occurs during polling.
 
 ## IPC contracts
 
@@ -76,7 +78,7 @@ The fixed campaign source pack is static and synthetic. `current-brief.md` is th
 
 ## AI and privacy boundary
 
-Local answers and deterministic findings need no network. Nebius uses `NEBIUS_API_KEY` from the environment/root `.env.local` or encrypted local Setup storage. The employee enables Nebius for the session. A Review question with a shared demo window can send the question and fixed synthetic text pack; a company question can send relevant approved company text. Draft or OCR text is sent only after a separate confirmation in its review flow. The API key remains in the main process. The app does not send image binaries or perform continuous capture. If the model cannot be reached, returns malformed output, or fails citation validation, a local answer is used. Citation IDs are structurally validated; model sentences are not independently checked against passages.
+Local answers and deterministic findings need no network. Nebius uses `NEBIUS_API_KEY` from the environment/root `.env.local` or encrypted local Setup storage. The employee enables Nebius for the session. A Review question with a shared demo window can send the question and fixed synthetic text pack; a company question can send relevant approved company text. External task review sends bounded observed text and only AI-eligible approved company sources after owner policy and a separate employee confirmation; credential-shaped text is rejected. The model must return exact source and observed excerpts, and the main process rechecks authorization and current observation before display. Interpretive suggestions are still model suggestions, not independently proven entailment. Image binaries are never sent. If the model fails validation, a local rule result remains.
 
 The public repository must never contain `.env.local` or credentials. `.env.example` lists variable names only. Do not log request headers, keys, or sensitive prompt content.
 
@@ -88,7 +90,7 @@ The company workspace is now stored as JSON in Electron's user-data directory, w
 
 Nebius receives only a question/draft and relevant approved text sources after session opt-in; draft and OCR review also prompt before sending. Tavily receives only the explicit web query and returns external URLs. The new Nebius company-source path has not passed a live request in this session because automated computer-use approval rejected that data transfer. Do not infer success from the older fixed-source Nebius check.
 
-Electron `desktopCapturer` lists windows. The user chooses a Canva-titled window; pressing Review captures one thumbnail frame, extracts visible text locally, and deletes the temporary PNG. Stop sharing clears the selected window. No continuous capture runs. A screenshot can miss hidden text or visual issues; the app labels the review as OCR.
+Electron `desktopCapturer` lists windows, excluding Averill-owned window IDs. The user chooses one external window; Read captures once, while Start polls every six seconds. A Swift helper resolves the native window number/owner PID and reads accessible text where available, excluding secure fields and browser chrome outside the active web area. OCR of a selected-window thumbnail is the fallback; the temporary PNG is deleted immediately. Pause/Stop clear observed text; Stop also clears the selection. OCR can miss hidden text, assets, layout and publication state, and is labelled accordingly.
 
 ## Known gaps and tradeoffs
 
@@ -100,7 +102,7 @@ Electron `desktopCapturer` lists windows. The user chooses a Canva-titled window
 
 ## Extension sequence
 
-Verify the existing one-frame macOS Canva selection, permission handling, OCR, and Stop sharing end to end. Rehearse the packaged app and approved company-source Nebius path. Then add cloud authentication/synchronization, stronger source-conflict and citation checks, and deletion/revocation behavior. Keep work actions human-owned unless the product decision changes explicitly. See [docs/HANDOVER.md](docs/HANDOVER.md) for the current checks and their evidence boundaries.
+Add a browser DOM/field adapter and test actual email, LinkedIn, Instagram and Canva draft accounts. Verify permission revocation, full-screen/second-monitor behavior and a consented live Nebius task-review request. Expand task schemas beyond exact phrase rules, then tackle company deployment and stronger semantic evidence checks. Keep work actions human-owned. See [docs/HANDOVER.md](docs/HANDOVER.md) for current checks and limits.
 
 ## Learning state and IPC
 
@@ -110,7 +112,7 @@ State lives in the `learning` field of the existing schema-1 workspace: sessions
 
 Week keys are Monday-based in Europe/Copenhagen. Only confirmed current-week sessions are eligible. Company evidence must remain visible, approved, hash/version-matching and outside same-title conflicts. Excluding activity or invalidating evidence blocks affected questions. A fingerprint detects changed records so explicit refresh can create an updated set. Previous answers remain in local history; only the current person/current week is exposed by the learning snapshot.
 
-Learn is offline and stores no screenshots. The official guide opens only on an employee action. It neither connects to Canva’s document API nor proves element alignment. Existing Work capture is a separate explicit one-frame OCR route. Separate local accounts provide application-level person isolation; they do not provide synchronized authenticated accounts across devices.
+Learn is offline and stores no screenshots. The official guide opens only on an employee action. It neither connects to Canva’s document API nor proves element alignment. Work can read once or poll a selected window locally; this is separate from verified Canva learning. Separate local accounts provide application-level person isolation; they do not provide synchronized authenticated accounts across devices.
 
 ## Elseweek department pack and organic LinkedIn — 26 September 2026
 

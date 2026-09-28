@@ -8,7 +8,7 @@ Averill is a standalone company agent assistant that helps an employee keep work
 
 The product identity is **Averill**. **Elseweek** is the fictional travel company used in the hackathon demo. Its campaign documents and work windows are test material, not Averill branding. Product copy, demo content, and developer documentation are in English.
 
-**Product boundary, corrected 28 September:** employees create and edit email, LinkedIn, Instagram, design and other work in the tools they already use. Averill is a separate companion with a floating button. It helps with an explicitly selected external window after a requested one-frame text capture, then consults approved company sources with Nebius when enabled. Public fact-checks use Tavily with only the public question the employee types. Elseweek has its own website in `travel-site/`; it is the example company, not an Averill work app. The four built-in editors remain reproducible hackathon fixtures, not the main employee workflow.
+**Product boundary, corrected 28 September:** employees create and edit email, LinkedIn, Instagram, design and other work in the tools they already use. Averill is a separate companion with a floating button. A person chooses one external window for a local read or six-second observation; a bounded task review compares its text with approved company sources, with optional consented Nebius suggestions. Public fact-checks use Tavily with only the public question the employee types. Elseweek has its own website in `travel-site/`; it is the example company, not an Averill work app. The four built-in editors remain reproducible hackathon fixtures, not the main employee workflow.
 
 ## Why this exists
 
@@ -29,6 +29,7 @@ Approved launch email: 15 October 2026 at 10:00 Copenhagen time. Approved paid c
 
 ## Current product state
 
+- Work can locally observe a selected external window and check exact current approved rules for email, organic LinkedIn, paid Instagram, Canva text, Operations and People. The exact-rule coverage is currently narrow; optional Nebius task suggestions require source and observed-excerpt validation, with no live request verified. See the [acceptance matrix](docs/EXTERNAL_WORK_ACCEPTANCE.md) and [handover](docs/HANDOVER.md).
 - Review findings can open explanation context, copy the suggested correction, start a person-owned practice exercise and recheck supported fields after a human edit. Learn also has composition, LinkedIn visual and newsletter export exercises with ordered self-confirmed steps and a linked company source/version where selected. Offline free questions are limited to the bounded Canva lesson; selected Canva OCR remains a separate explicit one-frame action.
 - Knowledge exposes exact matching passages with source version, approval metadata and line/page when available. Reviewers can compare extracted lines, explicitly link a replacement across different titles, decide with a reason, and answer local private requests for missing evidence. Search filters include department, type, status and conflicts.
 - Admins can disable/reset another non-owner local account; a signed-in person can change their password. Eligible local source copies and personal Learn history can be deleted. Temporary onboarding files are cleaned after replacement or successful application. These controls do not provide a hosted identity system, encrypted company knowledge store or signed distribution.
@@ -45,12 +46,12 @@ Approved launch email: 15 October 2026 at 10:00 Copenhagen time. Approved paid c
 - People can import individual files or a folder (up to 100 supported files per selection). Imported copies and workspace metadata persist under Electron user data. Private files must be proposed before a lead can approve them for a department. A lead can set priority or supersede a source. Different approved files with the same title and different hashes cause a conflict; both are excluded from company answers until resolved.
 - Markdown, plain text, CSV, JSON, and SVG text is indexed locally. On macOS, PDF text and image OCR use a local Swift helper; an unreadable file is marked as such. Imported Canva exports can be opened and their extracted text reviewed. This is not structural Canva document access or full visual analysis.
 - The Work tab includes a company marketing draft review path. With explicit consent, relevant approved source text and a draft are sent to Nebius. The Review composer answers questions about the shared synthetic campaign from its fixed source pack; when no demo window is shared it uses the company workspace. A separate Research tab calls Tavily for a user-entered public query only. Tavily results are not company-approved sources.
-- A Canva browser/app window can be explicitly selected for a one-frame OCR review and unselected with Stop sharing. The current code does not continuously monitor an arbitrary external window or infer design geometry. macOS Screen Recording permission is required for capture.
+- One external browser/app window can be selected for an Accessibility or OCR read, then polled locally every six seconds until Pause/Stop. The current code does not infer design geometry or inspect hidden fields. macOS Screen Recording permission is required for OCR.
 - The Averill assistant and supplied Elseweek work windows use the approved Petrol / Coral / Ice color system and bundled Geologica, Spline Sans, and Fragment Mono font packages. The social creative preview renders the actual supplied SVG asset.
 
 ## Explicit non-goals for this prototype
 
-No continuous arbitrary macOS window capture, external app control, background observation, automatic edit, email send, or post publication is implemented. One explicitly selected Canva window can be captured on demand for visible-text OCR. Do not present that as full app understanding. The campaign source pack is synthetic; no real customer data is required for the demo.
+No arbitrary-window surveillance, external app control, automatic edit, email send, or post publication is implemented. Observation runs only for the selected window after explicit Start; it is a six-second local poll, not field-aware editor integration. Do not present visible text as full app understanding. The campaign source pack is synthetic; no real customer data is required for the demo.
 
 ## Product and design decisions
 
@@ -71,7 +72,7 @@ No continuous arbitrary macOS window capture, external app control, background o
 
 The implementation and external gates for every requested addition are tracked in [docs/ADDITIONS_STATUS.md](docs/ADDITIONS_STATUS.md). The A/B design and technical preflight are in [docs/AB_TEST_PLAN.md](docs/AB_TEST_PLAN.md); there is no live randomized result.
 
-1. Complete native desktop verification of Canva window capture, review, and Stop sharing with a real Canva window; test image import in the running app.
+1. Complete the real-platform acceptance matrix with disposable Substack/email, LinkedIn, Instagram and Canva accounts; verify field boundaries, permission denial, full-screen and second-monitor behavior. Add a browser DOM adapter for editable fields.
 2. Verify the new company-source Nebius request live after explicit approval for the synthetic test payload. The previous live check covers only the fixed historical Aurelia source pack.
 3. Add cloud authentication and sync before describing the local account demo as a multi-device employee product. Extend specialized checks to other departments only after their source and workflow requirements are defined.
 4. Improve conflict detection beyond different files sharing one title, and independently verify model claims against cited passages.

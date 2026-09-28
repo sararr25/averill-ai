@@ -5,12 +5,17 @@
   "description": "Averill company agent assistant desktop demo with fictional Elseweek campaign",
   "main": "main.js",
   "scripts": {
+    "prestart": "npm run build:context",
     "start": "electron .",
     "test": "node --test tests/*.test.js",
     "build:ocr": "sh scripts/build-ocr.sh",
-    "package:mac": "npm run build:ocr && electron-packager . Averill --platform=darwin --arch=arm64 --out=dist --overwrite --prune --no-asar --ignore=^/dist$",
+    "build:context": "sh scripts/build-context.sh",
+    "package:mac": "npm run build:ocr && npm run build:context && electron-packager . Averill --platform=darwin --arch=arm64 --out=dist --overwrite --prune --no-asar --ignore=^/dist$",
     "verify:intake": "electron scripts/verify-multisource.cjs",
-    "verify:feedback": "electron scripts/verify-feedback.cjs"
+    "verify:feedback": "electron scripts/verify-feedback.cjs",
+    "verify:external": "electron scripts/verify-external.cjs",
+    "verify:task-review": "electron scripts/verify-task-review.cjs",
+    "verify:native-window": "electron scripts/verify-native-window.cjs"
   },
   "dependencies": {
     "@fontsource/fragment-mono": "^5.3.0",

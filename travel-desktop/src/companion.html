@@ -1,7 +1,18 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Ask Averill</title><style>
-html,body{margin:0;background:transparent;font-family:system-ui,sans-serif}
-button{width:124px;height:54px;border:1px solid #91d3df;border-radius:27px;background:#002129;color:#f4f5f3;box-shadow:0 6px 22px #00171d99;cursor:pointer;font-size:13px;font-weight:650}
-button:hover,button:focus-visible{background:#0c303a;outline:2px solid #ff705e;outline-offset:-3px}
-span{display:inline-grid;place-items:center;width:26px;height:26px;margin-right:4px;border-radius:50%;background:#ff705e;color:#002129;font-weight:800}
-</style></head><body><button id="open" type="button" aria-label="Ask Averill about your current work"><span aria-hidden="true">A</span> Ask Averill</button><script>document.getElementById('open').addEventListener('click',()=>window.desktop.openCompanion());</script></body></html>
+html,body{margin:0;background:transparent;font-family:system-ui,sans-serif;color:#f4f5f3}
+.shell{width:208px;height:82px;box-sizing:border-box;border:1px solid #91d3df;border-radius:16px;background:#002129;box-shadow:0 6px 22px #00171d99;overflow:hidden}
+.grip{height:17px;padding:2px 12px 0;box-sizing:border-box;color:#91b2bf;font-size:10px;letter-spacing:.18em;-webkit-app-region:drag;cursor:move}
+.row{display:flex;gap:6px;align-items:center;padding:0 7px 7px}
+button{-webkit-app-region:no-drag;cursor:pointer;border:0;border-radius:9px;font-size:12px;font-weight:650;height:32px}
+#open{flex:1;background:#ff705e;color:#002129}#stop{background:#0c303a;color:#91d3df;padding:0 9px}#stop:disabled{opacity:.4;cursor:default}
+button:focus-visible{outline:2px solid #f4f5f3;outline-offset:1px}
+#status{display:block;padding:0 10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#bdd5df;font-size:11px}
+</style></head><body><div class="shell"><div class="grip" aria-label="Drag Averill button">AVERILL · DRAG TO MOVE</div><div class="row"><button id="open" type="button">Ask Averill</button><button id="stop" type="button" disabled>Stop</button></div><span id="status" role="status">No work shared</span></div><script>
+const status=document.getElementById('status'),stop=document.getElementById('stop');
+function render(value){const time=value.capturedAt?` · read ${new Date(value.capturedAt).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}`:'';status.textContent=value.error||(value.watching?`Watching ${value.window}${time}`:value.window?`Selected: ${value.window}${time}`:'No work shared');status.title=status.textContent;stop.disabled=!value.window;stop.title=value.window?'Stop sharing the selected window':'No work shared';}
+document.getElementById('open').addEventListener('click',()=>window.desktop.openCompanion());
+stop.addEventListener('click',async()=>{await window.desktop.stopCompanion();});
+window.desktop.onCompanionStatus(render);
+window.desktop.companionSnapshot().then(render).catch(()=>{});
+</script></body></html>

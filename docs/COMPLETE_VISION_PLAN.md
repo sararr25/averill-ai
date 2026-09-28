@@ -1,6 +1,12 @@
 # Averill complete-vision implementation plan
 
-Updated 28 September 2026. This is the execution plan for the product distinction confirmed by the owner. [HANDOVER.md](HANDOVER.md) records the current verified state; this document defines the work ahead. It does not claim the milestones below are implemented.
+Updated 28 September 2026. This is the execution plan for the product distinction confirmed by the owner. [HANDOVER.md](HANDOVER.md) records the current verified state. The implementation status of the first three numbered milestones is recorded below; later milestones remain planned.
+
+## Delivery status for points 1–3
+
+The [external-work acceptance matrix](EXTERNAL_WORK_ACCEPTANCE.md) defines the synthetic cases before implementation. **Point 1:** the movable floating control persists its position, returns to an available display, shows the chosen window and last local read, opens the signed-in assistant and offers Stop. **Point 2:** a selected macOS window can be polled every six seconds, with native Accessibility text when available and visible-text OCR otherwise. The observation stays in memory and is cleared by Stop/sign-out; the selected window number and owning PID are checked on every read. **Point 3:** an employee can select a work type and compare observed text with current approved, visible, non-conflicting company sources. Exact prohibitions and required phrases have local checks. Optional Nebius suggestions require session/company consent, a separate confirmation, exact observed/source quotes and a final source-authorization check. Synthetic email correction and revocation were verified end to end.
+
+The remaining acceptance gates are substantial: no browser DOM extension or official draft API, no field/selection-aware pause detector, no actual Substack/LinkedIn/Instagram/Canva account proof, no live Nebius request for this task engine, and no complete audience/date/asset/procedure schema. Real Chrome OCR and native TextEdit Accessibility were verified with synthetic text. Multi-monitor/full-screen, permission revocation and private-window behavior still need physical acceptance. The next work should close these gates before the full hackathon vertical slice is claimed.
 
 ## Product contract
 
@@ -10,7 +16,7 @@ Updated 28 September 2026. This is the execution plan for the product distinctio
 - Route company guidance and tool coaching to approved, employee-visible knowledge and Nebius when the company and person have enabled it; tool instructions need vetted documentation. Route public factual research to Tavily with a preview of the exact public query. Never send company documents or a raw screenshot to Tavily. Show which source supports each actionable suggestion and when evidence is insufficient.
 - The four supplied Electron work windows remain labelled synthetic fixtures for deterministic demos and regression tests. They do not define the real employee workflow.
 
-## Verified starting point
+## Historical starting point before points 1–3
 
 At commit `e01126f`, Elseweek already has a separate local website. Averill has local accounts and approval-controlled company sources; an optional source-constrained Nebius answer; Tavily public search; a floating Ask Averill window; explicit selection of external windows; one requested OCR frame; a company question form; and a typed public fact-check. The 35-test suite and isolated Electron smoke passed. The external flow has **no continuous observation, field-aware editor integration, generalized source-grounded coaching, verified visual understanding, automatic external action, or real multi-device company service**. No real external capture or live provider request was verified in that change.
 

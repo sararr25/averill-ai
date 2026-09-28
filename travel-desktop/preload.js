@@ -7,7 +7,7 @@ const operationLabels={
  'onboarding:drop':'Reading dropped files', 'onboarding:upload':'Selecting and reading company files', 'onboarding:synced':'Reading synced files', 'onboarding:links':'Downloading and reading linked files', 'onboarding:analyze':'Interpreting selected files with Nebius', 'onboarding:apply':'Saving company onboarding', 'onboarding:read-file':'Opening uploaded text',
  'company:privacy':'Saving company AI policy', 'cloud:configure':'Saving cloud configuration', 'cloud:connect':'Waiting for cloud sign-in', 'cloud:cancel':'Cancelling cloud sign-in', 'cloud:disconnect':'Disconnecting cloud account', 'cloud:list':'Loading cloud folder', 'cloud:import':'Downloading selected cloud files',
  'workspace:create':'Creating company workspace', 'workspace:add-person':'Adding person', 'workspace:import':'Importing sources', 'workspace:import-folder':'Importing folder', 'workspace:update-source':'Saving source status and priority', 'workspace:remove-source':'Deleting local source copy', 'workspace:request-clarification':'Requesting private clarification', 'workspace:resolve-clarification':'Answering private clarification', 'workspace:propose-source':'Proposing source', 'workspace:open-source':'Opening source file', 'workspace:read-file':'Opening source text', 'workspace:save-key':'Saving service key securely',
- 'agent:source':'Opening source text', 'agent:open-work':'Opening work window', 'agent:copy-finding':'Copying suggested correction', 'agent:share':'Updating sharing', 'agent:ask':'Preparing answer', 'agent:ask-demo':'Preparing demo answer', 'agent:ai-mode':'Updating AI mode', 'agent:open-source':'Opening file', 'agent:open-web':'Opening browser', 'agent:web-search':'Searching public web', 'agent:fact-check':'Checking public claim', 'agent:external-windows':'Finding available windows', 'agent:external-share':'Updating selected window', 'agent:external-review':'Reading selected window', 'learning:action':'Saving learning activity', 'companion:open':'Opening Averill'
+ 'agent:source':'Opening source text', 'agent:open-work':'Opening work window', 'agent:copy-finding':'Copying suggested correction', 'agent:share':'Updating sharing', 'agent:ask':'Preparing answer', 'agent:ask-demo':'Preparing demo answer', 'agent:ai-mode':'Updating AI mode', 'agent:open-source':'Opening file', 'agent:open-web':'Opening browser', 'agent:web-search':'Searching public web', 'agent:fact-check':'Checking public claim', 'agent:external-windows':'Finding available windows', 'agent:external-share':'Updating selected window', 'agent:external-review':'Reading selected window', 'agent:external-watch':'Updating work observation', 'agent:external-task-review':'Checking approved work rules', 'learning:action':'Saving learning activity', 'companion:open':'Opening Averill', 'companion:stop':'Stopping sharing'
 };
 function announce(value){for(const listener of operationListeners)try{listener(value);}catch{}}
 async function invoke(channel,...args){
@@ -55,6 +55,9 @@ contextBridge.exposeInMainWorld('desktop', {
   learningAction: (action, payload) => invoke('learning:action', action, payload),
   snapshot: () => invoke('agent:snapshot'),
   openCompanion: () => invoke('companion:open'),
+  companionSnapshot: () => invoke('companion:snapshot'),
+  stopCompanion: () => invoke('companion:stop'),
+  onCompanionStatus: (callback) => { ipcRenderer.on('companion:status', (_, value) => callback(value)); },
   onOpenContext: (callback) => { ipcRenderer.on('agent:open-context', () => callback()); },
   openWork: (kind) => invoke('agent:open-work', kind),
   copyFinding: (kind,id) => invoke('agent:copy-finding',kind,id),
@@ -87,4 +90,6 @@ contextBridge.exposeInMainWorld('desktop', {
   externalWindows: () => invoke('agent:external-windows'),
   shareExternal: (id, name) => invoke('agent:external-share', id, name),
   reviewExternal: () => invoke('agent:external-review'),
+  watchExternal: (enabled) => invoke('agent:external-watch', enabled),
+  reviewExternalTask: (task, useAI) => invoke('agent:external-task-review', task, useAI),
 });
