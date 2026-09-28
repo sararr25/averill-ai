@@ -2,7 +2,7 @@
 
 ## Purpose and status
 
-This document describes the implemented hackathon prototype and the boundaries for extending it. The current app is an Electron desktop demo with four supplied Elseweek work windows, a local company workspace, owner-scoped guided learning and weekly practice, and explicit one-frame OCR of a selected external Canva window. General continuous external application observation remains a future milestone.
+This document describes the implemented hackathon prototype and the boundaries for extending it. Elseweek is a separate demo company with a standalone website in `travel-site/`. Averill is the Electron companion for employees working in their usual tools. A floating Ask Averill button opens the assistant; the user can select an external app or browser window and request one-frame OCR of visible text. The four supplied Elseweek editor windows remain synthetic fixtures. Continuous external observation remains a future milestone.
 
 ## Requirements
 
@@ -21,6 +21,7 @@ This document describes the implemented hackathon prototype and the boundaries f
 | Main process | `travel-desktop/main.js` | Creates windows, tracks open/shared state, computes snapshots, registers IPC handlers |
 | Preload bridge | `travel-desktop/preload.js` | Exposes narrow `window.desktop` methods to sandboxed renderers |
 | Averill renderer | `travel-desktop/src/agent.html`, `agent.js` | Window list, findings, question composer, source viewer, AI opt-in |
+| Floating companion | `travel-desktop/src/companion.html` | Always-on-top Ask Averill entry point; focuses Work without reading the desktop |
 | Work renderer | `travel-desktop/src/work.html`, `work.js` | Synthetic email, social, handover fields and explicit draft save |
 | Rule engine | `travel-desktop/src/engine.js` | Pure issue checks and local campaign answers |
 | AI adapter | `travel-desktop/src/assistant.js` | Nebius model discovery, answer request, citation ID validation, local fallback |

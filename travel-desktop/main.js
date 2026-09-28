@@ -18,13 +18,14 @@ const { CloudImports } = require('./src/cloud-import');
 const cloud = new CloudImports({root:()=>app.getPath('userData'),secure:safeStorage,open:url=>shell.openExternal(url)});
 const learning = require('./src/learning');
 const { answerWorkspace, localWorkspaceAnswer } = require('./src/workspace-answer');
-const { searchPublicWeb } = require('./src/web-search');
+const { searchPublicWeb, factCheckPublic } = require('./src/web-search');
 
 const workKinds = ['email', 'linkedin', 'social', 'handover'];
 const workWindows = new Map();
 const workState = new Map();
 const shared = new Set();
 let agentWindow;
+let companionWindow;
 let aiEnabled = false;
 let companyWorkspace = null;
 let authenticatedPersonId = null;
@@ -66,6 +67,7 @@ function clearSessionWork() {
   workState.clear();
   for (const window of workWindows.values()) if (!window.isDestroyed()) window.close();
   workWindows.clear();
+  if (companionWindow && !companionWindow.isDestroyed()) companionWindow.hide();
 }
 function snapshot() {
   return {
@@ -86,6 +88,9 @@ function snapshot() {
 
 function publish() {
   if (agentWindow && !agentWindow.isDestroyed()) agentWindow.webContents.send('agent:snapshot', snapshot());
+  if (companionWindow && !companionWindow.isDestroyed()) {
+    if (signedIn()) companionWindow.showInactive(); else companionWindow.hide();
+  }
   for (const [kind, window] of workWindows) {
     if (!window.isDestroyed()) window.webContents.send('work:sharing', shared.has(kind));
   }
@@ -129,6 +134,11 @@ app.whenReady().then(async () => {
   const area = screen.getPrimaryDisplay().workArea;
   const agentWidth = Math.min(520, area.width - 40);
   agentWindow = createWindow('agent.html', { x: area.x + area.width - agentWidth - 12, y: area.y + 12, width: agentWidth, height: Math.min(850, area.height - 24), minWidth: 440, minHeight: 660, title: 'Averill' });
+  companionWindow = createWindow('companion.html', { x: area.x + area.width - 136, y: area.y + area.height - 94, width: 124, height: 56, minWidth: 124, minHeight: 56, frame: false, transparent: true, resizable: false, skipTaskbar: true, alwaysOnTop: true, show: false, title: 'Ask Averill' });
+  companionWindow.setAlwaysOnTop(true, 'floating');
+  companionWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
+  companionWindow.on('closed', () => { companionWindow = null; });
+  agentWindow.on('closed', () => { if (companionWindow && !companionWindow.isDestroyed()) companionWindow.close(); });
   loadSecrets().then(publish).catch(() => {});
   const fromAgent = (event, allowAnonymous = false) => {
     if (event.sender !== agentWindow.webContents) throw new Error('Averill window required');
@@ -141,6 +151,13 @@ app.whenReady().then(async () => {
     if (event.sender !== agentWindow.webContents && ![...workWindows.values()].some(w => w.webContents === event.sender)) throw new Error('Averill application window required');
     requireSession();
   };
+  ipcMain.handle('companion:open', (event) => {
+    if (!companionWindow || event.sender !== companionWindow.webContents) throw new Error('Companion window required');
+    requireSession();
+    agentWindow.show(); agentWindow.focus();
+    agentWindow.webContents.send('agent:open-context');
+    return true;
+  });
   const persistWorkspace = () => { workspace.save(app.getPath('userData'), companyWorkspace); publish(); return snapshot(); };
   ipcMain.handle('learning:action', (event, action, payload = {}) => {
     fromAgent(event);
@@ -422,16 +439,22 @@ app.whenReady().then(async () => {
     if(aiEnabled&&privacy.credentials(question))throw new Error('Remove credentials before using external AI.');
     return aiEnabled && privacy.allowed(companyWorkspace) ? answerQuestion(question, runtimeKeys.nebius) : { ...localAnswer(String(question || '').slice(0, 1000)), mode: 'local' };
   });
-  ipcMain.handle('agent:web-search', (event, query) => { fromAgent(event); return searchPublicWeb(query, runtimeKeys.tavily); });
+  ipcMain.handle('agent:web-search', (event, query) => { fromAgent(event); if (privacy.credentials(query)) throw new Error('Remove credentials before public web research.'); return searchPublicWeb(query, runtimeKeys.tavily); });
+  ipcMain.handle('agent:fact-check', (event, query) => { fromAgent(event); if (privacy.credentials(query)) throw new Error('Remove credentials before public fact-checking.'); return factCheckPublic(query, runtimeKeys.tavily); });
   ipcMain.handle('agent:external-windows', async (event) => {
     fromAgent(event);
     const permission = process.platform === 'darwin' ? systemPreferences.getMediaAccessStatus('screen') : 'granted';
     const sources = await desktopCapturer.getSources({ types: ['window'], thumbnailSize: { width: 0, height: 0 } });
     return { permission, windows: sources.filter((source) => source.name && !/Averill|Email Studio|LinkedIn Draft|Social Publisher|Campaign Files/.test(source.name)).map((source) => ({ id: source.id, name: source.name })) };
   });
-  ipcMain.handle('agent:external-share', (event, id, name) => {
+  ipcMain.handle('agent:external-share', async (event, id, name) => {
     fromAgent(event);
-    selectedExternalWindow = id ? { id: String(id), name: String(name || 'Selected window').slice(0, 150) } : null;
+    if (id) {
+      const available = await desktopCapturer.getSources({ types: ['window'], thumbnailSize: { width: 0, height: 0 } });
+      if (!available.some(source => source.id === id && source.name === name && source.name && !/Averill|Email Studio|LinkedIn Draft|Social Publisher|Campaign Files/.test(source.name))) throw new Error('Choose an available external window.');
+      fromAgent(event);
+    }
+    selectedExternalWindow = id ? { id: String(id), name: String(name).slice(0, 150) } : null;
     publish(); return snapshot();
   });
   ipcMain.handle('agent:external-review', async (event) => {

@@ -1,5 +1,13 @@
 # Averill execution handover
 
+## Product correction — 28 September 2026
+
+Elseweek is the fictional demo company and has an independent website in `travel-site/`. Averill is the Nvidia–Nebius hackathon product: a companion that helps Elseweek employees in the email, LinkedIn, Instagram, Canva, document and other tools they already use. The four supplied Electron editors are test fixtures, not the intended employee workspace.
+
+Implemented in this pass: Work leads with selection of any available external app or browser window, one requested OCR text capture, company-source question flow and typed public Tavily research. A floating always-on-top Ask Averill button returns to Work. The synthetic editors and pasted-draft review are inside a collapsed demo section. Nebius session opt-in and a separate captured-text confirmation remain in place. Tavily receives only the typed query. Screen capture is local and on demand; the app does not continuously observe arbitrary tools, understand non-text layout, edit an external service, or publish/send work. External platform API integrations have not been added. Current company answers remain conservative extractive answers and need broader source-grounded coaching to fulfill the full vision.
+
+Verification: `npm test` passed 35/35 with local loopback access for the existing OAuth test, including the new Tavily fact-check request and no-source guard. `npm run verify:feedback` passed in a temporary Electron profile and checked that the floating button opens Work, the new question form is present, and synthetic fixtures start collapsed. The unsigned arm64 package and ZIP were rebuilt; the same smoke test passed against bundled app resources. The handled private-link error printed during that smoke test is the expected negative case. No live external-window capture, Nebius request, Tavily request or direct packaged-app launch was performed in this pass.
+
 Updated 28 September 2026. Canonical entry point for continuing this repository. Read [PROJECT.md](../PROJECT.md), [ARCHITECTURE.md](../ARCHITECTURE.md), [AGENTS.md](../AGENTS.md) and the [desktop design system](../travel-desktop/design-system/DESIGN_SYSTEM.md) before changes.
 
 ## Product, identity and agreed demo

@@ -50,6 +50,17 @@
 .agent-body button:focus-visible,.agent-body input:focus-visible,.agent-body select:focus-visible,.agent-body textarea:focus-visible{outline:2px solid var(--ds-color-focus);outline-offset:2px}
 @media(max-width:480px){.agent-main{padding:16px}.agent-header{padding:12px 16px}.agent-nav{padding:0 16px}.ai-control{align-items:flex-start;flex-direction:column}}
 @media(prefers-reduced-motion:reduce){.agent-body *{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+.context-form{display:grid;gap:10px;margin-top:20px}
+.context-form label{font-size:13px;font-weight:600}
+.context-form textarea{width:100%;box-sizing:border-box;border:1px solid var(--ds-color-border);border-radius:10px;padding:12px;background:var(--ds-color-panel);color:var(--ds-color-text);resize:vertical}
+.context-actions{display:flex;gap:8px;flex-wrap:wrap}
+.context-form .field-hint{color:var(--ds-color-text-muted);font-size:12px;line-height:1.5;margin:0}
+#context-result{margin-top:16px;color:var(--ds-color-text-secondary);font-size:13px;line-height:1.5}
+#context-result .workspace-source{margin-top:8px}
+.demo-fixtures{margin-top:26px;border-top:1px solid var(--ds-color-border);padding-top:18px}
+.demo-fixtures summary{cursor:pointer;color:var(--ds-color-text-muted);font-size:12px}
+.demo-fixtures>p{margin-top:14px}
+.demo-fixtures textarea{width:100%;box-sizing:border-box}
 
 /* Reference composition: quiet chrome, aperture, finding, evidence, composer. */
 :root{--ink:var(--ds-color-text);--muted:var(--ds-color-text-muted);--line:var(--ds-color-border)}

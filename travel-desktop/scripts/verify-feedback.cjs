@@ -4,7 +4,14 @@ const pause=ms=>new Promise(r=>setTimeout(r,ms));
 app.whenReady().then(async()=>{try{
  let win;for(let i=0;i<100;i++){win=BrowserWindow.getAllWindows().find(w=>w.webContents.getURL().includes('agent.html'));if(win&&!win.webContents.isLoading()&&await win.webContents.executeJavaScript('Boolean(window.desktop)'))break;await pause(100);}
  const run=js=>win.webContents.executeJavaScript(js);
- await run("window.desktop.createWorkspace('Feedback Test','Owner','owner@example.test','Synthetic-password-123')");await run("(async()=>{current=await window.desktop.snapshot();render();showTab('setup');window.testEvents=[];window.desktop.onOperation(e=>window.testEvents.push(e));document.querySelector('.onboarding-section button').click();})()");
+ await run("window.desktop.createWorkspace('Feedback Test','Owner','owner@example.test','Synthetic-password-123')");
+ const companion=BrowserWindow.getAllWindows().find(w=>w.webContents.getURL().includes('companion.html'));
+ assert.ok(companion && companion.isVisible());
+ await companion.webContents.executeJavaScript("document.getElementById('open').click()");
+ await pause(100);assert.equal(await run("document.body.dataset.area"),'work');
+ assert.ok(await run("document.querySelector('#context-form') && document.querySelector('.demo-fixtures').open === false"));
+ assert.equal(await run("document.documentElement.scrollWidth <= innerWidth"),true);
+ await run("(async()=>{current=await window.desktop.snapshot();render();showTab('setup');window.testEvents=[];window.desktop.onOperation(e=>window.testEvents.push(e));document.querySelector('.onboarding-section button').click();})()");
  for(let i=0;i<100;i++){if(await run("window.testEvents.some(e=>e.channel==='onboarding:upload'&&e.state==='success')"))break;await pause(100);}
  assert.ok(await run("window.testEvents.some(e=>e.channel==='onboarding:upload'&&e.state==='pending')"));assert.ok(await run("document.querySelector('#operation-message').textContent.includes('Files received: 1')"));assert.equal(await run("document.querySelector('#operation-feedback').hidden"),false);
  await run("document.querySelector('#operation-knowledge').click()");await pause(100);assert.equal(await run("document.querySelectorAll('.knowledge-card').length"),1);assert.ok(await run("document.querySelector('#knowledge-list').textContent.includes('cobalt')"));

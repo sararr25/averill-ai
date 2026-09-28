@@ -4,6 +4,8 @@ Averill is a source-grounded company agent assistant for people working across a
 
 This repository contains an **Electron hackathon prototype**, a local company onboarding path, its Elseweek sample campaign and department source pack, a Canva tutor and weekly learning flow, the Elseweek travel website, approved design systems, and handover documentation. Elseweek is a fictional customer, not Averill's product name.
 
+Elseweek is the independent demo company with its own website. Employees create email, LinkedIn, Instagram, design and other work in their usual tools. Averill is the companion: its floating button opens help, and an employee can choose an external window for a requested visible-text capture and source-backed question. The supplied Electron editors remain hackathon test fixtures.
+
 ## Start here
 
 1. [Handover](docs/HANDOVER.md) — current demo, verified boundary, setup, gaps, and next actions.
@@ -36,7 +38,7 @@ Run `npm --prefix travel-site start` from the repository root for the fictional 
 
 ## Security and scope
 
-The supplied sample windows send **structured field state** through the app; Averill produces findings only while the employee explicitly shares a window. A selected Canva window can be captured for one OCR review after pressing Review; there is no continuous arbitrary-window observation, structural Canva API access, automatic edit, email send, or post publication. A local company workspace stores imported copies, people, department source approval, and priorities on one Mac. New workspaces use separate local email/password accounts; legacy role switching is disabled after owner-account activation. No cloud authentication or synchronization is provided. Local source lookup works without a key. Nebius is optional and sends relevant approved source text only after consent; Tavily receives only an explicit public web query. See [ARCHITECTURE.md](ARCHITECTURE.md) for exact boundaries.
+The supplied sample windows send **structured field state** through the app; Averill produces fixture findings only while the employee explicitly shares a window. An external app or browser window can be selected for one visible-text OCR review on request; there is no continuous arbitrary-window observation, structural platform API access, automatic edit, email send, or post publication. A local company workspace stores imported copies, people, department source approval, and priorities on one Mac. New workspaces use separate local email/password accounts; legacy role switching is disabled after owner-account activation. No cloud authentication or synchronization is provided. Local source lookup works without a key. Nebius is optional and sends relevant approved source text after consent; sending captured text asks separately. Tavily receives only an explicit typed public query. See [ARCHITECTURE.md](ARCHITECTURE.md) for exact boundaries.
 
 An administrator can disable or reset another non-owner local account; people can change their own password. This is local access management, without invitation delivery or cross-device revocation. Local source copies and individual Learn history can be deleted explicitly. The company knowledge store is not application-encrypted; the macOS package remains unsigned. The [A/B plan](docs/AB_TEST_PLAN.md) is prepared, with no statistical result claimed.
 

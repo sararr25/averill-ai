@@ -8,6 +8,8 @@ Averill is a standalone company agent assistant that helps an employee keep work
 
 The product identity is **Averill**. **Elseweek** is the fictional travel company used in the hackathon demo. Its campaign documents and work windows are test material, not Averill branding. Product copy, demo content, and developer documentation are in English.
 
+**Product boundary, corrected 28 September:** employees create and edit email, LinkedIn, Instagram, design and other work in the tools they already use. Averill is a separate companion with a floating button. It helps with an explicitly selected external window after a requested one-frame text capture, then consults approved company sources with Nebius when enabled. Public fact-checks use Tavily with only the public question the employee types. Elseweek has its own website in `travel-site/`; it is the example company, not an Averill work app. The four built-in editors remain reproducible hackathon fixtures, not the main employee workflow.
+
 ## Why this exists
 
 Campaign work crosses briefs, email, social scheduling, and handovers. A superseded brief or old asset can remain plausible and cause an avoidable mistake. Averill makes the current source visible at the point of work, while preserving the employee's control over edits and publication.

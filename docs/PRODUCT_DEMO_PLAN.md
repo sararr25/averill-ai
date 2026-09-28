@@ -2,6 +2,8 @@
 
 Decision record, 23 September 2026; implementation status updated 26 September 2026. The first specialized product path is marketing. Elseweek remains disposable sample data, not the product model. See [HANDOVER.md](HANDOVER.md) for verified behavior and remaining gates.
 
+Product correction, 28 September: Elseweek is a separate public-facing travel website, not an Averill app. Employee scenes should happen in actual Canva, LinkedIn, Instagram and email marketing tools. The floating Averill button and explicit external-window capture are the entry point. Supplied Electron editors are clearly labelled fallback fixtures. Current external capture reads visible text on demand; it does not yet deliver continuous or field-aware monitoring, external editing, publishing, or full visual coaching. Public claim checks use a typed Tavily query, while approved company guidance uses company knowledge and optional Nebius.
+
 ## Buyer and employee journey
 
 1. An administrator creates a local company workspace with an owner login, uploads Excel/PDF/SVG company material together and reviews bulk employee accounts. The hackathon now demonstrates separate local email/password accounts on one computer; it does not claim network synchronization.
