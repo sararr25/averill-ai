@@ -15,6 +15,7 @@ Elseweek is the independent demo company with its own website. Employees create 
 5. [desktop app README](travel-desktop/README.md) — run and demo instructions.
 6. [AGENTS.md](AGENTS.md) — rules for contributors and coding agents.
 7. [product demo plan](docs/PRODUCT_DEMO_PLAN.md) — buyer journey, decisions, acceptance path, and remaining gates.
+8. [complete vision plan](docs/COMPLETE_VISION_PLAN.md) — implementation sequence for assistance in employees' existing tools.
 
 ## Run
 

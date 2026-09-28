@@ -2,6 +2,8 @@
 
 ## Product correction — 28 September 2026
 
+The full implementation sequence and acceptance gates are in [COMPLETE_VISION_PLAN.md](COMPLETE_VISION_PLAN.md).
+
 Elseweek is the fictional demo company and has an independent website in `travel-site/`. Averill is the Nvidia–Nebius hackathon product: a companion that helps Elseweek employees in the email, LinkedIn, Instagram, Canva, document and other tools they already use. The four supplied Electron editors are test fixtures, not the intended employee workspace.
 
 Implemented in this pass: Work leads with selection of any available external app or browser window, one requested OCR text capture, company-source question flow and typed public Tavily research. A floating always-on-top Ask Averill button returns to Work. The synthetic editors and pasted-draft review are inside a collapsed demo section. Nebius session opt-in and a separate captured-text confirmation remain in place. Tavily receives only the typed query. Screen capture is local and on demand; the app does not continuously observe arbitrary tools, understand non-text layout, edit an external service, or publish/send work. External platform API integrations have not been added. Current company answers remain conservative extractive answers and need broader source-grounded coaching to fulfill the full vision.
