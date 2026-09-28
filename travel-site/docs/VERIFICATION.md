@@ -21,3 +21,11 @@
 - Local homepage and design-system gallery loaded in the in-app browser. The narrow viewport screenshot showed the new wordmark, hero, CTA and credited Copenhagen photo without visible horizontal overflow.
 - This pass changed labels and styling but not filter, dialog or planner algorithms. Chrome interaction checks passed for the Vienna filter and live count, destination dialog, trip selection and local brief result. The in-app browser did not activate controls reliably; Chrome provided the interaction proof.
 - The legacy Elseweek desktop source pack remains historical and requires a separate coordinated migration if the demo company is renamed there.
+
+## Vamo identity and site · 28 September 2026
+
+- Rebuilt the independent travel-site homepage with the approved second editorial/photo direction, Vamo name and Coastline palette. Primary ink is `#0E576B`; coral is `#F16D73`, mint is `#BFE4D5`, and small fuchsia marks use `#D52C85`.
+- `node --check` passed for `site.js` and `server.mjs`. The local page loaded in the in-app browser with all major sections in the accessibility tree.
+- Verified the Prague destination dialog, keyboard activation of “Start with Prague”, and generation of a local `vamo-prague-trip-brief.txt` download link. The browser's pointer automation did not consistently activate buttons inside the open dialog; keyboard activation did. No production deployment is claimed.
+- At an explicit 390px viewport, `document.documentElement.scrollWidth` matched `innerWidth`, so no horizontal page overflow was found. A desktop 1440px viewport also matched document width.
+- The ferry hero is AI-generated concept imagery, labeled as such in credits and asset documentation. Creator tiles are editorial previews rather than live social posts. The desktop Elseweek fixtures remain historical and were not changed in this pass.

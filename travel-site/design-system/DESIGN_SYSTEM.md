@@ -1,38 +1,31 @@
-# Common Miles design system
+# Vamo design system
 
-Version 2.0 · shared by the travel website and live gallery.
+Version 3.0 · 28 September 2026
 
-## Architecture
+Vamo is the fictional travel company used to demonstrate Averill. Its visual system applies only to `travel-site/`; Averill's desktop identity stays separate.
 
-`tokens.css` is the source of truth. `tokens.json` mirrors its registry. Primitive `--p-*` values feed semantic `--color-*` roles, then component aliases. Common Miles tokens apply only to `travel-site/`; Averill retains its own design system.
+## Direction
 
-| Role | Value | Use |
+A youthful travel magazine and social-first collective: candid people photography, oversize editorial type, torn-paper edges, small handwritten-feeling annotations, and vertical story previews. It should feel like a journey someone wants to share, not a software dashboard. The selected visual direction was the second Sundaze concept, renamed Vamo and recolored.
+
+## Palette
+
+| Role | Hex | Use |
 | --- | --- | --- |
-| Cloud | `#F5F8FF` | Page canvas |
-| White | `#FFFFFF` | Reading and form surfaces |
-| Night | `#10213E` | Type, dark sections |
-| Electric | `#2458F5` | Primary actions, focus |
-| Mist | `#E5ECFF` | Secondary surface |
-| Lime | `#D8FA63` | Small high-energy accents |
-| Slate | `#50617F` | Secondary copy |
-| Line | `#CBD7EC` | Dividers and fields |
+| Warm canvas | `#FFF8E9` | Main page, breathing space |
+| Sea ink | `#0E576B` | Primary type, footer, readable controls |
+| Sea deep | `#0A4353` | Hover and deeper contrast |
+| Mint | `#BFE4D5` | Large editorial section and soft contrast |
+| Coral | `#F16D73` | Main action and collage accent |
+| Coral ink | `#102B32` | Small text on coral surfaces |
+| Fuchsia | `#D52C85` | Tiny strokes and expressive marks only |
 
-## Logo and typography
+`tokens.css` is the source of truth. Fuchsia is a detail rather than a second primary action color. Small text on coral uses coral ink for contrast; sea ink is reserved for cream and mint surfaces. No navy brand surfaces.
 
-The custom SVG mark is a route ending at a lime point. Use it at 28px or larger, with half its width of clear space. The wordmark uses locally bundled DM Sans 600, lowercase, tight tracking. DM Sans 400/500/600 handles the entire interface; display headings scale from roughly 44px to 110px with short line lengths. Do not use Fraunces or Averill's Spline Sans. Keep body text at 15–16px with generous line height.
+## Type and imagery
 
-## Layout
+Fraunces provides large editorial headlines. DM Sans handles UI, labels and the energetic wordmark. The locally bundled ferry photo is AI-generated concept photography; it is not evidence of an actual trip or real creator. Copenhagen, Vienna and Prague photographs have source credits in `../docs/ASSETS.md`.
 
-Maximum content width 1320px, fluid gutters 20–72px, section gap 64–112px and a 4px spacing base. The hero combines a night-blue message field and destination photo. Destination cards form three columns on desktop and one below 760px. Photos carry a visible place label. Use 8px corners for compact controls and 16px for large surfaces.
+## Interaction
 
-## Components and states
-
-- Primary action: electric blue on white sections, lime on the night-blue hero, 48px minimum target, visible arrow when useful. Hover lifts 2px; reduced motion removes the lift.
-- Secondary action: night-blue outline with a clear text label.
-- Filter: native button with `aria-pressed`, explicit selected styling, a live result count and actual card filtering.
-- Destination card: real photo, location metadata, destination headline, concise description and explicit action.
-- Modal: native dialog, heading, close button, Escape and backdrop dismissal; trip selection leads to the planner.
-- Form: visible labels, native select validation, focus outline, local result and downloadable text brief. It never submits an enquiry.
-- FAQ: native details/summary with a visible disclosure icon.
-
-Focus uses a 2px electric outline, 5px offset. Use semantic headings, skip link, 44px minimum compact targets, text labels alongside decorative icons and reduced-motion support. Do not signal meaning only through colour. No invented pricing, bookings, availability or testimonials.
+Trip cards open real editorial detail dialogs. The trip form generates a local downloadable text brief without a booking or server submit. Story previews are clearly editorial concepts; they do not impersonate live social posts or invent metrics. The mobile layout stacks destination cards and allows horizontal story browsing. Keyboard focus is fuchsia and reduced motion removes visual transitions.

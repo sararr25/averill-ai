@@ -1,6 +1,6 @@
 # Historical implementation plan
 
-This file documents the former Elseweek direction and is retained for provenance. The current Common Miles identity is specified in `BRAND.md` and `../design-system/DESIGN_SYSTEM.md`.
+This file documents the former Elseweek direction and is retained for provenance. The current Vamo identity is specified in `BRAND.md` and `../design-system/DESIGN_SYSTEM.md`.
 
 ---
 

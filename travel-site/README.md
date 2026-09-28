@@ -1,38 +1,9 @@
-# Common Miles — travel studio website
+# Vamo — fictional travel website
 
-A working editorial website and design system for a fictional European city-break studio, independently branded from Averill.
+A standalone responsive travel demo for the Averill hackathon. Vamo is the fictional customer; Averill is the agent-assistant product.
 
-## Run
+Run with `npm start` in this directory and open http://127.0.0.1:4173/. No build step or external runtime services are required.
 
-From `averill-ai`:
+The homepage has a travel editorial hero, destination dialogs, creator-style editorial previews, journal articles and a browser-generated downloadable trip brief. It does not take reservations, payments or enquiries. The hero photography is AI-generated concept imagery, not an actual Vamo trip. Existing destination photos are credited in `docs/ASSETS.md`.
 
-```sh
-npm --prefix travel-site start
-```
-
-Open http://127.0.0.1:4173/ and http://127.0.0.1:4173/design-system/index.html. Node 22 is sufficient; no install or build is required. Set PORT to change the port. The standalone homepage can also be opened as index.html.
-
-## Included
-
-- Original Common Miles route mark and wordmark; locally bundled DM Sans fonts.
-- Responsive homepage, three destination stories, local city filters, editorial articles and FAQ.
-- Native dialogs and trip selection that preselects the planner.
-- Validated trip preferences and downloadable local text brief.
-- Shared CSS tokens, JSON token registry, live component gallery and brand specification.
-- Local, credited city photography and licensed Phosphor icons.
-
-## Scope
-
-This is a fictional demo, not an operational agency. No backend, payment, live availability or external enquiry is provided. The brief is generated in the browser; no personal contact information is collected. Common Miles is a proposed creative name, not a cleared trademark/domain. The older Aurelia campaign sources remain historical fixtures in the Averill app.
-
-## Design documentation
-
-- docs/IMPLEMENTATION_PLAN.md — plan and naming rationale
-- docs/BRAND.md — brand positioning, voice and visual rules
-- design-system/DESIGN_SYSTEM.md — interface specification
-- design-system/index.html — live gallery
-- docs/ASSETS.md — asset sources and licenses
-
-## Verification
-
-JavaScript syntax and local server routes/assets are checked. Browser acceptance checks cover filters, dialog navigation, required-field validation, generated brief and responsive layout; completed checks are recorded in docs/VERIFICATION.md. No production deployment or real booking has been verified.
+Brand tokens: `design-system/tokens.css`. Design rationale: `design-system/DESIGN_SYSTEM.md` and `docs/BRAND.md`.
