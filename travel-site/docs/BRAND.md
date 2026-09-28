@@ -2,7 +2,7 @@
 
 Version 3.0 · 28 September 2026
 
-Vamo is a fictional, youthful travel collective created as the demonstration company for Averill. Averill is the agent-assistant product presented at the hackathon. Their identities and interfaces remain independent. The existing Elseweek files inside the desktop demo are historical fixtures and require a separate coordinated migration.
+Vamo is a fictional, youthful travel collective created as the demonstration company for Averill. Averill is the agent-assistant product presented at the hackathon. **Vamo and Averill must never share a name, logo, palette or interface style.** Vamo's travel editorial belongs only to the customer-facing demo; Averill's assistant design belongs only to the product. The existing Elseweek files inside the desktop demo are historical fixtures and require a separate coordinated migration.
 
 ## Position and voice
 

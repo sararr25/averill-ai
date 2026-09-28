@@ -6,9 +6,9 @@ Updated 28 September 2026. This is the canonical product brief; [docs/HANDOVER.m
 
 Averill is a standalone company agent assistant that helps an employee keep work aligned with current, approved company information. It watches only work the employee explicitly shares, notices a relevant problem at a natural pause after an edit or selection, and gives a concise correction with a source the employee can inspect. Employees can also ask where to find files, what changed between versions, and what copy or schedule is approved.
 
-The product identity is **Averill**. **Elseweek** is the fictional travel company used in the hackathon demo. Its campaign documents and work windows are test material, not Averill branding. Product copy, demo content, and developer documentation are in English.
+The product identity is **Averill**. **Vamo** is the fictional travel-company brand used on the independent website. Their names, logos, visual styles and interfaces must never be shared. The current desktop campaign documents, accounts and work windows still carry the legacy **Elseweek** label; they are test fixtures, not Averill branding or proof of a completed Vamo migration. Product copy, demo content, and developer documentation are in English.
 
-**Product boundary, corrected 28 September:** employees create and edit email, LinkedIn, Instagram, design and other work in the tools they already use. Averill is a separate companion with a floating button. A person chooses one external window for a local read or six-second observation; a bounded task review compares its text with approved company sources, with optional consented Nebius suggestions. Public fact-checks use Tavily with only the public question the employee types. Elseweek has its own website in `travel-site/`; it is the example company, not an Averill work app. The four built-in editors remain reproducible hackathon fixtures, not the main employee workflow.
+**Product boundary, corrected 28 September:** employees create and edit email, LinkedIn, Instagram, design and other work in the tools they already use. Averill is a separate companion with a floating button. A person chooses one external window for a local read or six-second observation; a bounded task review compares its text with approved company sources, with optional consented Nebius suggestions. Public fact-checks use Tavily with only the public question the employee types. Vamo has its own website in `travel-site/`; it is the example company, not an Averill work app. The supplied desktop work windows remain Elseweek-labeled legacy fixtures. The four built-in editors remain reproducible hackathon fixtures, not the main employee workflow.
 
 ## Why this exists
 
@@ -16,7 +16,7 @@ Campaign work crosses briefs, email, social scheduling, and handovers. A superse
 
 ## Demo narrative
 
-The synthetic company is Elseweek. The campaign is **Winter Escapes 2027**. Brief v2 was approved on 22 September 2026; brief v1 and its square creative are intentionally retained as superseded material.
+The current website brand is Vamo. The still-unmigrated synthetic desktop company is Elseweek. Its campaign is **Winter Escapes 2027**. Brief v2 was approved on 22 September 2026; brief v1 and its square creative are intentionally retained as superseded material.
 
 | Chapter | Employee does | Averill finds | Source |
 | --- | --- | --- | --- |
@@ -35,7 +35,7 @@ Approved launch email: 15 October 2026 at 10:00 Copenhagen time. Approved paid c
 - Admins can disable/reset another non-owner local account; a signed-in person can change their password. Eligible local source copies and personal Learn history can be deleted. Temporary onboarding files are cleaned after replacement or successful application. These controls do not provide a hosted identity system, encrypted company knowledge store or signed distribution.
 
 - Learn provides four-step Canva practice, confirmed activity history and current-week questions/reflections. See the learning implementation section below.
-- Elseweek has an independent local consumer website in `travel-site/`; desktop company wording and current assets now use Elseweek. The old square remains deliberately historical.
+- Vamo has an independent local consumer website in `travel-site/`; desktop fixture wording and assets still use Elseweek. The old square remains deliberately historical.
 - Electron opens an independent Averill window and four separate supplied work windows: Email Studio, LinkedIn Draft, Social Publisher, and Campaign Files.
 - The employee opens and explicitly shares each work window. Work windows send structured field state via Electron IPC, but findings are produced only for shared windows. Checks run after blur or selection change. Closing or unsharing stops findings.
 - Deterministic rules detect the supplied campaign problems. Findings cite real local source files that can be opened.
@@ -57,7 +57,7 @@ No arbitrary-window surveillance, external app control, automatic edit, email se
 
 | Decision | Reason and consequence |
 | --- | --- |
-| Averill is the agent product name; Elseweek is the demo company | Keeps product identity separate from example customer branding. |
+| Averill is the agent product; Vamo is the fictional travel brand; Elseweek is a legacy desktop fixture label | Names, logos, palettes and UI styles stay separate. Desktop renaming requires a coordinated migration. |
 | Standalone desktop window | The employee can see the agent beside the work, across multiple work contexts. |
 | Explicit per-window sharing | Sharing is visible and reversible; no implied background surveillance. |
 | Feedback after completed field edit or selection | Corrections arrive at a useful moment without interrupting typing. |

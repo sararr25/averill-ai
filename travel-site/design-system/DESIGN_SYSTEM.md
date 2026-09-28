@@ -2,7 +2,7 @@
 
 Version 3.0 · 28 September 2026
 
-Vamo is the fictional travel company used to demonstrate Averill. Its visual system applies only to `travel-site/`; Averill's desktop identity stays separate.
+Vamo is the fictional travel company used to demonstrate Averill. Its visual system applies only to `travel-site/`; Averill's desktop identity stays separate. Never use Vamo as Averill's name or apply Vamo's mark, palette, typography, imagery or editorial layouts to the assistant. Never place Averill's name, aperture or desktop styling on the Vamo site.
 
 ## Direction
 

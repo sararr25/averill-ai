@@ -4,7 +4,7 @@
 
 The full implementation sequence and acceptance gates are in [COMPLETE_VISION_PLAN.md](COMPLETE_VISION_PLAN.md).
 
-Elseweek is the fictional demo company and has an independent website in `travel-site/`. Averill is the Nvidia–Nebius hackathon product: a companion that helps Elseweek employees in the email, LinkedIn, Instagram, Canva, document and other tools they already use. The four supplied Electron editors are test fixtures, not the intended employee workspace.
+Vamo is the fictional travel-company brand and has an independent website in `travel-site/`. Averill is the Nvidia–Nebius hackathon product: a companion that helps company employees in the email, LinkedIn, Instagram, Canva, document and other tools they already use. The four supplied Electron editors are test fixtures, not the intended employee workspace.
 
 Points 1–3 of the [complete-vision plan](COMPLETE_VISION_PLAN.md) now have an implemented local path. Work selects one external app/browser window, reads it through macOS Accessibility or visible-text OCR, and can poll it every six seconds after explicit Start. The movable floating control opens Averill, displays selection/observation/last-read status, and offers Stop. The main process checks the selected window ID and owning PID before each read; Stop, sign-out and account change clear transient text and prevent an in-flight read from restoring it. Captures are memory-only; temporary PNGs are deleted. The supplied Electron editors remain collapsed synthetic fixtures.
 
@@ -18,9 +18,13 @@ Updated 28 September 2026. Canonical entry point for continuing this repository.
 
 ## Product, identity and agreed demo
 
-Averill is a standalone company assistant. Elseweek is the fictional travel customer with a separate website in `travel-site/` and a department onboarding pack in `travel-desktop/demo-company/elseweek/`. Current desktop wording and approved assets now say Elseweek. The old square intentionally retains its historical Aurelia artwork. Preserve brief v1 and the old square asset because they are intentional outdated-material scenarios. Product, demo sources and developer documentation remain English.
+Averill is a standalone company assistant. Vamo is the fictional travel customer with a separate website in `travel-site/`. Averill and Vamo never share a name, logo, palette or interface style. The existing desktop department onboarding pack, prepared accounts, campaign sources and supplied windows still say Elseweek; they are legacy synthetic fixtures and were not migrated by the website redesign. See [Vamo website handover](../travel-site/docs/HANDOVER.md) for the current brand and migration boundary. The old square intentionally retains its historical Aurelia artwork. Preserve brief v1 and the old square asset because they are intentional outdated-material scenarios. Product, demo sources and developer documentation remain English.
 
 The owner’s video direction is: company data onboarding across departments → employee learns Canva → applies learning to LinkedIn and newsletter work → weekly personalised practice. Opening with a presentation of the website was rejected. Canva should demonstrate tool learning, with campaign correction as supporting context. See [PRODUCT_DEMO_PLAN.md](PRODUCT_DEMO_PLAN.md) for the target four-minute sequence and implementation gates; that duration is not a confirmed submission limit.
+
+## Brand boundary and website status — 28 September 2026
+
+The current travel website is **Vamo**, a fictional demo customer. **Averill** is the agent-assistant product submitted to the hackathon. Their names, visual systems and interfaces must never be merged. Vamo uses warm cream, sea ink `#0E576B`, mint, pink-leaning coral and restrained fuchsia in a people-first travel editorial. Averill retains its separate Petrol / Coral / Ice desktop design system. The Vamo website was committed locally as `35228aa`; a remote `main` push was rejected by automatic review because site-building authorization did not include remote publication. The current repository state should be checked before release. The still-Elseweek-labeled desktop fixtures and account data need a planned migration; do not describe that work as finished. See [the Vamo handover](../travel-site/docs/HANDOVER.md).
 
 ## Current app areas
 
@@ -67,7 +71,7 @@ npm run package:mac
 
 Packaged unsigned arm64 app: `travel-desktop/dist/Averill-darwin-arm64/Averill.app`. ZIP: `travel-desktop/dist/Averill-macOS-arm64.zip`, generated with `ditto`, not tracked by Git. Both were rebuilt after the 28 September addition pass. Restart an older running app to load the new code. Recent native checks used separate synthetic user-data profiles; do not import those records into the normal employee workspace.
 
-From the repository root, `npm --prefix travel-site start` serves Elseweek at `http://127.0.0.1:4173/`; gallery at `/design-system/index.html`. No install/build is needed for the dependency-free site. It includes city filters, native details/articles, local trip-brief generation and local photos/fonts. No bookings/payments/enquiry backend. Domain/trademark clearance is not established. Internal-browser desktop/mobile checks passed; download saving was not confirmed by the browser event.
+From the repository root, `npm --prefix travel-site start` serves Vamo at `http://127.0.0.1:4173/`; its design system is at `/design-system/index.html`. The dependency-free site has an editorial travel homepage, destination dialogs, creator-style editorial previews, journal dialogs and a local trip-brief generator. No booking, payment, enquiry or live social integration is present. The ferry hero is generated concept photography; city photos are credited. See [the dedicated site handover](../travel-site/docs/HANDOVER.md) for brand tokens, verified checks and next steps.
 
 Company copies and workspace JSON live in Electron user data. Optional Nebius/Tavily environment variables are listed in [`.env.example`](../.env.example). Keys entered in Setup use encrypted local storage; never commit keys, `.env.local`, imported user material, user-data folders or build dependencies.
 
@@ -128,7 +132,7 @@ The owner first requested preparation steps 2 and 3, then a stop. Those were del
 - `travel-desktop/sources/linkedin-campaign.md`, `assets/winter-linkedin-landscape.svg`: supplied organic LinkedIn evidence and visual.
 - `travel-desktop/src/accounts.js`, `onboarding.js`, `onboarding-ui.js`: local identity, intake/Nebius evidence/apply and guided Setup.
 - `travel-desktop/demo-company/elseweek-intake/`, `docs/ONBOARDING_TUTORIAL.md`: mixed-format demo and four-account tutorial.
-- `travel-site/`: independent Elseweek website, design system, brand and asset provenance.
+- `travel-site/`: independent Vamo website, design system, brand and asset provenance. Its handover is `travel-site/docs/HANDOVER.md`; desktop fixtures are still Elseweek-labeled.
 - [LEARNING_IMPLEMENTATION_PLAN.md](LEARNING_IMPLEMENTATION_PLAN.md): plan and delivered boundary.
 
 Remote: `https://github.com/sararr25/averill-ai.git`, branch `main`. Check current Git status/remote before continuing; this file deliberately does not embed its own commit hash. `ARCHITECTURE.md` is the canonical system design; the Word copy is a convenience export.

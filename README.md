@@ -2,9 +2,9 @@
 
 Averill is a source-grounded company agent assistant for people working across applications. The employee chooses what to share. Averill points out relevant inconsistencies after a field edit or asset selection, explains the issue, and links to the approved source. The employee decides what to change and whether to publish.
 
-This repository contains an **Electron hackathon prototype**, a local company onboarding path, its Elseweek sample campaign and department source pack, a Canva tutor and weekly learning flow, the Elseweek travel website, approved design systems, and handover documentation. Elseweek is a fictional customer, not Averill's product name.
+This repository contains an **Electron hackathon prototype**, a local company onboarding path, its Elseweek sample campaign and department source pack, a Canva tutor and weekly learning flow, the Vamo travel website, separate design systems, and handover documentation. Vamo is the fictional customer brand, never Averill's product name or style. Existing desktop fixtures still use the legacy Elseweek label.
 
-Elseweek is the independent demo company with its own website. Employees create email, LinkedIn, Instagram, design and other work in their usual tools. Averill is the companion: its floating button opens help, shows observation status and can stop sharing. An employee can choose one external window for a local read or six-second observation, then check bounded approved company rules against the visible text. The supplied Electron editors remain hackathon test fixtures.
+Vamo is the independent fictional travel company with its own website. The desktop demo still carries legacy Elseweek fixture names. Employees create email, LinkedIn, Instagram, design and other work in their usual tools. Averill is the companion: its floating button opens help, shows observation status and can stop sharing. An employee can choose one external window for a local read or six-second observation, then check bounded approved company rules against the visible text. The supplied Electron editors remain hackathon test fixtures.
 
 ## Start here
 
@@ -29,13 +29,13 @@ npm start
 
 Run `npm test` from `travel-desktop/` for the deterministic checks.
 
-## Learn and Elseweek
+## Learn and the demo company
 
 Open **Learn** after creating a workspace in Setup. Start the four-step Canva lesson, ask for step help, and confirm what you practised. Your week records confirmed steps and manually entered Canva/LinkedIn/newsletter activities. Weekly practice provides operation questions, source/version checks and practical reflections. It is offline and scoped to the active person; confirmation is not automatic visual assessment. See [learning plan](docs/LEARNING_IMPLEMENTATION_PLAN.md).
 
 Review findings now lead to person-owned correction practice. Learn also has three task exercises for composition, a LinkedIn visual and newsletter export, plus bounded offline question help. Knowledge shows exact extracted passages, version/approval metadata, line comparisons, motivated approvals and private clarification requests. See [added capabilities and enterprise gates](docs/ADDITIONS_STATUS.md).
 
-Run `npm --prefix travel-site start` from the repository root for the fictional Elseweek site at `http://127.0.0.1:4173/`. The [site README](travel-site/README.md) covers the independent consumer design and demo limits.
+Run `npm --prefix travel-site start` from the repository root for the fictional Vamo site at `http://127.0.0.1:4173/`. The [site README](travel-site/README.md) and [Vamo handover](travel-site/docs/HANDOVER.md) cover the independent consumer design, brand rules and demo limits.
 
 ## Security and scope
 

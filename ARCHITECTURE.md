@@ -2,7 +2,7 @@
 
 ## Purpose and status
 
-This document describes the implemented hackathon prototype and the boundaries for extending it. Elseweek is a separate demo company with a standalone website in `travel-site/`. Averill is the Electron companion for employees working in their usual tools. A floating Ask Averill button opens the assistant; the user can select one external app or browser window for a one-time read or explicit six-second local observation. macOS Accessibility text is preferred, with visible-text OCR fallback. The four supplied Elseweek editor windows remain synthetic fixtures. Browser DOM fields and platform APIs remain future adapters.
+This document describes the implemented hackathon prototype and the boundaries for extending it. Vamo is the separate fictional travel company with a standalone website in `travel-site/`. Averill is the Electron companion for employees working in their usual tools. A floating Ask Averill button opens the assistant; the user can select one external app or browser window for a one-time read or explicit six-second local observation. macOS Accessibility text is preferred, with visible-text OCR fallback. The four supplied editor windows and source pack still use the legacy Elseweek label and remain synthetic fixtures. Vamo and Averill never share a name, logo or design system; the website palette and editorial travel treatment do not enter the assistant UI. Browser DOM fields and platform APIs remain future adapters.
 
 ## Requirements
 
