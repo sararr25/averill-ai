@@ -27,3 +27,4 @@ for(const id of ['workspace-feedback','learning-status'])new MutationObserver(()
 }).observe(el(id),{childList:true,subtree:true,characterData:true});
 el('knowledge-search').addEventListener('input',()=>{clearTimeout(knowledgeSearchTimer);knowledgeSearchTimer=setTimeout(renderKnowledge,150);});
 el('knowledge-filter').addEventListener('change',renderKnowledge);
+for(const id of ['knowledge-department','knowledge-kind','knowledge-conflicts'])el(id).addEventListener('change',renderKnowledge);

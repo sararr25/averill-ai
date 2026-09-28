@@ -11,6 +11,7 @@ test('XLSX onboarding bulk creates separate manager, strategist and creator acco
   assert.equal(draft.people.length,3);assert.deepEqual(draft.people.map(p=>p.profile),['marketing_manager','marketing_strategy','content_creator']);
   assert.equal(draft.files[0].scope,'private');assert.match(draft.files[1].text,/Elseweek curates/);assert.equal(draft.files[2].version,'2');
   const result=await onboarding.apply(root,data,review(draft));assert.equal(result.peopleAdded,3);assert.equal(result.documentsAdded,4);
+  assert.equal(fs.existsSync(path.join(root,'averill-onboarding',draft.id)),false);assert.equal(data.onboarding.files,undefined);
   const disk=fs.readFileSync(path.join(root,'averill-workspace.json'),'utf8');for(const account of result.receipt){assert.ok(!disk.includes(account.password));assert.equal((await accounts.authenticate(data,account.email,account.password)).profile,account.profile);}
   await assert.rejects(accounts.authenticate(data,'maya@elseweek.example','incorrect-password'),/incorrect/);
   assert.ok(!JSON.stringify(workspace.publicSnapshot(data)).includes('credential'));

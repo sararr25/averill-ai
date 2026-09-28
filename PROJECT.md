@@ -1,6 +1,6 @@
 # Averill project
 
-Updated 26 September 2026. This is the canonical product brief; [docs/HANDOVER.md](docs/HANDOVER.md) is the current execution handover for the public `averill-ai` repository.
+Updated 28 September 2026. This is the canonical product brief; [docs/HANDOVER.md](docs/HANDOVER.md) is the current execution handover for the public `averill-ai` repository.
 
 ## What Averill is
 
@@ -26,6 +26,10 @@ The synthetic company is Elseweek. The campaign is **Winter Escapes 2027**. Brie
 Approved launch email: 15 October 2026 at 10:00 Copenhagen time. Approved paid creator Instagram Reel: 17 October 2026 at 18:00 Copenhagen time. The source pack in `travel-desktop/sources/` is authoritative for demo-specific details.
 
 ## Current product state
+
+- Review findings can open explanation context, copy the suggested correction, start a person-owned practice exercise and recheck supported fields after a human edit. Learn also has composition, LinkedIn visual and newsletter export exercises with ordered self-confirmed steps and a linked company source/version where selected. Offline free questions are limited to the bounded Canva lesson; selected Canva OCR remains a separate explicit one-frame action.
+- Knowledge exposes exact matching passages with source version, approval metadata and line/page when available. Reviewers can compare extracted lines, explicitly link a replacement across different titles, decide with a reason, and answer local private requests for missing evidence. Search filters include department, type, status and conflicts.
+- Admins can disable/reset another non-owner local account; a signed-in person can change their password. Eligible local source copies and personal Learn history can be deleted. Temporary onboarding files are cleaned after replacement or successful application. These controls do not provide a hosted identity system, encrypted company knowledge store or signed distribution.
 
 - Learn provides four-step Canva practice, confirmed activity history and current-week questions/reflections. See the learning implementation section below.
 - Elseweek has an independent local consumer website in `travel-site/`; desktop company wording and current assets now use Elseweek. The old square remains deliberately historical.
@@ -63,6 +67,8 @@ No continuous arbitrary macOS window capture, external app control, background o
 
 ## Next work
 
+The implementation and external gates for every requested addition are tracked in [docs/ADDITIONS_STATUS.md](docs/ADDITIONS_STATUS.md). The A/B design and technical preflight are in [docs/AB_TEST_PLAN.md](docs/AB_TEST_PLAN.md); there is no live randomized result.
+
 1. Complete native desktop verification of Canva window capture, review, and Stop sharing with a real Canva window; test image import in the running app.
 2. Verify the new company-source Nebius request live after explicit approval for the synthetic test payload. The previous live check covers only the fixed historical Aurelia source pack.
 3. Add cloud authentication and sync before describing the local account demo as a multi-device employee product. Extend specialized checks to other departments only after their source and workflow requirements are defined.
@@ -97,7 +103,7 @@ Imported sources do not drive the supplied deterministic editor findings. The fo
 
 ## File-based onboarding and separate local logins
 
-The later owner request adds an owner email/password account, batch file intake, explicit Nebius interpretation and four profiles: owner/CEO/admin, Marketing manager, Marketing strategy employee and Content creator. Marketing manager maps to lead; the latter two are distinct employees. Read `docs/ONBOARDING_TUTORIAL.md` for the demo. Local roster extraction and review remove one-by-one entry. Company-wide brand sources and private personnel files have distinct visibility. Owner and generated credentials are saved in separate local login documents, accessible to the owner from Account access. A live Nemotron check extracted three people from unstructured prose with exact evidence; a separate mixed-file check validated company/document assignments. No cloud authentication/sync or password recovery is claimed.
+The later owner request adds an owner email/password account, batch file intake, explicit Nebius interpretation and four profiles: owner/CEO/admin, Marketing manager, Marketing strategy employee and Content creator. Marketing manager maps to lead; the latter two are distinct employees. Read `docs/ONBOARDING_TUTORIAL.md` for the demo. Local roster extraction and review remove one-by-one entry. Company-wide brand sources and private personnel files have distinct visibility. Owner and generated credentials are saved in separate local login documents, accessible to the owner from Account access. A live Nemotron check extracted three people from unstructured prose with exact evidence; a separate mixed-file check validated company/document assignments. Admin reset of another non-owner local account and self-service password change are available; no hosted identity or sync is claimed.
 
 ## Prepared local demo accounts and services
 

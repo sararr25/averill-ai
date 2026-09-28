@@ -129,3 +129,7 @@ Desktop/Finder drop, local/synced files, HTTPS links and Google Drive/OneDrive s
 ## Feedback and know-how library — 27 September 2026
 
 A persistent status banner reports pending, completed, cancelled and failed explicit actions. Knowledge provides local document/text search, uploaded proposals, approved/pending/private/superseded sources, extracted-text reading and original-file access under existing role visibility. Intake is visible before onboarding confirmation. The library does not send documents to external AI. See the handover and onboarding tutorial for current verification and workflow.
+
+## Finding-to-practice demo update — 28 September 2026
+
+The reliable synthetic video path can now show a flawed LinkedIn draft, a finding and its source, **Practise this correction**, a human edit and **Recheck after my edit**. Learn stores the employee's reflection and the supported rule status separately. Task projects for a composition, LinkedIn visual and newsletter export can be demonstrated with self-confirmed steps, but the video must not imply verified Canva geometry, export completion, LinkedIn publishing or live Google/Microsoft sync. Knowledge can show an exact extracted passage, a textual version comparison, a reasoned approval and a private missing-evidence question. Check the latest [handover](HANDOVER.md) and [addition status](ADDITIONS_STATUS.md) before recording.

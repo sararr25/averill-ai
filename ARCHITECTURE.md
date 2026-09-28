@@ -28,12 +28,20 @@ This document describes the implemented hackathon prototype and the boundaries f
 | Design system | `travel-desktop/design-system/` and `src/agent-theme.css` | Approved visual tokens and implemented assistant styling |
 | Company workspace | `travel-desktop/src/workspace.js` | Local people, role switching, imported copies, approval, priority, and conflict detection |
 | Company answers | `travel-desktop/src/workspace-answer.js` | Approved-source retrieval, Nebius request, citation ID validation, local fallback |
+| Evidence extraction | `travel-desktop/src/evidence.js` | Exact matching lines and PDF page markers for new imports |
+| Source comparison | `travel-desktop/src/source-review.js` | Bounded line diff of two visible extracted documents |
 | Learning engine | `travel-desktop/src/learning.js` | Owner-scoped sessions, ordered confirmation, weekly eligibility, practice and feedback |
 | Learning UI | `travel-desktop/src/learning-ui.js` | Learn lesson/help, activity recording, weekly review and answer forms |
 | Public search | `travel-desktop/src/web-search.js` | Tavily search with a user-entered public query only |
 | macOS extraction | `travel-desktop/scripts/extract-text.swift` | PDF text and image OCR for imported files and selected-window frames |
 
 ## Data flow
+
+The 28 September additions keep `main.js` as the trust boundary. `learning:action` resolves a selected finding from current shared work in the main process before starting a person-owned exercise; completing it checks only whether that deterministic finding remains in current shared fields. The renderer cannot assert visual verification. Company answer citations now include an exact extracted line plus approval/version metadata. Model output must contain an exact source quote and an answer contained in that quote or it falls back to local extraction. New PDF extraction inserts `[PDF page N]` markers; existing imported PDF text gains page numbers only after reimport.
+
+`workspace:update-source` accepts a reviewer reason and optional ID of an approved predecessor in the same department/scope. The predecessor is superseded when the new document is approved. `source-review.js` compares at most 250 lines per document and 200 changes; this is a textual diff, not an automatic semantic conflict judgement. Clarification requests are local workspace records visible to the requester and authorised reviewer. Document decision reasons are withheld from ordinary employee snapshots after approval.
+
+Local account disabling takes effect at the next authentication; there is no remote session revocation. Password reset creates a new local login document. Source deletion removes only managed original copies and extracted text from the current profile, not the outside original or OS backups. Applied onboarding staging copies are removed; only counts/timestamps remain in the batch record. The workspace JSON, source copies and login documents are not application-encrypted. See [company-readiness gates](docs/ADDITIONS_STATUS.md) before real-company use.
 
 ```text
 Employee edits supplied work window
@@ -115,7 +123,7 @@ Learn is offline and stores no screenshots. The official guide opens only on an 
 
 `onboarding.js` stores an owner-only staged batch with extracted text, file hashes and provenance. `onboarding:upload/analyze/apply` require admin. XLSX subprocess and local Swift PDF/OCR provide text. Optional Nebius analysis sends capped text after explicit consent and validates identity evidence. The review payload can edit assignments but must reference known people/files; imported owner/admin profiles are rejected. Apply works on a cloned workspace, then saves and swaps state, removing new imported copies on failure. The workspace JSON and public snapshots contain no plaintext passwords. At the user's explicit request, account-documents.js saves owner and generated passwords in separate local Markdown files under userData/Averill-login-documents (0600 files, 0700 directory). An authenticated admin can open this folder through account:documents; it is outside source ingestion and Nebius prompts. Personnel documents remain private, company sources require admin approval and are visible across departments after approval. No invitation emails are sent.
 
-`onboarding-ui.js` keeps editable review drafts during rendering, collapses optional edits and supports explicit collective approval. Anonymous UI shows only login/company/demo account names, and protected snapshots omit sources/learning/intake. Staff account passwords and keys are never sent to Nebius. No local password recovery, cloud synchronization, production tenant security or external provider login is implemented.
+`onboarding-ui.js` keeps editable review drafts during rendering, collapses optional edits and supports explicit collective approval. Anonymous UI shows only login/company/demo account names, and protected snapshots omit sources/learning/intake. Staff account passwords and keys are never sent to Nebius. Admin reset of another non-owner local account and self-service password change are available; unauthenticated owner recovery, cloud synchronization, production tenant security and external provider login remain unimplemented.
 
 ## Prepared local demo provisioning
 

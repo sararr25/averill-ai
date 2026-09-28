@@ -35,3 +35,7 @@ Desktop/Finder drop, local/synced files, HTTPS links and Google Drive/OneDrive s
 ## Feedback and know-how library — 27 September 2026
 
 A persistent status banner reports pending, completed, cancelled and failed explicit actions. Knowledge provides local document/text search, uploaded proposals, approved/pending/private/superseded sources, extracted-text reading and original-file access under existing role visibility. Intake is visible before onboarding confirmation. The library does not send documents to external AI. See the handover and onboarding tutorial for current verification and workflow.
+
+## Local account and retention update — 28 September 2026
+
+The signed-in owner/admin can disable another non-owner account and restore it with a newly generated password. A signed-in person can change their own password with the current one. Updated credentials are written to the existing local login-document folder; no invitation email or unauthenticated reset link is sent. Disabling removes that account's login document and blocks its next authentication. Onboarding replaces old staging copies when a batch is restaged and removes the applied batch's temporary files after a successful commit. The applied workspace retains only batch ID, timestamp and counts. This is local account management, not hosted identity, cross-device revocation or tenant isolation. See [ADDITIONS_STATUS.md](ADDITIONS_STATUS.md).

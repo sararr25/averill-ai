@@ -27,3 +27,7 @@ Tokens are encrypted locally and scoped to owner/workspace. No background sync o
 While client registration is pending, choose downloaded files from synced Google Drive/OneDrive folders or drag them from Finder/Desktop. HTTPS public file/page links work independently. Google document links require a connected Drive account; Microsoft private links should use the picker or synced file. Signed URL query strings are not saved as source provenance.
 
 See [company confidentiality](COMPANY_CONFIDENTIALITY.md). OAuth consent is not permission to send documents to Nebius.
+
+## Real-company synchronization boundary — 28 September 2026
+
+Google Drive and OneDrive import credentials are separate from company account authentication. Averill still stores one local workspace on one Mac; it does not sync people, approvals, clarifications, learning or source files between devices. New local disable/reset controls affect local authentication only. A backend choice, tenant identity model, server-side authorization, encrypted transport/storage, revocation and conflict policy are required before inviting real employees across devices. Provider OAuth callback tests are local and mocked; actual Google/Microsoft authorization remains unverified. See [ADDITIONS_STATUS.md](ADDITIONS_STATUS.md).

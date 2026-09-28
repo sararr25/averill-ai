@@ -23,11 +23,11 @@ if ext == "pdf" {
     for index in 0..<min(document.pageCount, 30) {
         guard let page = document.page(at: index) else { continue }
         let text = page.string?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-        if !text.isEmpty { pages.append(text) }
+        if !text.isEmpty { pages.append("[PDF page \(index + 1)]\n" + text) }
         else {
             let thumbnail = page.thumbnail(of: NSSize(width: 1800, height: 2400), for: .mediaBox)
             var rect = CGRect(origin: .zero, size: thumbnail.size)
-            if let cgImage = thumbnail.cgImage(forProposedRect: &rect, context: nil, hints: nil) { pages.append(recognize(cgImage)) }
+            if let cgImage = thumbnail.cgImage(forProposedRect: &rect, context: nil, hints: nil) { pages.append("[PDF page \(index + 1)]\n" + recognize(cgImage)) }
         }
     }
     if document.pageCount > 30 { pages.append("[PDF extraction limited to the first 30 pages]") }

@@ -126,16 +126,28 @@ function importFolder(userData, data, directory, options = {}) {
   return { imported: imported.length, scanned: selected.length, limited: selected.length >= 100 };
 }
 
-function updateSource(data, sourceId, action, priority = 0) {
+function updateSource(data, sourceId, action, priority = 0, reason = '', supersedesId = null) {
   const source = data.sources.find((entry) => entry.id === sourceId);
   if (!source) throw new Error('Unknown source');
   if (source.scope === 'private') throw new Error('Private files must be proposed before approval');
   if (source.scope === 'company' ? person(data)?.role !== 'admin' : !canManage(data, source.department)) throw new Error('Department lead or administrator access required');
-  if (!['approved', 'rejected', 'superseded'].includes(action)) throw new Error('Invalid source status');
+  if (!['approved', 'rejected', 'superseded', 'clarification_requested'].includes(action)) throw new Error('Invalid source status');
+  if (supersedesId) {
+    if (action !== 'approved') throw new Error('Only an approval can replace a previous source');
+    const previous=data.sources.find(entry=>entry.id===supersedesId);
+    if (!previous||previous.id===source.id||previous.status!=='approved'||previous.department!==source.department||previous.scope!==source.scope||previous.sha256===source.sha256) throw new Error('Choose a different approved source in the same scope and department');
+    if(previous.supersedesId===source.id)throw new Error('Version link would create a cycle');
+    previous.status='superseded';previous.supersededBy=source.id;
+    source.supersedesId=previous.id;
+  }
+  const before=source.status;
   source.status = action;
   source.priority = Math.max(0, Math.min(100, Number(priority) || 0));
-  source.approvedAt = action === 'approved' ? new Date().toISOString() : null;
-  source.approvedBy = action === 'approved' ? data.activePersonId : null;
+  if(action==='approved'&&before!=='approved'){source.approvedAt=new Date().toISOString();source.approvedBy=data.activePersonId;}
+  if(action!=='approved'){source.approvedAt=null;source.approvedBy=null;}
+  if(action!==before||supersedesId||String(reason||'').trim()){
+    source.decisions||=[];source.decisions.push({action,reason:clean(reason||`${action} in Setup`,500),by:data.activePersonId,at:new Date().toISOString(),supersedesId:supersedesId||null});
+  }
   return source;
 }
 
@@ -145,6 +157,26 @@ function proposeSource(data, sourceId) {
   source.scope = 'department';
   source.status = 'pending';
   return source;
+}
+function removeSource(userData,data,sourceId){
+ const index=data.sources.findIndex(entry=>entry.id===sourceId);if(index<0)throw new Error('Unknown source');
+ const source=data.sources[index],active=person(data);
+ if(active?.role!=='admin'&&!(source.ownerId===active?.id&&source.scope==='private'&&source.status!=='approved'))throw new Error('Administrator access required to delete a shared source');
+ data.sources.splice(index,1);save(userData,data);
+ const root=fileStore(userData);
+ for(const filename of [`${source.id}${path.extname(source.storedPath)}`,`${source.id}.extracted.txt`])fs.rmSync(path.join(root,filename),{force:true});
+ return source.id;
+}
+function visibleClarifications(data){const active=person(data);if(!active)return [];return (data.clarifications||[]).filter(item=>item.requesterId===active.id||active.role==='admin'||active.role==='lead'&&active.department===item.department);}
+function requestClarification(data,question){
+ const active=person(data);if(!active)throw new Error('Sign in first');const text=clean(question,1000);if(text.length<10)throw new Error('Describe what evidence is missing');
+ const item={id:id(),requesterId:active.id,department:active.department||'Company',question:text,status:'pending',createdAt:new Date().toISOString(),reply:null,sourceId:null,resolvedBy:null,resolvedAt:null};data.clarifications||=[];data.clarifications.push(item);return item;
+}
+function resolveClarification(data,requestId,reply,sourceId){
+ const active=person(data),item=(data.clarifications||[]).find(entry=>entry.id===requestId);if(!item||!(active?.role==='admin'||active?.role==='lead'&&active.department===item.department))throw new Error('Reviewer access required');
+ const text=clean(reply,1000);if(text.length<10)throw new Error('Explain the decision or missing evidence');
+ if(sourceId){const source=approvedSources(data).find(entry=>entry.id===sourceId&&!conflicts(data).flat().includes(entry.id)&&(entry.scope==='company'||entry.department===item.department));if(!source)throw new Error('Choose an approved source visible to the requester');item.sourceId=source.id;}
+ item.reply=text;item.status='answered';item.resolvedBy=active.id;item.resolvedAt=new Date().toISOString();return item;
 }
 
 function visibleSources(data) {
@@ -173,7 +205,8 @@ function publicSnapshot(data) {
   if (!data) return { configured: false };
   const visible = visibleSources(data);
   const visibleIds = new Set(visible.map((source) => source.id));
-  return { configured: true, company: data.company, departments: data.departments, people: data.people.map(({ credential, onboardingEvidence, ...entry }) => entry), activePersonId: data.activePersonId, conflicts: conflicts(data).filter((group) => group.every((id) => visibleIds.has(id))), sources: visible.map(({ storedPath, textPath, ...source }) => source) };
+  const active=person(data);
+  return { configured: true, company: data.company, departments: data.departments, people: data.people.map(({ credential, onboardingEvidence, ...entry }) => entry), activePersonId: data.activePersonId, conflicts: conflicts(data).filter((group) => group.every((id) => visibleIds.has(id))), sources: visible.map(({ storedPath, textPath, decisions, ...source }) => ({...source,latestDecision:source.ownerId===active.id||active.role==='admin'||active.role==='lead'&&active.department===source.department?decisions?.at(-1)||null:null})),clarifications:visibleClarifications(data) };
 }
 
-module.exports = { load, save, create, person, addPerson, switchPerson, importFile, importFolder, updateSource, proposeSource, visibleSources, approvedSources, conflicts, publicSnapshot, extractText };
+module.exports = { load, save, create, person, addPerson, switchPerson, importFile, importFolder, updateSource, proposeSource, removeSource, visibleSources, visibleClarifications, requestClarification, resolveClarification, approvedSources, conflicts, publicSnapshot, extractText };

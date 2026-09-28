@@ -19,4 +19,6 @@ Do not claim an NDA, zero retention, no training or a selected region from an AP
 
 ## Production gaps
 
+Local document retention now includes explicit deletion of an eligible managed source copy/extracted text and removal of temporary onboarding batch copies after successful application or replacement. Personal Learn history can be deleted. These actions do not remove the source original outside Averill, OS backups, cached provider data or earlier copies already made outside the current profile. Workspace JSON, extracted text and saved login documents are still not application-encrypted. A real-company release requires an encryption migration, backup/retention/deletion policy, provider data-processing verification and tenant-scoped server authorization. See [ADDITIONS_STATUS.md](ADDITIONS_STATUS.md).
+
 Local company copies and workspace text use OS permissions, not application encryption. Local logins are not server tenant isolation. Production requires encrypted document storage, centrally enforced access, audit/deletion/retention controls and an agreed provider data-processing policy. Demo password documents are locally readable by design and must not be treated as production credential storage. Do not deploy this demo as enterprise-secret storage without these controls.

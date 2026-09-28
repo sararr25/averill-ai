@@ -106,7 +106,7 @@ function render() {
     const source = sourceButton(item.source);
     const review = node('button', 'Review this finding', 'secondary-button');review.type='button';
     review.addEventListener('click',()=>{selectedFindingId=`${item.kind}:${item.id}`;showTab('review');renderHero();el('hero-title').focus();});
-    card.append(context, title, body, source, review); findings.append(card);
+    card.append(context, title, body, source, review);appendFindingActions(card,item);findings.append(card);
   }
 }
 
@@ -168,9 +168,22 @@ function renderHero() {
     const arrow = node('span'); arrow.innerHTML = icon('arrow-right'); open.append(arrow);
     open.addEventListener('click', () => item.source.kind === 'asset' ? window.desktop.openSource(item.source.id) : showSource(item.source.id));
     source.append(open);
+    appendFindingActions(source,item);
   } else {
     if(!sharedNames.length)source.append(node('p','No work window is shared. Open Work to choose a window, then select Share.'));
   }
+}
+
+function appendFindingActions(parent,item){
+  const controls=node('div',undefined,'finding-actions');
+  const explain=node('button','Explain this correction','secondary-button');explain.type='button';
+  explain.addEventListener('click',()=>{selectedFindingId=`${item.kind}:${item.id}`;showTab('review');renderHero();el('question').value=`How do I correct ${item.title.toLowerCase()} in the shared ${kinds.find(kind=>kind.id===item.kind)?.title||'work'}?`;updateSend();el('question').focus();});
+  const copy=node('button','Copy suggested correction','secondary-button');copy.type='button';
+  copy.addEventListener('click',async()=>{try{await window.desktop.copyFinding(item.kind,item.id);}catch(error){el('answer-status').textContent=error.message;}});
+  const practice=node('button','Practise this correction','secondary-button');practice.type='button';
+  practice.addEventListener('click',async()=>{try{current=await window.desktop.learningAction('finding-start',{kind:item.kind,findingId:item.id});render();showTab('learn');el('learning-panel').querySelector('.finding-exercise h3')?.focus();}catch(error){el('answer-status').textContent=error.message;}});
+  const recheck=node('button','Recheck after my edit','secondary-button');recheck.type='button';recheck.addEventListener('click',async()=>{try{current=await window.desktop.snapshot();const remains=current.findings.some(finding=>finding.kind===item.kind&&finding.id===item.id);render();el('answer-status').textContent=remains?'This supported finding is still present. Review the field and source.':'This supported finding is clear in the current shared fields. Visual quality and publication remain for you to check.';}catch(error){el('answer-status').textContent=error.message;}});
+  controls.append(explain,copy,practice,recheck);parent.append(controls);
 }
 
 function node(tag, content, className) {
@@ -228,6 +241,7 @@ function renderWorkspace() {
   }
   renderOnboarding(panel);
   renderAccountAccess(panel);
+  renderPersonalAccount(panel);
   if (data.conflicts?.length) panel.append(node('p', `${data.conflicts.length} source conflict(s) need a lead decision. Averill will not use either conflicting version for answers.`, 'workspace-conflict'));
   if (active.role === 'admin') {
     panel.append(node('h3', 'Advanced: add a person manually'));
@@ -330,7 +344,10 @@ function addMessage(text, role, sources = []) {
   message.className = role === 'user' ? 'user-message' : 'assistant-message';
   const paragraph = document.createElement('p'); paragraph.textContent = text;
   message.append(paragraph);
-  for (const source of sources) message.append(sourceButton(source));
+  for (const source of sources) {
+    message.append(sourceButton(source));
+    if(source.quote)message.append(node('blockquote',`“${source.quote}” · v${source.version||'?'}${source.page?` · page ${source.page}`:` · line ${source.line||'?'}`} · Approved ${source.approvedAt?new Date(source.approvedAt).toLocaleDateString():'date unknown'} by ${source.approvedBy||'unknown'} · ${source.reason||'Relevant passage'}`,'answer-evidence'));
+  }
   el('conversation').append(message);
   el('conversation').scrollTop = el('conversation').scrollHeight;
   const feed=document.querySelector('.review-feed');feed.scrollTop=feed.scrollHeight;
@@ -350,6 +367,7 @@ el('ask-form').addEventListener('submit', async (event) => {
   try {
     const response = current.shared?.length ? await window.desktop.askDemo(question) : await window.desktop.ask(question);
     addMessage(response.text, 'assistant', response.sources);
+    if(!current.shared?.length&&!response.sources?.length&&current.workspace?.configured){const message=el('conversation').lastElementChild;const request=node('button','Ask a reviewer privately','secondary-button');request.type='button';request.addEventListener('click',async()=>{request.disabled=true;try{current=await window.desktop.requestClarification(question);render();message.append(node('p','Private clarification requested. Track it in Knowledge.'));}catch(error){request.disabled=false;el('answer-status').textContent=error.message;}});message.append(request);}
     el('answer-status').textContent = '';
   } catch (error) {
     el('question').value = question;

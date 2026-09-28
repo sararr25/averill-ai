@@ -127,7 +127,12 @@ function renderAccountAccess(panel){
   const submit=node('button','Enable owner login','secondary-button');submit.type='submit';form.append(submit);
   form.addEventListener('submit',async e=>{e.preventDefault();submit.disabled=true;try{current=await window.desktop.enableAccounts(email.value,password.value);password.value='';render();}catch(error){el('workspace-feedback').textContent=error.message;}finally{submit.disabled=false;}});host.append(form);
  }else{
-  host.append(node('p','People imported through onboarding receive separate accounts automatically. For an existing person, create access below.'));
+  host.append(node('p','People imported through onboarding receive separate local accounts. Account documents are local credentials, not invitations sent by email.'));
+  for(const account of current.auth.accounts.filter(account=>account.id!==data.activePersonId&&account.profile!=='owner')){
+   const row=node('div',undefined,'account-row');row.append(node('strong',`${account.name} · ${account.email}`),node('small',account.disabled?'Disabled · cannot sign in':'Active local account'));
+   if(!account.disabled)onboardingButton(row,'Disable access',async()=>{if(!window.confirm(`Disable ${account.name}'s local sign-in?`))return;current=await window.desktop.disableAccount(account.id);render();});
+   onboardingButton(row,account.disabled?'Restore with new password':'Reset password',async()=>{if(!window.confirm(`Create a new local password for ${account.name}? The previous password will stop working.`))return;const result=await window.desktop.recoverAccount(account.id);current=result.snapshot;render();showAccountReceipt([result.account]);});host.append(row);
+  }
   const available=data.people.filter(p=>!current.auth.accounts.some(a=>a.id===p.id));
   if(available.length){
    const form=node('form',undefined,'workspace-form');const label=node('label','Existing person');const select=node('select');for(const p of available){const option=node('option',`${p.name} · ${p.role}`);option.value=p.id;select.append(option);}label.append(select);form.append(label);
@@ -140,6 +145,11 @@ function renderAccountAccess(panel){
  }
  panel.append(host);
 }
+function renderPersonalAccount(panel){
+ if(!current.auth?.signedIn)return;
+ const section=node('section',undefined,'account-management');section.append(node('h3','Your password'),node('p','Change your own local password. The updated login document stays on this Mac; there is no email reset service.'));
+ const form=node('form',undefined,'workspace-form');const old=onboardingField(form,'Current password','','password');old.required=true;old.autocomplete='current-password';const next=onboardingField(form,'New password','','password');next.required=true;next.minLength=10;next.maxLength=128;next.autocomplete='new-password';const save=node('button','Change password','secondary-button');save.type='submit';form.append(save);form.addEventListener('submit',async event=>{event.preventDefault();save.disabled=true;try{current=await window.desktop.changePassword(old.value,next.value);old.value='';next.value='';render();el('workspace-feedback').textContent='Password changed. Your login document was updated locally.';}catch(error){el('workspace-feedback').textContent=error.message;}finally{save.disabled=false;}});section.append(form);panel.append(section);
+}
 function renderSession(){
  const locked=Boolean(current.auth?.enabled&&!current.auth.signedIn);
  document.body.classList.toggle('auth-locked',locked);
@@ -148,12 +158,12 @@ function renderSession(){
  if(locked){
   workspaceRenderKey=null;learningRenderKey=null;reviewContextKey=null;selectedFindingId=null;
   el('learning-panel').replaceChildren(); el('workspace-panel').replaceChildren();
-  knowledgeRequest++;el('knowledge-list').replaceChildren();el('knowledge-summary').replaceChildren();el('knowledge-search').value='';
+  knowledgeRequest++;knowledgeRenderKey=null;el('knowledge-list').replaceChildren();el('knowledge-requests').replaceChildren();el('knowledge-summary').replaceChildren();el('knowledge-search').value='';
   intakeCloudBrowser={};onboardingReceipt=null;el('account-receipt').replaceChildren();
   el('login-company').textContent=current.workspace?.company||'Your company';
   const accounts=el('login-account');const old=accounts.value;accounts.replaceChildren();
   const placeholder=node('option','Choose an account or enter your email');placeholder.value='';accounts.append(placeholder);
-  for(const person of current.auth.accounts){const option=node('option',`${person.name} · ${person.jobTitle}`);option.value=person.email;accounts.append(option);}accounts.value=old;
+  for(const person of current.auth.accounts.filter(person=>!person.disabled)){const option=node('option',`${person.name} · ${person.jobTitle}`);option.value=person.email;accounts.append(option);}accounts.value=old;
   return false;
  }
  if(current.auth?.signedIn&&current.auth.person){

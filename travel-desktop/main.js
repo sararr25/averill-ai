@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, shell, dialog, desktopCapturer, systemPreferences, safeStorage, screen } = require('electron');
+const { app, BrowserWindow, ipcMain, shell, dialog, desktopCapturer, systemPreferences, safeStorage, screen, clipboard } = require('electron');
 const fs = require('node:fs');
 const path = require('node:path');
 const os = require('node:os');
@@ -12,6 +12,7 @@ const accountDocuments = require('./src/account-documents');
 const onboarding = require('./src/onboarding');
 const privacy = require('./src/company-privacy');
 const knowledge = require('./src/knowledge');
+const sourceReview = require('./src/source-review');
 const remoteImport = require('./src/remote-import');
 const { CloudImports } = require('./src/cloud-import');
 const cloud = new CloudImports({root:()=>app.getPath('userData'),secure:safeStorage,open:url=>shell.openExternal(url)});
@@ -147,8 +148,24 @@ app.whenReady().then(async () => {
     if (!payload || typeof payload !== 'object' || Array.isArray(payload)) throw new Error('Invalid learning action');
     if (action === 'record') learning.record(companyWorkspace, payload);
     else if (action === 'start') learning.start(companyWorkspace, payload.sourceId);
+    else if (action === 'finding-start') {
+      if (!workKinds.includes(payload.kind) || !shared.has(payload.kind)) throw new Error('Share the work window and select a current finding first.');
+      const finding = inspect(payload.kind, workState.get(payload.kind) || {}).find(item => item.id === payload.findingId);
+      if (!finding) throw new Error('This finding has changed. Review the current work again.');
+      learning.startFinding(companyWorkspace, { ...finding, kind: payload.kind });
+    }
+    else if (action === 'finding-complete') {
+      const session = learning.snapshot(companyWorkspace).sessions.find(item => item.id === payload.sessionId && item.exercise);
+      if (!session) throw new Error('Finding exercise unavailable.');
+      const kind = session.exercise.kind;
+      const check = !shared.has(kind) ? 'not-checked' : inspect(kind, workState.get(kind) || {}).some(item => item.id === session.exercise.findingId) ? 'still-found' : 'rule-clear';
+      learning.completeFinding(companyWorkspace, payload.sessionId, payload.reflection, check);
+    }
+    else if(action==='project-start')learning.startProject(companyWorkspace,payload.projectId,payload.sourceId);
+    else if(action==='project-confirm')learning.confirmProject(companyWorkspace,payload.sessionId,payload.note);
     else if (action === 'confirm') learning.confirm(companyWorkspace, payload.sessionId, payload.stepId);
     else if (action === 'exclude') learning.exclude(companyWorkspace, payload.sessionId);
+    else if (action === 'delete-history') learning.deleteHistory(companyWorkspace);
     else if (action === 'quiz') learning.beginQuiz(companyWorkspace);
     else if (action === 'answer') learning.answer(companyWorkspace, payload.quizId, payload.questionId, payload.value);
     else throw new Error('Unknown learning action');
@@ -212,6 +229,9 @@ app.whenReady().then(async () => {
     if (error) throw new Error(error);
     return true;
   });
+  ipcMain.handle('account:disable',(event,personId)=>{admin(event);const target=accounts.disable(companyWorkspace,personId);const result=persistWorkspace();accountDocuments.remove(app.getPath('userData'),target.email);return result;});
+  ipcMain.handle('account:recover',async(event,personId)=>{admin(event);const actor=companyWorkspace.activePersonId,next=structuredClone(companyWorkspace);const {target,password}=await accounts.recover(next,personId);admin(event);if(companyWorkspace.activePersonId!==actor)throw new Error('Account changed.');companyWorkspace=next;persistWorkspace();accountDocuments.save(app.getPath('userData'),companyWorkspace,[{email:target.email,password}]);return {snapshot:snapshot(),account:{email:target.email,profile:target.profile,password}};});
+  ipcMain.handle('account:change-password',async(event,currentPassword,nextPassword)=>{fromAgent(event);const actor=companyWorkspace.activePersonId,next=structuredClone(companyWorkspace);const target=await accounts.changePassword(next,actor,currentPassword,nextPassword);fromAgent(event);if(companyWorkspace.activePersonId!==actor)throw new Error('Account changed.');companyWorkspace=next;persistWorkspace();accountDocuments.save(app.getPath('userData'),companyWorkspace,[{email:target.email,password:nextPassword}]);return snapshot();});
   const admin = (event) => { fromAgent(event); if(workspace.person(companyWorkspace)?.role!=='admin')throw new Error('Administrator access required.'); };
   const addIntake = (selected) => {
     const previous = companyWorkspace.onboarding;
@@ -331,10 +351,10 @@ app.whenReady().then(async () => {
     const importSummary = workspace.importFolder(app.getPath('userData'), companyWorkspace, selection.filePaths[0], options || {});
     return { ...persistWorkspace(), importSummary };
   });
-  ipcMain.handle('workspace:update-source', (event, id, action, priority) => {
+  ipcMain.handle('workspace:update-source', (event, id, action, priority, reason, supersedesId) => {
     fromAgent(event);
     if (!companyWorkspace) throw new Error('Create a workspace first');
-    workspace.updateSource(companyWorkspace, id, action, priority);
+    workspace.updateSource(companyWorkspace, id, action, priority, reason, supersedesId);
     return persistWorkspace();
   });
   ipcMain.handle('workspace:propose-source', (event, id) => {
@@ -348,7 +368,11 @@ app.whenReady().then(async () => {
     const source = workspace.visibleSources(companyWorkspace || { people: [], sources: [] }).find((entry) => entry.id === id);
     return source ? (await shell.openPath(source.storedPath)) === '' : false;
   });
-  ipcMain.handle('workspace:knowledge',(event,query,status)=>{fromAgent(event);return companyWorkspace?knowledge.list(companyWorkspace,query,status):{documents:[],total:0,approved:0,uploaded:0};});
+  ipcMain.handle('workspace:knowledge',(event,query,status,filters)=>{fromAgent(event);return companyWorkspace?knowledge.list(companyWorkspace,query,status,filters):{documents:[],total:0,approved:0,uploaded:0};});
+  ipcMain.handle('workspace:compare-sources',(event,newId,oldId)=>{fromAgent(event);return sourceReview.compare(companyWorkspace,newId,oldId);});
+  ipcMain.handle('workspace:remove-source',(event,id)=>{fromAgent(event);workspace.removeSource(app.getPath('userData'),companyWorkspace,id);publish();return snapshot();});
+  ipcMain.handle('workspace:request-clarification',(event,question)=>{fromAgent(event);workspace.requestClarification(companyWorkspace,question);return persistWorkspace();});
+  ipcMain.handle('workspace:resolve-clarification',(event,id,reply,sourceId)=>{fromAgent(event);workspace.resolveClarification(companyWorkspace,id,reply,sourceId);return persistWorkspace();});
   ipcMain.handle('workspace:read-file', (event, id) => {
     fromAgent(event);
     const source = workspace.visibleSources(companyWorkspace || { people: [], sources: [] }).find((entry) => entry.id === id);
@@ -363,6 +387,14 @@ app.whenReady().then(async () => {
   });
   ipcMain.handle('agent:snapshot', (event) => { fromAgent(event, true); return snapshot(); });
   ipcMain.handle('agent:open-work', (event, kind) => { fromApp(event); if (!workKinds.includes(kind)) throw new Error('Unknown work window'); openWork(kind); return snapshot(); });
+  ipcMain.handle('agent:copy-finding', (event, kind, id) => {
+    fromAgent(event);
+    if (!workKinds.includes(kind) || !shared.has(kind)) throw new Error('Share the work window first.');
+    const finding = inspect(kind, workState.get(kind) || {}).find(item => item.id === id);
+    if (!finding) throw new Error('This finding has changed.');
+    clipboard.writeText(`${finding.action}. ${finding.body}`);
+    return true;
+  });
   ipcMain.handle('agent:share', (event, kind, enable) => {
     fromAgent(event);
     if (!workKinds.includes(kind) || !workWindows.has(kind)) return snapshot();

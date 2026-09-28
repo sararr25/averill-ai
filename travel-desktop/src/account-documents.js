@@ -3,6 +3,7 @@ const path = require('node:path');
 const { profiles, validEmail } = require('./accounts');
 
 function directory(userData) { return path.join(userData, 'Averill-login-documents'); }
+function remove(userData,address){if(!validEmail(address))throw new Error('Invalid account email');fs.rmSync(path.join(directory(userData),`${address.replace(/[^a-z0-9@._-]/gi,'_')}.md`),{force:true});}
 function save(userData, data, entries) {
  if (!entries.length) return [];
  const root = directory(userData);
@@ -20,4 +21,4 @@ function save(userData, data, entries) {
   return target;
  });
 }
-module.exports = { directory, save };
+module.exports = { directory, save, remove };

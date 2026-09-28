@@ -18,4 +18,8 @@ Weekly sets use confirmed activity in the current Europe/Copenhagen Monday-based
 
 Verification: all 12 Node tests pass. Native Electron UI checked in a separate temporary user-data profile: workspace creation, Learn tab, contextual help, step advancement, weekly question creation, incorrect-answer explanation and practical-reflection completion. Test confirmation records are synthetic. Existing real Canva capture is unchanged; no real Canva design operation or window capture was verified by these checks. Packaged-app rebuild status is recorded in the handover.
 
+## Addition pass — 28 September 2026
+
+Review findings now offer a direct practice action. The main process selects the live finding from shared fields, and the person-owned exercise stores its supplied source, before/target description, employee reflection and a separate deterministic recheck status. Three ordered projects cover composition, a LinkedIn visual and newsletter export. Optional approved company sources retain ID/version/hash so later revocation is visible; the supplied demo guide is linked for the synthetic scenarios. Free-form step help is an offline lookup restricted to the four Canva lesson topics. A separately selected Canva window can be captured once on explicit request for OCR text. These records do not establish that a design was aligned, exported or published. People can delete their own local learning history. Current suite and native verification are in [HANDOVER.md](HANDOVER.md).
+
 Official guidance checked 26 September 2026: https://www.canva.com/help/layer-group-align/ . Interface variants can differ; the app links to the source rather than inventing coordinates.

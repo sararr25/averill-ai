@@ -30,11 +30,15 @@ Run `npm test` from `travel-desktop/` for the deterministic checks.
 
 Open **Learn** after creating a workspace in Setup. Start the four-step Canva lesson, ask for step help, and confirm what you practised. Your week records confirmed steps and manually entered Canva/LinkedIn/newsletter activities. Weekly practice provides operation questions, source/version checks and practical reflections. It is offline and scoped to the active person; confirmation is not automatic visual assessment. See [learning plan](docs/LEARNING_IMPLEMENTATION_PLAN.md).
 
+Review findings now lead to person-owned correction practice. Learn also has three task exercises for composition, a LinkedIn visual and newsletter export, plus bounded offline question help. Knowledge shows exact extracted passages, version/approval metadata, line comparisons, motivated approvals and private clarification requests. See [added capabilities and enterprise gates](docs/ADDITIONS_STATUS.md).
+
 Run `npm --prefix travel-site start` from the repository root for the fictional Elseweek site at `http://127.0.0.1:4173/`. The [site README](travel-site/README.md) covers the independent consumer design and demo limits.
 
 ## Security and scope
 
 The supplied sample windows send **structured field state** through the app; Averill produces findings only while the employee explicitly shares a window. A selected Canva window can be captured for one OCR review after pressing Review; there is no continuous arbitrary-window observation, structural Canva API access, automatic edit, email send, or post publication. A local company workspace stores imported copies, people, department source approval, and priorities on one Mac. New workspaces use separate local email/password accounts; legacy role switching is disabled after owner-account activation. No cloud authentication or synchronization is provided. Local source lookup works without a key. Nebius is optional and sends relevant approved source text only after consent; Tavily receives only an explicit public web query. See [ARCHITECTURE.md](ARCHITECTURE.md) for exact boundaries.
+
+An administrator can disable or reset another non-owner local account; people can change their own password. This is local access management, without invitation delivery or cross-device revocation. Local source copies and individual Learn history can be deleted explicitly. The company knowledge store is not application-encrypted; the macOS package remains unsigned. The [A/B plan](docs/AB_TEST_PLAN.md) is prepared, with no statistical result claimed.
 
 Never commit `.env.local` or a real API key. The app reads the local `.env.local` in the repository root, and administrators can configure encrypted keys in Setup; see [travel-desktop/README.md](travel-desktop/README.md). The root `.gitignore` excludes environment files at every depth.
 

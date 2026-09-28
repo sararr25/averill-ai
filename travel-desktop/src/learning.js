@@ -7,6 +7,11 @@ const steps = [
  {id:'align',title:'Practise alignment',instruction:'Use an alignment option suitable for the selected elements. Look at the result and decide whether it matches your intended layout.',help:'Try aligning two elements, then undo if the result is not what you intended. Averill cannot confirm their geometry from OCR.',question:'Why can alignment options change when you select more than one element?',options:['The reference can change from the page to the selected elements','Alignment always changes the font','Multiple elements cannot be aligned'],correct:0,explanation:'A single element can align to the page; multiple selected elements can align with one another.'},
  {id:'group',title:'Group and practise moving together',instruction:'Keep the intended elements selected and group them using Command+G on Mac or Ctrl+G on Windows. Move the group and check the result yourself.',help:'Grouping keeps a set of elements together for operations such as moving. Some element types have restrictions; consult the guide if grouping is unavailable.',question:'Which shortcut groups selected elements on a Mac?',options:['Command+P','Command+G','Command+S'],correct:1,explanation:'Command+G groups the selected elements on a Mac. Use Ctrl+G on Windows.'}
 ];
+const projects={
+ composition:{title:'Improve a composition',tool:'Canva',demoSource:null,steps:['Choose two related elements and describe the alignment problem.','Use Position or grouping to change the layout; inspect the result in Canva.','Record what improved and what you would still check before export.']},
+ linkedin_visual:{title:'Prepare a LinkedIn visual',tool:'LinkedIn',demoSource:'linkedin',steps:['Read the linked campaign source or the supplied LinkedIn guidance and state the approved audience and visual.','Prepare a landscape visual in Canva or the supplied draft; inspect its content and dimensions yourself.','Record the exported file name and how you checked it against the post draft.']},
+ newsletter_export:{title:'Export for a newsletter',tool:'Newsletter',demoSource:'brief',steps:['Read the relevant approved email guidance and choose an appropriate visual.','Export the visual yourself from Canva, then inspect the downloaded file.','Record the file name and how you applied or would apply it to the newsletter draft.']},
+};
 function weekKey(now = new Date()) {
  const parts = Object.fromEntries(new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Copenhagen',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date(now)).map(p=>[p.type,p.value]));
  const day = new Date(`${parts.year}-${parts.month}-${parts.day}T00:00:00Z`); day.setUTCDate(day.getUTCDate()-((day.getUTCDay()+6)%7)); return day.toISOString().slice(0,10);
@@ -28,8 +33,38 @@ function record(data,payload,now=new Date()) {
  const source=payload.sourceId?usableSources(data).find(s=>s.id===payload.sourceId):null;if(payload.sourceId&&!source)throw new Error('Company source unavailable');
  const session={id:crypto.randomUUID(),ownerId,title:`${payload.tool} practice`,note,createdAt:new Date(now).toISOString(),finishedAt:new Date(now).toISOString(),confirmed:[{id:'work',week:weekKey(now),at:new Date(now).toISOString(),kind:'employee-confirmed'}],excluded:false,source:source?{id:source.id,title:source.title,version:source.version,sha256:source.sha256}:null};state(data).sessions.push(session);return session;
 }
+function startFinding(data, finding, now=new Date()) {
+ const ownerId=owner(data);
+ if(!finding||!['email','linkedin','social','handover'].includes(finding.kind)||!finding.id||!finding.source?.id)throw new Error('Choose a supported finding');
+ const existing=state(data).sessions.find(s=>s.ownerId===ownerId&&!s.excluded&&!s.finishedAt&&s.exercise?.kind===finding.kind&&s.exercise?.findingId===finding.id);
+ if(existing)return existing;
+ const session={id:crypto.randomUUID(),ownerId,title:`${finding.kind} correction practice`,createdAt:new Date(now).toISOString(),confirmed:[],excluded:false,exercise:{kind:finding.kind,findingId:finding.id,title:finding.title,problem:finding.body,action:finding.action,source:{id:finding.source.id,title:finding.source.title,version:finding.source.id==='brief'?'2':finding.source.id==='oldBrief'?'1':null},before:'Finding present in the shared demo work',after:null,check:'pending'}};
+ state(data).sessions.push(session);return session;
+}
+function completeFinding(data,id,reflection,check,now=new Date()){
+ const session=sessionFor(data,id);if(!session.exercise||session.excluded||session.finishedAt)throw new Error('Finding exercise unavailable');
+ const text=String(reflection||'').trim().slice(0,1000);if(text.length<10)throw new Error('Describe what you changed and checked');
+ if(!['rule-clear','still-found','not-checked'].includes(check))throw new Error('Invalid review result');
+ session.note=text;session.exercise.after=check==='rule-clear'?'The original deterministic finding is no longer present.':check==='still-found'?'The finding is still present.':'No live field check was available.';session.exercise.check=check;
+ session.confirmed.push({id:'work',week:weekKey(now),at:new Date(now).toISOString(),kind:'employee-confirmed'});session.finishedAt=new Date(now).toISOString();return session;
+}
+function startProject(data,projectId,sourceId,now=new Date()){
+ const template=projects[projectId];if(!template)throw new Error('Unknown practice project');
+ const ownerId=owner(data);const existing=state(data).sessions.find(session=>session.ownerId===ownerId&&!session.excluded&&!session.finishedAt&&session.project?.id===projectId);if(existing)return existing;
+ const source=sourceId?usableSources(data).find(item=>item.id===sourceId):null;if(sourceId&&!source)throw new Error('Choose a visible approved source without a conflict');
+ const session={id:crypto.randomUUID(),ownerId,title:template.title,createdAt:new Date(now).toISOString(),confirmed:[],excluded:false,source:source?{id:source.id,title:source.title,version:source.version,sha256:source.sha256}:null,project:{id:projectId,tool:template.tool,demoSource:template.demoSource,steps:template.steps,notes:[]}};state(data).sessions.push(session);return session;
+}
+function confirmProject(data,id,note,now=new Date()){
+ const session=sessionFor(data,id);if(!session.project||session.excluded||session.finishedAt)throw new Error('Project unavailable');
+ const text=String(note||'').trim().slice(0,1000);if(text.length<10)throw new Error('Describe the result of this step');
+ const index=session.project.notes.length;if(index>=session.project.steps.length)throw new Error('Project already complete');
+ session.project.notes.push(text);session.confirmed.push({id:`project:${index}`,week:weekKey(now),at:new Date(now).toISOString(),kind:'employee-confirmed'});
+ if(session.project.notes.length===session.project.steps.length){session.note=session.project.notes.join(' · ');session.finishedAt=new Date(now).toISOString();}
+ return session;
+}
 function confirm(data,id,stepId,now=new Date()) {const s=sessionFor(data,id);if(s.excluded||s.finishedAt)throw new Error('This session is no longer active');const next=steps[s.confirmed.length];if(!next||next.id!==stepId)throw new Error('Confirm the current step first');s.confirmed.push({id:stepId,at:new Date(now).toISOString(),week:weekKey(now),kind:'employee-confirmed'});if(s.confirmed.length===steps.length)s.finishedAt=new Date(now).toISOString();}
 function exclude(data,id){sessionFor(data,id).excluded=true;}
+function deleteHistory(data){const id=owner(data),store=state(data);store.sessions=store.sessions.filter(session=>session.ownerId!==id);store.quizzes=store.quizzes.filter(quiz=>quiz.ownerId!==id);}
 function eligible(data,now) {return state(data).sessions.filter(s=>s.ownerId===owner(data)&&!s.excluded&&s.confirmed.some(c=>c.week===weekKey(now)));}
 function validQuestion(data,q,now) {const sessions=eligible(data,now); if(q.type==='work')return sessions.some(s=>s.id===q.sessionId); if(q.type==='source')return sessions.some(s=>s.id===q.sessionId&&sourceNow(data,q.source));return sessions.some(s=>s.confirmed.some(c=>c.week===weekKey(now)&&c.id===q.stepId));}
 function fingerprint(data,now){return JSON.stringify(eligible(data,now).map(s=>[s.id,s.confirmed.filter(c=>c.week===weekKey(now)).map(c=>c.id),sourceNow(data,s.source)?.sha256||null]));}
@@ -58,6 +93,6 @@ function snapshot(data,now=new Date()) {
  if(!data||!workspace.person(data))return {configured:false};const id=owner(data),store=data.learning||{sessions:[],quizzes:[]};
  const sessions=store.sessions.filter(s=>s.ownerId===id).map(s=>({...s,sourceAvailable:!!sourceNow(data,s.source)}));
  const quiz=[...store.quizzes].reverse().find(q=>q.ownerId===id&&q.week===weekKey(now));
- return {configured:true,week:weekKey(now),guide,steps:steps.map(({question,options,correct,explanation,...s})=>s),sessions,quiz:quiz?{...quiz,outdated:quiz.fingerprint!==fingerprint(data,now),questions:quiz.questions.map(({correct,explanation,...q})=>({...q,available:validQuestion(data,q,now)}))}:null};
+ return {configured:true,week:weekKey(now),guide,steps:steps.map(({question,options,correct,explanation,...s})=>s),projects:Object.entries(projects).map(([id,item])=>({id,title:item.title,tool:item.tool})),sessions,quiz:quiz?{...quiz,outdated:quiz.fingerprint!==fingerprint(data,now),questions:quiz.questions.map(({correct,explanation,...q})=>({...q,available:validQuestion(data,q,now)}))}:null};
 }
-module.exports={start,record,confirm,exclude,beginQuiz,answer,snapshot,weekKey};
+module.exports={start,record,startFinding,completeFinding,startProject,confirmProject,confirm,exclude,deleteHistory,beginQuiz,answer,snapshot,weekKey};

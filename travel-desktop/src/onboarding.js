@@ -61,6 +61,7 @@ function classify(file, personnel) {
 }
 function stage(userData, data, selected) {
  requireAdmin(data);
+ const priorBatch=data.onboarding?.id;
  if (!Array.isArray(selected) || selected.length > 30) throw new Error('Choose up to 30 files per onboarding batch.');
  const batchId = crypto.randomUUID();
  const root = path.join(userData, 'averill-onboarding', batchId);fs.mkdirSync(root, { recursive: true, mode: 0o700 });
@@ -93,11 +94,12 @@ function stage(userData, data, selected) {
   seen.add(person.email);
  }
  data.onboarding = { id: batchId, ownerId: data.activePersonId, mode: 'local', company: null, files, people, warnings, applied: false, createdAt: new Date().toISOString() };
+ if(priorBatch&&priorBatch!==batchId&&/^[0-9a-f-]{36}$/i.test(priorBatch))try{fs.rmSync(path.join(userData,'averill-onboarding',priorBatch),{recursive:true,force:true});}catch{ /* Keep the new draft even if old staging cleanup fails. */ }
  return data.onboarding;
 }
 function snapshot(data) {
  const draft = data?.onboarding;
- if(!draft || workspace.person(data)?.role !== 'admin' || draft.ownerId !== data.activePersonId) return null;
+ if(!draft || draft.applied || workspace.person(data)?.role !== 'admin' || draft.ownerId !== data.activePersonId) return null;
  return { ...draft, files: draft.files.map(({ storedPath, originalPath, text, ...file }) => ({ ...file, preview: text.slice(0, 3000), sentCharacters: Math.min(text.length, 12000) })) };
 }
 function evidenceIn(file, evidence) {
@@ -196,8 +198,9 @@ async function apply(userData,data,review) {
    if(file.category==='archive' && scope !== 'private') workspace.updateSource(next,source.id,'superseded');
   }
   if(review.useCompany && draft.company) {next.company=draft.company.name;next.companyDescription=draft.company.description;}
-  next.onboarding.applied=true;next.onboarding.appliedAt=new Date().toISOString();
+  next.onboarding={id:draft.id,ownerId:draft.ownerId,applied:true,appliedAt:new Date().toISOString(),documentsAdded:created.length,peopleAdded:receipt.length};
   workspace.save(userData,next);Object.assign(data,next);
+  if(/^[0-9a-f-]{36}$/i.test(draft.id))try{fs.rmSync(path.join(userData,'averill-onboarding',draft.id),{recursive:true,force:true});}catch{ /* A cleanup failure must not roll back a committed onboarding batch. */ }
   return {receipt,duplicates,peopleAdded:receipt.length,documentsAdded:created.length};
  } catch(error) {
   for(const source of created) for(const target of [source.storedPath,source.textPath]) if(target) fs.rmSync(target,{force:true});

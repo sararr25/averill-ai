@@ -37,3 +37,13 @@ test('four login documents survive restart without leaking credentials into work
   }
  } finally { fs.rmSync(root, { recursive: true, force: true }); }
 });
+
+test('administrator can disable and recover another local account while employees cannot recover themselves',async t=>{
+ const root=fs.mkdtempSync(path.join(os.tmpdir(),'averill-account-recovery-'));t.after(()=>fs.rmSync(root,{recursive:true,force:true}));
+ const data=workspace.create(root,'Sample','Owner');const owner=workspace.person(data);await accounts.configure(data,owner.id,'owner@example.com','old-owner-password','owner');
+ const employee=workspace.addPerson(data,'Worker','employee','Marketing');await accounts.configure(data,employee.id,'worker@example.com','old-worker-password','employee');
+ accounts.disable(data,employee.id);await assert.rejects(accounts.authenticate(data,employee.email,'old-worker-password'),/incorrect/);assert.equal(accounts.publicAccounts(data).find(a=>a.id===employee.id).disabled,true);
+ workspace.switchPerson(data,employee.id);assert.throws(()=>accounts.disable(data,owner.id),/administrator/);await assert.rejects(accounts.recover(data,owner.id),/administrator/);
+ workspace.switchPerson(data,owner.id);const recovered=await accounts.recover(data,employee.id);await assert.rejects(accounts.authenticate(data,employee.email,'old-worker-password'),/incorrect/);assert.equal((await accounts.authenticate(data,employee.email,recovered.password)).id,employee.id);
+ workspace.switchPerson(data,employee.id);await accounts.changePassword(data,employee.id,recovered.password,'new-worker-password');assert.equal((await accounts.authenticate(data,employee.email,'new-worker-password')).id,employee.id);
+});

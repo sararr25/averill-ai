@@ -3,11 +3,11 @@ const { contextBridge, ipcRenderer, webUtils } = require('electron');
 let operationId=0;
 const operationListeners=new Set();
 const operationLabels={
- 'account:login':'Signing in', 'account:logout':'Signing out', 'account:enable':'Saving owner login', 'account:create':'Creating account', 'account:documents':'Opening login documents',
+ 'account:login':'Signing in', 'account:logout':'Signing out', 'account:enable':'Saving owner login', 'account:create':'Creating account', 'account:documents':'Opening login documents', 'account:disable':'Disabling account', 'account:recover':'Recovering account', 'account:change-password':'Changing password',
  'onboarding:drop':'Reading dropped files', 'onboarding:upload':'Selecting and reading company files', 'onboarding:synced':'Reading synced files', 'onboarding:links':'Downloading and reading linked files', 'onboarding:analyze':'Interpreting selected files with Nebius', 'onboarding:apply':'Saving company onboarding', 'onboarding:read-file':'Opening uploaded text',
  'company:privacy':'Saving company AI policy', 'cloud:configure':'Saving cloud configuration', 'cloud:connect':'Waiting for cloud sign-in', 'cloud:cancel':'Cancelling cloud sign-in', 'cloud:disconnect':'Disconnecting cloud account', 'cloud:list':'Loading cloud folder', 'cloud:import':'Downloading selected cloud files',
- 'workspace:create':'Creating company workspace', 'workspace:add-person':'Adding person', 'workspace:import':'Importing sources', 'workspace:import-folder':'Importing folder', 'workspace:update-source':'Saving source status and priority', 'workspace:propose-source':'Proposing source', 'workspace:open-source':'Opening source file', 'workspace:read-file':'Opening source text', 'workspace:save-key':'Saving service key securely',
- 'agent:source':'Opening source text', 'agent:open-work':'Opening work window', 'agent:share':'Updating sharing', 'agent:ask':'Preparing answer', 'agent:ask-demo':'Preparing demo answer', 'agent:ai-mode':'Updating AI mode', 'agent:open-source':'Opening file', 'agent:open-web':'Opening browser', 'agent:web-search':'Searching public web', 'agent:external-windows':'Finding available windows', 'agent:external-share':'Updating selected window', 'agent:external-review':'Reading selected window', 'learning:action':'Saving learning activity'
+ 'workspace:create':'Creating company workspace', 'workspace:add-person':'Adding person', 'workspace:import':'Importing sources', 'workspace:import-folder':'Importing folder', 'workspace:update-source':'Saving source status and priority', 'workspace:remove-source':'Deleting local source copy', 'workspace:request-clarification':'Requesting private clarification', 'workspace:resolve-clarification':'Answering private clarification', 'workspace:propose-source':'Proposing source', 'workspace:open-source':'Opening source file', 'workspace:read-file':'Opening source text', 'workspace:save-key':'Saving service key securely',
+ 'agent:source':'Opening source text', 'agent:open-work':'Opening work window', 'agent:copy-finding':'Copying suggested correction', 'agent:share':'Updating sharing', 'agent:ask':'Preparing answer', 'agent:ask-demo':'Preparing demo answer', 'agent:ai-mode':'Updating AI mode', 'agent:open-source':'Opening file', 'agent:open-web':'Opening browser', 'agent:web-search':'Searching public web', 'agent:external-windows':'Finding available windows', 'agent:external-share':'Updating selected window', 'agent:external-review':'Reading selected window', 'learning:action':'Saving learning activity'
 };
 function announce(value){for(const listener of operationListeners)try{listener(value);}catch{}}
 async function invoke(channel,...args){
@@ -29,13 +29,16 @@ async function invoke(channel,...args){
 
 contextBridge.exposeInMainWorld('desktop', {
   onOperation: callback => { operationListeners.add(callback); },
-  listKnowledge: (query,status) => invoke('workspace:knowledge',query,status),
+  listKnowledge: (query,status,filters) => invoke('workspace:knowledge',query,status,filters),
   readOnboardingFile: id => invoke('onboarding:read-file',id),
   login: (email, password) => invoke('account:login', email, password),
   logout: () => invoke('account:logout'),
   enableAccounts: (email, password) => invoke('account:enable', email, password),
   createAccount: (id, email, profile) => invoke('account:create', id, email, profile),
   openAccountDocuments: () => invoke('account:documents'),
+  disableAccount: id => invoke('account:disable',id),
+  recoverAccount: id => invoke('account:recover',id),
+  changePassword: (currentPassword,nextPassword) => invoke('account:change-password',currentPassword,nextPassword),
   dropOnboarding: (files) => invoke('onboarding:drop', Array.from(files).map(file=>webUtils.getPathForFile(file))),
   linkOnboarding: (links) => invoke('onboarding:links', links),
   syncedOnboarding: () => invoke('onboarding:synced'),
@@ -52,6 +55,7 @@ contextBridge.exposeInMainWorld('desktop', {
   learningAction: (action, payload) => invoke('learning:action', action, payload),
   snapshot: () => invoke('agent:snapshot'),
   openWork: (kind) => invoke('agent:open-work', kind),
+  copyFinding: (kind,id) => invoke('agent:copy-finding',kind,id),
   share: (kind, enable) => invoke('agent:share', kind, enable),
   ask: (question) => invoke('agent:ask', question),
   askDemo: (question) => invoke('agent:ask-demo', question),
@@ -66,7 +70,11 @@ contextBridge.exposeInMainWorld('desktop', {
   switchPerson: (id) => invoke('workspace:switch-person', id),
   importSources: (options) => invoke('workspace:import', options),
   importFolder: (options) => invoke('workspace:import-folder', options),
-  updateSource: (id, action, priority) => invoke('workspace:update-source', id, action, priority),
+  updateSource: (id, action, priority, reason, supersedesId) => invoke('workspace:update-source', id, action, priority, reason, supersedesId),
+  compareSources: (newId,oldId) => invoke('workspace:compare-sources',newId,oldId),
+  removeSource: id => invoke('workspace:remove-source',id),
+  requestClarification: question => invoke('workspace:request-clarification',question),
+  resolveClarification: (id,reply,sourceId) => invoke('workspace:resolve-clarification',id,reply,sourceId),
   proposeSource: (id) => invoke('workspace:propose-source', id),
   openWorkspaceSource: (id) => invoke('workspace:open-source', id),
   readWorkspaceFile: (id) => invoke('workspace:read-file', id),

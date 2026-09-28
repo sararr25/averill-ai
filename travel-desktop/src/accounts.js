@@ -37,11 +37,25 @@ async function authenticate(data, address, password) {
  const safePassword = typeof password === 'string' && password.length <= 128 ? password : '';
  const hash = await scrypt(safePassword, stored.salt, 64);
  const expected = Buffer.from(stored.hash, 'hex');
- if (!person || expected.length !== hash.length || !crypto.timingSafeEqual(expected, hash)) throw new Error('Email or password is incorrect.');
+ if (!person || person.disabledAt || expected.length !== hash.length || !crypto.timingSafeEqual(expected, hash)) throw new Error('Email or password is incorrect.');
  return person;
+}
+function disable(data,personId){
+ const actor=data.people.find(p=>p.id===data.activePersonId),target=data.people.find(p=>p.id===personId);
+ if(actor?.role!=='admin'||!target?.credential||target.id===actor.id||target.profile==='owner')throw new Error('An administrator may disable another non-owner account only.');
+ target.disabledAt=new Date().toISOString();return target;
+}
+async function recover(data,personId){
+ const actor=data.people.find(p=>p.id===data.activePersonId),target=data.people.find(p=>p.id===personId);
+ if(actor?.role!=='admin'||!target?.credential||target.id===actor.id||target.profile==='owner')throw new Error('An administrator may recover another non-owner account only.');
+ const password=temporaryPassword();target.credential=await credential(password);target.disabledAt=null;target.recoveredAt=new Date().toISOString();return {target,password};
+}
+async function changePassword(data,personId,currentPassword,nextPassword){
+ const target=data.people.find(p=>p.id===personId);if(!target||data.activePersonId!==personId)throw new Error('Account unavailable');
+ await authenticate(data,target.email,currentPassword);target.credential=await credential(nextPassword);target.passwordChangedAt=new Date().toISOString();return target;
 }
 function temporaryPassword() { return `Av-${crypto.randomBytes(12).toString('base64url')}`; }
 function publicAccounts(data) {
- return (data?.people || []).filter(p => p.email && p.credential).map(p => ({ id: p.id, name: p.name, email: p.email, profile: p.profile, jobTitle: p.jobTitle, department: p.department }));
+ return (data?.people || []).filter(p => p.email && p.credential).map(p => ({ id: p.id, name: p.name, email: p.email, profile: p.profile, jobTitle: p.jobTitle, department: p.department, disabled:Boolean(p.disabledAt) }));
 }
-module.exports = { profiles, email, validEmail, validatePassword, credential, configure, authenticate, temporaryPassword, publicAccounts };
+module.exports = { profiles, email, validEmail, validatePassword, credential, configure, authenticate, disable, recover, changePassword, temporaryPassword, publicAccounts };
