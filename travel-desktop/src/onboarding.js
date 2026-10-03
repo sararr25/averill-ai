@@ -55,7 +55,7 @@ function classify(file, personnel) {
  const text = `${file.name}\n${file.text}`;
  if(personnel || /(?:team|roster|personnel|staff|employees|dipendenti)/i.test(file.name)) return { category: 'personnel', scope: 'private', department: 'Marketing', version: '1' };
  if (/(?:old.brief|archived|obsolete)/i.test(file.name) || /status:\s*(?:superseded|obsolete|archived)/i.test(file.text.slice(0, 600))) return { category: 'archive', scope: 'department', department: 'Marketing', version: '1' };
- if (/brand|company context|company overview|brandbook/i.test(file.name)) return { category: 'brand', scope: 'company', department: 'Company', version: '1' };
+ if (/brand|company context|company overview|brandbook/i.test(file.name)) return { category: 'brand', scope: 'company', department: 'Company', version: /version:\s*2/i.test(file.text) ? '2' : '1' };
  const department = /operations|trip.brief.procedure/i.test(text) ? 'Operations' : /employee.onboarding|people.handbook/i.test(text) ? 'People' : 'Marketing';
  return { category: 'knowledge', scope: 'department', department, version: /brief v2|version:\s*2/i.test(text) ? '2' : '1' };
 }

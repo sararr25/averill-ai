@@ -1,11 +1,11 @@
-# Elseweek onboarding and four account demo
+# Vamo onboarding and four account demo
 
 26 September 2026. All sample identities and sources are fictional. These are separate email/password accounts on one Mac; no online accounts, synchronization or invitation emails are provided.
 
 
 ## Prepared local demo accounts and services
 
-On this Mac, the existing Aurelia Demo workspace now provides four working logins: Demo Admin / alex@elseweek.example (Owner / CEO / admin), Maya Jensen / maya@elseweek.example (Marketing manager), Emma Larsen / emma@elseweek.example (Marketing strategy employee), Oscar Lind / oscar@elseweek.example (Content creator). Company name and original administrator ID are preserved. No existing password was reset. A timestamped pre-login workspace backup is adjacent to averill-workspace.json.
+On this Mac, the existing legacy Aurelia Demo workspace retains four working logins: Demo Admin / alex@elseweek.example (Owner / CEO / admin), Maya Jensen / maya@elseweek.example (Marketing manager), Emma Larsen / emma@elseweek.example (Marketing strategy employee), Oscar Lind / oscar@elseweek.example (Content creator). Company name and original administrator ID are preserved. No existing password was reset. A timestamped pre-login workspace backup is adjacent to averill-workspace.json.
 
 Actual emails/passwords are in separate documents under repository-root demo-login-documents, ignored by Git. Originals are in userData/Averill-login-documents. Open the owner document, then use its email/password on the packaged app sign-in screen. The owner can reopen the original folder from Account access. Never substitute /tmp synthetic test credentials.
 
@@ -17,19 +17,19 @@ For the prepared demo, sign in as owner and proceed to step 2. Existing roster e
 
 Quit an older running Averill and open the rebuilt app. In Setup, enter:
 
-- Company: Elseweek
+- Company: Vamo
 - Your name: Alex Holm
-- Work email: alex@elseweek.example
+- Work email: alex@vamo.example
 - A password of your choice, 10–128 characters
 
 Choose **Create company and sign in**. The owner is the administrator. If your older workspace already exists, select its administrator in the legacy role selector, then use **Account access → Enable owner login**. Existing people, sources and learning remain. Once enabled, use Sign out/Sign in instead of role switching.
 
 ## 2. Upload the company material together
 
-Choose **Add company files** and select the six files in `travel-desktop/demo-company/elseweek-intake/` (not this README):
+Choose **Add company files** and select the six files in `travel-desktop/demo-company/vamo-intake/` (not this README):
 
-- `elseweek-team.xlsx`: Maya, Emma and Oscar, their Marketing jobs and demo work emails.
-- `elseweek-brand-and-company.svg`: company-wide brand/company context, matching Elseweek's existing website palette/mark.
+- `vamo-team.xlsx`: Maya, Emma and Oscar, their Marketing jobs and demo work emails.
+- `vamo-brand-and-company.svg`: company-wide brand/company context, matching Vamo's existing website palette/mark.
 - `winter-escapes-campaign-v2.pdf`: campaign brief v2 and approved channel schedule.
 - `linkedin-campaign.md`: organic LinkedIn campaign requirements.
 - `operations-procedure.md`: Operations source.
@@ -49,10 +49,10 @@ Check the three person summaries. Expand a person to correct name, email, depart
 
 | Person | Email | Profile | Permissions |
 | --- | --- | --- | --- |
-| Alex Holm | alex@elseweek.example | Owner / CEO / admin | Company onboarding and accounts; company/department source approval |
-| Maya Jensen | maya@elseweek.example | Marketing manager | Marketing department source approval |
-| Emma Larsen | emma@elseweek.example | Marketing strategy employee | Marketing work and personal learning |
-| Oscar Lind | oscar@elseweek.example | Content creator | Marketing work and separate personal learning |
+| Alex Holm | alex@vamo.example | Owner / CEO / admin | Company onboarding and accounts; company/department source approval |
+| Maya Jensen | maya@vamo.example | Marketing manager | Marketing department source approval |
+| Emma Larsen | emma@vamo.example | Marketing strategy employee | Marketing work and personal learning |
+| Oscar Lind | oscar@vamo.example | Content creator | Marketing work and separate personal learning |
 
 Review the document summaries. Personnel records stay private to the owner. Brand context should be **Everyone in the company**, version 1. Campaign PDF should be Marketing, version 2; LinkedIn guidance Marketing, version 1. Operations/People documents stay in their own departments. Expand to correct a proposed scope/version.
 

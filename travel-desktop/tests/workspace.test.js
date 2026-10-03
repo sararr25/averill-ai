@@ -114,11 +114,11 @@ test('folder import copies supported nested files and leaves them pending', () =
 });
 
 
-test('Elseweek pack retains approval, exact versions and department visibility after restart', () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'elseweek-pack-'));
-  const pack = path.join(__dirname, '..', 'demo-company', 'elseweek');
+test('Vamo pack retains approval, exact versions and department visibility after restart', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'vamo-pack-'));
+  const pack = path.join(__dirname, '..', 'demo-company', 'vamo');
   try {
-    const data = workspace.create(root, 'Elseweek', 'Alex Holm');
+    const data = workspace.create(root, 'Vamo', 'Alex Holm');
     const admin = workspace.person(data);
     const leads = {}, employees = {};
     for (const dept of ['Marketing', 'Operations', 'People']) {
@@ -154,7 +154,7 @@ test('Elseweek pack retains approval, exact versions and department visibility a
       const visible = workspace.visibleSources(restored);
       assert.ok(visible.length >= 2);
       assert.ok(visible.every(item => item.department === dept));
-      assert.ok(visible.some(item => item.title === 'brand-and-company-context-v1.md'));
+      assert.ok(visible.some(item => item.title === 'brand-and-company-context-v2.md'));
       assert.equal(workspace.approvedSources(restored).some(item => item.id === old.id), false);
     }
     workspace.switchPerson(restored, admin.id);

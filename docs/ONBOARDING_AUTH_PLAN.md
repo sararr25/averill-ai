@@ -4,7 +4,7 @@
 
 ## Delivery sequence
 
-1. Read Excel (.xlsx), CSV, PDF and SVG with source provenance. Provide a mixed-format synthetic Elseweek intake folder, including a roster with real demo email addresses at the reserved `.example` domain. Preserve the older manual pack.
+1. Read Excel (.xlsx), CSV, PDF and SVG with source provenance. Provide a mixed-format synthetic Vamo intake folder, including a roster with real demo email addresses at the reserved `.example` domain. Preserve the older manual pack.
 2. Admin uploads files in one selection. Extract readable text locally. Parse clear roster rows deterministically; explicit Nebius analysis proposes people, company context and document department/scope/version. File text is data, never instructions. Every proposed person cites its source and evidence. Show unreadable, truncated, uncertain and duplicate entries rather than inventing data.
 3. Review screen lets the admin edit/exclude people and document assignments, confirm company context, choose approval and create accounts in bulk. Company-wide brand sources become a real company visibility scope. Roster files remain private to admin; do not expose personnel records as employee knowledge.
 4. Add separate account identity and job profiles. Marketing manager maps to lead; strategist/content creator map to separate employees; owner/admin is configured by the person creating the company, never inferred from an imported file. Implemented scope: separate local email/password accounts on the demo Mac. Online multi-device accounts remain outside this delivery. No emails/invitations are sent by this prototype.

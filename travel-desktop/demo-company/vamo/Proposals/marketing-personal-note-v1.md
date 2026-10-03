@@ -1,4 +1,4 @@
-# Elseweek — Personal marketing practice note
+# Vamo — Personal marketing practice note
 
 Version: 1. Owner: Emma Larsen, Marketing employee. Synthetic proposal, 26 September 2026.
 Private draft: not approved campaign policy.

@@ -1,4 +1,4 @@
-# Elseweek — Trip brief procedure
+# Vamo — Trip brief procedure
 
 Version: 1. Owner: Noah Berg, Operations lead. Synthetic demo procedure, 26 September 2026.
 Intended status: approved after workspace review. Department: Operations.

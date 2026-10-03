@@ -1,8 +1,8 @@
 # Averill product demo plan
 
-Decision record, 23 September 2026; implementation status updated 26 September 2026. The first specialized product path is marketing. Elseweek remains disposable sample data, not the product model. See [HANDOVER.md](HANDOVER.md) for verified behavior and remaining gates.
+Decision record, 23 September 2026; implementation status updated 26 September 2026. The first specialized product path is marketing. Vamo remains disposable sample data, not the product model. See [HANDOVER.md](HANDOVER.md) for verified behavior and remaining gates.
 
-Product correction, 28 September: Elseweek is a separate public-facing travel website, not an Averill app. Employee scenes should happen in actual Canva, LinkedIn, Instagram and email marketing tools. The floating Averill button and explicit external-window selection are the entry point. Supplied Electron editors are clearly labelled fallback fixtures. A selected window can now be observed locally every six seconds through Accessibility or OCR and checked against bounded approved rules. This does not establish field-aware monitoring, actual platform draft access, external editing, publishing or visual coaching. Public claim checks use a typed Tavily query, while approved company guidance uses company knowledge and optional Nebius.
+Product correction, 28 September: Vamo is a separate public-facing travel website, not an Averill app. Employee scenes should happen in actual Canva, LinkedIn, Instagram and email marketing tools. The floating Averill button and explicit external-window selection are the entry point. Supplied Electron editors are clearly labelled fallback fixtures. A selected window can now be observed locally every six seconds through Accessibility or OCR and checked against bounded approved rules. This does not establish field-aware monitoring, actual platform draft access, external editing, publishing or visual coaching. Public claim checks use a typed Tavily query, while approved company guidance uses company knowledge and optional Nebius.
 
 ## Buyer and employee journey
 
@@ -50,7 +50,7 @@ The intended demo is complete only when these paths survive app restart, role ac
 
 ## Video programme — company onboarding, guided work and weekly learning
 
-Updated 26 September 2026 following the owner’s direction. The opening is company-data onboarding across departments, rather than a presentation of the travel website. Canva demonstrates learning the tool. A weekly employee test closes the learning loop. Elseweek is the fictional customer; Averill remains the product.
+Updated 26 September 2026 following the owner’s direction. The opening is company-data onboarding across departments, rather than a presentation of the travel website. Canva demonstrates learning the tool. A weekly employee test closes the learning loop. Vamo is the fictional customer; Averill remains the product.
 
 ### Narrative
 
@@ -60,10 +60,10 @@ Show one employee’s marketing week after establishing that the company workspa
 
 | Time | Scene | Concrete screen action and outcome | Implementation boundary |
 | --- | --- | --- | --- |
-| 00:00–00:45 | Company and department onboarding | Administrator creates Elseweek and departments, adds people, imports a small synthetic source pack by department. Show company-wide brand guidance, a Marketing campaign brief and one Operations procedure. A lead approves a proposed source. Switch to the marketing employee and show their available context | Local accounts, bulk file onboarding, Nebius interpretation and source approval exist. Use the mixed-format Elseweek intake. Accounts are local to one Mac, not multi-device collaboration. Verify actual visibility rules instead of assuming access |
+| 00:00–00:45 | Company and department onboarding | Administrator creates Vamo and departments, adds people, imports a small synthetic source pack by department. Show company-wide brand guidance, a Marketing campaign brief and one Operations procedure. A lead approves a proposed source. Switch to the marketing employee and show their available context | Local accounts, bulk file onboarding, Nebius interpretation and source approval exist. Use the mixed-format Vamo intake. Accounts are local to one Mac, not multi-device collaboration. Verify actual visibility rules instead of assuming access |
 | 00:45–01:40 | Learn Canva while doing a real task | Employee shares a Canva window and asks “Help me turn this into a LinkedIn campaign visual.” Averill gives one step at a time: choose the agreed format, improve text hierarchy, align elements, then export. Employee performs the actions. Show one clarification and one confirmed learning step | The four-step guided lesson and learning records are implemented. Conversational tutoring and visual step verification remain future work. Selected-window observation reads accessible/visible text; it cannot reliably verify alignment, hidden layers or export settings. Validate each guidance source and observed state before recording |
 | 01:40–02:15 | Apply learning to a LinkedIn draft | Employee uses the creative and drafts a post. Averill helps apply approved tone/message and explains why a suggested change fits the brief. The employee makes the edit | LinkedIn-specific supplied editor and approved synthetic source pack are implemented. Explicit sharing checks the listed campaign requirements; it is not an external LinkedIn integration. Existing Social Publisher is Instagram; do not transfer its Reel date/disclosure rules to LinkedIn |
-| 02:15–02:50 | Prepare the newsletter | Employee selects audience and launch date. Averill highlights one mismatch, cites the current campaign source and explains the correction | Existing Email Studio supports the supplied campaign checks. Approved email is 15 October 2026 at 10:00 Europe/Copenhagen. Rehearse with coherent Elseweek sources |
+| 02:15–02:50 | Prepare the newsletter | Employee selects audience and launch date. Averill highlights one mismatch, cites the current campaign source and explains the correction | Existing Email Studio supports the supplied campaign checks. Approved email is 15 October 2026 at 10:00 Europe/Copenhagen. Rehearse with coherent Vamo sources |
 | 02:50–03:45 | Weekly employee practice | Open “Your week”, showing recorded activities and confirmed learning. Start a short personalised test: one Canva workflow question, one campaign audience decision and one practical copy exercise. Show an answer, explanation and a suggested next practice step | Confirmed activity history, weekly operation/source-version questions and reflection feedback are implemented. Campaign-audience assessment and automatic practical scoring are not. Use seeded synthetic records only if clearly labeled; do not describe them as automatically collected real history |
 | 03:45–04:00 | Close the loop | Show the next learning goal and Stop sharing. Close with the employee’s ability to work more independently with company context | A next-practice suggestion is implemented; editable long-term learning goals remain future work; the employee owns all work and publishing |
 
@@ -96,7 +96,7 @@ Version handover remains a strong optional scene: open brief v1, ask what change
 
 ### Preparation order
 
-1. Prepare a coherent Elseweek company pack across departments, with owners, visibility, approval and versions; retain the intentionally superseded campaign fixtures.
+1. Prepare a coherent Vamo company pack across departments, with owners, visibility, approval and versions; retain the intentionally superseded campaign fixtures.
 2. Rehearse actual onboarding, import, approval and employee visibility in the packaged app.
 3. Implement the learning-session record and employee “Your week” view, with employee review of recorded topics.
 4. Build a bounded Canva tutoring path; verify real capture, validated guidance, step handling, permission denial and Stop sharing. Current OCR alone does not satisfy this feature.
@@ -112,9 +112,9 @@ Onboarding establishes company and department context. The employee visibly lear
 
 The initial Learn flow is implemented: four-step Canva lesson with official references and help; confirmed session persistence; manual confirmed work records; source-linked weekly practice and feedback. The prototype can now demonstrate learning and a personalised weekly review using clearly identified synthetic test activity. Its tutoring is bounded and employee-confirmed. General conversation, visual verification of alignment/export, automatic work tracking and general LinkedIn integration remain outside the implemented path. See `LEARNING_IMPLEMENTATION_PLAN.md` and `HANDOVER.md` for checks.
 
-## Elseweek pack / LinkedIn update — 26 September 2026
+## Vamo pack / LinkedIn update — 26 September 2026
 
-Preparation steps for department pack and LinkedIn supplied editor are delivered. Import follows `travel-desktop/demo-company/elseweek/README.md` with explicit department, version, review and approval. Company-wide brand context is copied consistently into each department; no company-wide scope or authentication was added. The organic LinkedIn slot is 16 October, 09:00 Copenhagen, with its own landscape creative and CTA. The bounded editor checks five specific requirements, not general audience/copy reasoning. Canva capture/acceptance, richer weekly assessment and the full recording remain open; no work on those paths is included in this delivery.
+Preparation steps for department pack and LinkedIn supplied editor are delivered. Import follows `travel-desktop/demo-company/vamo/README.md` with explicit department, version, review and approval. Company-wide brand context is copied consistently into each department; no company-wide scope or authentication was added. The organic LinkedIn slot is 16 October, 09:00 Copenhagen, with its own landscape creative and CTA. The bounded editor checks five specific requirements, not general audience/copy reasoning. Canva capture/acceptance, richer weekly assessment and the full recording remain open; no work on those paths is included in this delivery.
 
 ## Updated onboarding and identity scene
 

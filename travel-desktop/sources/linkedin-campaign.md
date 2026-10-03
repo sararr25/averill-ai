@@ -1,17 +1,17 @@
-# Elseweek — Winter Escapes 2027 — LinkedIn campaign guidance
+# Vamo — Winter Escapes 2027 — LinkedIn campaign guidance
 
 Synthetic demo company policy. Version: 1. Status: APPROVED in the supplied campaign fixture.
 Owner: Maya Jensen, Marketing lead. Approved: 26 September 2026.
 Workspace import still requires explicit lead/admin approval; this text does not set workspace status.
 
 ## Channel and audience
-An organic post from the Elseweek company page, written for Denmark-based professionals considering a short European winter break. This is editorial context, not paid targeting. This fixture is not a paid creator endorsement and has no Instagram partnership-label requirement. Do not apply its requirements to other LinkedIn content.
+An organic post from the Vamo company page, written for Denmark-based professionals considering a short European winter break. This is editorial context, not paid targeting. This fixture is not a paid creator endorsement and has no Instagram partnership-label requirement. Do not apply its requirements to other LinkedIn content.
 
 ## Message and tone
 Lead with “Discover curated winter city breaks”. Describe Copenhagen, Vienna and Prague with calm, specific language. Do not claim “lowest prices guaranteed”; no price guarantee is approved. Avoid invented discounts, availability or booking guarantees. The supplied checks detect the price-guarantee phrase; broader tone and factual accuracy need human review.
 
 ## Call to action
-Include “Explore the winter collection”. The supplied editor saves local copy only; it does not publish, book or connect to LinkedIn. The Elseweek website is an independent local demonstration.
+Include “Explore the winter collection”. The supplied editor saves local copy only; it does not publish, book or connect to LinkedIn. The Vamo website is an independent local demonstration.
 
 ## Creative
 Use `winter-linkedin-landscape.svg`, 1200 × 627, for this campaign. The dimensions are a company demo choice, not a claim about LinkedIn platform requirements. The artwork is a supplied illustration adapted from the existing email hero. A Canva exercise can recreate its hierarchy and alignment; employee confirmation does not verify exported geometry.

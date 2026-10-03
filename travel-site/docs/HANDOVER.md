@@ -6,7 +6,7 @@ Updated 28 September 2026. Scope: the independent, fictional travel-company webs
 
 **Averill is the hackathon product:** an agent assistant for employees working with company information. **Vamo is the fictional travel company used to demonstrate it:** a consumer-facing brand and example customer. Vamo is never another name for Averill, and Averill is never the name of the travel agency. Do not put Averill's aperture, Petrol / Coral / Ice desktop styling, assistant language or navigation on Vamo's site. Do not put Vamo's wordmark, travel imagery, sea/cream/coral/fuchsia palette or editorial style on Averill's assistant UI. When both appear in one demo, identify them explicitly as separate products and surfaces.
 
-The older desktop fixtures, source pack, account documents and synthetic email addresses still say **Elseweek**. They were not renamed by the website rebrand. Treat Elseweek as a legacy fixture label, not a second current travel brand or an alias of Averill. A coordinated migration of desktop sources, fixtures, demo accounts, tests and onboarding data is still required before presenting a fully Vamo-named end-to-end demo. Preserve the intentional superseded brief v1 and old square creative through that migration.
+The shipped desktop fixtures, onboarding packs and new synthetic identities now use Vamo (3 October 2026). Existing persisted workspaces and credentials are not automatically rewritten; follow `../../docs/DEMO_MIGRATION.md`. The intentional historical brief and square creative are preserved.
 
 ## Approved Vamo direction
 
@@ -21,7 +21,7 @@ The older desktop fixtures, source pack, account documents and synthetic email a
 
 `index.html`, `styles.css` and `site.js` implement a responsive single-page website with a photographic hero, three destination cards and dialogs, creator-style editorial previews, journal dialogs, and a local downloadable trip brief. The trip form runs in the browser. There is no booking, payment, account, enquiry backend, Instagram connection or LinkedIn connection.
 
-The ferry hero (`assets/photos/vamo-friends-ferry.png`) is AI-generated concept imagery. It does not depict a real Vamo trip or real creator. The Copenhagen, Vienna and Prague images are locally bundled third-party photographs credited in `docs/ASSETS.md` and the site credits dialog. The creator-style tiles are editorial previews, not actual posts, partnerships or engagement data. Populating the Instagram and LinkedIn simulators with Vamo content is a separate next phase.
+The ferry hero (`assets/photos/vamo-friends-ferry.png`) is AI-generated concept imagery. It does not depict a real Vamo trip or real creator. The Copenhagen, Vienna and Prague images are locally bundled third-party photographs credited in `docs/ASSETS.md` and the site credits dialog. The creator-style tiles are editorial previews, not actual posts, partnerships or engagement data. The separate `demo-social-simulator` already contains local Vamo Instagram, LinkedIn and Brevo-inspired content; it is not a platform integration.
 
 ## Run and review
 
@@ -38,10 +38,10 @@ Verification performed in this local pass: `node --check` on `site.js` and `serv
 ## Next work
 
 1. Review the live site visually at desktop and mobile sizes with the owner; adjust the creative if requested.
-2. Plan the coordinated Elseweek-to-Vamo migration in the Averill desktop demo before changing fixtures. Inventory source IDs, campaign wording, SVG assets, `.example` accounts, local storage namespaces, onboarding pack, tests, prepared local workspace and packaged app. Do not rewrite persisted credentials or intentional historical assets casually.
-3. Only after that migration is agreed, build fictional Vamo Instagram and LinkedIn content in the respective simulators. Keep synthetic content visibly fictional and separate paid Instagram rules from organic LinkedIn rules.
+2. For an existing workspace, explicitly import/review/reapprove the shipped Vamo pack; preserve legacy credentials and intentionally historical material.
+3. Rehearse the separate Vamo Instagram/LinkedIn/Brevo simulator, including draft persistence, image uploads and local-only scheduling.
 4. Recheck asset provenance, interaction, accessibility and responsive behavior before any public deployment.
 
 ## Repository and publication status
 
-The Vamo website implementation was committed locally as `35228aa` on `main`. A push to `origin/main` was rejected by automatic approval review because building the site did not authorize remote publication to the main branch. Check the current Git state before publishing; this handover does not claim the remote is updated. Averill's central handover remains `docs/HANDOVER.md` at repository root.
+The Vamo website implementation was committed locally as `35228aa` on `main`. That initial push was blocked; the owner authorized release on 3 October and milestone 1 pushed the site commits to GitHub main. Averill's central handover remains `docs/HANDOVER.md` at repository root.

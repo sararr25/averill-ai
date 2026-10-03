@@ -243,7 +243,7 @@ function renderWorkspace() {
   if (!data.configured) {
     const form = node('form'); form.className = 'workspace-form';
     form.append(node('h3', 'Create your company and owner account'), node('p', 'Start with your account, then import existing company files to add the team.'));
-    const company = onboardingField(form, 'Company name', ''); company.placeholder = 'Elseweek'; company.required = true; company.maxLength = 120;
+    const company = onboardingField(form, 'Company name', ''); company.placeholder = 'Vamo'; company.required = true; company.maxLength = 120;
     const admin = onboardingField(form, 'Your name', ''); admin.required = true; admin.maxLength = 120;
     const email = onboardingField(form, 'Your work email', '', 'email'); email.required = true; email.autocomplete = 'username';
     const password = onboardingField(form, 'Create a password', '', 'password'); password.required = true; password.minLength = 10; password.maxLength = 128; password.autocomplete = 'new-password';

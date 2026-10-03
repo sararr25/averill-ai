@@ -10,7 +10,7 @@ The remaining acceptance gates are substantial: no browser DOM extension or offi
 
 ## Product contract
 
-- **Elseweek** is the fictional demonstration company. Its independent, public-facing website lives in `travel-site/`. It is not an Averill editor or employee application.
+- **Vamo** is the fictional demonstration company. Its independent, public-facing website lives in `travel-site/`. It is not an Averill editor or employee application.
 - **Averill** is the Nvidia–Nebius hackathon product. It learns approved company information and helps employees while they work in their existing browser and desktop tools. Email, LinkedIn and Instagram drafts stay in those tools. Employees own edits, sends and publication.
 - The small Ask Averill control must remain reachable. A person chooses what work Averill may observe and can stop sharing immediately. If a service offers a suitable authorized integration, use it; otherwise derive context from the selected live tool through a browser or OS adapter. OCR is a fallback for visible text, not a substitute for document structure or visual proof.
 - Route company guidance and tool coaching to approved, employee-visible knowledge and Nebius when the company and person have enabled it; tool instructions need vetted documentation. Route public factual research to Tavily with a preview of the exact public query. Never send company documents or a raw screenshot to Tavily. Show which source supports each actionable suggestion and when evidence is insufficient.
@@ -18,13 +18,13 @@ The remaining acceptance gates are substantial: no browser DOM extension or offi
 
 ## Historical starting point before points 1–3
 
-At commit `e01126f`, Elseweek already has a separate local website. Averill has local accounts and approval-controlled company sources; an optional source-constrained Nebius answer; Tavily public search; a floating Ask Averill window; explicit selection of external windows; one requested OCR frame; a company question form; and a typed public fact-check. The 35-test suite and isolated Electron smoke passed. The external flow has **no continuous observation, field-aware editor integration, generalized source-grounded coaching, verified visual understanding, automatic external action, or real multi-device company service**. No real external capture or live provider request was verified in that change.
+At commit `e01126f`, Vamo already has a separate local website. Averill has local accounts and approval-controlled company sources; an optional source-constrained Nebius answer; Tavily public search; a floating Ask Averill window; explicit selection of external windows; one requested OCR frame; a company question form; and a typed public fact-check. The 35-test suite and isolated Electron smoke passed. The external flow has **no continuous observation, field-aware editor integration, generalized source-grounded coaching, verified visual understanding, automatic external action, or real multi-device company service**. No real external capture or live provider request was verified in that change.
 
 ## Delivery sequence
 
 ### 0. Define the demo acceptance cases and source authority
 
-**Build:** Specify one end-to-end Elseweek task in each of: an email marketing site such as Substack, LinkedIn, Instagram, Canva, a document/file handover, Operations, and People. For every task, record the real tool, account used for the demo, observable field or state, approved Elseweek source/version, expected guidance, correction the employee makes, and the stop-sharing outcome. Use synthetic accounts/content. Decide which marketing platform can actually be tested; do not design around an assumed API.
+**Build:** Specify one end-to-end Vamo task in each of: an email marketing site such as Substack, LinkedIn, Instagram, Canva, a document/file handover, Operations, and People. For every task, record the real tool, account used for the demo, observable field or state, approved Vamo source/version, expected guidance, correction the employee makes, and the stop-sharing outcome. Use synthetic accounts/content. Decide which marketing platform can actually be tested; do not design around an assumed API.
 
 **Acceptance:** Each case has a falsifiable before/after check. The People case uses only the employee's authorized sources. The public-claim case has a separate external-source verdict and does not turn web results into company policy.
 
@@ -46,7 +46,7 @@ At commit `e01126f`, Elseweek already has a separate local website. Averill has 
 
 **Build:** In `src/workspace.js`, `workspace-answer.js` and a new task-review module, separate (1) approved company requirements, (2) observed work, (3) public facts and (4) tool instructions. Retrieve by department, person, status, version and task; exclude pending, revoked, conflicting, restricted or non-consented AI sources. Define task schemas for claims, audience, CTA, dates, creative, disclosure, file version and procedure steps. Use deterministic checks where an exact rule exists, and Nebius for interpretation/coaching with a structured response that identifies the observed excerpt, proposed change, exact company citation and uncertainty. Validate citations against source text and recheck source authorization immediately before display. Do not pass OCR text into a generic company Q&A prompt and treat the returned extract as a complete review.
 
-**Acceptance:** A supported wrong claim in a real email draft produces a relevant suggestion and exact current Elseweek citation. Correcting it clears or updates the suggestion. An unsupported claim receives uncertainty, not a fabricated citation. Revoking or superseding the source invalidates the suggestion. A model failure falls back to an honest local result.
+**Acceptance:** A supported wrong claim in a real email draft produces a relevant suggestion and exact current Vamo citation. Correcting it clears or updates the suggestion. An unsupported claim receives uncertainty, not a fabricated citation. Revoking or superseding the source invalidates the suggestion. A model failure falls back to an honest local result.
 
 ### 4. Deliver the employee interaction loop
 
@@ -62,9 +62,9 @@ At commit `e01126f`, Elseweek already has a separate local website. Averill has 
 
 ### 6. Cover the work domains with one engine and specific adapters
 
-**Marketing:** Email marketing copy and audience, organic LinkedIn, paid Instagram creative/disclosure/schedule, Canva design guidance. Keep platform rules separate from Elseweek campaign rules and verify current platform rules against official sources when needed.
+**Marketing:** Email marketing copy and audience, organic LinkedIn, paid Instagram creative/disclosure/schedule, Canva design guidance. Keep platform rules separate from Vamo campaign rules and verify current platform rules against official sources when needed.
 
-**Operations:** Trip brief handover, current procedure/version, approved destination facts and required steps. Guidance appears in the employee's document or workflow tool; it does not turn Elseweek's consumer site into an operations app.
+**Operations:** Trip brief handover, current procedure/version, approved destination facts and required steps. Guidance appears in the employee's document or workflow tool; it does not turn Vamo's consumer site into an operations app.
 
 **People:** Onboarding and internal questions from employee-visible People sources; prevent access to private personnel material. Provide process help without making employment decisions or revealing another person's records.
 
@@ -84,7 +84,7 @@ At commit `e01126f`, Elseweek already has a separate local website. Averill has 
 
 ## Release gates and order of proof
 
-1. **Hackathon vertical slice:** Elseweek website shown as company context; admin approves sources; an employee writes in a real external email tool; Averill observes the selected work after a pause, gives one cited correction; the employee fixes it; public fact-check runs through Tavily; Stop sharing clears context. Repeat a smaller scene in LinkedIn or Instagram and Canva.
+1. **Hackathon vertical slice:** Vamo website shown as company context; admin approves sources; an employee writes in a real external email tool; Averill observes the selected work after a pause, gives one cited correction; the employee fixes it; public fact-check runs through Tavily; Stop sharing clears context. Repeat a smaller scene in LinkedIn or Instagram and Canva.
 2. **Generalization:** Add the remaining marketing channel, Operations and People cases through the same task engine. Test account and source visibility, conflicts, offline/permission failures, source revocation, prompt injection in observed pages and no-send boundaries.
 3. **Production readiness:** Complete milestone 8 and real-device/provider verification. Do not describe the hackathon slice as secure multi-company deployment.
 

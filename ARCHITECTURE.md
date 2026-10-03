@@ -1,8 +1,10 @@
 # Averill system design
 
+Current update, 3 October 2026: shipped packs/editors use Vamo, new person-scoped drafts use vamo:v2, and old persisted credentials/approved copies are unchanged. See docs/DEMO_MIGRATION.md. Legacy company labels below describe prior versions.
+
 ## Purpose and status
 
-This document describes the implemented hackathon prototype and the boundaries for extending it. Vamo is the separate fictional travel company with a standalone website in `travel-site/`. Averill is the Electron companion for employees working in their usual tools. A floating Ask Averill button opens the assistant; the user can select one external app or browser window for a one-time read or explicit six-second local observation. macOS Accessibility text is preferred, with visible-text OCR fallback. The four supplied editor windows and source pack still use the legacy Elseweek label and remain synthetic fixtures. Vamo and Averill never share a name, logo or design system; the website palette and editorial travel treatment do not enter the assistant UI. Browser DOM fields and platform APIs remain future adapters.
+This document describes the implemented hackathon prototype and the boundaries for extending it. Vamo is the separate fictional travel company with a standalone website in `travel-site/`. Averill is the Electron companion for employees working in their usual tools. A floating Ask Averill button opens the assistant; the user can select one external app or browser window for a one-time read or explicit six-second local observation. macOS Accessibility text is preferred, with visible-text OCR fallback. The four supplied editor windows and source pack use Vamo and remain synthetic fixtures. Vamo and Averill never share a name, logo or design system; the website palette and editorial travel treatment do not enter the assistant UI. Browser DOM fields and platform APIs remain future adapters.
 
 ## Requirements
 
@@ -98,7 +100,7 @@ Electron `desktopCapturer` lists windows, excluding Averill-owned window IDs. Th
 - Structured work-window state is reliable but does not prove real desktop perception.
 - Static local sources enable transparent citations but do not handle company-wide retrieval or live document changes.
 - AI citations are checked for known IDs, not full factual entailment. Claims remain reviewable by the employee.
-- The assistant and supplied Elseweek work windows use Petrol / Coral / Ice, bundled fonts and matching outline icons. The Review pane has a focused finding and source hierarchy; operational controls are in Work.
+- The assistant and supplied Vamo work windows use Petrol / Coral / Ice, bundled fonts and matching outline icons. The Review pane has a focused finding and source hierarchy; operational controls are in Work.
 
 ## Extension sequence
 
@@ -114,11 +116,11 @@ Week keys are Monday-based in Europe/Copenhagen. Only confirmed current-week ses
 
 Learn is offline and stores no screenshots. The official guide opens only on an employee action. It neither connects to Canva’s document API nor proves element alignment. Work can read once or poll a selected window locally; this is separate from verified Canva learning. Separate local accounts provide application-level person isolation; they do not provide synchronized authenticated accounts across devices.
 
-## Elseweek department pack and organic LinkedIn — 26 September 2026
+## Vamo department pack and organic LinkedIn — 26 September 2026
 
-`demo-company/elseweek/` is a synthetic manual-onboarding pack. Brand context is duplicated identically per department because source scope remains private/department. Admin imports accept a chosen department and version. Main-process workspace logic rejects non-admin imports to another department. Textual APPROVED does not approve an imported source. Imported company source records still drive workspace answers and learning evidence; they do not control static supplied-window findings.
+`demo-company/vamo/` is a synthetic manual-onboarding pack. Brand context is duplicated identically per department because source scope remains private/department. Admin imports accept a chosen department and version. Main-process workspace logic rejects non-admin imports to another department. Textual APPROVED does not approve an imported source. Imported company source records still drive workspace answers and learning evidence; they do not control static supplied-window findings.
 
-`linkedin` is a fourth work kind, validated by the same sender/Share boundary as email/social/handover. Its source ID `linkedin` resolves to `linkedin-campaign.md`; `linkedinAsset` resolves to `winter-linkedin-landscape.svg`. Its deterministic rules check the campaign's specific claim, editorial audience, visual, CTA and planned date/time. No Instagram disclosure/partnership rule is used for that organic fixture. Source-guidance tone needs human review beyond those checks. The visual derives from the existing supplied illustration. Local drafts now use `elseweek:v1:<kind>`; legacy `aurelia:<kind>` data is left untouched. External-window selection excludes LinkedIn Draft as another supplied window.
+`linkedin` is a fourth work kind, validated by the same sender/Share boundary as email/social/handover. Its source ID `linkedin` resolves to `linkedin-campaign.md`; `linkedinAsset` resolves to `winter-linkedin-landscape.svg`. Its deterministic rules check the campaign's specific claim, editorial audience, visual, CTA and planned date/time. No Instagram disclosure/partnership rule is used for that organic fixture. Source-guidance tone needs human review beyond those checks. The visual derives from the existing supplied illustration. Local drafts now use `vamo:v1:<kind>`; legacy `aurelia:<kind>` data is left untouched. External-window selection excludes LinkedIn Draft as another supplied window.
 
 ## Account and onboarding architecture
 

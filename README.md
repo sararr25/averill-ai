@@ -2,9 +2,9 @@
 
 Averill is a source-grounded company agent assistant for people working across applications. The employee chooses what to share. Averill points out relevant inconsistencies after a field edit or asset selection, explains the issue, and links to the approved source. The employee decides what to change and whether to publish.
 
-This repository contains an **Electron hackathon prototype**, a local company onboarding path, its Elseweek sample campaign and department source pack, a Canva tutor and weekly learning flow, the Vamo travel website, separate design systems, and handover documentation. Vamo is the fictional customer brand, never Averill's product name or style. Existing desktop fixtures still use the legacy Elseweek label.
+This repository contains an **Electron hackathon prototype**, a local company onboarding path, its Vamo sample campaign and department source pack, a Canva tutor and weekly learning flow, the Vamo travel website, separate design systems, and handover documentation. Vamo is the fictional customer brand, never Averill's product name or style. Shipped desktop fixtures use Vamo; existing persisted workspaces retain their legacy identities.
 
-Vamo is the independent fictional travel company with its own website. The desktop demo still carries legacy Elseweek fixture names. Employees create email, LinkedIn, Instagram, design and other work in their usual tools. Averill is the companion: its floating button opens help, shows observation status and can stop sharing. An employee can choose one external window for a local read or six-second observation, then check bounded approved company rules against the visible text. The supplied Electron editors remain hackathon test fixtures.
+Vamo is the independent fictional travel company with its own website. The shipped desktop fixtures and onboarding pack use Vamo. Employees create email, LinkedIn, Instagram, design and other work in their usual tools. Averill is the companion: its floating button opens help, shows observation status and can stop sharing. An employee can choose one external window for a local read or six-second observation, then check bounded approved company rules against the visible text. The supplied Electron editors remain hackathon test fixtures.
 
 ## Start here
 
@@ -47,15 +47,15 @@ Never commit `.env.local` or a real API key. The app reads the local `.env.local
 
 License: [MIT](LICENSE).
 
-## Elseweek onboarding and LinkedIn
+## Vamo onboarding and LinkedIn
 
-The [company pack](travel-desktop/demo-company/elseweek/README.md) provides Marketing, Operations and People documents, fictional people and explicit import/approval instructions. Setup lets administrators select the import department and source version. Department brand copies provide consistent context without claiming a company-wide authorization scope.
+The [company pack](travel-desktop/demo-company/vamo/README.md) provides Marketing, Operations and People documents, fictional people and explicit import/approval instructions. Setup lets administrators select the import department and source version. Department brand copies provide consistent context without claiming a company-wide authorization scope.
 
 Open **LinkedIn Draft** in Work, then Share. Load the incoming draft to review five source-backed campaign mismatches; correct copy, audience, visual and planned date/time. Save is local only. This is an organic company-post fixture with its own [approved guidance](travel-desktop/sources/linkedin-campaign.md), not a LinkedIn integration. Supplied checks remain independent of imported workspace approval.
 
 ## Smooth onboarding and four local accounts
 
-Use [the updated onboarding tutorial](docs/ONBOARDING_TUTORIAL.md). Create your owner account, upload the mixed-format [intake pack](travel-desktop/demo-company/elseweek-intake/README.md), optionally let Nebius interpret extracted text, review the people/scopes/versions and confirm once. This creates Marketing manager, Marketing strategy employee and Content creator accounts in bulk with generated passwords saved in local login documents. Company brand guidance supports company-wide visibility; personnel files stay private to admin. The accounts are local to one Mac, not an online/synchronized service.
+Use [the updated onboarding tutorial](docs/ONBOARDING_TUTORIAL.md). Create your owner account, upload the mixed-format [intake pack](travel-desktop/demo-company/vamo-intake/README.md), optionally let Nebius interpret extracted text, review the people/scopes/versions and confirm once. This creates Marketing manager, Marketing strategy employee and Content creator accounts in bulk with generated passwords saved in local login documents. Company brand guidance supports company-wide visibility; personnel files stay private to admin. The accounts are local to one Mac, not an online/synchronized service.
 
 ## Executable and development continuation
 
@@ -65,7 +65,7 @@ Start future development from `docs/HANDOVER.md`, then `AGENTS.md`, `PROJECT.md`
 
 ## Prepared local demo accounts and services
 
-On this Mac, the existing Aurelia Demo workspace now provides four working logins: Demo Admin / alex@elseweek.example (Owner / CEO / admin), Maya Jensen / maya@elseweek.example (Marketing manager), Emma Larsen / emma@elseweek.example (Marketing strategy employee), Oscar Lind / oscar@elseweek.example (Content creator). Company name and original administrator ID are preserved. No existing password was reset. A timestamped pre-login workspace backup is adjacent to averill-workspace.json.
+On this Mac, the existing legacy Aurelia Demo workspace retains four working logins: Demo Admin / alex@elseweek.example (Owner / CEO / admin), Maya Jensen / maya@elseweek.example (Marketing manager), Emma Larsen / emma@elseweek.example (Marketing strategy employee), Oscar Lind / oscar@elseweek.example (Content creator). Company name and original administrator ID are preserved. No existing password was reset. A timestamped pre-login workspace backup is adjacent to averill-workspace.json.
 
 Actual emails/passwords are in separate documents under repository-root demo-login-documents, ignored by Git. Originals are in userData/Averill-login-documents. Open the owner document, then use its email/password on the packaged app sign-in screen. The owner can reopen the original folder from Account access. Never substitute /tmp synthetic test credentials.
 

@@ -10,13 +10,13 @@ const documents = require('../src/account-documents');
 test('four login documents survive restart without leaking credentials into workspace snapshots', async () => {
  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'averill-login-documents-'));
  try {
-  const data = workspace.create(root, 'Elseweek', 'Alex Holm');
+  const data = workspace.create(root, 'Vamo', 'Alex Holm');
   const entries = [];
   for (const [profile, email, name] of [
-   ['owner', 'alex@elseweek.example', 'Alex Holm'],
-   ['marketing_manager', 'maya@elseweek.example', 'Maya Jensen'],
-   ['marketing_strategy', 'emma@elseweek.example', 'Emma Larsen'],
-   ['content_creator', 'oscar@elseweek.example', 'Oscar Lind'],
+   ['owner', 'alex@vamo.example', 'Alex Holm'],
+   ['marketing_manager', 'maya@vamo.example', 'Maya Jensen'],
+   ['marketing_strategy', 'emma@vamo.example', 'Emma Larsen'],
+   ['content_creator', 'oscar@vamo.example', 'Oscar Lind'],
   ]) {
    const person = profile === 'owner' ? workspace.person(data) : workspace.addPerson(data, name, accounts.profiles[profile].role, 'Marketing');
    const password = accounts.temporaryPassword();

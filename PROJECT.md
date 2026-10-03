@@ -1,14 +1,16 @@
 # Averill project
 
+Current update, 3 October 2026: shipped source packs and fixtures use Vamo; old persisted credentials and source approvals remain unchanged. See docs/DEMO_MIGRATION.md. Earlier state descriptions below are historical until reconciled with the current milestone ledger.
+
 Updated 28 September 2026. This is the canonical product brief; [docs/HANDOVER.md](docs/HANDOVER.md) is the current execution handover for the public `averill-ai` repository.
 
 ## What Averill is
 
 Averill is a standalone company agent assistant that helps an employee keep work aligned with current, approved company information. It watches only work the employee explicitly shares, notices a relevant problem at a natural pause after an edit or selection, and gives a concise correction with a source the employee can inspect. Employees can also ask where to find files, what changed between versions, and what copy or schedule is approved.
 
-The product identity is **Averill**. **Vamo** is the fictional travel-company brand used on the independent website. Their names, logos, visual styles and interfaces must never be shared. The current desktop campaign documents, accounts and work windows still carry the legacy **Elseweek** label; they are test fixtures, not Averill branding or proof of a completed Vamo migration. Product copy, demo content, and developer documentation are in English.
+The product identity is **Averill**. **Vamo** is the fictional travel-company brand used on the independent website. Their names, logos, visual styles and interfaces must never be shared. Current shipped campaign documents, new-demo accounts and work windows use Vamo; existing local accounts/imported copies retain their previous identity. Product copy, demo content, and developer documentation are in English.
 
-**Product boundary, corrected 28 September:** employees create and edit email, LinkedIn, Instagram, design and other work in the tools they already use. Averill is a separate companion with a floating button. A person chooses one external window for a local read or six-second observation; a bounded task review compares its text with approved company sources, with optional consented Nebius suggestions. Public fact-checks use Tavily with only the public question the employee types. Vamo has its own website in `travel-site/`; it is the example company, not an Averill work app. The supplied desktop work windows remain Elseweek-labeled legacy fixtures. The four built-in editors remain reproducible hackathon fixtures, not the main employee workflow.
+**Product boundary, corrected 28 September:** employees create and edit email, LinkedIn, Instagram, design and other work in the tools they already use. Averill is a separate companion with a floating button. A person chooses one external window for a local read or six-second observation; a bounded task review compares its text with approved company sources, with optional consented Nebius suggestions. Public fact-checks use Tavily with only the public question the employee types. Vamo has its own website in `travel-site/`; it is the example company, not an Averill work app. The supplied desktop work windows are Vamo-labeled synthetic fixtures. The four built-in editors remain reproducible hackathon fixtures, not the main employee workflow.
 
 ## Why this exists
 
@@ -16,7 +18,7 @@ Campaign work crosses briefs, email, social scheduling, and handovers. A superse
 
 ## Demo narrative
 
-The current website brand is Vamo. The still-unmigrated synthetic desktop company is Elseweek. Its campaign is **Winter Escapes 2027**. Brief v2 was approved on 22 September 2026; brief v1 and its square creative are intentionally retained as superseded material.
+The current website brand is Vamo. The shipped synthetic desktop company is Vamo. Its campaign is **Winter Escapes 2027**. Brief v2 was approved on 22 September 2026; brief v1 and its square creative are intentionally retained as superseded material.
 
 | Chapter | Employee does | Averill finds | Source |
 | --- | --- | --- | --- |
@@ -35,11 +37,11 @@ Approved launch email: 15 October 2026 at 10:00 Copenhagen time. Approved paid c
 - Admins can disable/reset another non-owner local account; a signed-in person can change their password. Eligible local source copies and personal Learn history can be deleted. Temporary onboarding files are cleaned after replacement or successful application. These controls do not provide a hosted identity system, encrypted company knowledge store or signed distribution.
 
 - Learn provides four-step Canva practice, confirmed activity history and current-week questions/reflections. See the learning implementation section below.
-- Vamo has an independent local consumer website in `travel-site/`; desktop fixture wording and assets still use Elseweek. The old square remains deliberately historical.
+- Vamo has an independent local consumer website in `travel-site/`; current desktop fixture wording and assets also use Vamo. The old square remains deliberately historical.
 - Electron opens an independent Averill window and four separate supplied work windows: Email Studio, LinkedIn Draft, Social Publisher, and Campaign Files.
 - The employee opens and explicitly shares each work window. Work windows send structured field state via Electron IPC, but findings are produced only for shared windows. Checks run after blur or selection change. Closing or unsharing stops findings.
 - Deterministic rules detect the supplied campaign problems. Findings cite real local source files that can be opened.
-- Campaign questions use constrained local source lookup by default. With a demo window shared, Review uses the fixed Elseweek source pack; otherwise it uses visible approved company sources. Nebius AI is optional and user-enabled. Responses without valid source IDs fall back to a local answer.
+- Campaign questions use constrained local source lookup by default. With a demo window shared, Review uses the fixed Vamo source pack; otherwise it uses visible approved company sources. Nebius AI is optional and user-enabled. Responses without valid source IDs fall back to a local answer.
 - The assistant now applies the approved colors, font families, aperture, outline icons, focused Review hierarchy and bottom question composer. Work controls, research and setup use separate tabs. The reference image remains a visual specification; the app uses separate desktop windows.
 - A live Nebius check on 23 September 2026 returned the approved assets and citations. The automated tests cover all four supplied workflows, source existence, unsupported questions, and model citation validation. These checks do not establish behavior with arbitrary external apps.
 - A local company workspace can now be created on one Mac. An administrator adds people; the role switcher demonstrates administrator, department lead, and employee permissions on that same computer. It is retained only for legacy workspaces until owner login is activated. New workspaces use distinct local accounts; no multi-device synchronization is provided.
@@ -47,7 +49,7 @@ Approved launch email: 15 October 2026 at 10:00 Copenhagen time. Approved paid c
 - Markdown, plain text, CSV, JSON, and SVG text is indexed locally. On macOS, PDF text and image OCR use a local Swift helper; an unreadable file is marked as such. Imported Canva exports can be opened and their extracted text reviewed. This is not structural Canva document access or full visual analysis.
 - The Work tab includes a company marketing draft review path. With explicit consent, relevant approved source text and a draft are sent to Nebius. The Review composer answers questions about the shared synthetic campaign from its fixed source pack; when no demo window is shared it uses the company workspace. A separate Research tab calls Tavily for a user-entered public query only. Tavily results are not company-approved sources.
 - One external browser/app window can be selected for an Accessibility or OCR read, then polled locally every six seconds until Pause/Stop. The current code does not infer design geometry or inspect hidden fields. macOS Screen Recording permission is required for OCR.
-- The Averill assistant and supplied Elseweek work windows use the approved Petrol / Coral / Ice color system and bundled Geologica, Spline Sans, and Fragment Mono font packages. The social creative preview renders the actual supplied SVG asset.
+- The Averill assistant and supplied Vamo work windows use the approved Petrol / Coral / Ice color system and bundled Geologica, Spline Sans, and Fragment Mono font packages. The social creative preview renders the actual supplied SVG asset.
 
 ## Explicit non-goals for this prototype
 
@@ -57,7 +59,7 @@ No arbitrary-window surveillance, external app control, automatic edit, email se
 
 | Decision | Reason and consequence |
 | --- | --- |
-| Averill is the agent product; Vamo is the fictional travel brand; Elseweek is a legacy desktop fixture label | Names, logos, palettes and UI styles stay separate. Desktop renaming requires a coordinated migration. |
+| Averill is the agent product; Vamo is the fictional travel brand; Elseweek is a legacy persisted-workspace label | Names, logos, palettes and UI styles stay separate. Shipped sources are migrated; persisted account/data migration requires explicit review. |
 | Standalone desktop window | The employee can see the agent beside the work, across multiple work contexts. |
 | Explicit per-window sharing | Sharing is visible and reversible; no implied background surveillance. |
 | Feedback after completed field edit or selection | Corrections arrive at a useful moment without interrupting typing. |
@@ -96,11 +98,11 @@ The 28 September UX pass makes the shared demo context explicit in Review, adds 
 
 The Learn area adds an offline, bounded Canva tutor (selection, Position, alignment, grouping), contextual help and official tool references. The employee performs and confirms each step. Owner-scoped sessions persist in the local company workspace. Employees can record other confirmed Canva/LinkedIn/newsletter practice and link visible approved sources. Weekly practice uses the current Europe/Copenhagen week, generates operation questions and activity reflections, and explains answers. Source/version questions require still-approved, visible, non-conflicting evidence. The practical exercise is self-confirmed, not visually assessed; no mastery score or manager evaluation is provided. This does not establish general conversational Canva tutoring or automatic activity tracking. See `docs/LEARNING_IMPLEMENTATION_PLAN.md` for plan and verification.
 
-## Elseweek and LinkedIn delivery — 26 September 2026
+## Vamo and LinkedIn delivery — 26 September 2026
 
-The coherent synthetic company pack is in `travel-desktop/demo-company/elseweek/`, with Marketing, Operations and People, shared brand copies, owners, versions, a private proposal and an archived v1. Follow its README for imports: current campaign brief at metadata version 2, other documents at version 1. An admin selects department/version; non-admin imports are limited to their own department. Review and approval remain explicit.
+The coherent synthetic company pack is in `travel-desktop/demo-company/vamo/`, with Marketing, Operations and People, shared brand copies, owners, versions, a private proposal and an archived v1. Follow its README for imports: current campaign brief at metadata version 2, other documents at version 1. An admin selects department/version; non-admin imports are limited to their own department. Review and approval remain explicit.
 
-LinkedIn Draft is a fourth supplied window with organic company-post copy, editorial audience, asset, date/time, source action and local Save. Explicit Share enables checks for the unapproved price phrase, wrong audience, wrong creative, missing CTA and incorrect campaign slot. Planned LinkedIn slot is 16 October 2026, 09:00 Europe/Copenhagen. Guidance is synthetic company policy, not platform rules. Existing email and paid Instagram dates remain as previously approved. Current asset branding is Elseweek; the superseded square remains unchanged. Old Aurelia local draft keys are preserved and not loaded into the new Elseweek draft namespace.
+LinkedIn Draft is a fourth supplied window with organic company-post copy, editorial audience, asset, date/time, source action and local Save. Explicit Share enables checks for the unapproved price phrase, wrong audience, wrong creative, missing CTA and incorrect campaign slot. Planned LinkedIn slot is 16 October 2026, 09:00 Europe/Copenhagen. Guidance is synthetic company policy, not platform rules. Existing email and paid Instagram dates remain as previously approved. Current asset branding is Vamo; the superseded square remains unchanged. Old Aurelia local draft keys are preserved and not loaded into the new Vamo draft namespace.
 
 Imported sources do not drive the supplied deterministic editor findings. The four fixtures cite the static pack; unshared company questions use visible approved workspace sources. No external LinkedIn connection, Canva export integration, full tone assessment or publishing was added.
 
@@ -110,7 +112,7 @@ The later owner request adds an owner email/password account, batch file intake,
 
 ## Prepared local demo accounts and services
 
-On this Mac, the existing Aurelia Demo workspace now provides four working logins: Demo Admin / alex@elseweek.example (Owner / CEO / admin), Maya Jensen / maya@elseweek.example (Marketing manager), Emma Larsen / emma@elseweek.example (Marketing strategy employee), Oscar Lind / oscar@elseweek.example (Content creator). Company name and original administrator ID are preserved. No existing password was reset. A timestamped pre-login workspace backup is adjacent to averill-workspace.json.
+On this Mac, the existing Aurelia Demo workspace now provides four working logins: Demo Admin / alex@vamo.example (Owner / CEO / admin), Maya Jensen / maya@vamo.example (Marketing manager), Emma Larsen / emma@vamo.example (Marketing strategy employee), Oscar Lind / oscar@vamo.example (Content creator). Company name and original administrator ID are preserved. No existing password was reset. A timestamped pre-login workspace backup is adjacent to averill-workspace.json.
 
 Actual emails/passwords are in separate documents under repository-root demo-login-documents, ignored by Git. Originals are in userData/Averill-login-documents. Open the owner document, then use its email/password on the packaged app sign-in screen. The owner can reopen the original folder from Account access. Never substitute /tmp synthetic test credentials.
 

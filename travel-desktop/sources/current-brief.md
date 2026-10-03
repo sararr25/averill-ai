@@ -2,7 +2,7 @@
 
 Status: APPROVED. Updated 22 September 2026. This version supersedes v1.
 
-Company: Elseweek. Synthetic demonstration sources; owner: Maya Jensen, Marketing lead.
+Company: Vamo. Synthetic demonstration sources; owner: Maya Jensen, Marketing lead.
 
 ## Audience
 Denmark-based travel subscribers interested in short European winter breaks. Do not send the launch email to the full subscriber list.

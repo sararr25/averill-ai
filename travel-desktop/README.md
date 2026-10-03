@@ -1,6 +1,6 @@
-# Averill desktop — Elseweek demo
+# Averill desktop — Vamo demo
 
-Averill is a standalone company agent assistant prototype demonstrated with the fictional **Winter Escapes 2027** campaign. Elseweek is the fictional test company. All product copy and campaign sources are in English. Read the [central handover](../docs/HANDOVER.md), [project brief](../PROJECT.md), and [system design](../ARCHITECTURE.md) before extending the app.
+Averill is a standalone company agent assistant prototype demonstrated with the fictional **Winter Escapes 2027** campaign. Vamo is the fictional test company. All product copy and campaign sources are in English. Read the [central handover](../docs/HANDOVER.md), [project brief](../PROJECT.md), and [system design](../ARCHITECTURE.md) before extending the app.
 
 The selected visual direction and implementation specification live in [design-system/DESIGN_SYSTEM.md](design-system/DESIGN_SYSTEM.md). [Preview](design-system/preview.html) is a review artifact; the running app uses the Petrol / Coral / Ice system, but the preview is not proof of pixel parity.
 
@@ -56,19 +56,19 @@ The intentionally superseded campaign brief v1 and square creative are part of t
 npm test
 ```
 
-The 18 tests cover issue detection and resolution for the supplied workflows, source file existence, uncertainty for unsupported questions, model citation IDs, local workspace persistence, folder import, employee learning persistence/isolation, source invalidation, exclusion and Copenhagen week rollover. The packaged app was opened and verified for the shared brief finding and a locally answered, cited comparison. See the [handover](../docs/HANDOVER.md) for checks still pending.
+The current 44 tests cover issue detection and resolution for the supplied workflows, source file existence, uncertainty for unsupported questions, model citation IDs, local workspace persistence, folder import, employee learning persistence/isolation, source invalidation, exclusion and Copenhagen week rollover. The packaged app was opened and verified for the shared brief finding and a locally answered, cited comparison. See the [handover](../docs/HANDOVER.md) for checks still pending.
 
 ## Company pack and LinkedIn demo
 
-Use [the Elseweek pack README](demo-company/elseweek/README.md) to create people and import Marketing, Operations and People documents at the correct versions. An administrator can choose department and source version in Setup; employee/lead imports stay in their own department. Imported documents arrive pending. Brand context is explicitly approved per department.
+Use [the Vamo pack README](demo-company/vamo/README.md) to create people and import Marketing, Operations and People documents at the correct versions. An administrator can choose department and source version in Setup; employee/lead imports stay in their own department. Imported documents arrive pending. Brand context is explicitly approved per department.
 
 Open LinkedIn Draft, Share, then Load incoming draft. Correct the guarantee phrase, editorial audience, selected creative, CTA and planned date/time. The correct slot is 16 October 2026 at 09:00 Europe/Copenhagen. Open the LinkedIn guidance from the draft or the finding citation. Save retains a local draft; Stop sharing clears findings. The editor is supplied synthetic work, not an external LinkedIn connection. Its limited copy checks do not establish a complete tone assessment.
 
-The static fixture and imported workspace paths are separate. Switching people clears sharing; source approval changes control company answers and learning evidence, not the supplied editor rules. Previous Aurelia drafts remain in their old localStorage keys and are not loaded into Elseweek drafts.
+The static fixture and imported workspace paths are separate. Switching people clears sharing; source approval changes control company answers and learning evidence, not the supplied editor rules. Previous Aurelia drafts remain in their old localStorage keys and are not loaded into Vamo drafts.
 
 ## File onboarding and local account demo
 
-Follow [the onboarding tutorial](../docs/ONBOARDING_TUTORIAL.md). Create the owner email/password account, upload the six mixed-format Elseweek intake files, optionally use explicitly disclosed Nebius analysis, review people/document assignments, approve selected sources and confirm the batch. Three Marketing accounts are created together. Use Account access → Open login documents to retrieve each email/password document and sign out/in to demonstrate owner, manager, strategist and creator. Restart requires login. Existing workspaces can enable owner login without losing data; existing people can receive separate accounts.
+Follow [the onboarding tutorial](../docs/ONBOARDING_TUTORIAL.md). Create the owner email/password account, upload the six mixed-format Vamo intake files, optionally use explicitly disclosed Nebius analysis, review people/document assignments, approve selected sources and confirm the batch. Three Marketing accounts are created together. Use Account access → Open login documents to retrieve each email/password document and sign out/in to demonstrate owner, manager, strategist and creator. Restart requires login. Existing workspaces can enable owner login without losing data; existing people can receive separate accounts.
 
 XLSX/CSV staff tables are read locally. PDFs use PDFKit and scanned-page Vision OCR (first 30 pages); new PDF extractions retain page markers. SVG onboarding extracts text/title/description. Unsupported/unreadable files are flagged. XLS needs a modern XLSX/CSV export. Brand context can be company-wide; personnel copies remain private. Admin reset of non-owner local passwords and self-service password change are available; owner recovery uses the local login document. No cloud authentication, multi-device synchronization or delivered invitations are implemented.
 
@@ -80,7 +80,7 @@ Start future development from `docs/HANDOVER.md`, then `AGENTS.md`, `PROJECT.md`
 
 ## Prepared local demo accounts and services
 
-On this Mac, the existing Aurelia Demo workspace now provides four working logins: Demo Admin / alex@elseweek.example (Owner / CEO / admin), Maya Jensen / maya@elseweek.example (Marketing manager), Emma Larsen / emma@elseweek.example (Marketing strategy employee), Oscar Lind / oscar@elseweek.example (Content creator). Company name and original administrator ID are preserved. No existing password was reset. A timestamped pre-login workspace backup is adjacent to averill-workspace.json.
+On this Mac, the existing legacy Aurelia Demo workspace retains four working logins: Demo Admin / alex@elseweek.example (Owner / CEO / admin), Maya Jensen / maya@elseweek.example (Marketing manager), Emma Larsen / emma@elseweek.example (Marketing strategy employee), Oscar Lind / oscar@elseweek.example (Content creator). Company name and original administrator ID are preserved. No existing password was reset. A timestamped pre-login workspace backup is adjacent to averill-workspace.json.
 
 Actual emails/passwords are in separate documents under repository-root demo-login-documents, ignored by Git. Originals are in userData/Averill-login-documents. Open the owner document, then use its email/password on the packaged app sign-in screen. The owner can reopen the original folder from Account access. Never substitute /tmp synthetic test credentials.
 

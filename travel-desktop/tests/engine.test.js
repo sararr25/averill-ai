@@ -14,7 +14,7 @@ test('email findings appear for an incoming draft and disappear after correction
 test('social findings cover asset, disclosure and date and disappear after correction', () => {
   const incoming = { caption: 'Winter in Vienna', asset: 'winter-square-old.svg', date: '2026-10-21', partnershipLabel: false };
   assert.deepEqual(inspect('social', incoming).map((item) => item.id), ['wrong-format', 'missing-disclosure', 'calendar-conflict']);
-  const fixed = { caption: 'Winter in Vienna. Paid partnership with Elseweek', asset: 'winter-reel-vertical.svg', date: '2026-10-17', partnershipLabel: true };
+  const fixed = { caption: 'Winter in Vienna. Paid partnership with Vamo', asset: 'winter-reel-vertical.svg', date: '2026-10-17', partnershipLabel: true };
   assert.deepEqual(inspect('social', fixed), []);
 });
 

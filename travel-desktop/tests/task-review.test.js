@@ -7,7 +7,7 @@ const { localReview, reviewTask } = require('../src/task-review');
 
 const root = fs.mkdtempSync(path.join(os.tmpdir(), 'averill-task-review-'));
 const policy = path.join(root, 'marketing.txt');
-fs.writeFileSync(policy, 'Do not claim "lowest prices guaranteed".\nEvery marketing email must include this footer: "You are receiving this email because you subscribed to Elseweek. Unsubscribe anytime."\n');
+fs.writeFileSync(policy, 'Do not claim "lowest prices guaranteed".\nEvery marketing email must include this footer: "You are receiving this email because you subscribed to Vamo. Unsubscribe anytime."\n');
 const data = {
   people: [{ id: 'owner', role: 'admin', department: null }, { id: 'staff', role: 'employee', department: 'People' }],
   activePersonId: 'owner',
@@ -19,7 +19,7 @@ test('review cites exact approved rules and updates when the employee corrects t
   assert.ok(before.findings.some(item => item.type === 'forbidden-claim' && item.source.id === 'marketing-v2'));
   assert.ok(before.findings.some(item => item.type === 'missing-required-text'));
   assert.ok(before.findings.every(item => fs.readFileSync(policy, 'utf8').includes(item.source.quote)));
-  const after = localReview(data, 'email', 'Discover curated winter city breaks. You are receiving this email because you subscribed to Elseweek. Unsubscribe anytime.');
+  const after = localReview(data, 'email', 'Discover curated winter city breaks. You are receiving this email because you subscribed to Vamo. Unsubscribe anytime.');
   assert.equal(after.findings.length, 0);
 });
 

@@ -192,7 +192,7 @@ function openWork(kind) {
   const area = screen.getPrimaryDisplay().workArea;
   const width = Math.max(760, Math.min(980, area.width - 540));
   const height = Math.min(850, area.height - 24);
-  const window = createWindow('work.html', { x: area.x + 12, y: area.y + 12, width, height, minWidth: 760, minHeight: 620, title: `${titles[kind]} · Elseweek` }, { kind, person: companyWorkspace.activePersonId });
+  const window = createWindow('work.html', { x: area.x + 12, y: area.y + 12, width, height, minWidth: 760, minHeight: 620, title: `${titles[kind]} · Vamo` }, { kind, person: companyWorkspace.activePersonId });
   workWindows.set(kind, window);
   window.on('closed', () => { workWindows.delete(kind); workState.delete(kind); shared.delete(kind); publish(); });
   publish();

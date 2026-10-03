@@ -6,8 +6,8 @@ const workspace = require('../src/workspace');
 
 const profile = fs.mkdtempSync('/tmp/averill-task-review-ui-');
 const ruleFile = path.join(profile, 'marketing-policy.md');
-fs.writeFileSync(ruleFile, 'Do not claim "lowest prices guaranteed".\nEvery marketing email must include this footer: "You are receiving this email because you subscribed to Elseweek. Unsubscribe anytime."');
-const company = workspace.create(profile, 'Elseweek', 'Demo Owner');
+fs.writeFileSync(ruleFile, 'Do not claim "lowest prices guaranteed".\nEvery marketing email must include this footer: "You are receiving this email because you subscribed to Vamo. Unsubscribe anytime."');
+const company = workspace.create(profile, 'Vamo', 'Demo Owner');
 const policy = workspace.importFile(profile, company, ruleFile, { department: 'Marketing', version: '2' });
 workspace.updateSource(company, policy.id, 'approved');
 workspace.save(profile, company);
@@ -39,7 +39,7 @@ app.whenReady().then(async () => {
     const before = await run("window.desktop.reviewExternalTask('email',false)");
     assert.ok(before.findings.some(item => item.type === 'forbidden-claim' && item.source.id === policy.id));
     assert.ok(before.findings.some(item => item.type === 'missing-required-text'));
-    await external.webContents.executeJavaScript("document.getElementById('draft').textContent='Discover curated winter city breaks. You are receiving this email because you subscribed to Elseweek. Unsubscribe anytime.'");
+    await external.webContents.executeJavaScript("document.getElementById('draft').textContent='Discover curated winter city breaks. You are receiving this email because you subscribed to Vamo. Unsubscribe anytime.'");
     await pause(400);
     const secondCapture = await run('window.desktop.reviewExternal()');
     const corrected = await run("window.desktop.reviewExternalTask('email',false)");

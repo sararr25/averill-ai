@@ -6,7 +6,7 @@
 
 ## Product boundary
 
-This system belongs to the independent desktop assistant. Elseweek is the fictional company in the demo work windows. The screenshot shows a visual composition, not a claim that the agent and Campaign Files are one application. The current prototype receives structured changes from the four supplied work windows after the user shares them. It cites local files, suggests corrections, and never edits, sends, or publishes on the user's behalf.
+This system belongs to the independent desktop assistant. Vamo is the fictional company in the demo work windows. The screenshot shows a visual composition, not a claim that the agent and Campaign Files are one application. The current prototype receives structured changes from the four supplied work windows after the user shares them. It cites local files, suggests corrections, and never edits, sends, or publishes on the user's behalf.
 
 ## Design intent
 

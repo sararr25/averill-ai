@@ -1,7 +1,7 @@
 const test=require('node:test');const assert=require('node:assert/strict');const fs=require('node:fs');const os=require('node:os');const path=require('node:path');const http=require('node:http');const https=require('node:https');const {EventEmitter}=require('node:events');const crypto=require('node:crypto');
 const remote=require('../src/remote-import');const {CloudImports}=require('../src/cloud-import');const workspace=require('../src/workspace');const onboarding=require('../src/onboarding');const privacy=require('../src/company-privacy');const {answerWorkspace}=require('../src/workspace-answer');
-const pack=path.join(__dirname,'../demo-company/elseweek-intake');
-function fixture(){const root=fs.mkdtempSync(path.join(os.tmpdir(),'averill-multisource-'));return {root,data:workspace.create(root,'Elseweek','Alex Holm')};}
+const pack=path.join(__dirname,'../demo-company/vamo-intake');
+function fixture(){const root=fs.mkdtempSync(path.join(os.tmpdir(),'averill-multisource-'));return {root,data:workspace.create(root,'Vamo','Alex Holm')};}
 test('HTTPS imports block private DNS/IPs, mixed DNS answers, credentials and nonstandard ports',async()=>{
  for(const address of ['127.0.0.1','10.1.2.3','172.16.0.1','192.168.2.1','169.254.169.254','100.64.0.1','::1','fc00::1','fe80::1','::ffff:127.0.0.1','2001:db8::1'])assert.equal(remote.publicAddress(address),false,address);
  for(const url of ['http://example.org/a.pdf','https://user:password@example.org/a.pdf','https://example.org:8443/a.pdf','https://127.0.0.1/a.pdf','https://[::1]/a.pdf'])await assert.rejects(remote.target(url),/HTTPS|Private/);
@@ -18,7 +18,7 @@ test('download redirects are validated and never receive the previous bearer tok
 });
 test('company privacy blocks all network calls by default and restricted/credential files cannot enter prompts',async()=>{
  const {root,data}=fixture();try{
-  onboarding.stage(root,data,[path.join(pack,'elseweek-team.xlsx'),path.join(pack,'linkedin-campaign.md')]);assert.ok(data.onboarding.files.every(f=>!f.aiAllowed));
+  onboarding.stage(root,data,[path.join(pack,'vamo-team.xlsx'),path.join(pack,'linkedin-campaign.md')]);assert.ok(data.onboarding.files.every(f=>!f.aiAllowed));
   let calls=0;const fetcher=async()=>{calls++;throw new Error('Unexpected network');};
   await assert.rejects(onboarding.analyze(data,'synthetic-key',{consent:true,fetcher}),/Company AI is off/);assert.equal(calls,0);
   privacy.configure(data,true);privacy.permissions(data.onboarding.files,data.onboarding.files.map(f=>({id:f.id,confidentiality:'restricted',aiAllowed:true})));
