@@ -1,5 +1,11 @@
 # Averill product demo plan
 
+## Current recording plan — 3 October 2026
+
+Use the **2:50** sequence and ordered checks in [DEMO_REHEARSAL.md](DEMO_REHEARSAL.md). Official [submission requirements](SUBMISSION_REQUIREMENTS.md) supersede the historical four-minute timing below. Live synthetic Token Factory/NVIDIA Nemotron review and current real Canva text/Position/PNG operations have evidence; email sign-in, installed Chrome extension, complete packaged app rehearsal and final public video/test-build URL remain open. [Submission draft](../devpost-submission.md) is prepared, not submitted.
+
+## Historical decisions and narrative
+
 Decision record, 23 September 2026; implementation status updated 26 September 2026. The first specialized product path is marketing. Vamo remains disposable sample data, not the product model. See [HANDOVER.md](HANDOVER.md) for verified behavior and remaining gates.
 
 Product correction, 28 September: Vamo is a separate public-facing travel website, not an Averill app. Employee scenes should happen in actual Canva, LinkedIn, Instagram and email marketing tools. The floating Averill button and explicit external-window selection are the entry point. Supplied Electron editors are clearly labelled fallback fixtures. A selected window can now be observed locally every six seconds through Accessibility or OCR and checked against bounded approved rules. This does not establish field-aware monitoring, actual platform draft access, external editing, publishing or visual coaching. Public claim checks use a typed Tavily query, while approved company guidance uses company knowledge and optional Nebius.

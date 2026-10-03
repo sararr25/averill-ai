@@ -6,9 +6,9 @@ The owner requested points 1–5 in order, with one commit and GitHub push after
 | --- | --- | --- |
 | 1 | Release consistency, current docs, app/ZIP verification and GitHub synchronization | Complete — pushed 00282cc |
 | 2 | Coherent Vamo source/fixture pack and current People guidance | Complete — pushed 17abad5 |
-| 3 | A real external email draft correction loop | Local implementation verified; Brevo sign-in acceptance pending |
-| 4 | Field-aware observation and broader task requirements | Implemented; installed Chrome/platform acceptance pending |
-| 5 | Canva/AI rehearsal, event requirements and submission preparation | Pending |
+| 3 | A real external email draft correction loop | Pushed d367ce5 — local implementation verified; Brevo sign-in acceptance pending |
+| 4 | Field-aware observation and broader task requirements | Pushed a60d861 — implemented; installed Chrome/platform acceptance pending |
+| 5 | Canva/AI rehearsal, event requirements and submission preparation | Preparation and live synthetic Nemotron request verified; full recording/platform gates open |
 
 ## Point 1
 
@@ -33,3 +33,10 @@ Added a local Read and recheck action that captures fresh selected-window text b
 Added an opt-in activeTab browser extension, authenticated ephemeral loopback pairing, one selected field, pause/blur/selection events, typing invalidation, foreground/heartbeat Stop and person/session cleanup. Added explicit source-backed audience/date/time/asset/procedure/version/disclosure requirements with unobserved-field reporting; OCR does not invent field metadata. Native browser IPC/DOM smoke passed with a synthetic extension client. The 47-test suite is rerun before commit. Actual Chrome installation/permissions and platform-specific DOM acceptance remain open.
 
 Point 4 current validation: **47/47 tests**, native browser IPC/content-script smoke and native email task-review smoke pass. Release comparison passed: 116 tracked files, both helpers and 3,105 archive entries. Archive SHA-256 `c1d00b343b8fe8bab19acdb851c7bbe1d2f489f5b392d8a418d577e5fb1c3f51`. Actual Chrome extension loading awaits owner permission; Brevo awaits sign-in.
+
+## Point 5
+
+Added an explicit synthetic-only live model check, official event/submission checklist, draft submission text and a 2:50 rehearsal plan. Token Factory/NVIDIA `nvidia/nemotron-3-super-120b-a12b` returned one exact-citation-validated model suggestion. Real Canva custom canvas/text sizing/Position/PNG export were exercised on a new synthetic draft; actual selected-window OCR, changed-text observation and Stop passed in an isolated Averill profile. This is not automatic geometry or complete app lesson verification. Brevo needs sign-in, Chrome installation needs permission, the full packaged story/consent UI needs rehearsal and the final video/public test-build URL are outstanding. No registration, rule acceptance, send or publication occurred.
+
+Point 5 final release comparison passed: 117 tracked source files, both native helpers and 3,106 archive entries. ZIP SHA-256 `a2cc82d692072e728c0063426cbe6e8c182a63cf9fa58799b377d85806ba19e5`. Final regression suite: 47/47.
+Packaged-resource feedback smoke passed, including pending/success/error/cancel status, knowledge import/search and logout cleanup. Full packaged interactive rehearsal and app consent UI remain separate. Point 5 is committed and pushed as the final preparation milestone; acceptance gates listed above remain open.

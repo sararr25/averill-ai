@@ -87,7 +87,7 @@ async function reviewTask(data, task, observedText, key, useAI = false, observed
       if (!match || !quote || quote.length < 12 || !match.text.includes(quote) || excerpt && !String(observedText).includes(excerpt) || !suggestion || suggestion.length > 300) return [];
       return [{ type: 'model-suggestion', observedExcerpt: excerpt, suggestion, source: citation(match.source, quote), confidence: 'model-suggestion' }];
     });
-    return { mode: 'model', findings: [...local.findings, ...findings].slice(0, 8), status: findings.length ? 'Nebius suggestions cite exact approved passages; their interpretation still needs employee review.' : local.status };
+    return { mode: 'model', model, provider: 'Nebius Token Factory', findings: [...local.findings, ...findings].slice(0, 8), status: findings.length ? 'Nebius suggestions cite exact approved passages; their interpretation still needs employee review.' : local.status };
   } catch { return local; }
 }
 

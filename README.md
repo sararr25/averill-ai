@@ -78,3 +78,15 @@ Desktop/Finder drop, local/synced files, HTTPS links and Google Drive/OneDrive s
 ## Feedback and know-how library — 27 September 2026
 
 A persistent status banner reports pending, completed, cancelled and failed explicit actions. Knowledge provides local document/text search, uploaded proposals, approved/pending/private/superseded sources, extracted-text reading and original-file access under existing role visibility. Intake is visible before onboarding confirmation. The library does not send documents to external AI. See the handover and onboarding tutorial for current verification and workflow.
+
+## Hackathon readiness — 3 October 2026
+
+See the [submission checklist](docs/SUBMISSION_REQUIREMENTS.md), [2:50 rehearsal](docs/DEMO_REHEARSAL.md) and [draft description](devpost-submission.md). The five follow-up commits are tracked in the [milestone ledger](docs/MILESTONES_2026-10-03.md). Real-platform acceptance, final video and a public verified test-build URL remain open.
+
+A live generated-email/policy request passed via Nebius Token Factory using NVIDIA `nvidia/nemotron-3-super-120b-a12b`. To reproduce intentionally, configure NEBIUS_API_KEY locally and run:
+
+```sh
+npm --prefix travel-desktop run verify:nebius -- --synthetic-consent
+```
+
+This sends only the script's generated public test strings. It requires a validated model suggestion, never counts a local fallback as a live success, and writes a key-free receipt to ignored dist. Model IDs are discovered from the provider or set explicitly with NEBIUS_MODEL; availability may change. This proof does not establish the app consent UI, real company-document authorization or a controlled model comparison.

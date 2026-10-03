@@ -1,5 +1,11 @@
 # Averill execution handover
 
+## Current rehearsal and submission preparation — 3 October 2026
+
+The live generated-policy/email request passed through Nebius Token Factory with NVIDIA `nvidia/nemotron-3-super-120b-a12b`, with one validated model suggestion. Run `npm run verify:nebius -- --synthetic-consent` only when intending that generated payload to be sent; it does not read normal user data. The ignored receipt contains model/time/counts without keys or prompts. It tests the runtime model path, not the app consent UI.
+
+Real Canva practice on a separate synthetic 1200 × 627 design verified text edit, font size 48, Position → Middle and completed PNG export. Actual selected-window OCR, changed-text observation and Stop passed in an isolated profile. No automatic Averill geometry assessment is claimed. [DEMO_REHEARSAL.md](DEMO_REHEARSAL.md) records ordered remaining acceptance. [SUBMISSION_REQUIREMENTS.md](SUBMISSION_REQUIREMENTS.md) records official event data (30 October 17:00 UTC deadline and sub-three-minute video); [submission draft](../devpost-submission.md) is prepared. Registration, final video and public build URL remain unconfirmed/open. No submission or publication was performed.
+
 ## Current release status — 3 October 2026
 
 This section supersedes historical test totals and artifact statements below. The current suite passes **47/47**. Source native feedback, selected-window OCR and task-review smoke passed on 3 October in isolated synthetic profiles; bundled-resource feedback passed too. These are not actual email/social/Canva account acceptance.
