@@ -483,6 +483,7 @@ function renderTaskReview(result) {
   const output = el('external-task-result');
   if (result.contentHash !== current.externalObservation?.contentHash) { output.textContent = 'The visible work changed. Review the current text again.'; return; }
   output.replaceChildren(node('p', `${result.status} ${result.mode === 'model' ? 'Nebius review completed.' : 'Local rule check.'}`));
+  if (result.mode === 'model' && result.model) output.append(node('small', `${result.provider || 'Nebius Token Factory'} · ${result.model}`));
   if (result.uncheckedFields?.length) output.append(node('small', `Not observed in this field: ${result.uncheckedFields.join(', ')}.`));
   for (const item of result.findings) {
     const card = node('div', undefined, 'workspace-source');

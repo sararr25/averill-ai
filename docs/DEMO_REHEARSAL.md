@@ -1,5 +1,7 @@
 # Final demo rehearsal — 3 October 2026
 
+4 October continuation: see [ACCEPTANCE_2026-10-04.md](ACCEPTANCE_2026-10-04.md). Packaged renderer consent/restart regression and actual app launch now have evidence; manual platform rehearsal and final video remain separate.
+
 Current recording plan: **2:50**, below the official three-minute limit. Supersedes the four-minute timing in the historical product plan. [Requirements](SUBMISSION_REQUIREMENTS.md). These are ordered acceptance steps, not a claim that every step has passed.
 
 | Time | Scene | Evidence to show |

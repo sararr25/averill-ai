@@ -1,5 +1,7 @@
 # External-work acceptance matrix
 
+Current evidence, 4 October 2026: see [ACCEPTANCE_2026-10-04.md](ACCEPTANCE_2026-10-04.md). 47/47 tests, real Canva OCR/edit/Stop, live synthetic Nemotron request, packaged renderer consent cancellation/review and restart now pass. The DOM field adapter and explicit field requirements exist; actual installed Chrome and email/social platform acceptance remain open. Earlier totals and missing-implementation statements below are historical.
+
 Updated 28 September 2026. These are synthetic Vamo test cases for Averill, not content to publish. The employee creates work in the named external tool; Averill never creates the draft. This matrix prepares numbered points 1–3 of the implementation plan: dependable companion, selected-window observation and bounded source-grounded task review. The task engine exists for exact company phrases, with optional Nebius suggestions; it does not yet cover every case below.
 
 | Case | External tool and observable state | Approved Vamo authority | Before → employee correction | Observation acceptance |

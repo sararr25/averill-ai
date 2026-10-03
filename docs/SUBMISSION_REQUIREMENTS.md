@@ -6,10 +6,10 @@ Deadline: **30 October 2026, 17:00 UTC / 18:00 Europe/Copenhagen**. Suggested tr
 
 ## Required deliverables
 
-- A working application with real runtime Nebius Token Factory inference or Nebius AI Cloud compute, and at least one NVIDIA open model. The isolated synthetic task-review request passed with `nvidia/nemotron-3-super-120b-a12b` on 3 October; the final recording still needs the consented application flow.
+- A working application with real runtime Nebius Token Factory inference or Nebius AI Cloud compute, and at least one NVIDIA open model. The isolated synthetic task-review request passed with `nvidia/nemotron-3-super-120b-a12b` on 3 October; the packaged renderer consent flow also passed a synthetic live regression on 4 October; the final recording still needs the manual platform story.
 - A public repository with an OSI-approved license, setup instructions and a clear explanation of models and tools. This repository has MIT. Check public judge access before submitting.
 - A public YouTube demonstration showing the application functioning on its target device and explaining Nebius/NVIDIA use. Keep the final cut below three minutes; the plan is **2:50**. The earlier four-minute narrative is historical.
-- A working demo or test-build URL for this application. Although the structured URL field is optional, the submission prose requires it for non-Physical-AI entries. The unsigned local arm64 ZIP is not yet a public download URL.
+- A working demo or test-build URL for this application. Although the structured URL field is optional, the submission prose requires it for non-Physical-AI entries. The unsigned arm64 preview release is prepared at https://github.com/sararr25/averill-ai/releases/tag/v0.1.0-preview.20261004; confirm publication and judge access before submission.
 - Completed description, selected track, model/platform feedback and owner eligibility declarations. Do not invent ratings or accept declarations on the owner's behalf.
 
 ## Submission fields

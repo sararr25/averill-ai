@@ -90,3 +90,7 @@ npm --prefix travel-desktop run verify:nebius -- --synthetic-consent
 ```
 
 This sends only the script's generated public test strings. It requires a validated model suggestion, never counts a local fallback as a live success, and writes a key-free receipt to ignored dist. Model IDs are discovered from the provider or set explicitly with NEBIUS_MODEL; availability may change. This proof does not establish the app consent UI, real company-document authorization or a controlled model comparison.
+
+## Preview delivery and remaining acceptance — 4 October 2026
+
+[Public preview release](https://github.com/sararr25/averill-ai/releases/tag/v0.1.0-preview.20261004) contains the verified unsigned macOS arm64 build and checksum after publication. See [the current acceptance record](docs/ACCEPTANCE_2026-10-04.md) for setup, regression evidence and account/permission/hardware gates. Work now names the actual provider/model used by a completed AI review. `verify:rehearsal` exercises packaged resources, consent cancellation, synthetic live review and restart without touching normal user data.

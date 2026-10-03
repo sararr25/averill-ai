@@ -1,5 +1,11 @@
 # Averill execution handover
 
+## Pending-work continuation — 4 October 2026
+
+[Current acceptance record](ACCEPTANCE_2026-10-04.md) supersedes the earlier consent-UI/restart gates. 47/47 tests pass. Packaged-resource regression now verifies consent cancellation, one live generated-public-text Nebius/NVIDIA review through renderer handlers, correction, authority revocation, Stop, weekly practice, person isolation and second-process restart. Work displays the actual runtime model. The actual unsigned `.app` also launched on this Mac at the existing workspace sign-in screen; normal user data was preserved.
+
+The public preview build is prepared for GitHub release `v0.1.0-preview.20261004`; verify the release page before sharing. Real email login, explicit local-extension installation permission, platform/full hardware rehearsal, final recording/public YouTube URL and owner submission declarations remain gates. The regression harness is not a substitute for installed Chrome or a real email editor.
+
 ## Current rehearsal and submission preparation — 3 October 2026
 
 The live generated-policy/email request passed through Nebius Token Factory with NVIDIA `nvidia/nemotron-3-super-120b-a12b`, with one validated model suggestion. Run `npm run verify:nebius -- --synthetic-consent` only when intending that generated payload to be sent; it does not read normal user data. The ignored receipt contains model/time/counts without keys or prompts. It tests the runtime model path, not the app consent UI.
