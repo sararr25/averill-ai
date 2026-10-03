@@ -14,10 +14,12 @@ Opt-in Chrome Manifest V3 extension, distributed as source for the hackathon pro
 
 Only top-frame fields are supported. Cross-origin frames, shadow DOM, native select popups, closed editors and platform-specific controls require their own acceptance. Password/email/tel inputs and fields labelled as payment, credentials, recipient or personnel are excluded. Credential-shaped strings/payment numbers are redacted again in the desktop. The short-lived pairing token remains in extension session storage and is absent from public workspace snapshots. Paste it only into this extension, never a website. No provider request, edit, send or post is automatic.
 
-The local server checks loopback Host, an extension Origin, a random 256-bit token, one tab/origin and monotonic event sequence. A new session/person, Stop, lost heartbeat or app exit invalidates it. The extension relay never accepts an arbitrary destination URL from a page. Installation in the user's actual Chrome profile and real-platform drafts remain manual acceptance gates.
+The local server checks loopback Host, an extension Origin, a random 256-bit token, one tab/origin and monotonic event sequence. A new session/person, Stop, lost heartbeat or app exit invalidates it. The extension relay never accepts an arbitrary destination URL from a page. Installation in the owner's Chrome profile and field transport on local fake pages were verified on 4 October 2026. Real-platform drafts and the remaining installed-browser edge cases remain manual acceptance gates.
 
 ## Evidence and requirements
 
 `npm test` covers bridge authorization, stale/cross-tab rejection, edit invalidation, expiry, session rotation and source-backed structured field checks. `npm run verify:browser` exercises native IPC/UI and the actual content-script pause code in a synthetic DOM with a test extension client. This does not establish installed-extension or actual-platform success.
 
 Approved files may contain explicit lines such as `Field requirement: email | audience | "Travel subscribers — Denmark".` Supported keys: audience, date, time, asset, procedure, version, disclosure. A requirement is checked only when its matching field was actually selected; other fields are labelled unobserved. OCR cannot invent field metadata, asset geometry, schedule state or publication.
+
+Actual installed Chrome evidence: [4 October acceptance](../../docs/INSTALLED_EXTENSION_2026-10-04.md). Brevo selected-field correction/Stop passed; LinkedIn and Instagram transport were verified separately from task-specific rule acceptance.

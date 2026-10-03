@@ -42,3 +42,7 @@ Added an explicit synthetic-only live model check, official event/submission che
 
 Point 5 final release comparison passed: 117 tracked source files, both native helpers and 3,106 archive entries. ZIP SHA-256 `a2cc82d692072e728c0063426cbe6e8c182a63cf9fa58799b377d85806ba19e5`. Final regression suite: 47/47.
 Packaged-resource feedback smoke passed, including pending/success/error/cancel status, knowledge import/search and logout cleanup. Full packaged interactive rehearsal and app consent UI remain separate. Point 5 is committed and pushed as the final preparation milestone; acceptance gates listed above remain open.
+
+## 4 October installed Chrome acceptance
+
+Supersedes the historical sign-in/installation blockers above: Brevo is a fake local page requiring no sign-in. The owner explicitly authorized and completed extension installation. Installed Chrome field transport passed on Brevo, LinkedIn and Instagram. Brevo exact source-backed correction, typing invalidation, pause refresh and native Averill Stop passed. Instagram native image upload/caption editing passed; image persistence, complete packaged story, hardware edge cases and final recording are separate acceptance gates. See INSTALLED_EXTENSION_2026-10-04.md.

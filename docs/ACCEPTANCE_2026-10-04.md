@@ -23,8 +23,8 @@ Keys, environment files, generated login documents and normal user-data files ar
 
 | Gate | Exact next step | Why it is still open |
 | --- | --- | --- |
-| Fake platform correction loop | Use demo-tools/social-simulator/ and the local /brevo draft without sign-in; after extension approval test selected-field review, manual correction and Stop | Page creation/edit/preview/local scheduling/reload passed; extension-assisted acceptance is still open |
-| Installed Chrome extension | Confirm loading the reviewed local extension and its activeTab/scripting/loopback permissions; then test the actual extension transport and platform editor | Installation/access approval is required by the computer-use policy; broad pending-work authorization cannot replace that action-time confirmation |
+| Fake platform correction loop | Brevo selected-field correction, exact source-backed review and Averill Stop passed in installed Chrome | Complete packaged narrative and structured audience/date acceptance remain separate |
+| Installed Chrome edge cases | Installation was explicitly authorized and completed by the owner; actual Brevo, LinkedIn and Instagram field transport passed | Actual logout/account rotation, private-field exclusions, expired pairing and cross-origin editors still need installed-browser acceptance |
 | Manual full packaged story | Rehearse onboarding → Canva step → fake Brevo draft → consented AI → weekly practice → Stop after the extension gate | Packaged-resource regression is distinct from manual platform acceptance |
 | Screen permission denial, full screen and physical second monitor | Exercise those states on the target Mac without weakening security protections | Simulated tests do not establish actual TCC denial/revocation or a second physical display |
 | Final recording and public YouTube URL | Record the accepted 2:50 story after fake-page correction acceptance, review the cut and publish to the owner's intended channel | No final recording exists; a synthetic regression screenshot is not a functioning-platform video |
@@ -44,6 +44,6 @@ The explicit flag permits only generated public policy/draft text to Token Facto
 
 ## Local fake pages clarified by the owner
 
-Brevo requires no sign-in. See demo-tools/social-simulator/README.md for implemented scope and actual browser checks. Instagram/LinkedIn existing layouts are preserved. Two simulator timezone/date tests and build pass. Image upload is not claimed verified: the browser controller lacked file access. Extension installation approval was requested and remains pending.
+Brevo requires no sign-in. See demo-tools/social-simulator/README.md for implemented scope and actual browser checks. Instagram/LinkedIn existing layouts are preserved. Two simulator timezone/date tests and build pass. The owner explicitly authorized installation and reported it installed. Native Chrome confirmed the installed companion. Instagram image upload and caption editing now pass through the native picker; image save/reload remains a separate acceptance step. See [installed extension evidence](INSTALLED_EXTENSION_2026-10-04.md).
 
 The source-controlled simulator independently passed npm ci, 2/2 tests and build. npm reports zero vulnerabilities after removal of the unused Tailwind build dependency; its unchanged static reset and MIT license are retained. Brevo Home now uses Vamo, a current Copenhagen calendar and actual local scheduled state instead of fixed September data. This final Home cleanup was build-verified; browser checks above preceded it.
