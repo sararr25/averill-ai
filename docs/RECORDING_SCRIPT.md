@@ -1,6 +1,6 @@
 # Recording script — 2:50
 
-Prepared 4 October 2026. Record after the real email/installed-extension gates in ACCEPTANCE_2026-10-04.md. This is narration and a shot list, not an existing video or a claim that the platform rehearsal passed. Use fictional Vamo data only. Crop passwords, local account documents, keys and unrelated browser tabs out of every frame.
+Prepared 4 October 2026. Record after the fake Brevo correction/installed-extension gates in ACCEPTANCE_2026-10-04.md. This is narration and a shot list, not an existing video or a claim that the platform rehearsal passed. Use fictional Vamo data only. Crop passwords, local account documents, keys and unrelated browser tabs out of every frame.
 
 ## 0:00–0:25 — Company knowledge
 

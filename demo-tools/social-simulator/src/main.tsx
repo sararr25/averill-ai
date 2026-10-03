@@ -1,0 +1,10 @@
+import React from 'react';
+import { createRoot } from 'react-dom/client';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { DemoLauncher } from './pages/DemoLauncher';
+import { InstagramDemo } from './pages/InstagramDemo';
+import { LinkedInDemo } from './pages/LinkedInDemo';
+import { BrevoDemo } from './pages/BrevoDemo';
+import './style.css';
+import './vamo.css';
+createRoot(document.getElementById('root')!).render(<React.StrictMode><BrowserRouter><Routes><Route path="/" element={<DemoLauncher/>}/><Route path="/instagram" element={<InstagramDemo/>}/><Route path="/linkedin" element={<LinkedInDemo/>}/><Route path="/brevo" element={<BrevoDemo/>}/></Routes></BrowserRouter></React.StrictMode>);

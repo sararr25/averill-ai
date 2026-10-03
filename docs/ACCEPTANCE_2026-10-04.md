@@ -23,14 +23,14 @@ Keys, environment files, generated login documents and normal user-data files ar
 
 | Gate | Exact next step | Why it is still open |
 | --- | --- | --- |
-| Real email draft | Sign in to the opened Brevo tab, or identify an already authenticated email tool; then rehearse an unpublished synthetic draft | Brevo is visibly at sign-in; no account access was supplied |
+| Fake platform correction loop | Use demo-tools/social-simulator/ and the local /brevo draft without sign-in; after extension approval test selected-field review, manual correction and Stop | Page creation/edit/preview/local scheduling/reload passed; extension-assisted acceptance is still open |
 | Installed Chrome extension | Confirm loading the reviewed local extension and its activeTab/scripting/loopback permissions; then test the actual extension transport and platform editor | Installation/access approval is required by the computer-use policy; broad pending-work authorization cannot replace that action-time confirmation |
-| Manual full packaged story | Rehearse onboarding → real Canva step → real email → consented AI → weekly practice → Stop after the account/extension gates | Packaged-resource regression is distinct from manual platform acceptance |
+| Manual full packaged story | Rehearse onboarding → Canva step → fake Brevo draft → consented AI → weekly practice → Stop after the extension gate | Packaged-resource regression is distinct from manual platform acceptance |
 | Screen permission denial, full screen and physical second monitor | Exercise those states on the target Mac without weakening security protections | Simulated tests do not establish actual TCC denial/revocation or a second physical display |
-| Final recording and public YouTube URL | Record the accepted 2:50 story after real-platform gates, review the cut and publish to the owner's intended channel | No final recording exists; a synthetic regression screenshot is not a functioning-platform video |
+| Final recording and public YouTube URL | Record the accepted 2:50 story after fake-page correction acceptance, review the cut and publish to the owner's intended channel | No final recording exists; a synthetic regression screenshot is not a functioning-platform video |
 | Registration and eligibility/ratings | Owner confirms Devpost account, residence, new/existing status, ratings and declarations | The connected Devpost account still lists only WebMCP on 4 October. Identity, experience ratings and binding declarations cannot be invented or accepted on behalf of the owner |
 
-No email/post was sent, no campaign scheduled, and no Devpost agreement accepted or entry submitted.
+No real email/post was sent, no real campaign scheduled, and no Devpost agreement accepted or entry submitted.
 
 ## Reproduce the packaged-resource rehearsal
 
@@ -41,3 +41,9 @@ AVERILL_NATIVE_APP="$PWD/travel-desktop/dist/Averill-darwin-arm64/Averill.app/Co
 ```
 
 The explicit flag permits only generated public policy/draft text to Token Factory. Configure NEBIUS_API_KEY locally; it is not printed. Omit the flag for offline regression. Temporary profiles are removed after successful or failed child execution. This command uses development Electron with the release's app resources; it does not itself launch the distributed `.app` executable.
+
+## Local fake pages clarified by the owner
+
+Brevo requires no sign-in. See demo-tools/social-simulator/README.md for implemented scope and actual browser checks. Instagram/LinkedIn existing layouts are preserved. Two simulator timezone/date tests and build pass. Image upload is not claimed verified: the browser controller lacked file access. Extension installation approval was requested and remains pending.
+
+The source-controlled simulator independently passed npm ci, 2/2 tests and build. npm reports zero vulnerabilities after removal of the unused Tailwind build dependency; its unchanged static reset and MIT license are retained. Brevo Home now uses Vamo, a current Copenhagen calendar and actual local scheduled state instead of fixed September data. This final Home cleanup was build-verified; browser checks above preceded it.

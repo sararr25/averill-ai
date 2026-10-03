@@ -1,3 +1,5 @@
+> Demo scope corrected on 4 October: use the local fake Brevo, Instagram and LinkedIn pages without platform accounts. See demo-tools/social-simulator/README.md for page verification and remaining extension/image checks. Production integration remains a separate product boundary.
+
 # External-work acceptance matrix
 
 Current evidence, 4 October 2026: see [ACCEPTANCE_2026-10-04.md](ACCEPTANCE_2026-10-04.md). 47/47 tests, real Canva OCR/edit/Stop, live synthetic Nemotron request, packaged renderer consent cancellation/review and restart now pass. The DOM field adapter and explicit field requirements exist; actual installed Chrome and email/social platform acceptance remain open. Earlier totals and missing-implementation statements below are historical.

@@ -1,3 +1,5 @@
+> 4 October owner correction: Brevo, Instagram and LinkedIn are local fake pages; no Brevo sign-in is required. The simulator is versioned in demo-tools/social-simulator/. Brevo page flow and LinkedIn text persistence passed; installed-extension correction acceptance awaits the owner's approval request. References to real Brevo login below describe an abandoned acceptance target, not a current gate.
+
 # Follow-up milestones — 3 October 2026
 
 The owner requested points 1–5 in order, with one commit and GitHub push after each completed milestone. This is the current execution ledger; historical evidence in other documents does not establish new acceptance.
@@ -6,7 +8,7 @@ The owner requested points 1–5 in order, with one commit and GitHub push after
 | --- | --- | --- |
 | 1 | Release consistency, current docs, app/ZIP verification and GitHub synchronization | Complete — pushed 00282cc |
 | 2 | Coherent Vamo source/fixture pack and current People guidance | Complete — pushed 17abad5 |
-| 3 | A real external email draft correction loop | Pushed d367ce5 — local implementation verified; Brevo sign-in acceptance pending |
+| 3 | A real external email draft correction loop | Pushed d367ce5 — local implementation verified; fake Brevo extension-assisted acceptance pending |
 | 4 | Field-aware observation and broader task requirements | Pushed a60d861 — implemented; installed Chrome/platform acceptance pending |
 | 5 | Canva/AI rehearsal, event requirements and submission preparation | Preparation and live synthetic Nemotron request verified; full recording/platform gates open |
 

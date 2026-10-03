@@ -1,10 +1,11 @@
+<!-- Current demo correction: no Brevo sign-in is needed. -->
 # Averill execution handover
 
 ## Pending-work continuation — 4 October 2026
 
 [Current acceptance record](ACCEPTANCE_2026-10-04.md) supersedes the earlier consent-UI/restart gates. 47/47 tests pass. Packaged-resource regression now verifies consent cancellation, one live generated-public-text Nebius/NVIDIA review through renderer handlers, correction, authority revocation, Stop, weekly practice, person isolation and second-process restart. Work displays the actual runtime model. The actual unsigned `.app` also launched on this Mac at the existing workspace sign-in screen; normal user data was preserved.
 
-The public preview build is published at GitHub release `v0.1.0-preview.20261004`, targeting `3ce9e29`. Unauthenticated page/download HTTP 200 and the uploaded ZIP digest were verified. Real email login, explicit local-extension installation permission, platform/full hardware rehearsal, final recording/public YouTube URL and owner submission declarations remain gates. The regression harness is not a substitute for installed Chrome or a real email editor.
+The public preview build is published at GitHub release `v0.1.0-preview.20261004`, targeting `3ce9e29`. Unauthenticated page/download HTTP 200 and the uploaded ZIP digest were verified. Explicit local-extension installation permission, platform/full hardware rehearsal, final recording/public YouTube URL and owner submission declarations remain gates. The regression harness is distinct from installed Chrome acceptance on the local fake editors.
 
 ## Current rehearsal and submission preparation — 3 October 2026
 
@@ -26,7 +27,7 @@ The opt-in extension in `travel-desktop/browser-extension/` shares one clicked t
 
 ## Current email loop — 3 October 2026
 
-Work now offers **Read and recheck locally**, which reads fresh selected-window text before exact-rule review and makes no provider request. Advice clears when person/source authority/policy or chosen work type changes. Native synthetic email correction/citation/revocation/Stop passes. Actual Brevo draft acceptance needs user sign-in; see the milestone ledger.
+Work now offers **Read and recheck locally**, which reads fresh selected-window text before exact-rule review and makes no provider request. Advice clears when person/source authority/policy or chosen work type changes. Native synthetic email correction/citation/revocation/Stop passes. The demo uses the local fake Brevo page without sign-in; extension-assisted correction acceptance remains pending. See demo-tools/social-simulator/README.md.
 
 ## Current demo migration — 3 October 2026
 
@@ -226,3 +227,12 @@ Knowledge previews now strip simple Markdown heading/backtick markers for readin
 Modules: knowledge.js (role-filtered local query), knowledge-ui.js and feedback-ui.js; preload operation notifications and main-process knowledge/read-upload IPC. Existing work sharing, learning and external AI boundaries are preserved. Avoid restoring the old silent callbacks or re-enabling intrinsically disabled cloud buttons after onboarding operations.
 
 26 Node tests pass, including upload visibility, text search and exclusion of another person's private personnel evidence. `npm run verify:feedback` passes against source and rebuilt bundle resources: native pending/success/error/cancel, pre-confirmation and approved library, local text reading/search, viewport bounds and logout cleanup in an isolated synthetic profile. `AVERILL_NATIVE_APP` selects final bundle Resources/app. The 28 September source renderer was visually checked in Review (ready/finding), Work, Knowledge search, and Campaign Files v1/v2. This is not a direct launch of the final `.app` executable; the normal user profile is preserved.
+
+
+## Fake platform demo — 4 October 2026 correction
+
+The owner confirmed that Brevo, Instagram and LinkedIn are local fake pages. Real account sign-in is not a hackathon demo gate. `demo-tools/social-simulator/` now contains a reproducible source copy of the existing sibling simulator, preserving the social profile/feed layouts. Brevo uses fictional Vamo sender/audiences, an intentionally flawed Winter Escapes draft, persisted folders and separate Copenhagen date/time/timezone controls. Unsupported controls are labeled or disabled; no real send occurs.
+
+Simulator tests: 2/2 timezone/date cases and production build pass. Actual Chrome checks passed Brevo creation/edit/preview/scheduling/reload and LinkedIn text save/reload; Instagram profile/composer inspection passed, but image chooser/save remains manual acceptance because the Chrome controller refused local file access and then became unresponsive during selection. The request to install Averill's local extension has been sent to the owner and remains unanswered. Do not change the Codex controller's permissions as a workaround. Full Averill observation/correction/Stop on these pages is still separate from page behavior verification.
+
+The source-controlled simulator independently passed npm ci, 2/2 tests and build. npm reports zero vulnerabilities after removal of the unused Tailwind build dependency; its unchanged static reset and MIT license are retained. Brevo Home now uses Vamo, a current Copenhagen calendar and actual local scheduled state instead of fixed September data. This final Home cleanup was build-verified; browser checks above preceded it.
