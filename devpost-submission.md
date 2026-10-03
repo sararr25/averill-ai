@@ -41,7 +41,7 @@ Complete real-platform acceptance, signing/notarization, broader supported field
 - Repository: https://github.com/sararr25/averill-ai — MIT, setup in README.md.
 - Track proposed: Best apps and agents.
 - Video: TODO public YouTube URL, final cut 2:50.
-- Demo/test build: https://github.com/sararr25/averill-ai/releases/tag/v0.1.0-preview.20261004 — verify release publication and clean judge download; unsigned macOS arm64.
+- Demo/test build: https://github.com/sararr25/averill-ai/releases/tag/v0.1.0-preview.20261004 — published; public page/download HTTP 200 and upload digest verified; unsigned macOS 13+ arm64. Clean target-Mac installation remains separate.
 - Submitter type / organization / residence / province: TODO owner confirmation.
 - New or existing before 26 August / significant updates: TODO owner confirmation against project history.
 - Model quality (1–10), Nebius recommendation (1–10), inference experience (1–10): TODO owner ratings.

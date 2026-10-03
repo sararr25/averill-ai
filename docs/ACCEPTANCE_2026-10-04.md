@@ -13,7 +13,7 @@ Continuation requested by the owner: finish pending work and keep committing/pus
 
 ## Public test build
 
-Release target: `v0.1.0-preview.20261004`, on the public `sararr25/averill-ai` repository. Release assets are the verified ZIP and SHA256SUMS; the release notes describe local setup, unsigned arm64 scope and open platform gates. Confirm actual release publication before treating this URL as available:
+Published release: `v0.1.0-preview.20261004`, on the public `sararr25/averill-ai` repository. Release assets are the verified ZIP and SHA256SUMS; the release notes describe local setup, unsigned arm64 scope and open platform gates. The release and download both returned HTTP 200 without authentication. GitHub reports the same uploaded ZIP digest as the locally verified archive: `acef84c59cf6bc5609d17328aff7a6129c4624a26d33b3d508d03fc87125ef8b`. Release target is commit `3ce9e296011e254494c7f25a4896732ce74af566`. Public URL:
 
 https://github.com/sararr25/averill-ai/releases/tag/v0.1.0-preview.20261004
 
