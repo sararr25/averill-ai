@@ -5,8 +5,8 @@ The owner requested points 1–5 in order, with one commit and GitHub push after
 | Point | Scope | Status |
 | --- | --- | --- |
 | 1 | Release consistency, current docs, app/ZIP verification and GitHub synchronization | Complete — pushed 00282cc |
-| 2 | Coherent Vamo source/fixture pack and current People guidance | Complete — 44/44 regressions pass |
-| 3 | A real external email draft correction loop | Pending |
+| 2 | Coherent Vamo source/fixture pack and current People guidance | Complete — pushed 17abad5 |
+| 3 | A real external email draft correction loop | Local implementation verified; Brevo sign-in acceptance pending |
 | 4 | Field-aware observation and broader task requirements | Pending |
 | 5 | Canva/AI rehearsal, event requirements and submission preparation | Pending |
 
@@ -23,3 +23,7 @@ Shipped sources, new accounts, XLSX/PDF/SVG intake and current artwork use Vamo.
 Point 2 regression suite: 44/44. Current source SVG/PDF/XLSX documents extract with Vamo identity; the native task-review check is rerun before commit.
 
 Point 2 native task-review passed. App/ZIP release passed with 107 source files, both helpers and 3,096 archive entries. Current archive SHA-256: `f83989b24f775a45f9334f29090e62cce18ff4a58ca0d358c1c0619207d722c3`.
+
+## Point 3
+
+Added a local Read and recheck action that captures fresh selected-window text before reviewing current approved sources. Existing displayed findings clear on source/person/policy changes and work-type changes. The native email smoke verifies the employee correction through this action, exact citation, source revocation and Stop. Actual Brevo is at its login screen; its unpublished-draft acceptance remains open, awaiting user sign-in. No actual platform success is claimed.

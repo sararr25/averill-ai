@@ -8,6 +8,10 @@ Use `npm run package:release` from `travel-desktop` to rebuild the unsigned arm6
 
 The owner authorized pushing the five follow-up milestones on 3 October. The earlier publication block is historical; record each new milestone and its push separately in [MILESTONES_2026-10-03.md](MILESTONES_2026-10-03.md). Real-platform, permission and physical-display gates remain open.
 
+## Current email loop — 3 October 2026
+
+Work now offers **Read and recheck locally**, which reads fresh selected-window text before exact-rule review and makes no provider request. Advice clears when person/source authority/policy or chosen work type changes. Native synthetic email correction/citation/revocation/Stop passes. Actual Brevo draft acceptance needs user sign-in; see the milestone ledger.
+
 ## Current demo migration — 3 October 2026
 
 The shipped campaign sources, current artwork labels, four editors, tests, manual pack and mixed-format intake now use Vamo. Packs are `demo-company/vamo/` and `demo-company/vamo-intake/`; People guide v2 describes local sign-in. Newly generated fictional addresses use `vamo.example`; new draft keys use `vamo:v2`. Existing normal-profile credentials, imported copies, approvals, login documents and old drafts remain unchanged. Use a fresh isolated Vamo workspace for recording, or explicitly reimport and reapprove updated source files. Do not silently rename account emails or treat changed text as previously approved. See [DEMO_MIGRATION.md](DEMO_MIGRATION.md).

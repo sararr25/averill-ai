@@ -41,15 +41,15 @@ app.whenReady().then(async () => {
     assert.ok(before.findings.some(item => item.type === 'missing-required-text'));
     await external.webContents.executeJavaScript("document.getElementById('draft').textContent='Discover curated winter city breaks. You are receiving this email because you subscribed to Vamo. Unsubscribe anytime.'");
     await pause(400);
-    const secondCapture = await run('window.desktop.reviewExternal()');
-    const corrected = await run("window.desktop.reviewExternalTask('email',false)");
+    const corrected = await run("window.desktop.recheckExternalTask('email')");
+    const secondCapture = await run('window.desktop.snapshot()').then(s => s.externalObservation);
     assert.equal(corrected.findings.length, 0, `Remaining: ${corrected.findings.map(item => item.type).join(', ')}; visible: ${secondCapture.text}`);
     await run(`window.desktop.updateSource(${JSON.stringify(policy.id)},'superseded',0,'Test revocation')`);
     const revoked = await run("window.desktop.reviewExternalTask('email',false)");
     assert.match(revoked.status, /No approved/);
     await run('window.desktop.shareExternal(null,null)');
     await assert.rejects(() => run("window.desktop.reviewExternalTask('email',false)"), /Read the selected window/);
-    console.log('PASS external email rule citation, employee correction, source revocation and Stop');
+    console.log('PASS external email rule citation, employee correction, fresh recheck, source revocation and Stop');
     app.quit();
   } catch (error) { console.error(error.stack); app.exit(1); }
 });

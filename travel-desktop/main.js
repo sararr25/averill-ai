@@ -554,6 +554,15 @@ app.whenReady().then(async () => {
     publish(); return snapshot();
   });
   ipcMain.handle('agent:external-review', async (event) => { fromAgent(event); return captureExternal(); });
+  ipcMain.handle('agent:external-recheck', async (event, task) => {
+    fromAgent(event);
+    if (!taskReview.tasks[task]) throw new Error('Choose a supported work type.');
+    await captureExternal();
+    fromAgent(event);
+    const observed = externalObservation;
+    if (!observed || !selectedExternalWindow) throw new Error('Sharing stopped before review completed.');
+    return { ...taskReview.localReview(companyWorkspace, task, observed.text), observedAt: observed.capturedAt, method: observed.method, window: observed.windowName, contentHash: observed.contentHash };
+  });
   ipcMain.handle('agent:external-task-review', async (event, task, useAI) => {
     fromAgent(event);
     if (!taskReview.tasks[task]) throw new Error('Choose a supported work type.');

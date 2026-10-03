@@ -1,3 +1,4 @@
+let lastWorkAuthority = null;
 const kinds = [
   { id: 'email', title: 'Email Studio', detail: 'Draft, audience and footer', icon: 'mail' },
   { id: 'linkedin', title: 'LinkedIn Draft', detail: 'Organic company post and campaign visual', icon: 'image' },
@@ -52,6 +53,8 @@ function render() {
     el('context-question').value = ''; el('context-result').replaceChildren(); el('external-result').replaceChildren(); el('external-task-result').replaceChildren();
     return;
   }
+  const authority = JSON.stringify([current.workspace?.activePersonId, current.workspace?.sources, current.privacy]);
+  if (authority !== lastWorkAuthority) { lastWorkAuthority = authority; el('external-task-result').replaceChildren(); el('context-result').replaceChildren(); }
   renderWorkspace();
   renderKnowledge();
   renderLearning();
@@ -60,6 +63,7 @@ function render() {
   el('watch-external').disabled = !current.externalWindow;
   el('watch-external').textContent = current.externalWatching ? 'Pause observing' : 'Start observing';
   el('stop-external').disabled = !current.externalWindow;
+  el('external-local-recheck').disabled = !current.externalWindow;
   el('external-task-review').disabled = !current.externalObservation;
   if (current.externalWindow?.id !== lastExternalWindowId) {
     lastExternalText = '';
@@ -457,6 +461,24 @@ el('watch-external').addEventListener('click', async () => {
   catch (error) { el('external-watch-status').textContent = error.message; }
 });
 el('stop-external').addEventListener('click', async () => { current = await window.desktop.shareExternal(null, null); el('external-result').textContent = 'Window sharing stopped.'; el('external-list').replaceChildren(); render(); });
+el('external-local-recheck').addEventListener('click', async () => {
+  const output = el('external-task-result'); output.textContent = 'Reading the selected window and checking current sources locally…';
+  try { renderTaskReview(await window.desktop.recheckExternalTask(el('external-task').value)); }
+  catch (error) { output.textContent = error.message; }
+});
+el('external-task').addEventListener('change', () => el('external-task-result').replaceChildren());
+function renderTaskReview(result) {
+  const output = el('external-task-result');
+  if (result.contentHash !== current.externalObservation?.contentHash) { output.textContent = 'The visible work changed. Review the current text again.'; return; }
+  output.replaceChildren(node('p', `${result.status} ${result.mode === 'model' ? 'Nebius review completed.' : 'Local rule check.'}`));
+  for (const item of result.findings) {
+    const card = node('div', undefined, 'workspace-source');
+    card.append(node('strong', item.confidence === 'model-suggestion' ? 'AI suggestion' : 'Approved rule match'), node('p', item.suggestion));
+    if (item.observedExcerpt) card.append(node('small', `Observed: “${item.observedExcerpt}”`));
+    card.append(sourceButton(item.source), node('small', `Source v${item.source.version}: “${item.source.quote}”`));
+    output.append(card);
+  }
+}
 el('external-task-review').addEventListener('click', async () => {
   const output = el('external-task-result'); output.textContent = 'Checking current approved sources…';
   const task = el('external-task').value;
@@ -464,15 +486,7 @@ el('external-task-review').addEventListener('click', async () => {
   if (useAI && !window.confirm(`Send the observed text from ${current.externalWindow?.name || 'the selected window'} and eligible approved sources to Nebius for this review?`)) { output.textContent = 'Review cancelled.'; return; }
   try {
     const result = await window.desktop.reviewExternalTask(task, useAI);
-    if (result.contentHash !== current.externalObservation?.contentHash) { output.textContent = 'The visible work changed. Review the current text again.'; return; }
-    output.replaceChildren(node('p', `${result.status} ${result.mode === 'model' ? 'Nebius review completed.' : 'Local rule check.'}`));
-    for (const item of result.findings) {
-      const card = node('div', undefined, 'workspace-source');
-      card.append(node('strong', item.confidence === 'model-suggestion' ? 'AI suggestion' : 'Approved rule match'), node('p', item.suggestion));
-      if (item.observedExcerpt) card.append(node('small', `Observed: “${item.observedExcerpt}”`));
-      card.append(sourceButton(item.source), node('small', `Source v${item.source.version}: “${item.source.quote}”`));
-      output.append(card);
-    }
+    renderTaskReview(result);
   } catch (error) { output.textContent = error.message; }
 });
 el('context-form').addEventListener('submit', async (event) => {
