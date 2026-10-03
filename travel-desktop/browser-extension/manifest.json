@@ -1,0 +1,1 @@
+{"manifest_version":3,"name":"Averill selected-field companion","version":"0.1.0","description":"Share one selected draft field locally with Averill after an edit pause. No sending or publication.","permissions":["activeTab","scripting","storage"],"host_permissions":["http://127.0.0.1/*"],"background":{"service_worker":"background.js"},"action":{"default_popup":"popup.html"}}

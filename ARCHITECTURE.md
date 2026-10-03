@@ -4,7 +4,7 @@ Current update, 3 October 2026: shipped packs/editors use Vamo, new person-scope
 
 ## Purpose and status
 
-This document describes the implemented hackathon prototype and the boundaries for extending it. Vamo is the separate fictional travel company with a standalone website in `travel-site/`. Averill is the Electron companion for employees working in their usual tools. A floating Ask Averill button opens the assistant; the user can select one external app or browser window for a one-time read or explicit six-second local observation. macOS Accessibility text is preferred, with visible-text OCR fallback. The four supplied editor windows and source pack use Vamo and remain synthetic fixtures. Vamo and Averill never share a name, logo or design system; the website palette and editorial travel treatment do not enter the assistant UI. Browser DOM fields and platform APIs remain future adapters.
+This document describes the implemented hackathon prototype and the boundaries for extending it. Vamo is the separate fictional travel company with a standalone website in `travel-site/`. Averill is the Electron companion for employees working in their usual tools. A floating Ask Averill button opens the assistant; the user can select one external app or browser window for a one-time read or explicit six-second local observation. macOS Accessibility text is preferred, with visible-text OCR fallback. The four supplied editor windows and source pack use Vamo and remain synthetic fixtures. Vamo and Averill never share a name, logo or design system; the website palette and editorial travel treatment do not enter the assistant UI. An opt-in activeTab DOM adapter is implemented in browser-extension with ephemeral authenticated loopback transport; actual installed-platform acceptance remains open. Official platform draft APIs remain future adapters.
 
 ## Requirements
 
@@ -141,3 +141,7 @@ Desktop/Finder drop, local/synced files, HTTPS links and Google Drive/OneDrive s
 ## Feedback and know-how library — 27 September 2026
 
 A persistent status banner reports pending, completed, cancelled and failed explicit actions. Knowledge provides local document/text search, uploaded proposals, approved/pending/private/superseded sources, extracted-text reading and original-file access under existing role visibility. Intake is visible before onboarding confirmation. The library does not send documents to external AI. See the handover and onboarding tutorial for current verification and workflow.
+
+## Browser field transport — 3 October 2026
+
+`browser-bridge.js` starts only after signed-in Work pairing, binds to a random loopback port, validates Host/extension Origin/token and one tab/origin, and rejects stale sequences. Stop/person change closes it and clears text. Field selection/pause/blur yields bounded DOM value and field metadata; typing yields an invalidation event. Extension session storage carries only short-lived pairing, never company files or provider keys. Company task review checks explicit requirements only against matching selected-field evidence. Native OCR remains a separate fallback without inferred field structure. Cross-origin frames and live-platform acceptance are open.

@@ -38,7 +38,7 @@ function observation({ personId, windowId, windowName, method, text, timestamp =
     windowId,
     windowName,
     method,
-    confidence: method === 'accessibility' ? 'structured-text' : 'visible-text-only',
+    confidence: method === 'browser-dom' ? 'selected-field' : method === 'accessibility' ? 'structured-text' : 'visible-text-only',
     capturedAt: timestamp.toISOString(),
     text: content,
     sensitiveRedacted,

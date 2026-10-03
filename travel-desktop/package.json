@@ -17,7 +17,8 @@
     "verify:task-review": "electron scripts/verify-task-review.cjs",
     "verify:native-window": "electron scripts/verify-native-window.cjs",
     "package:release": "node scripts/release.cjs",
-    "verify:release": "node scripts/release.cjs --verify"
+    "verify:release": "node scripts/release.cjs --verify",
+    "verify:browser": "electron scripts/verify-browser.cjs"
   },
   "dependencies": {
     "@fontsource/fragment-mono": "^5.3.0",

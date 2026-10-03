@@ -125,3 +125,5 @@ Desktop/Finder drop, local/synced files, HTTPS links and Google Drive/OneDrive s
 ## Feedback and know-how library — 27 September 2026
 
 A persistent status banner reports pending, completed, cancelled and failed explicit actions. Knowledge provides local document/text search, uploaded proposals, approved/pending/private/superseded sources, extracted-text reading and original-file access under existing role visibility. Intake is visible before onboarding confirmation. The library does not send documents to external AI. See the handover and onboarding tutorial for current verification and workflow.
+
+Current 3 October addition: opt-in selected-field browser adapter and exact source-backed audience/date/time/asset/procedure/version requirements are implemented. See the extension README and milestone ledger for the distinction between synthetic transport/DOM tests and installed real-platform acceptance.

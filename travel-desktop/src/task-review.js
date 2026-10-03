@@ -22,15 +22,23 @@ function visibleMatch(observed, phrase) {
   return observed.match(new RegExp(pattern, 'i'))?.[0] || '';
 }
 
-function localReview(data, task, observedText) {
+function localReview(data, task, observedText, observedField = null) {
   const observed = String(observedText || '').trim().slice(0, 6000);
   const sources = currentSources(data, task);
   if (!observed) return { mode: 'local', findings: [], status: 'No readable work text. Select a window and read it again.' };
   if (!sources.length) return { mode: 'local', findings: [], status: 'No approved, visible and conflict-free source is available for this work type.' };
   const findings = [];
+  const unchecked = new Set();
   for (const { source, text } of sources) {
     for (const line of text.split(/\r?\n/)) {
       const rule = line.trim();
+      const fieldRule = rule.match(/^Field requirement:\s*(email|linkedin|instagram|canva|operations|people)\s*\|\s*(audience|date|time|asset|procedure|version|disclosure)\s*\|\s*"([^"]{1,200})"\.?$/i);
+      if (fieldRule && fieldRule[1].toLowerCase() === task) {
+        const [, , fieldName, expected] = fieldRule;
+        const labels = {audience:/audience|segment/i,date:/date/i,time:/time/i,asset:/asset|creative|file/i,procedure:/procedure|step/i,version:/version|brief/i,disclosure:/disclosure|partnership/i};
+        if (!observedField || !labels[fieldName.toLowerCase()].test(observedField.label)) unchecked.add(fieldName.toLowerCase());
+        else if (observedField.value.trim().toLowerCase() !== expected.trim().toLowerCase()) findings.push({type:'field-requirement', observedExcerpt:observedField.value, suggestion:`The approved ${fieldName} is “${expected}”. Check and update this selected field yourself.`, source:citation(source,rule),confidence:'selected-field-rule'});
+      }
       const banned = [...rule.matchAll(/(?:do not claim|remove|must not use)\s+[“"]([^”"]{5,120})[”"]/gi)];
       for (const [, phrase] of banned) {
         const excerpt = visibleMatch(observed, phrase);
@@ -38,7 +46,7 @@ function localReview(data, task, observedText) {
         findings.push({ type: 'forbidden-claim', observedExcerpt: excerpt, suggestion: `Review and remove the quoted claim. The approved source says: ${rule}`, source: citation(source, rule), confidence: 'exact-rule' });
       }
       const required = task === 'email' && /every marketing email must include this footer/i.test(rule) || task === 'instagram' && /for paid creator content, include/i.test(rule) || task === 'linkedin' && /include [“"]explore the winter collection/i.test(rule);
-      if (required) {
+      if (required && (!observedField || /body|message|caption|post copy|email content/i.test(observedField.label))) {
         const quoted = rule.match(/[“"]([^”"]{8,200})[”"]/);
         if (quoted && !visibleMatch(observed, quoted[1]) && !findings.some(f => f.source.id === source.id && f.type === 'missing-required-text')) {
           findings.push({ type: 'missing-required-text', observedExcerpt: '', suggestion: `Check whether this required text belongs in the draft: ${quoted[1]}`, source: citation(source, rule), confidence: 'source-rule-visible-text' });
@@ -46,11 +54,11 @@ function localReview(data, task, observedText) {
       }
     }
   }
-  return { mode: 'local', findings: findings.slice(0, 6), status: findings.length ? 'Exact company rules matched the visible text. Check the surrounding editor state before acting.' : 'No exact rule conflict found in visible text. This is not a full content, layout or publication check.' };
+  return { mode: 'local', uncheckedFields: [...unchecked], findings: findings.slice(0, 6), status: findings.length ? 'Exact company rules matched the visible text. Check the surrounding editor state before acting.' : 'No exact rule conflict found in visible text. This is not a full content, layout or publication check.' };
 }
 
-async function reviewTask(data, task, observedText, key, useAI = false) {
-  const local = localReview(data, task, observedText);
+async function reviewTask(data, task, observedText, key, useAI = false, observedField = null) {
+  const local = localReview(data, task, observedText, observedField);
   if (!useAI) return local;
   if (!privacy.allowed(data) || !key) return { ...local, status: `${local.status} Nebius is unavailable or company AI is disabled.` };
   if (privacy.credentials(observedText)) throw new Error('Remove credentials from the observed work before Nebius review.');

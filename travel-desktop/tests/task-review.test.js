@@ -66,3 +66,14 @@ test('Nebius suggestions require exact observed and approved source excerpts', a
 });
 
 test.after(() => fs.rmSync(root, { recursive: true, force: true }));
+
+test('selected-field requirements check only observed metadata; OCR never invents audience or schedule', t => {
+ const directory=fs.mkdtempSync(path.join(os.tmpdir(),'averill-fields-'));t.after(()=>fs.rmSync(directory,{recursive:true,force:true}));
+ const file=path.join(directory,'rules.md');fs.writeFileSync(file,'Field requirement: email | audience | "Travel subscribers — Denmark".\nField requirement: email | date | "2026-10-15".\nField requirement: operations | procedure | "Awaiting human verification".');
+ const state={people:[{id:'owner',role:'admin'}],activePersonId:'owner',sources:[{id:'rules',title:'Current requirements',version:'2',department:'Marketing',scope:'company',status:'approved',textPath:file,ownerId:'owner'}]};
+ const ocr=localReview(state,'email','Everyone in Europe');assert.equal(ocr.findings.length,0);assert.deepEqual(ocr.uncheckedFields,['audience','date']);
+ const field=localReview(state,'email','Everyone in Europe',{label:'Audience segment',kind:'select',value:'Everyone in Europe'});assert.equal(field.findings[0].type,'field-requirement');assert.ok(field.findings[0].source.quote.includes('Travel subscribers'));assert.deepEqual(field.uncheckedFields,['date']);
+ assert.equal(localReview(state,'email','Travel subscribers — Denmark',{label:'Audience',kind:'select',value:'Travel subscribers — Denmark'}).findings.length,0);
+ assert.equal(localReview(state,'operations','Confirmed booking',{label:'Procedure',kind:'text',value:'Confirmed booking'}).findings.length,1);
+ state.sources[0].status='superseded';assert.equal(localReview(state,'email','Everyone',{label:'Audience',kind:'select',value:'Everyone'}).findings.length,0);
+});

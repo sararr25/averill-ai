@@ -10,3 +10,8 @@ Company: Vamo. Version: 1. Owner: Maya Jensen, Marketing lead. Synthetic demonst
 21 October 2026 was the date in superseded brief v1 and is not the approved launch slot.
 
 26 September extension: 16 October 2026, 09:00: organic Vamo LinkedIn company post. Use `winter-linkedin-landscape.svg` and the approved message/CTA in `linkedin-campaign.md`.
+
+## Explicit field requirements
+Field requirement: instagram | date | "2026-10-17".
+Field requirement: instagram | time | "18:00".
+Field requirement: instagram | asset | "winter-reel-vertical.svg".

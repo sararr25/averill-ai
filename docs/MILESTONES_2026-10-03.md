@@ -7,7 +7,7 @@ The owner requested points 1–5 in order, with one commit and GitHub push after
 | 1 | Release consistency, current docs, app/ZIP verification and GitHub synchronization | Complete — pushed 00282cc |
 | 2 | Coherent Vamo source/fixture pack and current People guidance | Complete — pushed 17abad5 |
 | 3 | A real external email draft correction loop | Local implementation verified; Brevo sign-in acceptance pending |
-| 4 | Field-aware observation and broader task requirements | Pending |
+| 4 | Field-aware observation and broader task requirements | Implemented; installed Chrome/platform acceptance pending |
 | 5 | Canva/AI rehearsal, event requirements and submission preparation | Pending |
 
 ## Point 1
@@ -27,3 +27,9 @@ Point 2 native task-review passed. App/ZIP release passed with 107 source files,
 ## Point 3
 
 Added a local Read and recheck action that captures fresh selected-window text before reviewing current approved sources. Existing displayed findings clear on source/person/policy changes and work-type changes. The native email smoke verifies the employee correction through this action, exact citation, source revocation and Stop. Actual Brevo is at its login screen; its unpublished-draft acceptance remains open, awaiting user sign-in. No actual platform success is claimed.
+
+## Point 4
+
+Added an opt-in activeTab browser extension, authenticated ephemeral loopback pairing, one selected field, pause/blur/selection events, typing invalidation, foreground/heartbeat Stop and person/session cleanup. Added explicit source-backed audience/date/time/asset/procedure/version/disclosure requirements with unobserved-field reporting; OCR does not invent field metadata. Native browser IPC/DOM smoke passed with a synthetic extension client. The 47-test suite is rerun before commit. Actual Chrome installation/permissions and platform-specific DOM acceptance remain open.
+
+Point 4 current validation: **47/47 tests**, native browser IPC/content-script smoke and native email task-review smoke pass. Release comparison passed: 116 tracked files, both helpers and 3,105 archive entries. Archive SHA-256 `c1d00b343b8fe8bab19acdb851c7bbe1d2f489f5b392d8a418d577e5fb1c3f51`. Actual Chrome extension loading awaits owner permission; Brevo awaits sign-in.

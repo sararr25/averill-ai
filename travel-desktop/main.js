@@ -22,6 +22,7 @@ const { searchPublicWeb, factCheckPublic } = require('./src/web-search');
 const { nativeWindow, observation, windowNumber } = require('./src/external-observation');
 const { clampCompanion } = require('./src/companion-position');
 const taskReview = require('./src/task-review');
+const { BrowserBridge } = require('./src/browser-bridge');
 
 const workKinds = ['email', 'linkedin', 'social', 'handover'];
 const workWindows = new Map();
@@ -41,6 +42,14 @@ let externalWatchTimer = null;
 let externalCaptureBusy = false;
 let externalError = '';
 let externalEpoch = 0;
+const browserBridge = new BrowserBridge({
+  onObservation: result => {
+    if (!signedIn() || browserBridge.personId !== companyWorkspace.activePersonId) { browserBridge.stop(); return; }
+    selectedExternalWindow = { id: result?.windowId || selectedExternalWindow?.id || 'browser:pending', name: 'Shared browser field', adapter: 'browser-dom' };
+    externalObservation = result; externalWatching = true; externalError = result ? '' : 'Editing selected field. Review updates after a pause.'; publish();
+  },
+  onStop: () => { stopExternal(); publish(); },
+});
 const runtimeKeys = { nebius: process.env.NEBIUS_API_KEY || '', tavily: process.env.TAVILY_API_KEY || '' };
 
 function secretPath() { return path.join(app.getPath('userData'), 'averill-secrets.enc.json'); }
@@ -72,6 +81,7 @@ function signedIn() {
 }
 function requireSession() { if (!signedIn()) throw new Error('Sign in to your account first.'); }
 function stopExternal(clearSelection = true) {
+  browserBridge.stop();
   externalEpoch += 1;
   if (externalWatchTimer) clearInterval(externalWatchTimer);
   externalWatchTimer = null;
@@ -98,6 +108,7 @@ function snapshot() {
     onboarding: signedIn() ? onboarding.snapshot(companyWorkspace) : null,
     workspace: signedIn() ? workspace.publicSnapshot(companyWorkspace) : { configured: Boolean(companyWorkspace), company: companyWorkspace?.company },
     learning: learning.snapshot(signedIn() ? companyWorkspace : null),
+    browserBridge: signedIn() ? browserBridge.status() : {ready:false,connected:false},
     externalWindow: signedIn() ? selectedExternalWindow : null,
     externalWatching: signedIn() && externalWatching,
     externalObservation: signedIn() ? externalObservation : null,
@@ -125,6 +136,10 @@ function publish() {
 async function captureExternal() {
   requireSession();
   if (!selectedExternalWindow) throw new Error('Choose a work window first.');
+  if (selectedExternalWindow.adapter === 'browser-dom') {
+    if (!externalObservation) throw new Error('Select a draft field in the browser and finish editing before review.');
+    return { window: externalObservation.windowName, text: externalObservation.text, method: 'browser-dom', capturedAt: externalObservation.capturedAt };
+  }
   const chosen = selectedExternalWindow;
   const personId = companyWorkspace.activePersonId;
   const epoch = externalEpoch;
@@ -554,6 +569,20 @@ app.whenReady().then(async () => {
     publish(); return snapshot();
   });
   ipcMain.handle('agent:external-review', async (event) => { fromAgent(event); return captureExternal(); });
+  ipcMain.handle('agent:browser-pair', async event => {
+    fromAgent(event); stopExternal();
+    const personId = companyWorkspace.activePersonId, pairingEpoch = externalEpoch;
+    const pair = await browserBridge.start(personId);
+    try { fromAgent(event); if (personId !== companyWorkspace.activePersonId || pairingEpoch !== externalEpoch) throw new Error('Sharing or account changed. Start pairing again.'); }
+    catch (error) { browserBridge.stop(); throw error; }
+    publish(); return pair;
+  });
+  ipcMain.handle('agent:browser-copy-pair', async event => {
+    fromAgent(event);
+    if (!browserBridge.token || !browserBridge.server) throw new Error('Start browser pairing first.');
+    clipboard.writeText(JSON.stringify({ endpoint: `http://127.0.0.1:${browserBridge.server.address().port}/observation`, token: browserBridge.token }));
+    return true;
+  });
   ipcMain.handle('agent:external-recheck', async (event, task) => {
     fromAgent(event);
     if (!taskReview.tasks[task]) throw new Error('Choose a supported work type.');
@@ -561,7 +590,7 @@ app.whenReady().then(async () => {
     fromAgent(event);
     const observed = externalObservation;
     if (!observed || !selectedExternalWindow) throw new Error('Sharing stopped before review completed.');
-    return { ...taskReview.localReview(companyWorkspace, task, observed.text), observedAt: observed.capturedAt, method: observed.method, window: observed.windowName, contentHash: observed.contentHash };
+    return { ...taskReview.localReview(companyWorkspace, task, observed.text, observed.field), observedAt: observed.capturedAt, method: observed.method, window: observed.windowName, contentHash: observed.contentHash };
   });
   ipcMain.handle('agent:external-task-review', async (event, task, useAI) => {
     fromAgent(event);
@@ -570,7 +599,7 @@ app.whenReady().then(async () => {
     if (!observed || !selectedExternalWindow || observed.windowId !== selectedExternalWindow.id) throw new Error('Read the selected window before reviewing its work.');
     const personId = companyWorkspace.activePersonId;
     const epoch = externalEpoch;
-    const result = await taskReview.reviewTask(companyWorkspace, task, observed.text, runtimeKeys.nebius, useAI === true && aiEnabled);
+    const result = await taskReview.reviewTask(companyWorkspace, task, observed.text, runtimeKeys.nebius, useAI === true && aiEnabled, observed.field);
     fromAgent(event);
     if (epoch !== externalEpoch || personId !== companyWorkspace.activePersonId || observed.contentHash !== externalObservation?.contentHash) throw new Error('The work changed or sharing stopped. Read it again.');
     const current = new Map(taskReview.currentSources(companyWorkspace, task).map(item => [item.source.id, item]));
@@ -580,6 +609,7 @@ app.whenReady().then(async () => {
   ipcMain.handle('agent:external-watch', (event, enabled) => {
     fromAgent(event);
     if (enabled && !selectedExternalWindow) throw new Error('Choose a work window first.');
+    if (selectedExternalWindow?.adapter === 'browser-dom' && enabled) throw new Error('Browser field sharing is controlled by the extension.');
     if (!enabled) { stopExternal(false); publish(); return snapshot(); }
     externalWatching = true;
     if (!externalWatchTimer) externalWatchTimer = setInterval(watchExternalTick, 6000);
@@ -624,4 +654,5 @@ app.whenReady().then(async () => {
   app.on('activate', () => { if (BrowserWindow.getAllWindows().length === 0) app.quit(); });
 });
 
+app.on('before-quit', () => browserBridge.stop());
 app.on('window-all-closed', () => app.quit());

@@ -59,10 +59,14 @@ function render() {
   renderKnowledge();
   renderLearning();
   renderHero();
+  el('browser-copy-pair').disabled = !current.browserBridge?.ready;
+  el('stop-external').disabled = !current.externalWindow && !current.browserBridge?.ready;
+  if (current.browserBridge?.connected) el('browser-pair-status').textContent = 'Browser field connected. Finish editing to review the selected field.';
+  else if (!current.browserBridge?.ready) el('browser-pair-status').textContent = '';
   el('review-external').disabled = !current.externalWindow;
-  el('watch-external').disabled = !current.externalWindow;
+  el('watch-external').disabled = !current.externalWindow || current.externalWindow.adapter === 'browser-dom';
   el('watch-external').textContent = current.externalWatching ? 'Pause observing' : 'Start observing';
-  el('stop-external').disabled = !current.externalWindow;
+  el('stop-external').disabled = !current.externalWindow && !current.browserBridge?.ready;
   el('external-local-recheck').disabled = !current.externalWindow;
   el('external-task-review').disabled = !current.externalObservation;
   if (current.externalWindow?.id !== lastExternalWindowId) {
@@ -73,13 +77,13 @@ function render() {
     el('context-result').replaceChildren();
     el('external-task-result').replaceChildren();
   }
-  el('external-watch-status').textContent = current.externalError || (current.externalWatching ? 'Observing the selected window locally. Text updates after a pause; no automatic AI request.' : current.externalWindow ? 'Window selected. Observation is paused.' : 'No external work shared.');
+  el('external-watch-status').textContent = current.externalError || (current.externalWatching ? current.externalWindow?.adapter === 'browser-dom' ? 'Sharing one browser field after edit pauses; no automatic AI request.' : 'Observing the selected window locally every six seconds; no automatic AI request.' : current.externalWindow ? 'Window selected. Observation is paused.' : 'No external work shared.');
   if (current.externalObservation && current.externalObservation.contentHash !== lastObservationHash) {
     lastObservationHash = current.externalObservation.contentHash;
     lastExternalText = current.externalObservation.text;
     el('external-task-result').replaceChildren();
     const item = current.externalObservation;
-    el('external-result').replaceChildren(node('strong', `${item.method === 'accessibility' ? 'Accessible text' : 'Visible OCR text'} in ${item.windowName}`), node('small', `Read ${new Date(item.capturedAt).toLocaleTimeString()} · ${item.method === 'ocr' ? 'Only visible text; layout and hidden content are unverified.' : 'Text exposed by the selected app.'}${item.sensitiveRedacted ? ' Sensitive-looking text was redacted.' : ''}`), node('pre', item.text || 'No readable text detected.'));
+    el('external-result').replaceChildren(node('strong', `${item.method === 'browser-dom' ? `Selected field: ${item.field.label}` : item.method === 'accessibility' ? 'Accessible text' : 'Visible OCR text'} in ${item.windowName}`), node('small', `Read ${new Date(item.capturedAt).toLocaleTimeString()} · ${item.method === 'browser-dom' ? 'Only this field is shared; other draft fields and publication are unverified.' : item.method === 'ocr' ? 'Only visible text; layout and hidden content are unverified.' : 'Text exposed by the selected app.'}${item.sensitiveRedacted ? ' Sensitive-looking text was redacted.' : ''}`), node('pre', item.text || 'No readable text detected.'));
   }
   if (!current.externalObservation && lastObservationHash) {
     lastObservationHash = null; lastExternalText = '';
@@ -448,12 +452,20 @@ el('choose-external').addEventListener('click', async () => {
     for (const item of result.windows) list.append(action(`Choose ${item.name}`, () => window.desktop.shareExternal(item.id, item.name)));
   } catch (error) { list.replaceChildren(node('p', error.message)); }
 });
+el('browser-pair').addEventListener('click', async () => {
+  try { await window.desktop.pairBrowser(); el('browser-pair-status').textContent = 'Pairing is ready for two minutes. Copy details into the extension on your chosen draft tab.'; }
+  catch (error) { el('browser-pair-status').textContent = error.message; }
+});
+el('browser-copy-pair').addEventListener('click', async () => {
+  try { await window.desktop.copyBrowserPair(); el('browser-pair-status').textContent = 'Pairing copied. Paste only into the Averill extension; it stays on this Mac.'; }
+  catch (error) { el('browser-pair-status').textContent = error.message; }
+});
 el('review-external').addEventListener('click', async () => {
   const result = el('external-result'); result.textContent = 'Reading visible text from the selected window…';
   try {
     const review = await window.desktop.reviewExternal();
     lastExternalText = review.text || '';
-    result.replaceChildren(node('strong', `${review.method === 'accessibility' ? 'Accessible' : 'Visible OCR'} text in ${review.window}`), node('pre', review.text || 'No readable text detected in this frame.'));
+    result.replaceChildren(node('strong', `${review.method === 'browser-dom' ? 'Selected browser field' : review.method === 'accessibility' ? 'Accessible' : 'Visible OCR'} text in ${review.window}`), node('pre', review.text || 'No readable text detected in this frame.'));
   } catch (error) { result.textContent = error.message; }
 });
 el('watch-external').addEventListener('click', async () => {
@@ -471,6 +483,7 @@ function renderTaskReview(result) {
   const output = el('external-task-result');
   if (result.contentHash !== current.externalObservation?.contentHash) { output.textContent = 'The visible work changed. Review the current text again.'; return; }
   output.replaceChildren(node('p', `${result.status} ${result.mode === 'model' ? 'Nebius review completed.' : 'Local rule check.'}`));
+  if (result.uncheckedFields?.length) output.append(node('small', `Not observed in this field: ${result.uncheckedFields.join(', ')}.`));
   for (const item of result.findings) {
     const card = node('div', undefined, 'workspace-source');
     card.append(node('strong', item.confidence === 'model-suggestion' ? 'AI suggestion' : 'Approved rule match'), node('p', item.suggestion));

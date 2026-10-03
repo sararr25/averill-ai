@@ -18,3 +18,9 @@ Email hero: `winter-email-hero.svg`. Partner Reel: `winter-reel-vertical.svg`. S
 
 ## Organic LinkedIn extension — approved 26 September 2026
 The original email/Reel schedule remains unchanged. The organic company post uses `winter-linkedin-landscape.svg` on 16 October at 09:00 Europe/Copenhagen. Use `linkedin-campaign.md` for its editorial audience, message and CTA. Do not apply Instagram paid partnership requirements to this fixture.
+
+## Explicit field requirements
+Field requirement: email | audience | "Travel subscribers — Denmark".
+Field requirement: email | date | "2026-10-15".
+Field requirement: email | time | "10:00".
+Field requirement: email | asset | "winter-email-hero.svg".

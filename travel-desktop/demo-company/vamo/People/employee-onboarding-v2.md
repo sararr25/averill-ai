@@ -12,3 +12,5 @@ Never share account passwords as company knowledge. The administrator retrieves 
 Employees explicitly choose work to share and can stop sharing. Canva lesson completion is employee-confirmed practice, not verified mastery. Weekly practice is formative learning; this demo defines no manager performance score or employment evaluation.
 
 This guide establishes People context only. No specialized People automation is implemented.
+
+Field requirement: people | version | "2".

@@ -22,3 +22,9 @@ The Instagram vertical Reel and `winter-square-old.svg` are not approved for thi
 
 ## Example approved draft
 Discover curated winter city breaks in Copenhagen, Vienna and Prague. Explore the winter collection.
+
+## Explicit field requirements
+Field requirement: linkedin | audience | "Denmark-based professionals".
+Field requirement: linkedin | date | "2026-10-16".
+Field requirement: linkedin | time | "09:00".
+Field requirement: linkedin | asset | "winter-linkedin-landscape.svg".

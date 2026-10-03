@@ -10,3 +10,5 @@ Intended status: approved after workspace review. Department: Operations.
 5. Ask Marketing for the current approved message before reusing campaign text. Operations sources do not authorize changes to campaign schedules.
 
 Do not include traveller identities or real contact details in the hackathon workspace. Use fictional records only. Source documents can be answered from the local workspace; no specialized Operations checks are implemented.
+
+Field requirement: operations | procedure | "Awaiting human verification".

@@ -2,11 +2,15 @@
 
 ## Current release status — 3 October 2026
 
-This section supersedes historical test totals and artifact statements below. The current suite passes **44/44**. Source native feedback, selected-window OCR and task-review smoke passed on 3 October in isolated synthetic profiles; bundled-resource feedback passed too. These are not actual email/social/Canva account acceptance.
+This section supersedes historical test totals and artifact statements below. The current suite passes **47/47**. Source native feedback, selected-window OCR and task-review smoke passed on 3 October in isolated synthetic profiles; bundled-resource feedback passed too. These are not actual email/social/Canva account acceptance.
 
 Use `npm run package:release` from `travel-desktop` to rebuild the unsigned arm64 app and ZIP together. `npm run verify:release` compares tracked desktop source and both native helpers with the bundle, extracts the ZIP and compares its complete file/symlink inventory. Build evidence and archive SHA-256 are in ignored `travel-desktop/dist/release-verification.json`. It records the source revision at build time, not a claim that later commits are bundled.
 
 The owner authorized pushing the five follow-up milestones on 3 October. The earlier publication block is historical; record each new milestone and its push separately in [MILESTONES_2026-10-03.md](MILESTONES_2026-10-03.md). Real-platform, permission and physical-display gates remain open.
+
+## Current browser field adapter — 3 October 2026
+
+The opt-in extension in `travel-desktop/browser-extension/` shares one clicked top-frame field locally after a pause, blur or selection. Pairing is ephemeral and person/tab/origin scoped; typing invalidates advice and Stop/logout/expiry revokes the connection. Work labels selected-field evidence separately from native Accessibility/OCR. Source-backed field requirements cover audience/date/time/asset/procedure/version/disclosure only when that field was observed; other requirements remain unverified. No edits or automatic provider requests exist. Read the extension README for installation, privacy and acceptance limits. Native tests use a synthetic extension client; actual Chrome/platform installation remains pending.
 
 ## Current email loop — 3 October 2026
 
