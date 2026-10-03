@@ -1,6 +1,14 @@
 # Averill execution handover
 
-## Current handover — 28 September 2026
+## Current release status — 3 October 2026
+
+This section supersedes historical test totals and artifact statements below. The current suite passes **44/44**. Source native feedback, selected-window OCR and task-review smoke passed on 3 October in isolated synthetic profiles; bundled-resource feedback passed too. These are not actual email/social/Canva account acceptance.
+
+Use `npm run package:release` from `travel-desktop` to rebuild the unsigned arm64 app and ZIP together. `npm run verify:release` compares tracked desktop source and both native helpers with the bundle, extracts the ZIP and compares its complete file/symlink inventory. Build evidence and archive SHA-256 are in ignored `travel-desktop/dist/release-verification.json`. It records the source revision at build time, not a claim that later commits are bundled.
+
+The owner authorized pushing the five follow-up milestones on 3 October. The earlier publication block is historical; record each new milestone and its push separately in [MILESTONES_2026-10-03.md](MILESTONES_2026-10-03.md). Real-platform, permission and physical-display gates remain open.
+
+## Historical handover — 28 September 2026
 
 The full implementation sequence and acceptance gates are in [COMPLETE_VISION_PLAN.md](COMPLETE_VISION_PLAN.md).
 
@@ -77,7 +85,7 @@ Company copies and workspace JSON live in Electron user data. Optional Nebius/Ta
 
 ## Verified evidence
 
-- **33 Node tests pass (current suite):** original campaign, workspace, onboarding, privacy, OAuth callback and learning tests plus local account disable/reset/change, finding/task practice, motivated version decisions and line diff, exact passage/model extraction, clarification isolation and managed-copy deletion.
+- **33 Node tests passed at that historical stage:** original campaign, workspace, onboarding, privacy, OAuth callback and learning tests plus local account disable/reset/change, finding/task practice, motivated version decisions and line diff, exact passage/model extraction, clarification isolation and managed-copy deletion.
 - **Addition pass native preflight:** an isolated synthetic owner shared a flawed LinkedIn draft, saw five findings and opened a linked practice exercise with source and before/target text. An unsupported company-policy question returned no citation and offered private clarification. After fixing a loading defect, Knowledge displayed three documents and the owner answered the request privately; line comparison opened with both source versions. No real Canva screen, live provider account or real employee data was used. The preflight exposed and resolved the two defects documented in [AB_TEST_PLAN.md](AB_TEST_PLAN.md).
 - **Bundle and extractor:** `npm run package:mac` rebuilt the unsigned arm64 app; `npm run verify:feedback` passed against its bundled resources after updating a historical assertion to the new Knowledge status wording. The suite intentionally tests that private-network import is rejected, which logs a handled error. The rebuilt Swift helper extracted `[PDF page 1]` from the synthetic campaign PDF. `git diff --check` and syntax checks passed. The ZIP was regenerated after packaging. This is bundled-resource smoke, not a direct final-app launch or signed-install test.
 - **UX continuity check:** native source app with an isolated synthetic owner verified zero-citation no-evidence answers, editor-to-editor navigation, unsaved Setup input retention, undo of a loaded flawed draft, five-finding Review navigation, Stop from Review, direct Knowledge-to-Setup proposal opening and Learn focus advancement. Review was visually rechecked after giving its feed an independent scroll region. `npm run verify:feedback` passed for source and bundled app resources. The final `.app` executable was packaged but not directly launched for this pass.

@@ -59,9 +59,9 @@ Use [the updated onboarding tutorial](docs/ONBOARDING_TUTORIAL.md). Create your 
 
 ## Executable and development continuation
 
-On this Mac, open `travel-desktop/dist/Averill-darwin-arm64/Averill.app` from the repository folder. This unsigned build targets Apple Silicon macOS. Rebuild the ZIP from the current `.app` before sharing; an older archive may not include the latest observation features. Quit older running copies before launching it. Build outputs are ignored by Git.
+On this Mac, open `travel-desktop/dist/Averill-darwin-arm64/Averill.app` from the repository folder. This unsigned build targets Apple Silicon macOS. Use `npm run package:release` before sharing; it rebuilds the app and ZIP and rejects stale source or archive content. Quit older running copies before launching it. Build outputs are ignored by Git.
 
-Start future development from `docs/HANDOVER.md`, then `AGENTS.md`, `PROJECT.md`, `ARCHITECTURE.md`, `docs/ONBOARDING_AUTH_PLAN.md` and `docs/ONBOARDING_TUTORIAL.md`. Run `npm test` in travel-desktop; `npm run package:mac` rebuilds the app. The website has its own travel-site documentation.
+Start future development from `docs/HANDOVER.md`, then `AGENTS.md`, `PROJECT.md`, `ARCHITECTURE.md`, `docs/ONBOARDING_AUTH_PLAN.md` and `docs/ONBOARDING_TUTORIAL.md`. Run `npm test` in travel-desktop; `npm run package:release` rebuilds the app and ZIP together and verifies their contents. `npm run verify:release` checks an existing release. The website has its own travel-site documentation.
 
 ## Prepared local demo accounts and services
 
