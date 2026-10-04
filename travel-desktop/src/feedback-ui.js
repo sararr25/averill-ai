@@ -2,7 +2,7 @@ let feedbackOperation=0;
 let feedbackTimer;
 function showOperation(state,title,message,{actionable=false}={}){
  clearTimeout(feedbackTimer);
- const host=el('operation-feedback');host.hidden=false;host.dataset.state=state;
+ const host=el('operation-feedback');const wasHidden=host.hidden;host.hidden=false;if(wasHidden)guidedMotion.enter(host,220,6);host.dataset.state=state;
  host.setAttribute('aria-busy',String(state==='pending'));
  el('operation-title').textContent=title;
  el('operation-symbol').textContent=state==='pending'?'◌':state==='error'?'!':state==='success'?'✓':'i';
@@ -12,7 +12,7 @@ function showOperation(state,title,message,{actionable=false}={}){
 window.desktop.onOperation(event=>{
  if(event.id<feedbackOperation)return;feedbackOperation=event.id;
  const actionable=event.state==='success'&&(event.intake||event.channel==='onboarding:apply');
- showOperation(event.state,event.state==='pending'?'Working…':event.state==='error'?'Action failed':'Completed',event.message,{actionable});
+ showOperation(event.state,event.state==='pending'?'Working…':event.state==='error'?'Action failed':'',event.message,{actionable});
  el('operation-knowledge').hidden=!actionable;
 });
 el('operation-dismiss').addEventListener('click',()=>{clearTimeout(feedbackTimer);el('operation-feedback').hidden=true;});

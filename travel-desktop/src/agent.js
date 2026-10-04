@@ -1,4 +1,10 @@
 let lastWorkAuthority = null;
+let externalReview=null;
+let reviewRequest=0;
+let reviewPending=false;
+function workIdentity(){return JSON.stringify([current.workspace?.activePersonId,current.auth?.signedIn,current.workspace?.sources,current.privacy,current.externalWindow?.id,current.externalObservation?.contentHash,el('external-task').value]);}
+function invalidateWorkReview(){externalReview=null;reviewRequest++;const output=el('review-work-result');output.replaceChildren();delete output.dataset.identity;}
+
 const kinds = [
   { id: 'email', title: 'Email Studio', detail: 'Draft, audience and footer', icon: 'mail' },
   { id: 'linkedin', title: 'LinkedIn Draft', detail: 'Organic company post and campaign visual', icon: 'image' },
@@ -25,6 +31,7 @@ function preferredArea(){
 
 function showTab(name) {
   if(!areas.has(name))return;
+  const changed=document.body.dataset.area!==name;
   document.body.dataset.area = name;
   if(current.auth?.signedIn&&current.auth.person?.id)localStorage.setItem(`averill:last-area:${current.auth.person.id}`,name);
   for (const button of document.querySelectorAll('[data-tab-button]')) {
@@ -34,6 +41,7 @@ function showTab(name) {
   }
   for (const panel of document.querySelectorAll('[data-tab]')) panel.classList.toggle('active', panel.dataset.tab === name);
   document.querySelector('.agent-main').scrollTop = 0;
+  if(changed)guidedMotion.enter(document.querySelector(`[data-tab="${name}"]`),220,6);
 }
 for (const button of document.querySelectorAll('[data-tab-button]')) button.addEventListener('click', () => showTab(button.dataset.tabButton));
 
@@ -49,16 +57,19 @@ function sourceButton(source) {
 
 function render() {
   if (!renderSession()) {
+    invalidateWorkReview();
     lastExternalText = ''; lastExternalWindowId = null; lastObservationHash = null;
     el('context-question').value = ''; el('context-result').replaceChildren(); el('external-result').replaceChildren(); el('external-task-result').replaceChildren();
     return;
   }
+  if(externalReview&&externalReview.identity!==workIdentity())invalidateWorkReview();
   const authority = JSON.stringify([current.workspace?.activePersonId, current.workspace?.sources, current.privacy]);
   if (authority !== lastWorkAuthority) { lastWorkAuthority = authority; el('external-task-result').replaceChildren(); el('context-result').replaceChildren(); }
   renderWorkspace();
   renderKnowledge();
   renderLearning();
   renderHero();
+  renderWorkStep();
   el('browser-copy-pair').disabled = !current.browserBridge?.ready;
   el('stop-external').disabled = !current.externalWindow && !current.browserBridge?.ready;
   if (current.browserBridge?.connected) el('browser-pair-status').textContent = 'Browser field connected. Finish editing to review the selected field.';
@@ -68,7 +79,8 @@ function render() {
   el('watch-external').textContent = current.externalWatching ? 'Pause observing' : 'Start observing';
   el('stop-external').disabled = !current.externalWindow && !current.browserBridge?.ready;
   el('external-local-recheck').disabled = !current.externalWindow;
-  el('external-task-review').disabled = !current.externalObservation;
+  el('external-task-review').disabled = !current.externalObservation || reviewPending;
+  el('external-local-recheck').disabled = !current.externalWindow || reviewPending;
   if (current.externalWindow?.id !== lastExternalWindowId) {
     lastExternalText = '';
     lastExternalWindowId = current.externalWindow?.id || null;
@@ -149,6 +161,18 @@ function render() {
 }
 
 function renderHero() {
+  el('review-start').hidden=Boolean(externalReview||(current.shared||[]).length||(current.findings||[]).length);
+  const workOutput=el('review-work-result');
+  if(externalReview){
+    el('hero-label').textContent='WORK REVIEW';el('hero-title').textContent=externalReview.result.findings.length?'Review these corrections.':'Rule check completed.';
+    el('hero-body').textContent='Use the evidence below to edit in your own tool. Recheck after your edit; layout and publication still need your review.';
+    el('hero-selected').replaceChildren();el('hero-source').replaceChildren();el('finding-navigation').replaceChildren();
+    const context=el('review-context');context.textContent=`${current.externalWindow?.name||'Selected work'} · ${el('external-task').selectedOptions[0].textContent}`;
+    const stop=node('button','Stop sharing','secondary-button');stop.type='button';stop.addEventListener('click',()=>el('stop-external').click());context.append(stop);
+    if(workOutput.dataset.identity!==JSON.stringify([externalReview.identity,externalReview.result])){drawTaskReview(workOutput,externalReview.result);workOutput.dataset.identity=JSON.stringify([externalReview.identity,externalReview.result]);guidedMotion.enter(workOutput,320,8);}
+    document.body.classList.add('has-finding');return;
+  }
+  workOutput.replaceChildren();delete workOutput.dataset.identity;
   const findings=current.findings||[];
   let index=findings.findIndex(item=>`${item.kind}:${item.id}`===selectedFindingId);
   if(index<0)index=0;
@@ -208,7 +232,7 @@ function renderHero() {
     source.append(open);
     appendFindingActions(source,item);
   } else {
-    if(!sharedNames.length)source.append(node('p','No work window is shared. Open Work to choose a window, then select Share.'));
+    if(!sharedNames.length)source.append(node('p','1. Share one field or window. 2. Check approved rules. 3. Edit and recheck in your tool.','review-instructions'));
   }
 }
 
@@ -255,7 +279,7 @@ function renderWorkspace() {
     const admin = onboardingField(form, 'Your name', ''); admin.required = true; admin.maxLength = 120;
     const email = onboardingField(form, 'Your work email', '', 'email'); email.required = true; email.autocomplete = 'username';
     const password = onboardingField(form, 'Create a password', '', 'password'); password.required = true; password.minLength = 10; password.maxLength = 128; password.autocomplete = 'new-password';
-    const submit = node('button', 'Create company and sign in', 'secondary-button'); submit.type = 'submit';form.append(submit);
+    const submit = node('button', 'Create company and sign in', 'agent-primary'); submit.type = 'submit';form.append(submit);
     form.addEventListener('submit', async (event) => {
       event.preventDefault(); submit.disabled = true;
       try { current = await window.desktop.createWorkspace(company.value, admin.value, email.value, password.value); password.value = ''; render(); }
@@ -268,6 +292,7 @@ function renderWorkspace() {
   const active = data.people.find((entry) => entry.id === data.activePersonId);
   panel.append(node('strong', data.company));
   panel.append(node('p', `Departments: ${data.departments.join(', ')}.`));
+  panel.append(node('p',data.sources.some(source=>source.status==='approved')?'Approved sources are available. Open Work to review a draft; AI services are optional.':'Next: add company files, review their extracted text, then approve eligible sources.','setup-next'));
   if (!current.auth?.enabled) {
     const select = node('select'); select.setAttribute('aria-label', 'Legacy demo role');
     for (const person of data.people) {
@@ -288,7 +313,7 @@ function renderWorkspace() {
     const role = node('select'); for (const value of ['employee', 'lead', 'admin']) { const option = node('option', value); option.value = value; role.append(option); }
     const department = node('input'); department.value = 'Marketing'; department.placeholder = 'Department';
     const add = node('button', 'Add person', 'secondary-button'); add.type = 'submit';
-    form.append(name, role, department, add);
+    for(const [text,input] of [['Person name',name],['Role',role],['Department',department]]){const label=node('label',text);label.append(input);form.append(label);}form.append(add);
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
       try { current = await window.desktop.addPerson(name.value, role.value, department.value); render(); }
@@ -301,7 +326,7 @@ function renderWorkspace() {
       const keyForm = node('form'); keyForm.className = 'workspace-form';
       const input = node('input'); input.type = 'password'; input.placeholder = `${label} API key`; input.autocomplete = 'off'; input.required = true;
       const save = node('button', `Save ${label} key`, 'secondary-button'); save.type = 'submit';
-      keyForm.append(input, save);
+      const fieldLabel=node('label',`${label} API key`);fieldLabel.append(input);keyForm.append(fieldLabel,save);
       keyForm.addEventListener('submit', async (event) => {
         event.preventDefault();
         try { current = await window.desktop.saveApiKey(service, input.value); input.value = ''; el('workspace-feedback').textContent = `${label} key saved securely.`; render(); }
@@ -365,6 +390,7 @@ function renderWorkspace() {
     list.append(row);
   }
   panel.append(list);
+  groupSetup(panel);
 }
 
 async function showSource(id) {
@@ -472,37 +498,59 @@ el('watch-external').addEventListener('click', async () => {
   try { current = await window.desktop.watchExternal(!current.externalWatching); render(); }
   catch (error) { el('external-watch-status').textContent = error.message; }
 });
-el('stop-external').addEventListener('click', async () => { current = await window.desktop.shareExternal(null, null); el('external-result').textContent = 'Window sharing stopped.'; el('external-list').replaceChildren(); render(); });
-el('external-local-recheck').addEventListener('click', async () => {
-  const output = el('external-task-result'); output.textContent = 'Reading the selected window and checking current sources locally…';
-  try { renderTaskReview(await window.desktop.recheckExternalTask(el('external-task').value)); }
-  catch (error) { output.textContent = error.message; }
-});
-el('external-task').addEventListener('change', () => el('external-task-result').replaceChildren());
-function renderTaskReview(result) {
-  const output = el('external-task-result');
-  if (result.contentHash !== current.externalObservation?.contentHash) { output.textContent = 'The visible work changed. Review the current text again.'; return; }
+el('stop-external').addEventListener('click', async () => { invalidateWorkReview();renderHero(); current = await window.desktop.shareExternal(null, null); el('external-result').textContent = 'Window sharing stopped.'; el('external-list').replaceChildren(); render(); });
+function drawTaskReview(output,result){
   output.replaceChildren(node('p', `${result.status} ${result.mode === 'model' ? 'Nebius review completed.' : 'Local rule check.'}`));
-  if (result.mode === 'model' && result.model) output.append(node('small', `${result.provider || 'Nebius Token Factory'} · ${result.model}`));
-  if (result.uncheckedFields?.length) output.append(node('small', `Not observed in this field: ${result.uncheckedFields.join(', ')}.`));
-  for (const item of result.findings) {
-    const card = node('div', undefined, 'workspace-source');
-    card.append(node('strong', item.confidence === 'model-suggestion' ? 'AI suggestion' : 'Approved rule match'), node('p', item.suggestion));
-    if (item.observedExcerpt) card.append(node('small', `Observed: “${item.observedExcerpt}”`));
-    card.append(sourceButton(item.source), node('small', `Source v${item.source.version}: “${item.source.quote}”`));
-    output.append(card);
+  if(result.mode==='model'&&result.model)output.append(node('small',`${result.provider||'Nebius Token Factory'} · ${result.model}`));
+  if(result.uncheckedFields?.length)output.append(node('p',`Not observed in this field: ${result.uncheckedFields.join(', ')}.`,'field-hint'));
+  for(const item of result.findings){
+    const card=node('article',undefined,'workspace-source review-evidence');
+    card.append(node('strong',item.confidence==='model-suggestion'?'AI suggestion':'Approved rule match'),node('p',item.suggestion));
+    if(item.observedExcerpt)card.append(node('p',`Observed: “${item.observedExcerpt}”`));
+    card.append(sourceButton(item.source),node('small',`Source v${item.source.version}: “${item.source.quote}”`));output.append(card);
   }
+  const recheck=node('button','Recheck after my edit','secondary-button');recheck.type='button';
+  recheck.addEventListener('click',()=>{showTab('work');el('external-local-recheck').focus();});output.append(recheck);
 }
-el('external-task-review').addEventListener('click', async () => {
-  const output = el('external-task-result'); output.textContent = 'Checking current approved sources…';
-  const task = el('external-task').value;
-  const useAI = Boolean(current.aiEnabled && current.privacy?.companyAI);
-  if (useAI && !window.confirm(`Send the observed text from ${current.externalWindow?.name || 'the selected window'} and eligible approved sources to Nebius for this review?`)) { output.textContent = 'Review cancelled.'; return; }
-  try {
-    const result = await window.desktop.reviewExternalTask(task, useAI);
+function renderTaskReview(result){
+  const output=el('external-task-result');
+  if(result.contentHash!==current.externalObservation?.contentHash){output.textContent='The visible work changed. Check the current text again.';return;}
+  externalReview={identity:workIdentity(),result};drawTaskReview(output,result);renderHero();showTab('review');el('hero-title').focus();
+}
+async function checkWork(fresh){
+  if(reviewPending)return;
+  const output=el('external-task-result');const task=el('external-task').value;
+  const useAI=!fresh&&Boolean(current.aiEnabled&&current.privacy?.companyAI);
+  if(useAI&&!window.confirm(`Send the observed text from ${current.externalWindow?.name||'the selected window'} and eligible approved sources to Nebius for this review?`)){output.textContent='Review cancelled.';return;}
+  invalidateWorkReview();
+  const request=++reviewRequest;
+  // A fresh capture may change the hash, but must keep its person, sources, task and selected window.
+  const authority=JSON.stringify([current.workspace?.activePersonId,current.auth?.signedIn,current.workspace?.sources,current.privacy,current.externalWindow?.id,task]);
+  const hash=current.externalObservation?.contentHash;
+  reviewPending=true;render();output.textContent=fresh?'Reading fresh text and checking locally…':'Checking approved sources…';
+  try{
+    const result=await(fresh?window.desktop.recheckExternalTask(task):window.desktop.reviewExternalTask(task,useAI));
+    const now=JSON.stringify([current.workspace?.activePersonId,current.auth?.signedIn,current.workspace?.sources,current.privacy,current.externalWindow?.id,el('external-task').value]);
+    if(request!==reviewRequest||authority!==now||(!fresh&&hash!==current.externalObservation?.contentHash))return;
     renderTaskReview(result);
-  } catch (error) { output.textContent = error.message; }
-});
+  }catch(error){if(request===reviewRequest)output.textContent=error.message;}
+  finally{reviewPending=false;render();}
+}
+el('external-local-recheck').addEventListener('click',()=>checkWork(true));
+el('external-task-review').addEventListener('click',()=>checkWork(false));
+el('external-task').addEventListener('change',()=>{invalidateWorkReview();el('external-task-result').replaceChildren();renderHero();});
+el('review-start').addEventListener('click',()=>{showTab('work');el('browser-pair').focus();});
+let workStepIdentity;
+function renderWorkStep(){
+ const captured=Boolean(current.externalObservation),selected=Boolean(current.externalWindow),ready=Boolean(current.browserBridge?.ready);
+ const identity=current.externalWindow?.id||null;
+ if(identity!==workStepIdentity){workStepIdentity=identity;document.querySelector('.browser-adapter').open=!selected;document.querySelector('.native-adapter').open=selected&&!captured&&current.externalWindow.adapter!=='browser-dom';}
+ el('work-next').textContent=reviewPending?'Checking your work… You can stop sharing at any time.':captured?'Text captured. Choose the work type below, then check approved rules.':selected?(current.externalWindow.adapter==='browser-dom'?'Finish editing the selected field. Advice clears while you type.':'Window selected. Read visible text to capture one frame.'):(ready?'Copy pairing details into the extension, then select a draft field.':'Start by connecting a browser field or choosing an app window.');
+ for(const id of ['browser-pair','browser-copy-pair','review-external','external-task-review']){
+   const primary=!reviewPending&&(captured?id==='external-task-review':selected?id==='review-external'&&current.externalWindow.adapter!=='browser-dom':ready?id==='browser-copy-pair':id==='browser-pair');
+   el(id).classList.toggle('agent-primary',primary);el(id).classList.toggle('secondary-button',!primary);
+ }
+}
 el('context-form').addEventListener('submit', async (event) => {
   event.preventDefault();
   const question = el('context-question').value.trim();
@@ -551,7 +599,7 @@ el('login-form').addEventListener('submit', async (event) => {
   finally { submit.disabled = false; }
 });
 window.desktop.onSnapshot((value) => { current = value; render(); });
-window.desktop.onOpenContext(() => { showTab('work'); el('context-question').focus(); });
+window.desktop.onOpenContext(() => { showTab('work'); el(current.externalObservation?'external-task-review':current.externalWindow?'review-external':'browser-pair').focus(); });
 window.desktop.snapshot().then((value) => { current = value; render(); showTab(preferredArea()); });
 
 for (const target of document.querySelectorAll('[data-icon]')) target.innerHTML = icon(target.dataset.icon);

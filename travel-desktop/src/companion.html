@@ -1,13 +1,15 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Ask Averill</title><style>
-html,body{margin:0;background:transparent;font-family:system-ui,sans-serif;color:#f4f5f3}
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Ask Averill</title><link rel="stylesheet" href="../design-system/tokens.css"><style>
+@font-face{font-family:'Spline Sans';font-style:normal;font-weight:400;font-display:swap;src:url('../node_modules/@fontsource/spline-sans/files/spline-sans-latin-400-normal.woff2') format('woff2')}
+html,body{margin:0;background:transparent;font-family:var(--ds-font-body);color:#f4f5f3}
 .shell{width:208px;height:82px;box-sizing:border-box;border:1px solid #91d3df;border-radius:16px;background:#002129;box-shadow:0 6px 22px #00171d99;overflow:hidden}
 .grip{height:17px;padding:2px 12px 0;box-sizing:border-box;color:#91b2bf;font-size:10px;letter-spacing:.18em;-webkit-app-region:drag;cursor:move}
-.row{display:flex;gap:6px;align-items:center;padding:0 7px 7px}
-button{-webkit-app-region:no-drag;cursor:pointer;border:0;border-radius:9px;font-size:12px;font-weight:650;height:32px}
-#open{flex:1;background:#ff705e;color:#002129}#stop{background:#0c303a;color:#91d3df;padding:0 9px}#stop:disabled{opacity:.4;cursor:default}
+.row{display:flex;gap:6px;align-items:center;padding:0 7px 3px}
+button{-webkit-app-region:no-drag;cursor:pointer;border:0;border-radius:9px;font-size:12px;font-weight:650;height:40px}
+#open{flex:1;background:var(--ds-color-signal);color:#002129}#stop{background:#0c303a;color:var(--ds-color-verified);padding:0 9px}#stop:disabled{opacity:.4;cursor:default}
 button:focus-visible{outline:2px solid #f4f5f3;outline-offset:1px}
 #status{display:block;padding:0 10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#bdd5df;font-size:11px}
+button{transition:transform 140ms cubic-bezier(.22,1,.36,1),background-color 140ms}button:not(:disabled):active{transform:translateY(1px);transition-duration:80ms}#open:hover{background:var(--ds-color-signal-hover)}#stop:not(:disabled):hover{background:var(--ds-color-panel-hover)}@media(prefers-reduced-motion:reduce){button{transition:none}button:active{transform:none!important}}
 </style></head><body><div class="shell"><div class="grip" aria-label="Drag Averill button">AVERILL · DRAG TO MOVE</div><div class="row"><button id="open" type="button">Ask Averill</button><button id="stop" type="button" disabled>Stop</button></div><span id="status" role="status">No work shared</span></div><script>
 const status=document.getElementById('status'),stop=document.getElementById('stop');
 function render(value){const time=value.capturedAt?` · read ${new Date(value.capturedAt).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}`:'';status.textContent=value.error||(value.watching?`Watching ${value.window}${time}`:value.window?`Selected: ${value.window}${time}`:'No work shared');status.title=status.textContent;stop.disabled=!value.window;stop.title=value.window?'Stop sharing the selected window':'No work shared';}

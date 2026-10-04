@@ -1,6 +1,15 @@
 <!-- Current demo correction: no Brevo sign-in is needed. -->
 # Averill execution handover
 
+## Approved B Guided UI — 4 October 2026
+
+Implemented the approved UI/UX audit in the existing Electron app. Work now makes the next step explicit; external checks appear in Review with observed text, correction and source. Advice clears on task/text/source/person changes and Stop. Controls, Setup/Knowledge disclosures, Learn hierarchy and B motion use the Averill design system. Read [UI_UX_AUDIT_2026-10-04.md](UI_UX_AUDIT_2026-10-04.md) for evidence and remaining manual visual checks.
+
+Validation: 47/47 tests; native feedback/knowledge/learning/focus/reduced-motion, browser-client privacy/Stop, renderer rule review/correction/recheck/revocation/task invalidation and all six areas at 440×660, 520×850, 960×820. The actual native app was inspected through CUA with an isolated synthetic profile. Normal user data was preserved. No provider request was made for this UI pass.
+
+The local unsigned arm64 `.app` and ZIP are rebuilt and bundle/archive verified. The public GitHub release still targets `3ce9e29`; it does not yet contain these UI changes. Runtime reduced motion is tested via emulation; OS setting, full VoiceOver/200% zoom and frame profiling remain manual checks.
+
+
 ## Pending-work continuation — 4 October 2026
 
 [Current acceptance record](ACCEPTANCE_2026-10-04.md) supersedes the earlier consent-UI/restart gates. 47/47 tests pass. Packaged-resource regression now verifies consent cancellation, one live generated-public-text Nebius/NVIDIA review through renderer handlers, correction, authority revocation, Stop, weekly practice, person isolation and second-process restart. Work displays the actual runtime model. The actual unsigned `.app` also launched on this Mac at the existing workspace sign-in screen; normal user data was preserved.

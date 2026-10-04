@@ -1,0 +1,54 @@
+/* B — Guided: action → captured work → source-backed result. */
+.agent-body{--control-border:var(--ds-color-control-border);--motion-ease:cubic-bezier(.22,1,.36,1);color-scheme:dark}
+.agent-body :is(input:not([type=checkbox]),select,textarea){box-sizing:border-box;max-width:100%;min-height:40px;padding:9px 11px;border:1px solid var(--control-border);border-radius:8px;background:var(--ds-color-window);color:var(--ds-color-text);font:400 14px/1.45 var(--ds-font-body)}
+.agent-body label{font-size:13px;line-height:1.5;color:var(--ds-color-text-secondary)}
+.agent-body :is(button,.source-link,summary){min-height:40px;box-sizing:border-box;cursor:pointer}
+.agent-body button{transition:transform 140ms var(--motion-ease),background-color 140ms,border-color 140ms,color 140ms}
+.agent-body button:not(:disabled):active{transform:translateY(1px);transition-duration:80ms}
+.agent-body button:disabled{cursor:not-allowed}
+.agent-body :is(button,summary,input,select,textarea):focus-visible{outline:2px solid var(--ds-color-focus);outline-offset:2px}
+.agent-body summary{display:flex;align-items:center;gap:10px;color:var(--ds-color-text);font:600 14px/1.45 var(--ds-font-body);padding:8px 0}
+.agent-body summary::before{content:'›';display:inline-block;color:var(--ds-color-verified);font-size:20px;transition:transform 140ms var(--motion-ease)}
+.agent-body details[open]>summary::before{transform:rotate(90deg)}
+.agent-body summary:hover{color:var(--ds-color-verified)}
+.agent-body .section-head{align-items:flex-start;flex-direction:column;gap:4px}
+.agent-body .section-head h2{margin-bottom:0}
+.agent-body .section-head span{font-size:12px}
+.agent-body .section-note,.agent-body .field-hint{font-size:13px;line-height:1.55}
+.agent-body .section-note{margin:12px 0}
+.agent-body :is(.browser-adapter,.native-adapter,.work-question,.knowledge-filter-options,.setup-group){border-top:1px solid var(--ds-color-border);padding:10px 0;margin:12px 0}
+.agent-body .browser-adapter p,.agent-body .native-adapter p{font-size:13px;line-height:1.55;color:var(--ds-color-text-secondary)}
+.agent-body .work-progress{display:flex;gap:12px;flex-wrap:wrap;color:var(--ds-color-text-muted);font-size:12px;margin:18px 0 10px}
+.agent-body .work-progress span+span::before{content:'›';margin-right:12px;color:var(--ds-color-verified)}
+.agent-body #work-next{font-size:14px;line-height:1.55;color:var(--ds-color-text);margin:12px 0}
+.agent-body .sharing-controls{display:flex;gap:12px;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--ds-color-window);border-bottom:1px solid var(--ds-color-border);padding:8px 0;z-index:2}
+.agent-body .sharing-controls button{flex-shrink:0}
+.agent-body .context-form{margin:16px 0;padding-top:12px}
+.agent-body #external-task{display:block;width:100%;margin:8px 0 12px}
+.agent-body #review-start{margin:8px 0 20px}
+.agent-body .review-instructions{font-size:13px!important;line-height:1.65!important}
+.agent-body[data-area=review] .aperture-wrap{height:48px;background:none;filter:none!important}
+.agent-body[data-area=review] .aperture-mark{width:32px;height:32px;filter:none!important;animation:none!important}
+.agent-body[data-area=review] .hero-tagline,.agent-body[data-area=review] .hero-rule{display:none}
+.agent-body[data-area=review] .review-hero h2{font-size:28px;line-height:1.2}
+.agent-body .review-evidence{padding:14px;margin:12px 0;border-left:2px solid var(--ds-color-verified)}
+.agent-body .review-evidence p{margin:8px 0!important;font-size:14px!important;line-height:1.55!important}
+.agent-body .review-evidence small{display:block;font-size:12px;line-height:1.6;color:var(--ds-color-text-secondary)}
+.agent-body .knowledge-card{border-top:1px solid var(--ds-color-border);box-shadow:none}
+.agent-body .knowledge-details{margin-top:8px}
+.agent-body .learning-card h3{font-size:18px}
+.agent-body .session-bar button,.agent-body .review-context button,.agent-body .finding-navigation button,.agent-body .operation-feedback #operation-dismiss{min-height:40px}
+.agent-body .operation-feedback{height:60px;min-height:60px;flex-shrink:0}
+.agent-body .operation-feedback #operation-title:empty{display:none}
+.source-dialog{opacity:0;transform:translateY(8px);transition:opacity 140ms ease-in,transform 220ms var(--motion-ease),display 140ms allow-discrete,overlay 140ms allow-discrete}
+.source-dialog[open]{opacity:1;transform:translateY(0);transition-timing-function:var(--motion-ease)}
+@starting-style{.source-dialog[open]{opacity:0;transform:translateY(8px)}}
+@media(prefers-reduced-motion:reduce){.agent-body *, .agent-body *::before{transition:none!important;animation:none!important}.agent-body button:not(:disabled):active{transform:none}.source-dialog{transform:none;transition:none}}
+
+.agent-body #external-result strong,.agent-body #external-result small{display:block;line-height:1.6}.agent-body #external-result small{font-size:12px;margin-top:4px}.agent-body :is(.browser-adapter,.context-form) button{margin-right:6px;margin-bottom:6px}.agent-body .learning-week{border-top:1px solid var(--ds-color-border);margin-top:24px;padding-top:8px}
+/* Reserve routine feedback space; visibility removes it from keyboard/AX when idle. */
+.agent-body:not(.auth-locked) .operation-feedback[hidden]{display:flex;visibility:hidden;opacity:0;pointer-events:none}
+.agent-body .operation-feedback{opacity:1;visibility:visible;transition:opacity 140ms ease-in,visibility 140ms allow-discrete}
+@starting-style{.agent-body .operation-feedback:not([hidden]){opacity:0}}
+@media(prefers-reduced-motion:reduce){.agent-body .operation-feedback{transition:none}}
+.agent-body .secondary-button{border-color:var(--ds-color-control-border)}

@@ -47,6 +47,7 @@
   --ds-color-text-secondary: var(--ds-slate-300);
   --ds-color-text-muted: var(--ds-slate-400);
   --ds-color-border: var(--ds-outline);
+  --ds-color-control-border: #397084;
   --ds-color-signal: var(--ds-coral-500);
   --ds-color-signal-hover: var(--ds-coral-400);
   --ds-color-verified: var(--ds-ice-300);
@@ -65,7 +66,7 @@
   --ds-action-fg: var(--ds-color-signal);
   --ds-action-fg-hover: var(--ds-color-signal-hover);
   --ds-input-bg: var(--ds-color-panel);
-  --ds-input-border: var(--ds-color-border);
+  --ds-input-border: var(--ds-color-control-border);
   --ds-input-focus: var(--ds-color-focus);
   --ds-divider: var(--ds-color-border);
 }

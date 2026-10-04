@@ -46,17 +46,19 @@ async function renderKnowledge(){
    card.append(node('h3',file.name),status);
    card.append(node('p',`${file.kind==='uploaded'?'Upload proposal':file.scope==='company'?'Company-wide':file.scope==='private'?'Only you':file.department} · v${file.version||'1'} · ${file.readable?'Text extracted':'No readable text'} · ${file.confidentiality} · ${file.aiAllowed?'AI permission recorded':'Local only'}`,'knowledge-meta'));
    if(file.kind==='uploaded')card.append(node('p','This file has been received. Confirm the onboarding proposal in Setup to save it as a source; approval is a separate step.'));
+   const metadata=node('details',undefined,'knowledge-details');metadata.append(node('summary','Approval details'));
    if(file.kind==='saved'){
-    card.append(node('p',`Approved ${file.approvedAt?new Date(file.approvedAt).toLocaleString():'—'} · Approver ${file.approvedBy||'—'}${file.conflict?' · Conflict: excluded from answers':''}${file.supersedesId?' · Replaces an earlier source':''}${file.supersededBy?' · Replaced by a later source':''}`,'knowledge-meta'));
-    if(file.latestDecision)card.append(node('p',`Latest decision: ${file.latestDecision.action} · ${file.latestDecision.reason} · ${new Date(file.latestDecision.at).toLocaleString()}`,'knowledge-decision'));
+    metadata.append(node('p',`Approved ${file.approvedAt?new Date(file.approvedAt).toLocaleString():'—'} · Approver ${file.approvedBy||'—'}${file.conflict?' · Conflict: excluded from answers':''}${file.supersedesId?' · Replaces an earlier source':''}${file.supersededBy?' · Replaced by a later source':''}`,'knowledge-meta'));
+    if(file.latestDecision)metadata.append(node('p',`Latest decision: ${file.latestDecision.action} · ${file.latestDecision.reason} · ${new Date(file.latestDecision.at).toLocaleString()}`,'knowledge-decision'));
    }
+   if(file.kind==='saved')card.append(metadata);
    card.append(knowledgeExcerpt(file.excerpt,el('knowledge-search').value));
    const read=node('button','Read extracted text','secondary-button');read.type='button';read.disabled=!file.readable;
    read.addEventListener('click',async()=>{read.disabled=true;try{const content=await(file.kind==='uploaded'?window.desktop.readOnboardingFile(file.id):window.desktop.readWorkspaceFile(file.id));activeSourceId=null;el('open-source').hidden=true;el('source-title').textContent=content.title;el('source-content').textContent=content.text||'No readable text.';el('source-dialog').showModal();}catch{}finally{read.disabled=!file.readable;}});card.append(read);
    if(file.kind==='saved'){
     const open=node('button','Open original file','secondary-button');open.type='button';open.addEventListener('click',()=>window.desktop.openWorkspaceSource(file.id).catch(()=>{}));card.append(open);
     if(file.canDelete){const remove=node('button','Delete local source copy','secondary-button');remove.type='button';remove.addEventListener('click',async()=>{if(!window.confirm(`Delete the local copy and extracted text of ${file.name}? The original outside Averill and system backups are not deleted.`))return;try{current=await window.desktop.removeSource(file.id);render();}catch(error){summary.textContent=error.message;}});card.append(remove);}
-    if(file.status!=='approved'){const manage=node('button','Manage in Setup','secondary-button');manage.type='button';manage.addEventListener('click',()=>{showTab('setup');const target=[...document.querySelectorAll('[data-source-id]')].find(element=>element.dataset.sourceId===file.id);if(target){target.scrollIntoView({block:'center'});target.tabIndex=-1;target.focus();}});card.append(manage);}
+    if(file.status!=='approved'){const manage=node('button','Manage in Setup','secondary-button');manage.type='button';manage.addEventListener('click',()=>{showTab('setup');const target=[...document.querySelectorAll('[data-source-id]')].find(element=>element.dataset.sourceId===file.id);if(target){for(let parent=target.parentElement;parent;parent=parent.parentElement)if(parent.tagName==='DETAILS')parent.open=true;target.scrollIntoView({block:'center'});target.tabIndex=-1;target.focus();}});card.append(manage);}
     const candidates=(current.workspace.sources||[]).filter(source=>source.id!==file.id&&source.status==='approved'&&source.scope===file.scope&&source.department===file.department);
     if(candidates.length){
       const label=node('label','Compare with an approved source');const select=node('select');select.append(new Option('Choose a document',''));

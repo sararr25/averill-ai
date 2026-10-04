@@ -14,7 +14,7 @@ function renderLearning(){
  const panel=el('learning-panel');panel.replaceChildren();
  if(!data.configured){panel.append(node('p','Create a company workspace and select a person in Setup to save learning.'));return;}
  panel.append(node('p',`Learning for ${current.workspace.people.find(p=>p.id===current.workspace.activePersonId)?.name}. Week beginning ${data.week} · Europe/Copenhagen.`,'section-note'));
- const active=data.sessions.find(s=>!s.finishedAt&&!s.excluded);
+ const active=data.sessions.find(s=>!s.finishedAt&&!s.excluded&&!s.exercise&&!s.project&&!s.note);
  const lesson=node('article',undefined,'learning-card');lesson.append(node('h3','Canva layout essentials'));
  if(!active){
   lesson.append(node('p','Practise selecting, positioning, aligning and grouping elements. Start with an open Canva design. A shared window is optional; use Work for explicit OCR capture.'));
@@ -25,7 +25,7 @@ function renderLearning(){
   const step=data.steps[active.confirmed.length];lesson.append(node('p',`Step ${active.confirmed.length+1} of ${data.steps.length} · Confirmed by you, not automatically verified.`,'section-note'),node('h4',step.title),node('p',step.instruction));
   const help=node('details');help.append(node('summary','I need help with this step'),node('p',step.help));lesson.append(help,guideLink(data.guide));
   if(active.source){lesson.append(node('p',`${active.source.title} · v${active.source.version}${active.sourceAvailable?'':' · no longer available for practice'}`));if(active.sourceAvailable){const b=node('button','Read company context','source-link');b.type='button';b.addEventListener('click',()=>showSource(active.source.id));lesson.append(b);}}
-  lesson.append(learningButton('I tried this step — continue','confirm',{sessionId:active.id,stepId:step.id}));
+  const next=learningButton('I tried this step — continue','confirm',{sessionId:active.id,stepId:step.id});next.classList.add('agent-primary');lesson.append(next);
  }
  panel.append(lesson);
  for(const session of data.sessions.filter(s=>s.exercise&&!s.finishedAt&&!s.excluded)){
@@ -64,7 +64,7 @@ function renderLearning(){
  const sessions=data.sessions.filter(s=>s.confirmed.some(c=>c.week===data.week)||!s.finishedAt);
  if(!sessions.length)week.append(node('p','No learning recorded this week. Start a lesson and confirm a step.'));
  for(const s of sessions){const row=node('div',undefined,'learning-record');row.append(node('strong',s.title),node('p',`${s.note?'Activity confirmed this week':`${s.confirmed.filter(c=>c.week===data.week).length} steps confirmed this week`}${s.finishedAt&&!s.note?' · lesson finished':''}${s.excluded?' · excluded':''}`));if(s.note)row.append(node('p',s.note));if(s.exercise?.after)row.append(node('p',`Before: ${s.exercise.before} After: ${s.exercise.after} Employee confirmation and deterministic rule check are separate.`));if(!s.excluded)row.append(learningButton('Exclude this session','exclude',{sessionId:s.id}));week.append(row);}
- const begin=learningButton(data.quiz?'Resume or refresh weekly practice':'Start weekly practice','quiz');begin.classList.add('agent-primary');begin.disabled=!sessions.some(s=>!s.excluded&&s.confirmed.some(c=>c.week===data.week));week.append(begin);panel.append(week);
+ const begin=learningButton(data.quiz?'Resume or refresh weekly practice':'Start weekly practice','quiz');begin.classList.add('agent-primary');begin.disabled=!sessions.some(s=>!s.excluded&&s.confirmed.some(c=>c.week===data.week));week.append(begin);const weekly=node('details',undefined,'learning-week');weekly.open=Boolean(data.quiz);weekly.append(node('summary','Your week and learning history'),week);panel.append(weekly);
  const remove=node('button','Delete my local learning history','secondary-button learning-delete');remove.type='button';remove.addEventListener('click',()=>{if(window.confirm('Delete all of your local lesson, activity and weekly practice records? This cannot be undone in Averill.'))learnAction('delete-history');});week.append(remove);
  const quiz=data.quiz;if(!quiz)return;
  if(quiz.outdated)panel.append(node('p','Your learning record changed. Refresh weekly practice to include the latest confirmed activities.','section-note'));

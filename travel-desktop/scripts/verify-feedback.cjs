@@ -3,6 +3,7 @@ const root=process.env.AVERILL_NATIVE_APP||path.resolve(__dirname,'..');const pr
 const pause=ms=>new Promise(r=>setTimeout(r,ms));
 app.whenReady().then(async()=>{try{
  let win;for(let i=0;i<100;i++){win=BrowserWindow.getAllWindows().find(w=>w.webContents.getURL().includes('agent.html'));if(win&&!win.webContents.isLoading()&&await win.webContents.executeJavaScript('Boolean(window.desktop)'))break;await pause(100);}
+ const rendererErrors=[];win.webContents.on('console-message',(_event,level,message)=>{if(level===3)rendererErrors.push(message)});
  const run=js=>win.webContents.executeJavaScript(js);
  await run("window.desktop.createWorkspace('Feedback Test','Owner','owner@example.test','Synthetic-password-123')");
  const companion=BrowserWindow.getAllWindows().find(w=>w.webContents.getURL().includes('companion.html'));
@@ -23,6 +24,13 @@ app.whenReady().then(async()=>{try{
  await run("document.querySelector('#knowledge-search').value='missing term';document.querySelector('#knowledge-search').dispatchEvent(new Event('input'))");await pause(250);assert.equal(await run("document.querySelectorAll('.knowledge-card').length"),0);
  await run("document.querySelector('#knowledge-search').value='cobalt';document.querySelector('#knowledge-search').dispatchEvent(new Event('input'))");await pause(250);assert.equal(await run("document.querySelectorAll('.knowledge-card').length"),1);
  assert.equal(await run('document.documentElement.scrollWidth<=innerWidth'),true);assert.equal(await run('document.querySelector(".agent-main").getBoundingClientRect().bottom<=innerHeight+1'),true);
+ await run("(async()=>{current=await window.desktop.learningAction('start',{});render();showTab('learn')})()");await pause(100);
+ assert.ok(await run("[...document.querySelectorAll('#learning-panel button')].some(b=>b.textContent.includes('continue')&&b.classList.contains('agent-primary'))"));
+ await run("[...document.querySelectorAll('#learning-panel button')].find(b=>b.textContent.includes('continue')).click()");await pause(150);assert.ok(await run("document.activeElement.tagName==='H4'"));
+ win.webContents.debugger.attach('1.3');await win.webContents.debugger.sendCommand('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]});await pause(50);
+ assert.ok(await run("guidedMotion.reduced.matches"));await run("showTab('work')");assert.equal(await run("document.getAnimations().length"),0);
+ win.webContents.debugger.detach();
  fs.writeFileSync('/tmp/averill-feedback-knowledge.png',(await win.webContents.capturePage()).toPNG());await run('window.desktop.logout()');assert.equal(await run("document.querySelectorAll('.knowledge-card').length"),0);
+ assert.deepEqual(rendererErrors,[],'Renderer must complete without console errors');
  console.log('PASS native pending/success/error/cancel feedback, uploaded/full-text/approved knowledge, text search, viewport and logout cleanup');app.quit();
  }catch(error){console.error(error.stack);app.exit(1);}});

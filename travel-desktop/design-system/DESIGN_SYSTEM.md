@@ -150,3 +150,9 @@ Review also names the shared demo windows and provides direct Stop controls. Mul
 ## 28 September 2026 operational additions
 
 Finding actions use the existing secondary controls under the cited source; the source remains visually primary. Learning comparison uses two bordered text panels for the observed finding and target action, with explicit employee-confirmed language. Knowledge adds compact filter fields and a reasoned approval panel. The semantic ice/coral tokens continue to distinguish approved evidence from a required decision; neither state is communicated by color alone. `src/ui-refinements.css` contains the implemented additions.
+
+## Guided interaction update — 4 October 2026
+
+The owner approved variant B. Work leads from explicit sharing to a rule check; Review presents the observed excerpt, correction and versioned source. Current task/source/text/person validity governs results. Setup and Knowledge use progressive disclosure; Learn emphasizes the employee-confirmed next step.
+
+Use `--ds-color-control-border: #397084` for interactive outlines (3.06:1 on window #002129); #20515F remains a grouping hairline. Desktop controls have a 40px minimum height. B uses 80ms press/140ms release, 220ms area entry at 6px, 320ms result entry at 8px, and 140ms dialog/feedback exit, with the shared ease-out curve. Reduced motion removes movement and cancels running animations. The aperture is static without glow. No animation library is required.
