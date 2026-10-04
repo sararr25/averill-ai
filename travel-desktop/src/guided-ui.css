@@ -3,6 +3,7 @@
 .agent-body :is(input:not([type=checkbox]),select,textarea){box-sizing:border-box;max-width:100%;min-height:40px;padding:9px 11px;border:1px solid var(--control-border);border-radius:8px;background:var(--ds-color-window);color:var(--ds-color-text);font:400 14px/1.45 var(--ds-font-body)}
 .agent-body label{font-size:13px;line-height:1.5;color:var(--ds-color-text-secondary)}
 .agent-body :is(button,.source-link,summary){min-height:40px;box-sizing:border-box;cursor:pointer}
+.agent-body summary{transition:color 140ms var(--motion-ease)}
 .agent-body button{transition:transform 140ms var(--motion-ease),background-color 140ms,border-color 140ms,color 140ms}
 .agent-body button:not(:disabled):active{transform:translateY(1px);transition-duration:80ms}
 .agent-body button:disabled{cursor:not-allowed}
