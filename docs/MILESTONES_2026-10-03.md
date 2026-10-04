@@ -1,5 +1,7 @@
 > 4 October owner correction: Brevo, Instagram and LinkedIn are local fake pages; no Brevo sign-in is required. The simulator is versioned in demo-tools/social-simulator/. Brevo page flow and LinkedIn text persistence passed; installed-extension correction acceptance awaits the owner's approval request. References to real Brevo login below describe an abandoned acceptance target, not a current gate.
 
+Current status, 4 October 2026: the Guided UI release is public at [v0.1.0-preview.20261004.2](https://github.com/sararr25/averill-ai/releases/tag/v0.1.0-preview.20261004.2). See [PROJECT_STATUS_2026-10-04.md](PROJECT_STATUS_2026-10-04.md) and [NEXT_STEPS_2026-10-04.md](NEXT_STEPS_2026-10-04.md) for current evidence, ordered checks and pending fixes. Dated earlier sections are historical where superseded.
+
 # Follow-up milestones — 3 October 2026
 
 The owner requested points 1–5 in order, with one commit and GitHub push after each completed milestone. This is the current execution ledger; historical evidence in other documents does not establish new acceptance.
@@ -46,3 +48,7 @@ Packaged-resource feedback smoke passed, including pending/success/error/cancel 
 ## 4 October installed Chrome acceptance
 
 Supersedes the historical sign-in/installation blockers above: Brevo is a fake local page requiring no sign-in. The owner explicitly authorized and completed extension installation. Installed Chrome field transport passed on Brevo, LinkedIn and Instagram. Brevo exact source-backed correction, typing invalidation, pause refresh and native Averill Stop passed. Instagram native image upload/caption editing passed; image persistence, complete packaged story, hardware edge cases and final recording are separate acceptance gates. See INSTALLED_EXTENSION_2026-10-04.md.
+
+## Guided UI publication follow-up — 4 October 2026
+
+Runtime/UI commits `571ccdf` and `50e5c61` are pushed. Release `v0.1.0-preview.20261004.2` publishes the verified `50e5c61` app/ZIP and SHA256SUMS. Unauthenticated archive download digest matches. Current project documents and the system-design Word snapshot are updated; NEXT_STEPS_2026-10-04.md is the ordered handover. The normal Mac workspace was preserved.

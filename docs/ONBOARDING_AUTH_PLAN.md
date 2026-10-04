@@ -1,5 +1,7 @@
 # Company file onboarding and employee accounts
 
+Current status, 4 October 2026: the Guided UI release is public at [v0.1.0-preview.20261004.2](https://github.com/sararr25/averill-ai/releases/tag/v0.1.0-preview.20261004.2). See [PROJECT_STATUS_2026-10-04.md](PROJECT_STATUS_2026-10-04.md) and [NEXT_STEPS_2026-10-04.md](NEXT_STEPS_2026-10-04.md) for current evidence, ordered checks and pending fixes. Dated earlier sections are historical where superseded.
+
 26 September 2026. Owner request: import existing Excel/PDF/SVG/company documents, let Nebius structure unclear content, and demonstrate separate owner/admin, Marketing manager, Marketing strategy employee and Content creator logins. Preserve English product content and the current design system.
 
 ## Delivery sequence

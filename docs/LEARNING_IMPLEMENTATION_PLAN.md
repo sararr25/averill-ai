@@ -1,5 +1,7 @@
 # Canva tutor and weekly practice implementation plan
 
+Current status, 4 October 2026: the Guided UI release is public at [v0.1.0-preview.20261004.2](https://github.com/sararr25/averill-ai/releases/tag/v0.1.0-preview.20261004.2). See [PROJECT_STATUS_2026-10-04.md](PROJECT_STATUS_2026-10-04.md) and [NEXT_STEPS_2026-10-04.md](NEXT_STEPS_2026-10-04.md) for current evidence, ordered checks and pending fixes. Dated earlier sections are historical where superseded.
+
 26 September 2026. Implement a local, offline learning path in the existing Electron app.
 
 1. Add a Learn area using the shared Averill visual tokens. Provide a bounded Canva lesson on selecting, positioning and grouping elements, with official Canva references and contextual help. The employee performs and confirms each step; no geometry verification or automatic Canva operation is claimed. Optional capture remains the existing explicit one-frame OCR path.

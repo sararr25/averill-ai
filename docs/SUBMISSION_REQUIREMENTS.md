@@ -1,5 +1,7 @@
 # Nebius x NVIDIA submission requirements
 
+Current status, 4 October 2026: the Guided UI release is public at [v0.1.0-preview.20261004.2](https://github.com/sararr25/averill-ai/releases/tag/v0.1.0-preview.20261004.2). See [PROJECT_STATUS_2026-10-04.md](PROJECT_STATUS_2026-10-04.md) and [NEXT_STEPS_2026-10-04.md](NEXT_STEPS_2026-10-04.md) for current evidence, ordered checks and pending fixes. Dated earlier sections are historical where superseded.
+
 Verified 3 October 2026 through the event's Devpost rules, dates and submission schema. Sources: [event](https://nebiusglobalaihackathon.devpost.com/), [rules](https://nebiusglobalaihackathon.devpost.com/rules). Recheck before submitting; this is preparation, not registration or a submitted entry.
 
 Deadline: **30 October 2026, 17:00 UTC / 18:00 Europe/Copenhagen**. Suggested track: **Best apps and agents**.
@@ -9,7 +11,7 @@ Deadline: **30 October 2026, 17:00 UTC / 18:00 Europe/Copenhagen**. Suggested tr
 - A working application with real runtime Nebius Token Factory inference or Nebius AI Cloud compute, and at least one NVIDIA open model. The isolated synthetic task-review request passed with `nvidia/nemotron-3-super-120b-a12b` on 3 October; the packaged renderer consent flow also passed a synthetic live regression on 4 October; the final recording still needs the manual platform story.
 - A public repository with an OSI-approved license, setup instructions and a clear explanation of models and tools. This repository has MIT. Check public judge access before submitting.
 - A public YouTube demonstration showing the application functioning on its target device and explaining Nebius/NVIDIA use. Keep the final cut below three minutes; the plan is **2:50**. The earlier four-minute narrative is historical.
-- A working demo or test-build URL for this application. Although the structured URL field is optional, the submission prose requires it for non-Physical-AI entries. The unsigned arm64 preview release is published at https://github.com/sararr25/averill-ai/releases/tag/v0.1.0-preview.20261004; public page/download access and uploaded digest were verified on 4 October; a clean target-Mac installation is still a separate check.
+- A working demo or test-build URL for this application. Although the structured URL field is optional, the submission prose requires it for non-Physical-AI entries. The unsigned arm64 preview release is published at https://github.com/sararr25/averill-ai/releases/tag/v0.1.0-preview.20261004.2; public page/download access and uploaded digest were verified on 4 October; a clean target-Mac installation is still a separate check.
 - Completed description, selected track, model/platform feedback and owner eligibility declarations. Do not invent ratings or accept declarations on the owner's behalf.
 
 ## Submission fields

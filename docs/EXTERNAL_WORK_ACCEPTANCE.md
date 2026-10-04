@@ -1,8 +1,10 @@
 > Demo scope corrected on 4 October: use the local fake Brevo, Instagram and LinkedIn pages without platform accounts. See demo-tools/social-simulator/README.md for page verification and remaining extension/image checks. Production integration remains a separate product boundary.
 
+Current status, 4 October 2026: the Guided UI release is public at [v0.1.0-preview.20261004.2](https://github.com/sararr25/averill-ai/releases/tag/v0.1.0-preview.20261004.2). See [PROJECT_STATUS_2026-10-04.md](PROJECT_STATUS_2026-10-04.md) and [NEXT_STEPS_2026-10-04.md](NEXT_STEPS_2026-10-04.md) for current evidence, ordered checks and pending fixes. Dated earlier sections are historical where superseded.
+
 # External-work acceptance matrix
 
-Current evidence, 4 October 2026: see [ACCEPTANCE_2026-10-04.md](ACCEPTANCE_2026-10-04.md). 47/47 tests, real Canva OCR/edit/Stop, live synthetic Nemotron request, packaged renderer consent cancellation/review and restart now pass. The DOM field adapter and explicit field requirements exist; actual installed Chrome and email/social platform acceptance remain open. Earlier totals and missing-implementation statements below are historical.
+Current evidence, 4 October 2026: see [ACCEPTANCE_2026-10-04.md](ACCEPTANCE_2026-10-04.md). 47/47 tests, real Canva OCR/edit/Stop, live synthetic Nemotron request, packaged renderer consent cancellation/review and restart now pass. The DOM field adapter and explicit field requirements exist; installed Chrome selected-field demo acceptance has evidence; full manual acceptance on the new release and production platform integration remain separate. Earlier totals and missing-implementation statements below are historical.
 
 Updated 28 September 2026. These are synthetic Vamo test cases for Averill, not content to publish. The employee creates work in the named external tool; Averill never creates the draft. This matrix prepares numbered points 1–3 of the implementation plan: dependable companion, selected-window observation and bounded source-grounded task review. The task engine exists for exact company phrases, with optional Nebius suggestions; it does not yet cover every case below.
 

@@ -1,5 +1,16 @@
 <!-- Current demo correction: no Brevo sign-in is needed. -->
+
+Current status, 4 October 2026: the Guided UI release is public at [v0.1.0-preview.20261004.2](https://github.com/sararr25/averill-ai/releases/tag/v0.1.0-preview.20261004.2). See [PROJECT_STATUS_2026-10-04.md](PROJECT_STATUS_2026-10-04.md) and [NEXT_STEPS_2026-10-04.md](NEXT_STEPS_2026-10-04.md) for current evidence, ordered checks and pending fixes. Dated earlier sections are historical where superseded.
+
 # Averill execution handover
+
+## Latest publication and next actions
+
+The Guided UI is public in `v0.1.0-preview.20261004.2`, built from `50e5c61`. Public page/checksum download returned HTTP 200; a fresh unauthenticated ZIP download matches SHA-256 `38499d6041da183209478f48a5bde3b1f363503733b761ac040da98cc91aa36b`. The previous release is retained.
+
+Next execute [NEXT_STEPS_2026-10-04.md](NEXT_STEPS_2026-10-04.md) in order: published-app launch/restart, full fake-editor correction loop, privacy/account cases, manual role/accessibility/hardware checks, then final video and owner submission declarations. No current test proves every one of those gates. Cloud sync, production publishing and geometry assessment are future product scope.
+
+Documentation is synchronized separately from the binary; no runtime source changed in this publication pass.
 
 ## Approved B Guided UI — 4 October 2026
 
@@ -7,14 +18,14 @@ Implemented the approved UI/UX audit in the existing Electron app. Work now make
 
 Validation: 47/47 tests; native feedback/knowledge/learning/focus/reduced-motion, browser-client privacy/Stop, renderer rule review/correction/recheck/revocation/task invalidation and all six areas at 440×660, 520×850, 960×820. The actual native app was inspected through CUA with an isolated synthetic profile. Normal user data was preserved. No provider request was made for this UI pass.
 
-The local unsigned arm64 `.app` and ZIP are rebuilt and bundle/archive verified. The public GitHub release still targets `3ce9e29`; it does not yet contain these UI changes. Runtime reduced motion is tested via emulation; OS setting, full VoiceOver/200% zoom and frame profiling remain manual checks.
+The local unsigned arm64 `.app` and ZIP are rebuilt and bundle/archive verified. The new public release targets `50e5c61` and includes these UI changes. Its ZIP digest is recorded in PROJECT_STATUS_2026-10-04.md. Runtime reduced motion is tested via emulation; OS setting, full VoiceOver/200% zoom and frame profiling remain manual checks.
 
 
 ## Pending-work continuation — 4 October 2026
 
 [Current acceptance record](ACCEPTANCE_2026-10-04.md) supersedes the earlier consent-UI/restart gates. 47/47 tests pass. Packaged-resource regression now verifies consent cancellation, one live generated-public-text Nebius/NVIDIA review through renderer handlers, correction, authority revocation, Stop, weekly practice, person isolation and second-process restart. Work displays the actual runtime model. The actual unsigned `.app` also launched on this Mac at the existing workspace sign-in screen; normal user data was preserved.
 
-The public preview build is published at GitHub release `v0.1.0-preview.20261004`, targeting `3ce9e29`. Unauthenticated page/download HTTP 200 and the uploaded ZIP digest were verified. Explicit local-extension installation permission, platform/full hardware rehearsal, final recording/public YouTube URL and owner submission declarations remain gates. The regression harness is distinct from installed Chrome acceptance on the local fake editors.
+The public preview build is published at GitHub release `v0.1.0-preview.20261004`, targeting `3ce9e29`. Unauthenticated page/download HTTP 200 and the uploaded ZIP digest were verified. Extension installation and selected-field demo proof are complete; full manual rehearsal/hardware checks, final recording/public YouTube URL and owner submission declarations remain gates. The regression harness is distinct from installed Chrome acceptance on the local fake editors.
 
 ## Current rehearsal and submission preparation — 3 October 2026
 
@@ -32,7 +43,7 @@ The owner authorized pushing the five follow-up milestones on 3 October. The ear
 
 ## Current browser field adapter — 3 October 2026
 
-The opt-in extension in `travel-desktop/browser-extension/` shares one clicked top-frame field locally after a pause, blur or selection. Pairing is ephemeral and person/tab/origin scoped; typing invalidates advice and Stop/logout/expiry revokes the connection. Work labels selected-field evidence separately from native Accessibility/OCR. Source-backed field requirements cover audience/date/time/asset/procedure/version/disclosure only when that field was observed; other requirements remain unverified. No edits or automatic provider requests exist. Read the extension README for installation, privacy and acceptance limits. Native tests use a synthetic extension client; actual Chrome/platform installation remains pending.
+The opt-in extension in `travel-desktop/browser-extension/` shares one clicked top-frame field locally after a pause, blur or selection. Pairing is ephemeral and person/tab/origin scoped; typing invalidates advice and Stop/logout/expiry revokes the connection. Work labels selected-field evidence separately from native Accessibility/OCR. Source-backed field requirements cover audience/date/time/asset/procedure/version/disclosure only when that field was observed; other requirements remain unverified. No edits or automatic provider requests exist. Read the extension README for installation, privacy and acceptance limits. Native tests use a synthetic extension client; installed Chrome selected-field acceptance is recorded in INSTALLED_EXTENSION_2026-10-04.md; full manual new-release and production-platform acceptance remain separate.
 
 ## Current email loop — 3 October 2026
 

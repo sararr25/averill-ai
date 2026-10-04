@@ -1,8 +1,10 @@
 # Averill product demo plan
 
+Current status, 4 October 2026: the Guided UI release is public at [v0.1.0-preview.20261004.2](https://github.com/sararr25/averill-ai/releases/tag/v0.1.0-preview.20261004.2). See [PROJECT_STATUS_2026-10-04.md](PROJECT_STATUS_2026-10-04.md) and [NEXT_STEPS_2026-10-04.md](NEXT_STEPS_2026-10-04.md) for current evidence, ordered checks and pending fixes. Dated earlier sections are historical where superseded.
+
 ## Current recording plan — 3 October 2026
 
-Use the **2:50** sequence and ordered checks in [DEMO_REHEARSAL.md](DEMO_REHEARSAL.md). Official [submission requirements](SUBMISSION_REQUIREMENTS.md) supersede the historical four-minute timing below. Live synthetic Token Factory/NVIDIA Nemotron review and current real Canva text/Position/PNG operations have evidence; email sign-in, installed Chrome extension, complete packaged app rehearsal and final public video/test-build URL remain open. [Submission draft](../devpost-submission.md) is prepared, not submitted.
+Use the **2:50** sequence and ordered checks in [DEMO_REHEARSAL.md](DEMO_REHEARSAL.md). Official [submission requirements](SUBMISSION_REQUIREMENTS.md) supersede the historical four-minute timing below. Live synthetic Token Factory/NVIDIA Nemotron review and current real Canva text/Position/PNG operations have evidence; fake Brevo needs no sign-in, the extension is installed, and the test-build URL is public; complete manual packaged rehearsal and final video remain open. [Submission draft](../devpost-submission.md) is prepared, not submitted.
 
 ## Historical decisions and narrative
 

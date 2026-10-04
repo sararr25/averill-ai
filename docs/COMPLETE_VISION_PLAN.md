@@ -1,5 +1,7 @@
 # Averill complete-vision implementation plan
 
+Current status, 4 October 2026: the Guided UI release is public at [v0.1.0-preview.20261004.2](https://github.com/sararr25/averill-ai/releases/tag/v0.1.0-preview.20261004.2). See [PROJECT_STATUS_2026-10-04.md](PROJECT_STATUS_2026-10-04.md) and [NEXT_STEPS_2026-10-04.md](NEXT_STEPS_2026-10-04.md) for current evidence, ordered checks and pending fixes. Dated earlier sections are historical where superseded.
+
 Updated 28 September 2026. This is the execution plan for the product distinction confirmed by the owner. [HANDOVER.md](HANDOVER.md) records the current verified state. The implementation status of the first three numbered milestones is recorded below; later milestones remain planned.
 
 ## Delivery status for points 1–3

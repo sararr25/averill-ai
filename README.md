@@ -1,5 +1,7 @@
 # Averill
 
+Current status, 4 October 2026: the Guided UI release is public at [v0.1.0-preview.20261004.2](https://github.com/sararr25/averill-ai/releases/tag/v0.1.0-preview.20261004.2). See [docs/PROJECT_STATUS_2026-10-04.md](docs/PROJECT_STATUS_2026-10-04.md) and [docs/NEXT_STEPS_2026-10-04.md](docs/NEXT_STEPS_2026-10-04.md) for current evidence, ordered checks and pending fixes. Dated earlier sections are historical where superseded.
+
 Averill is a source-grounded company agent assistant for people working across applications. The employee chooses what to share. Averill points out relevant inconsistencies after a field edit or asset selection, explains the issue, and links to the approved source. The employee decides what to change and whether to publish.
 
 This repository contains an **Electron hackathon prototype**, a local company onboarding path, its Vamo sample campaign and department source pack, a Canva tutor and weekly learning flow, the Vamo travel website, separate design systems, and handover documentation. Vamo is the fictional customer brand, never Averill's product name or style. Shipped desktop fixtures use Vamo; existing persisted workspaces retain their legacy identities.
@@ -81,7 +83,7 @@ A persistent status banner reports pending, completed, cancelled and failed expl
 
 ## Hackathon readiness — 3 October 2026
 
-See the [submission checklist](docs/SUBMISSION_REQUIREMENTS.md), [2:50 rehearsal](docs/DEMO_REHEARSAL.md) and [draft description](devpost-submission.md). The five follow-up commits are tracked in the [milestone ledger](docs/MILESTONES_2026-10-03.md). Real-platform acceptance, final video and a public verified test-build URL remain open.
+See the [submission checklist](docs/SUBMISSION_REQUIREMENTS.md), [2:50 rehearsal](docs/DEMO_REHEARSAL.md) and [draft description](devpost-submission.md). The five follow-up commits are tracked in the [milestone ledger](docs/MILESTONES_2026-10-03.md). The public verified test-build URL and installed Chrome demo proof are available. Complete manual acceptance on the new release, hardware checks and final video remain open.
 
 A live generated-email/policy request passed via Nebius Token Factory using NVIDIA `nvidia/nemotron-3-super-120b-a12b`. To reproduce intentionally, configure NEBIUS_API_KEY locally and run:
 
@@ -93,4 +95,4 @@ This sends only the script's generated public test strings. It requires a valida
 
 ## Preview delivery and remaining acceptance — 4 October 2026
 
-[Public preview release](https://github.com/sararr25/averill-ai/releases/tag/v0.1.0-preview.20261004) contains the verified unsigned macOS 13+ arm64 build and checksum. Public page/download access and uploaded ZIP digest match were verified on 4 October. See [the current acceptance record](docs/ACCEPTANCE_2026-10-04.md) for setup, regression evidence and account/permission/hardware gates. Work now names the actual provider/model used by a completed AI review. `verify:rehearsal` exercises packaged resources, consent cancellation, synthetic live review and restart without touching normal user data.
+[Public preview release](https://github.com/sararr25/averill-ai/releases/tag/v0.1.0-preview.20261004.2) contains the verified unsigned macOS 13+ arm64 build and checksum. Public page/download access and uploaded ZIP digest match were verified on 4 October. See [the current acceptance record](docs/ACCEPTANCE_2026-10-04.md) for setup, regression evidence and account/permission/hardware gates. Work now names the actual provider/model used by a completed AI review. `verify:rehearsal` exercises packaged resources, consent cancellation, synthetic live review and restart without touching normal user data.

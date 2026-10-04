@@ -1,5 +1,7 @@
 # Recording script — 2:50
 
+Current status, 4 October 2026: the Guided UI release is public at [v0.1.0-preview.20261004.2](https://github.com/sararr25/averill-ai/releases/tag/v0.1.0-preview.20261004.2). See [PROJECT_STATUS_2026-10-04.md](PROJECT_STATUS_2026-10-04.md) and [NEXT_STEPS_2026-10-04.md](NEXT_STEPS_2026-10-04.md) for current evidence, ordered checks and pending fixes. Dated earlier sections are historical where superseded.
+
 Prepared 4 October 2026. Record after the fake Brevo correction/installed-extension gates in ACCEPTANCE_2026-10-04.md. This is narration and a shot list, not an existing video or a claim that the platform rehearsal passed. Use fictional Vamo data only. Crop passwords, local account documents, keys and unrelated browser tabs out of every frame.
 
 ## 0:00–0:25 — Company knowledge
@@ -16,7 +18,7 @@ Show the real synthetic Canva design and an explicit window share. Perform one P
 
 ## 0:55–1:40 — Correct a draft
 
-Show an unpublished synthetic email, an explicit shared field/window, approved source citation, human edit and fresh local recheck. Keep recipients and send/schedule controls outside the action.
+Show fake Brevo without sign-in, explicitly share its draft field in Work, choose Check approved rules, and inspect the result in Review. Show the source citation, human edit and fresh local recheck. Keep recipients and send/schedule controls outside the action.
 
 “In the email draft, a price guarantee conflicts with the approved policy. Averill identifies the observed phrase and cites the exact source and version. The employee checks the evidence, changes the copy and requests a fresh local recheck. The finding clears. Only the shared text was checked; hidden audience or scheduling settings remain unverified.”
 
@@ -38,4 +40,4 @@ Show Stop and cleared observation. Finish with the public repository and preview
 
 “Stop sharing clears the observation and ends the connection. Averill keeps company sources inspectable and meaningful actions human-owned. The working macOS preview and its checksum are available on GitHub.”
 
-End card: `github.com/sararr25/averill-ai` and `github.com/sararr25/averill-ai/releases/tag/v0.1.0-preview.20261004`. Label the preview unsigned, macOS 13+, Apple Silicon. Do not claim cloud synchronization, automatic publication, general conversational Canva control or installed-platform acceptance beyond the recorded evidence.
+End card: `github.com/sararr25/averill-ai` and `github.com/sararr25/averill-ai/releases/tag/v0.1.0-preview.20261004.2`. Label the preview unsigned, macOS 13+, Apple Silicon. Do not claim cloud synchronization, automatic publication, general conversational Canva control or installed-platform acceptance beyond the recorded evidence.

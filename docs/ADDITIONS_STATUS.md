@@ -1,5 +1,7 @@
 # Added capabilities and company-readiness gates
 
+Current status, 4 October 2026: the Guided UI release is public at [v0.1.0-preview.20261004.2](https://github.com/sararr25/averill-ai/releases/tag/v0.1.0-preview.20261004.2). See [PROJECT_STATUS_2026-10-04.md](PROJECT_STATUS_2026-10-04.md) and [NEXT_STEPS_2026-10-04.md](NEXT_STEPS_2026-10-04.md) for current evidence, ordered checks and pending fixes. Dated earlier sections are historical where superseded.
+
 Updated 28 September 2026. This is the implementation ledger for section “What I would add” in the UI/UX/functionality audit. `docs/HANDOVER.md` remains the operational entry point.
 
 ## Work to learning

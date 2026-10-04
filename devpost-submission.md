@@ -1,5 +1,7 @@
 # Averill — submission draft
 
+Current status, 4 October 2026: the Guided UI release is public at [v0.1.0-preview.20261004.2](https://github.com/sararr25/averill-ai/releases/tag/v0.1.0-preview.20261004.2). See [docs/PROJECT_STATUS_2026-10-04.md](docs/PROJECT_STATUS_2026-10-04.md) and [docs/NEXT_STEPS_2026-10-04.md](docs/NEXT_STEPS_2026-10-04.md) for current evidence, ordered checks and pending fixes. Dated earlier sections are historical where superseded.
+
 Preparation draft, 3 October 2026. **Not submitted.** TODO fields require real evidence or owner input. Requirements: [docs/SUBMISSION_REQUIREMENTS.md](docs/SUBMISSION_REQUIREMENTS.md).
 
 ## Tagline
@@ -14,7 +16,7 @@ Company guidance often lives in documents away from the place where work happens
 
 A company owner creates a local workspace, imports documents and reviews people and source authority. Employees can consult approved guidance, explicitly share one external window or selected browser field, inspect a cited finding and make their own correction. Guided Canva lessons and person-owned weekly practice support learning. Vamo is the fictional sample company.
 
-The prototype runs on one Mac with separate local accounts. Its external checks are bounded text/rule checks. Browser field sharing is opt-in; platform acceptance remains pending. Canva steps are employee-confirmed, without automatic geometry assessment. There is no automatic editing, email sending or social publishing.
+The prototype runs on one Mac with separate local accounts. Its external checks are bounded text/rule checks. Browser field sharing is opt-in; installed Chrome selected-field tests on local fake editors have evidence, while production platform acceptance remains unverified. Canva steps are employee-confirmed, without automatic geometry assessment. There is no automatic editing, email sending or social publishing.
 
 ## How we built it
 
@@ -30,7 +32,7 @@ TODO: include a consented runtime request in the recorded application demonstrat
 
 ## Validation and challenges
 
-47 automated tests plus isolated native feedback, task-review and browser IPC/content-script smoke checks cover local behavior. The app and ZIP are verified together. Real email account access, installed Chrome extension behavior, full packaged rehearsal, permission denial and physical display checks remain acceptance gates. Keeping authority, privacy, model suggestions and employee confirmation distinct is central to the implementation.
+The Guided UI directs shared draft checks into Review with observed excerpts and versioned citations. Native motion respects reduced motion. 47 automated tests plus isolated native feedback, task-review and browser IPC/content-script smoke checks cover local behavior. The app and ZIP are verified together. Installed Chrome selected-field behavior on local fake editors has evidence. Complete manual rehearsal on this release, permission denial and physical display checks remain gates. Keeping authority, privacy, model suggestions and employee confirmation distinct is central to the implementation.
 
 ## What is next
 
@@ -41,7 +43,7 @@ Complete real-platform acceptance, signing/notarization, broader supported field
 - Repository: https://github.com/sararr25/averill-ai — MIT, setup in README.md.
 - Track proposed: Best apps and agents.
 - Video: TODO public YouTube URL, final cut 2:50.
-- Demo/test build: https://github.com/sararr25/averill-ai/releases/tag/v0.1.0-preview.20261004 — published; public page/download HTTP 200 and upload digest verified; unsigned macOS 13+ arm64. Clean target-Mac installation remains separate.
+- Demo/test build: https://github.com/sararr25/averill-ai/releases/tag/v0.1.0-preview.20261004.2 — published; public page/download HTTP 200 and upload digest verified; unsigned macOS 13+ arm64. Clean target-Mac installation remains separate.
 - Submitter type / organization / residence / province: TODO owner confirmation.
 - New or existing before 26 August / significant updates: TODO owner confirmation against project history.
 - Model quality (1–10), Nebius recommendation (1–10), inference experience (1–10): TODO owner ratings.

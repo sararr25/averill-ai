@@ -1,5 +1,7 @@
 # Remaining acceptance — 4 October 2026
 
+Current status, 4 October 2026: the Guided UI release is public at [v0.1.0-preview.20261004.2](https://github.com/sararr25/averill-ai/releases/tag/v0.1.0-preview.20261004.2). See [PROJECT_STATUS_2026-10-04.md](PROJECT_STATUS_2026-10-04.md) and [NEXT_STEPS_2026-10-04.md](NEXT_STEPS_2026-10-04.md) for current evidence, ordered checks and pending fixes. Dated earlier sections are historical where superseded.
+
 Continuation requested by the owner: finish pending work and keep committing/pushing. This record separates observed results from gates requiring an account, permission or physical hardware.
 
 ## Verified in this continuation
@@ -11,9 +13,13 @@ Continuation requested by the owner: finish pending work and keep committing/pus
 - Local correction/recheck, typing invalidation, source revocation, floating Stop, confirmed learning, weekly practice and unauthorized learning access rejection pass. Receipt/screenshots remain ignored in `travel-desktop/dist/rehearsal/`.
 - This is a regression harness with scripted consent decisions and a synthetic extension client, not proof of installed Chrome, Brevo or manual completion of the whole narrative.
 
-## Public test build
+## Guided UI public test build
 
-Published release: `v0.1.0-preview.20261004`, on the public `sararr25/averill-ai` repository. Release assets are the verified ZIP and SHA256SUMS; the release notes describe local setup, unsigned arm64 scope and open platform gates. The release and download both returned HTTP 200 without authentication. GitHub reports the same uploaded ZIP digest as the locally verified archive: `acef84c59cf6bc5609d17328aff7a6129c4624a26d33b3d508d03fc87125ef8b`. Release target is commit `3ce9e296011e254494c7f25a4896732ce74af566`. Public URL:
+Release `v0.1.0-preview.20261004.2` targets `50e5c61`. The public page and checksum return HTTP 200, and a fresh unauthenticated archive download matches the local and GitHub ZIP digest `38499d6041da183209478f48a5bde3b1f363503733b761ac040da98cc91aa36b`. Package verification matches 120 tracked desktop sources, both native helpers and 3109 ZIP entries. Source and bundle-resource UI regression boundaries are recorded in UI_UX_AUDIT_2026-10-04.md. This does not establish clean target-Mac install or full manual rehearsal.
+
+## Historical first public test build
+
+Historical first release: `v0.1.0-preview.20261004`, on the public `sararr25/averill-ai` repository. Release assets are the verified ZIP and SHA256SUMS; the release notes describe local setup, unsigned arm64 scope and open platform gates. The release and download both returned HTTP 200 without authentication. GitHub reports the same uploaded ZIP digest as the locally verified archive: `acef84c59cf6bc5609d17328aff7a6129c4624a26d33b3d508d03fc87125ef8b`. Release target is commit `3ce9e296011e254494c7f25a4896732ce74af566`. Historical URL:
 
 https://github.com/sararr25/averill-ai/releases/tag/v0.1.0-preview.20261004
 

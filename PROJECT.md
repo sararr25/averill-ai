@@ -1,5 +1,7 @@
 # Averill project
 
+Current status, 4 October 2026: the Guided UI release is public at [v0.1.0-preview.20261004.2](https://github.com/sararr25/averill-ai/releases/tag/v0.1.0-preview.20261004.2). See [docs/PROJECT_STATUS_2026-10-04.md](docs/PROJECT_STATUS_2026-10-04.md) and [docs/NEXT_STEPS_2026-10-04.md](docs/NEXT_STEPS_2026-10-04.md) for current evidence, ordered checks and pending fixes. Dated earlier sections are historical where superseded.
+
 Current update, 3 October 2026: shipped source packs and fixtures use Vamo; old persisted credentials and source approvals remain unchanged. See docs/DEMO_MIGRATION.md. Earlier state descriptions below are historical until reconciled with the current milestone ledger.
 
 Updated 28 September 2026. This is the canonical product brief; [docs/HANDOVER.md](docs/HANDOVER.md) is the current execution handover for the public `averill-ai` repository.
@@ -127,3 +129,7 @@ Desktop/Finder drop, local/synced files, HTTPS links and Google Drive/OneDrive s
 A persistent status banner reports pending, completed, cancelled and failed explicit actions. Knowledge provides local document/text search, uploaded proposals, approved/pending/private/superseded sources, extracted-text reading and original-file access under existing role visibility. Intake is visible before onboarding confirmation. The library does not send documents to external AI. See the handover and onboarding tutorial for current verification and workflow.
 
 Current 3 October addition: opt-in selected-field browser adapter and exact source-backed audience/date/time/asset/procedure/version requirements are implemented. See the extension README and milestone ledger for the distinction between synthetic transport/DOM tests and installed real-platform acceptance.
+
+## Guided UI release
+
+External task results now appear in Review. Work highlights sharing/capture/check prerequisites. Setup groups administration; Knowledge discloses filters and approval detail; Learn promotes the next confirmed step. Native B motion respects reduced motion. See the current UI audit for test boundaries.

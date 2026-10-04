@@ -1,5 +1,7 @@
 # Averill UI/UX audit — 4 October 2026
 
+Current status, 4 October 2026: the Guided UI release is public at [v0.1.0-preview.20261004.2](https://github.com/sararr25/averill-ai/releases/tag/v0.1.0-preview.20261004.2). See [PROJECT_STATUS_2026-10-04.md](PROJECT_STATUS_2026-10-04.md) and [NEXT_STEPS_2026-10-04.md](NEXT_STEPS_2026-10-04.md) for current evidence, ordered checks and pending fixes. Dated earlier sections are historical where superseded.
+
 Status: audit and interaction proposal completed; product implementation awaits the Genjutsu thesis/variant gate. The existing Petrol / Coral / Ice identity remains the foundation. No React/shadcn/Tailwind migration or animation dependency is proposed: the desktop uses plain Electron HTML, JavaScript and CSS.
 
 ## Verification boundary
@@ -71,6 +73,6 @@ Computed contrast on #002129: text #F4F5F3 15.37:1; secondary #BDD5DF 11.00:1; m
 
 Not verified: animation frame timing on low-end hardware (no 60fps claim), whole-app VoiceOver/200% zoom, OS-level Reduce Motion setting, and complete authenticated employee/lead/admin visual acceptance. Native minimum width remains 440; no mobile support is claimed. Existing installed Chrome proof belongs to the previous acceptance record; this UI pass uses a synthetic extension client and does not extend that claim.
 
-The updated local unsigned arm64 app/ZIP are rebuilt and bundle-verified separately from the existing public GitHub release, which still targets 3ce9e29. See HANDOVER.md for the current artifact and validation boundary.
+The updated local unsigned arm64 app/ZIP are rebuilt and bundle-verified separately from the new public GitHub release, which targets 50e5c61. See HANDOVER.md for the current artifact and validation boundary.
 
 Static full scan: 24 checks ran; two heuristic categories fired. Hover matches in legacy CSS are covered by the global button transition in guided-ui.css; the introduced summary also has a 140ms color transition. Timer matches are security/network expiry and the feedback visibility deadline, not frame-driven animation. Four JSX/framework checks did not run (non-interactive click handlers, conditional exits, decorative accessibility and inline animated styles), because this app uses native HTML/JS. Native controls/dialog/feedback semantics were inspected separately; these four checks are not reported as passing.

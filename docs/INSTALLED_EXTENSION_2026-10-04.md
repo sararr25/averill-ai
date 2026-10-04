@@ -1,5 +1,7 @@
 # Installed Chrome extension acceptance — 4 October 2026
 
+Current status, 4 October 2026: the Guided UI release is public at [v0.1.0-preview.20261004.2](https://github.com/sararr25/averill-ai/releases/tag/v0.1.0-preview.20261004.2). See [PROJECT_STATUS_2026-10-04.md](PROJECT_STATUS_2026-10-04.md) and [NEXT_STEPS_2026-10-04.md](NEXT_STEPS_2026-10-04.md) for current evidence, ordered checks and pending fixes. Dated earlier sections are historical where superseded.
+
 The owner explicitly authorized installation and demo tests, manually installed the reviewed local companion, then reported “installata”. Native Chrome showed Averill selected-field companion in its toolbar and its actual popup. This pass tested the installed extension, not a synthetic extension client.
 
 The desktop ran its canonical development resources in a temporary isolated profile with one generated Marketing v2 source, explicitly approved in the test setup. Pairing was initiated through desktop IPC; extension popup pairing and field selection used real Chrome UI. Normal user accounts/imported approvals were preserved. No AI/provider request or real-platform publication occurred.

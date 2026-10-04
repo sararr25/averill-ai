@@ -1,5 +1,7 @@
 # Averill system design
 
+Current status, 4 October 2026: the Guided UI release is public at [v0.1.0-preview.20261004.2](https://github.com/sararr25/averill-ai/releases/tag/v0.1.0-preview.20261004.2). See [docs/PROJECT_STATUS_2026-10-04.md](docs/PROJECT_STATUS_2026-10-04.md) and [docs/NEXT_STEPS_2026-10-04.md](docs/NEXT_STEPS_2026-10-04.md) for current evidence, ordered checks and pending fixes. Dated earlier sections are historical where superseded.
+
 Current update, 3 October 2026: shipped packs/editors use Vamo, new person-scoped drafts use vamo:v2, and old persisted credentials/approved copies are unchanged. See docs/DEMO_MIGRATION.md. Legacy company labels below describe prior versions.
 
 ## Purpose and status
@@ -145,3 +147,7 @@ A persistent status banner reports pending, completed, cancelled and failed expl
 ## Browser field transport — 3 October 2026
 
 `browser-bridge.js` starts only after signed-in Work pairing, binds to a random loopback port, validates Host/extension Origin/token and one tab/origin, and rejects stale sequences. Stop/person change closes it and clears text. Field selection/pause/blur yields bounded DOM value and field metadata; typing yields an invalidation event. Extension session storage carries only short-lived pairing, never company files or provider keys. Company task review checks explicit requirements only against matching selected-field evidence. Native OCR remains a separate fallback without inferred field structure. Cross-origin frames and live-platform acceptance are open.
+
+## Guided renderer state
+
+`guided-ui.js` provides interruptible native entry motion and Setup grouping. `guided-ui.css` implements shared controls, disclosure hierarchy and native feedback/dialog exits. `agent.js` stores external results only with an identity over person/session/source authority/privacy/window/hash/task, clears them on invalidation and checks request generation before presentation. Fresh recheck clears the previous result before capture. This renderer defense supplements existing main-process authorization and observation checks; it does not replace them.
