@@ -56,3 +56,9 @@ The date-control automation initially showed a date without committing the nativ
 The owner explicitly authorized publication after the initial automatic-review rejection. The focus fix is now public in [v0.1.0-preview.20261012](https://github.com/sararr25/averill-ai/releases/tag/v0.1.0-preview.20261012), built from `e1f05cb`. GitHub's uploaded ZIP digest matches local verification: `b40ea24e9fe96f407be7f7139c7809ef1dcb1ffe96b6359d484f3b6e7780e80f`. The page and checksum are publicly accessible; the previous release is retained. This unsigned macOS 13+ Apple Silicon preview does not complete the still-open manual/hardware gates above.
 
 Publication verification: a fresh unauthenticated ZIP download matches the local and GitHub-uploaded SHA-256. [Public-download receipt](review-evidence-2026-10-12/continuation/publication-verification.json).
+
+## Local ticket-fix build — 12 October 2026
+
+The local app and ZIP now include Learn recovery and Knowledge count fixes from `da33f51`. Release verification passes 120 tracked source files, both helpers and 3109 archive entries. SHA-256: `e48aae9bdeef98fefc31e91c7bb6f5a293ea8d90626a8ed5951db4e95966d8f3`. Offline rehearsal on packaged resources passes consent cancellation, correction/revocation, Stop, weekly practice, account isolation and separate-process restart; zero provider requests. The rejected cross-person learning action in the log is an expected assertion. [Build receipt](review-evidence-2026-10-12/ticket-build-continuation/release-verification.json), [rehearsal receipt](review-evidence-2026-10-12/ticket-build-continuation/offline-rehearsal.json).
+
+This remains a local candidate; the public preview is unchanged. Development Electron loading packaged resources does not complete final-executable/clean-Mac/physical-device acceptance.
