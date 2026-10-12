@@ -25,11 +25,14 @@ Completed in this review, using synthetic material and isolated profiles. [Plan 
 
 - [x] Native Learn continuation: approved-source lesson, four synthetic confirmations with heading focus, weekly wrong/correct feedback, source read/Escape, required reflection confirmation, completion, exclusion/recovery and second-account empty history passed. Fixed misleading refresh instructions after excluding the only eligible lesson; native source UI retest and **47/47 tests** pass with zero provider calls. [Receipt](review-evidence-2026-10-12/learning-continuation/verification.json). Actual Canva operations and final executable remain separate gates.
 
+- [x] Native chooser retest showed import success in both AX and pixels without resize. Source saved pending, reasonless rejection refused, reasoned rejection persisted, extracted-line comparison/replacement and current-source lookup passed. Fixed Knowledge counter that reported zero for review despite pending decisions; native retest and 47/47 regression pass. [Receipt](review-evidence-2026-10-12/intake-continuation/verification.json). Packaged chooser/Finder drop remain open.
+- [x] Unused local pairing expired and explicit Stop cleared a renewed unused pairing. Installed Chrome continuation was interrupted; no new installed-browser matrix acceptance is claimed.
+
 ## Still open
 
 - [ ] Clean target-Mac install and the full manual final-executable story.
 - [ ] Installed Chrome expiry, broader sensitive-field matrix, background/navigation and cross-origin cases; social-specific rule and structured-field acceptance.
-- [ ] Actual Finder drag/drop, rejection/current-version UI completion and manual Canva-to-weekly-practice acceptance. Repeat chooser after a rendering stall: import/AX completed but pixels stayed on Working until resize.
+- [ ] Actual Finder drag/drop, manual Canva-to-weekly-practice acceptance. Development chooser retest passed without resize; repeat on final executable after the earlier rendering stall.
 - [ ] Complete keyboard traversal/VoiceOver, OS reduced motion and frame/CPU profiling. Native zoom and source Escape focus are verified separately.
 - [ ] Actual permission denial/revocation, external-app full-screen capture/Stop and physical second monitor.
 - [ ] Live Drive/OneDrive OAuth, provider confidentiality/retention settings and fresh consented AI acceptance if included in the final story.

@@ -1,0 +1,11 @@
+{
+  "date": "2026-10-12",
+  "checks": [
+    "Unused local pairing expired; native Work returned to disabled Copy pairing and Stop controls",
+    "Explicit Stop of renewed unused pairing cleared readiness"
+  ],
+  "limits": [
+    "Installed Chrome pairing attempt not completed due to repeated foreground changes and popup-input failure",
+    "No new installed background/navigation/cross-origin/social acceptance established"
+  ]
+}

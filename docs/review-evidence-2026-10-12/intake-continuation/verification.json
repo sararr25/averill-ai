@@ -1,0 +1,24 @@
+{
+  "date": "2026-10-12",
+  "environment": "Development Electron; isolated synthetic QA profile; real macOS chooser and CUA UI actions",
+  "checks": [
+    "Native chooser imported Markdown; pixels showed Files received without resize",
+    "Extracted marker reviewed; onboarding confirmed without approval leaves pending source",
+    "Reject without reason refused; rejection reason persisted in Approval details",
+    "Compared extracted lines against approved prior source",
+    "Explicit replacement approval superseded old source",
+    "Local answer cites current approved replacement v2",
+    "Rejected marker and superseded fictional-company passage do not produce an answer",
+    "Knowledge count now distinguishes upload proposals and pending decisions in displayed results"
+  ],
+  "regression": {
+    "passed": 47,
+    "failed": 0
+  },
+  "providerCalls": 0,
+  "limits": [
+    "Actual Finder drop still open",
+    "Chooser retest was development executable; packaged-executable repeat remains open",
+    "Normal profile and approvals untouched"
+  ]
+}

@@ -36,7 +36,8 @@ async function renderKnowledge(){
   department.append(new Option('Company-wide','Company'));department.value=[...department.options].some(option=>option.value===selectedDepartment)?selectedDepartment:'all';
   const result=await window.desktop.listKnowledge(el('knowledge-search').value,el('knowledge-filter').value,{department:department.value,kind:el('knowledge-kind').value,conflict:el('knowledge-conflicts').checked});
   if(request!==knowledgeRequest)return;
-  summary.textContent=`${result.documents.length} shown of ${result.total} · ${result.uploaded} for review · ${result.approved} approved`;
+  const awaitingDecision=result.documents.filter(file=>file.canReview&&['pending','clarification_requested'].includes(file.status)).length;
+  summary.textContent=`${result.documents.length} shown of ${result.total} · ${result.uploaded} upload proposals · ${awaitingDecision} awaiting your decision in these results · ${result.approved} approved`;
   host.replaceChildren();
   if(!result.documents.length){host.append(node('p',result.total?'No documents match this search or status.':'No company documents yet. Add files in Setup; they appear here immediately for review.'));return;}
   for(const file of result.documents){
