@@ -51,7 +51,7 @@ function sourceButton(source) {
   button.className = 'source-link';
   button.innerHTML = `${icon('document')}<span></span>${icon('arrow')}`;
   button.querySelector('span').textContent = source.title;
-  button.addEventListener('click', () => source.kind === 'asset' ? window.desktop.openSource(source.id) : showSource(source.id));
+  button.addEventListener('click', () => source.kind === 'asset' ? window.desktop.openSource(source.id) : showSource(source.id, button));
   return button;
 }
 
@@ -228,7 +228,7 @@ function renderHero() {
     const open = node('button', undefined, 'approved-action'); open.type = 'button';
     open.append(node('span', item.kind === 'handover' ? 'Open approved brief' : 'Open current source'));
     const arrow = node('span'); arrow.innerHTML = icon('arrow-right'); open.append(arrow);
-    open.addEventListener('click', () => item.source.kind === 'asset' ? window.desktop.openSource(item.source.id) : showSource(item.source.id));
+    open.addEventListener('click', () => item.source.kind === 'asset' ? window.desktop.openSource(item.source.id) : showSource(item.source.id, open));
     source.append(open);
     appendFindingActions(source,item);
   } else {
@@ -393,14 +393,20 @@ function renderWorkspace() {
   groupSetup(panel);
 }
 
-async function showSource(id) {
+let sourceDialogReturnFocus = null;
+function openSourceDialog(trigger = document.activeElement) {
+  sourceDialogReturnFocus = trigger;
+  el('source-dialog').showModal();
+}
+
+async function showSource(id, trigger = document.activeElement) {
   const item = await window.desktop.source(id);
   if (!item) return;
   activeSourceId = id;
   el('open-source').hidden=false;
   el('source-title').textContent = item.title;
   el('source-content').textContent = item.content;
-  el('source-dialog').showModal();
+  openSourceDialog(trigger);
 }
 
 function addMessage(text, role, sources = []) {
@@ -584,6 +590,11 @@ el('context-public').addEventListener('click', async () => {
   } catch (error) { output.textContent = error.message; }
 });
 el('close-source').addEventListener('click', () => el('source-dialog').close());
+el('source-dialog').addEventListener('close', () => {
+  const trigger = sourceDialogReturnFocus;
+  sourceDialogReturnFocus = null;
+  if (trigger?.isConnected && !trigger.disabled) trigger.focus();
+});
 el('ai-toggle').addEventListener('click', async () => {
   if (!current.aiEnabled && !window.confirm('Enable Nebius for this session? Your questions and relevant approved company text sources will be sent to Nebius. Images and window captures are not sent by this control.')) return;
   current = await window.desktop.aiMode(!current.aiEnabled); render();
@@ -604,8 +615,8 @@ window.desktop.snapshot().then((value) => { current = value; render(); showTab(p
 
 for (const target of document.querySelectorAll('[data-icon]')) target.innerHTML = icon(target.dataset.icon);
 el('ask-form').querySelector('.composer-attach').innerHTML = icon('document');
-el('ask-form').querySelector('.composer-attach').addEventListener('click', () => {
+el('ask-form').querySelector('.composer-attach').addEventListener('click', (event) => {
   const source = (current.findings?.find(item=>`${item.kind}:${item.id}`===selectedFindingId)||current.findings?.[0])?.source;
-  if (source) source.kind === 'asset' ? window.desktop.openSource(source.id) : showSource(source.id);
+  if (source) source.kind === 'asset' ? window.desktop.openSource(source.id) : showSource(source.id, event.currentTarget);
   else showTab('work');
 });
