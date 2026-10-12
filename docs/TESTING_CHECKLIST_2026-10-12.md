@@ -25,14 +25,14 @@ Completed in this review, using synthetic material and isolated profiles. [Plan 
 
 - [x] Native Learn continuation: approved-source lesson, four synthetic confirmations with heading focus, weekly wrong/correct feedback, source read/Escape, required reflection confirmation, completion, exclusion/recovery and second-account empty history passed. Fixed misleading refresh instructions after excluding the only eligible lesson; native source UI retest and **47/47 tests** pass with zero provider calls. [Receipt](review-evidence-2026-10-12/learning-continuation/verification.json). Actual Canva operations and final executable remain separate gates.
 
-- [x] Native chooser retest showed import success in both AX and pixels without resize. Source saved pending, reasonless rejection refused, reasoned rejection persisted, extracted-line comparison/replacement and current-source lookup passed. Fixed Knowledge counter that reported zero for review despite pending decisions; native retest and 47/47 regression pass. [Receipt](review-evidence-2026-10-12/intake-continuation/verification.json). Packaged chooser/Finder drop remain open.
+- [x] Native chooser retest showed import success in both AX and pixels without resize. Source saved pending, reasonless rejection refused, reasoned rejection persisted, extracted-line comparison/replacement and current-source lookup passed. Fixed Knowledge counter that reported zero for review despite pending decisions; native retest and 47/47 regression pass. [Receipt](review-evidence-2026-10-12/intake-continuation/verification.json). Packaged chooser remains open; Finder was verified in the later human-drop continuation.
 - [x] Unused local pairing expired and explicit Stop cleared a renewed unused pairing. Installed Chrome continuation was interrupted; no new installed-browser matrix acceptance is claimed.
 
 ## Still open
 
 - [ ] Clean target-Mac install and the full manual final-executable story.
 - [ ] Installed Chrome expiry, broader sensitive-field matrix, background/navigation and cross-origin cases; social-specific rule and structured-field acceptance.
-- [ ] Actual Finder drag/drop, manual Canva-to-weekly-practice acceptance. Development chooser retest passed without resize; repeat on final executable after the earlier rendering stall.
+- [ ] Manual Canva-to-weekly-practice acceptance. Development chooser retest passed without resize; repeat on final executable after the earlier rendering stall.
 - [ ] Complete keyboard traversal/VoiceOver, OS reduced motion and frame/CPU profiling. Native zoom and source Escape focus are verified separately.
 - [ ] Actual permission denial/revocation, external-app full-screen capture/Stop and physical second monitor.
 - [ ] Live Drive/OneDrive OAuth, provider confidentiality/retention settings and fresh consented AI acceptance if included in the final story.
@@ -64,3 +64,7 @@ The local app and ZIP now include Learn recovery and Knowledge count fixes from 
 This remains a local candidate; the public preview is unchanged. Development Electron loading packaged resources does not complete final-executable/clean-Mac/physical-device acceptance.
 
 Finder-drop attempt: the isolated profile and real Finder file are prepared side by side. Native automation selected the file, but cross-application dragging did not reach Averill; the destination-referenced attempt returned a window-target error. Finder acceptance remains unchecked. This is an automation limitation, not a reproduced product defect. [Attempt receipt](review-evidence-2026-10-12/finder-drop-attempt/verification.json).
+
+## Real Finder drop verified
+
+- [x] The owner performed a real Finder drag of `qa-native-drop.md` into the prepared isolated QA app. Averill visibly received one file and extracted its exact marker/text locally. The agent saved it pending without automatic approval, then explicitly approved it with a reason and verified the approved source after renderer reload. Zero provider requests. No source fix was needed. [Receipt](review-evidence-2026-10-12/finder-drop/verification.json), [pending](review-evidence-2026-10-12/finder-drop/pending.png), [approved](review-evidence-2026-10-12/finder-drop/approved.png). This supersedes the earlier automation-only attempt; whole-process/final-executable gates remain distinct.
