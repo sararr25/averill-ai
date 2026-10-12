@@ -17,16 +17,26 @@ Completed in this review, using synthetic material and isolated profiles. [Plan 
 - [x] Canonical simulator: **2/2 date/timezone tests and production build passed**. Unsupported social scheduling, Reel/disclosure controls and real platform APIs were reviewed as outside its scope.
 - [x] Documentation: corrected obsolete no-extension/no-live-model claims and the public-build TODO. Official event overview rechecked; detailed rules retrieval failed, so eligibility/declarations remain unverified.
 
+- [x] Actual macOS chooser: local Markdown imported, extracted text reviewed and explicitly approved. Multisource regression also passed synced XLSX/public HTTPS, AI-off/private-link/missing-OAuth rejection; its drop is a synthetic event.
+- [x] Actual role walkthrough: owner, Marketing lead/employee and Operations employee; private/pending/cross-department exclusions and lead clarification/approval passed.
+- [x] Installed Chrome/local Brevo: prohibited claim/footer correction, immediate typing invalidation, recheck, logout/late edit, person isolation and sender Email address exclusion passed.
+- [x] Source-dialog focus defect reproduced and fixed (`e1f05cb`); mouse-open then Escape returns to its read button. Source and bundle regressions cover staged close and saved-source Escape. New local candidate app/ZIP match 120 tracked files, both helpers and 3109 entries; packaged-resource offline restart rehearsal passed with zero provider requests.
+- [x] Native **207.36% zoom**: six areas reachable, no horizontal overflow observed; restored Actual Size. Main-app full screen and companion access passed without active external capture.
+
 ## Still open
 
 - [ ] Clean target-Mac install and the full manual final-executable story.
-- [ ] Installed Chrome logout/person switch, expiry, private fields, background/navigation and cross-origin cases; social-specific rule and structured-field acceptance. Today's browser smoke is not installed-extension evidence.
-- [ ] Real native chooser/drop and complete role/department walkthrough; manual Canva-to-weekly-practice acceptance.
-- [ ] Keyboard/VoiceOver/200% zoom, OS reduced motion and frame/CPU profiling.
-- [ ] Actual permission denial/revocation, full screen and physical second monitor.
+- [ ] Installed Chrome expiry, broader sensitive-field matrix, background/navigation and cross-origin cases; social-specific rule and structured-field acceptance.
+- [ ] Actual Finder drag/drop, rejection/current-version UI completion and manual Canva-to-weekly-practice acceptance. Repeat chooser after a rendering stall: import/AX completed but pixels stayed on Working until resize.
+- [ ] Complete keyboard traversal/VoiceOver, OS reduced motion and frame/CPU profiling. Native zoom and source Escape focus are verified separately.
+- [ ] Actual permission denial/revocation, external-app full-screen capture/Stop and physical second monitor.
 - [ ] Live Drive/OneDrive OAuth, provider confidentiality/retention settings and fresh consented AI acceptance if included in the final story.
 
 ## Evidence
+
+- [Manual acceptance receipt and explicit limits](review-evidence-2026-10-12/continuation/manual-acceptance.json)
+- [Installed email after correction](review-evidence-2026-10-12/continuation/installed-email-corrected.png)
+- [Native zoom](review-evidence-2026-10-12/continuation/native-207-percent-zoom.png)
 
 - [Instagram after reload](review-evidence-2026-10-12/instagram-reload.png)
 - [LinkedIn after reload](review-evidence-2026-10-12/linkedin-reload.png)
@@ -35,3 +45,7 @@ Completed in this review, using synthetic material and isolated profiles. [Plan 
 - [Offline packaged-resource receipt](review-evidence-2026-10-12/offline-rehearsal.json)
 
 The date-control automation initially showed a date without committing the native segments; native keyboard entry committed it and scheduling passed. This was not treated as a demonstrated app persistence defect. The cause of the previously missing local Electron locales is unknown; no product source or published ZIP changed.
+
+## Candidate release
+
+The focus fix is committed/pushed at `e1f05cb`. The rebuilt local app and ZIP contain that change; the public release remains `v0.1.0-preview.20261004.2`. New candidate ZIP SHA-256: `b40ea24e9fe96f407be7f7139c7809ef1dcb1ffe96b6359d484f3b6e7780e80f`. Publishing `v0.1.0-preview.20261012` was rejected by automatic approval review because a new public artifact was not explicitly authorized; publication awaits owner approval. No new release was created.

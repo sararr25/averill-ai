@@ -1,0 +1,23 @@
+{
+  "date": "2026-10-12",
+  "boundary": "Actual native macOS UI and installed Chrome extension, canonical local simulator, isolated synthetic accounts; source app unless stated otherwise.",
+  "providerRequests": 0,
+  "normalProfilePreserved": true,
+  "checks": {
+    "nativeChooser": "Selected QA Markdown through actual macOS chooser; reviewed extracted marker, explicitly approved and saved. No actual Finder drop proof.",
+    "roles": "Owner 7 sources including private/pending; Marketing lead 4 sources and department clarification/approval; Marketing employee 4 approved sources without review/admin controls; Operations employee only 2 company/Operations sources.",
+    "installedEmail": "Selected Brevo email body; exact prohibited claim and missing footer cited Marketing policy v2. Manual correction immediately invalidated advice; paused capture/recheck found no exact conflict.",
+    "installedPrivacy": "Logout revoked pairing and observation; late edit did not restore them. Operations login had no prior browser context. Newly paired Email address sender field excluded from observation.",
+    "nativeZoom": "View menu Zoom In: 207.36%, CSS viewport 709x445; all six areas reachable, no horizontal overflow observed; Setup Tab reached file disclosure. Restored Actual Size.",
+    "nativeFullScreen": "Main Averill window entered/exited native full screen; floating companion reachable via Window menu. No active external capture; Stop was disabled.",
+    "sourceFocus": "Native mouse-open/read source then Escape initially focused BODY. Explicit trigger restoration fixed it; native UI recheck returned focus to Read extracted text. Regression asserts staged close and saved-source Escape."
+  },
+  "open": [
+    "Actual Finder drag/drop",
+    "Chooser rendering stall: pixels/capturePage remained at old Working screen while AX/DOM/import were complete; resize recovered. Root cause not established; repeat on packaged executable.",
+    "Installed browser background/navigation/cross-origin/expiry and social-specific rule matrix",
+    "Complete keyboard/VoiceOver/OS reduced motion/frame and CPU profiling",
+    "External app full-screen capture/Stop, permission denial/revocation and physical second monitor",
+    "Manual Canva-to-weekly-practice and full packaged-story acceptance"
+  ]
+}

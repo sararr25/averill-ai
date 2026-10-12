@@ -1,3 +1,5 @@
+Current continuation: [12 October checklist](TESTING_CHECKLIST_2026-10-12.md) supersedes completed items below. Source focus fix `e1f05cb` is pushed and locally packaged/verified; public preview is still 4 October, pending explicit approval to upload the new candidate. Keep incomplete manual/hardware/installed-browser checks open.
+
 # Averill next steps and acceptance handover
 
 Updated 4 October 2026 after Guided UI publication. Use the public release linked in PROJECT_STATUS_2026-10-04.md. The code is implemented and pushed; completion below requires recorded evidence, not another build alone.

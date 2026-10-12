@@ -7,13 +7,13 @@ Approved by the owner and published to GitHub using the to-tickets skill. Each t
 | Ticket | Delivers | Blocked by | Current status |
 | --- | --- | --- | --- |
 | [#1](https://github.com/sararr25/averill-ai/issues/1) Verify release ZIP and app consistency | Acceptance criteria and evidence are in the linked ticket | None | Complete: local release integrity; clean-Mac install remains in final acceptance |
-| [#2](https://github.com/sararr25/averill-ai/issues/2) Verify onboarding, roles and Knowledge | Acceptance criteria and evidence are in the linked ticket | None | Started: native intake/Knowledge regression; real chooser/role walkthrough open |
-| [#3](https://github.com/sararr25/averill-ai/issues/3) Verify browser correction and Stop | Acceptance criteria and evidence are in the linked ticket | None | Started: synthetic-client and native OCR correction; installed-browser edge cases open |
+| [#2](https://github.com/sararr25/averill-ai/issues/2) Verify onboarding, roles and Knowledge | Acceptance criteria and evidence are in the linked ticket | None | In progress: actual chooser/roles passed; Finder drop and rendering-stall retest open |
+| [#3](https://github.com/sararr25/averill-ai/issues/3) Verify browser correction and Stop | Acceptance criteria and evidence are in the linked ticket | None | In progress: installed email correction/logout/person/private-label passed; remaining browser/social matrix open |
 | [#4](https://github.com/sararr25/averill-ai/issues/4) Verify fake-editor persistence and structured fields | Acceptance criteria and evidence are in the linked ticket | None | Complete: supported local media/persistence/schedule acceptance |
 | [#5](https://github.com/sararr25/averill-ai/issues/5) Verify Learn, weekly practice and restart | Acceptance criteria and evidence are in the linked ticket | None | Started: offline source and release-resource rehearsal; manual practice walkthrough open |
-| [#6](https://github.com/sararr25/averill-ai/issues/6) Verify accessibility and motion | Acceptance criteria and evidence are in the linked ticket | None | Started: layout/focus/emulated reduced motion; accessibility/profiling open |
-| [#7](https://github.com/sararr25/averill-ai/issues/7) Verify permissions, full screen and displays | Acceptance criteria and evidence are in the linked ticket | #1 | Ready after #1; physical permissions/displays not tested |
-| [#8](https://github.com/sararr25/averill-ai/issues/8) Reconcile documentation and optional integrations | Acceptance criteria and evidence are in the linked ticket | None | Started: stale claims corrected; external provider/rules gates open |
+| [#6](https://github.com/sararr25/averill-ai/issues/6) Verify accessibility and motion | Acceptance criteria and evidence are in the linked ticket | None | In progress: native 207% zoom and dialog focus fix; VoiceOver/OS motion/profiling open |
+| [#7](https://github.com/sararr25/averill-ai/issues/7) Verify permissions, full screen and displays | Acceptance criteria and evidence are in the linked ticket | #1 | In progress: main-app full screen/companion access; capture permissions/displays open |
+| [#8](https://github.com/sararr25/averill-ai/issues/8) Reconcile documentation and optional integrations | Acceptance criteria and evidence are in the linked ticket | None | Complete: claims reconciled and local negative paths passed; optional live/provider/owner gates explicit |
 | [#9](https://github.com/sararr25/averill-ai/issues/9) Rehearse the complete packaged story | Acceptance criteria and evidence are in the linked ticket | #1, #2, #3, #4, #5, #6, #7 | Blocked by remaining #2–#7 acceptance |
 
 ## Execution order

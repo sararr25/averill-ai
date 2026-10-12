@@ -1,6 +1,6 @@
 # Averill current project status
 
-Latest testing continuation: [12 October plan and tickets](TESTING_PLAN_2026-10-12.md) and [short checklist](TESTING_CHECKLIST_2026-10-12.md). Local release integrity is restored; fresh local media/persistence acceptance is recorded there. The public binary remains the 4 October preview.
+Latest testing continuation: [12 October plan and tickets](TESTING_PLAN_2026-10-12.md) and [short checklist](TESTING_CHECKLIST_2026-10-12.md). Local release integrity is restored; actual chooser/roles, installed email/privacy, 207% native zoom and main-app full-screen evidence are recorded there. Source-dialog focus is fixed/pushed at `e1f05cb`; its rebuilt local candidate passes bundle feedback and offline restart rehearsal. The public binary remains the 4 October preview; publication of the new candidate awaits explicit owner approval after automatic review rejected the upload.
 
 The Guided UI preview is public: [v0.1.0-preview.20261004.2](https://github.com/sararr25/averill-ai/releases/tag/v0.1.0-preview.20261004.2). Build source is `50e5c610f89bfc6437a435638d92122fdd4a0f47`. This is an unsigned macOS 13+ Apple Silicon preview, not a hosted web application. The previous release remains available.
 

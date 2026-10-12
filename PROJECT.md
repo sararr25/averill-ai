@@ -55,7 +55,7 @@ Approved launch email: 15 October 2026 at 10:00 Copenhagen time. Approved paid c
 
 ## Explicit non-goals for this prototype
 
-No arbitrary-window surveillance, external app control, automatic edit, email send, or post publication is implemented. Observation runs only for the selected window after explicit Start; it is a six-second local poll, not field-aware editor integration. Do not present visible text as full app understanding. The campaign source pack is synthetic; no real customer data is required for the demo.
+No arbitrary-window surveillance, external app control, automatic edit, email send, or post publication is implemented. Native observation runs only for the selected window after explicit Start, using a six-second local poll. A separate opt-in Chrome extension shares one clicked top-frame field locally after pause, blur or selection; it does not inspect hidden settings. Do not present visible text as full app understanding. The campaign source pack is synthetic; no real customer data is required for the demo.
 
 ## Product and design decisions
 
@@ -76,8 +76,8 @@ No arbitrary-window surveillance, external app control, automatic edit, email se
 
 The implementation and external gates for every requested addition are tracked in [docs/ADDITIONS_STATUS.md](docs/ADDITIONS_STATUS.md). The A/B design and technical preflight are in [docs/AB_TEST_PLAN.md](docs/AB_TEST_PLAN.md); there is no live randomized result.
 
-1. Complete the real-platform acceptance matrix with disposable Substack/email, LinkedIn, Instagram and Canva accounts; verify field boundaries, permission denial, full-screen and second-monitor behavior. Add a browser DOM adapter for editable fields.
-2. Verify the new company-source Nebius request live after explicit approval for the synthetic test payload. The previous live check covers only the fixed historical Aurelia source pack.
+1. Complete the real-platform acceptance matrix with disposable Substack/email, LinkedIn, Instagram and Canva accounts; verify field boundaries, permission denial, full-screen and second-monitor behavior. The opt-in browser DOM adapter is implemented; finish its installed-browser edge-case and social-specific acceptance.
+2. Preserve the distinction between the consented generated-public-text Nebius request verified on 3–4 October and real-company/provider acceptance. Live OAuth and provider confidentiality/retention remain unverified; repeat AI only with deliberate payload consent.
 3. Add cloud authentication and sync before describing the local account demo as a multi-device employee product. Extend specialized checks to other departments only after their source and workflow requirements are defined.
 4. Improve conflict detection beyond different files sharing one title, and independently verify model claims against cited passages.
 5. Rehearse permission denial, offline fallback, and the full demo on the packaged macOS app. The package includes the macOS text-extraction helper.

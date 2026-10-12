@@ -1,0 +1,22 @@
+{
+  "verifiedAt": "2026-10-12T18:41:41.488Z",
+  "packagedResources": true,
+  "liveSyntheticReview": false,
+  "providerRequests": 0,
+  "checks": [
+    "consent declined",
+    "local correction",
+    "source revocation",
+    "typing invalidation",
+    "floating Stop",
+    "learning confirmation",
+    "weekly practice",
+    "person isolation",
+    "restart requires login",
+    "approval persistence",
+    "AI disabled after restart",
+    "learning persistence after restart"
+  ],
+  "boundary": "synthetic bridge client and regression consent-dialog decisions; no installed Chrome or real email platform proof",
+  "restartVerified": true
+}

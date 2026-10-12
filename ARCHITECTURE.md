@@ -106,7 +106,7 @@ Electron `desktopCapturer` lists windows, excluding Averill-owned window IDs. Th
 
 ## Extension sequence
 
-Add a browser DOM/field adapter and test actual email, LinkedIn, Instagram and Canva draft accounts. Verify permission revocation, full-screen/second-monitor behavior and a consented live Nebius task-review request. Expand task schemas beyond exact phrase rules, then tackle company deployment and stronger semantic evidence checks. Keep work actions human-owned. See [docs/HANDOVER.md](docs/HANDOVER.md) for current checks and limits.
+The opt-in browser DOM/field adapter is implemented. Finish installed-extension privacy/session and social-specific checks, then test disposable real-platform draft accounts. Verify permission revocation and full-screen/second-monitor behavior. Generated-public-text Nebius task review passed with consent on 3–4 October; this does not verify real-company confidentiality or live OAuth. Expand task schemas beyond exact phrase rules, then tackle company deployment and stronger semantic evidence checks. Keep work actions human-owned. See [docs/HANDOVER.md](docs/HANDOVER.md) for current checks and limits.
 
 ## Learning state and IPC
 
