@@ -1,0 +1,30 @@
+{
+  "date": "2026-10-12",
+  "environment": "Development Electron 44.4.4, temporary synthetic QA profile; native macOS UI operated through CUA",
+  "checks": [
+    "Approved Marketing v2 source selected for lesson",
+    "Four synthetic employee confirmations; focus moves to next heading",
+    "Contextual help displayed",
+    "Weekly questions generated from confirmed activity and source v2",
+    "Wrong-answer explanation and correct-answer feedback",
+    "Source text read; Escape restores initiating source button",
+    "Reflection rejected until explicit checkbox confirmation",
+    "Weekly practice completion and next-practice guidance",
+    "Excluding sole lesson disables refresh and invalidates derived questions",
+    "Fixed recovery instructions and outdated heading verified after reload",
+    "New confirmed step re-enables refresh; regenerated questions omit excluded lesson",
+    "Separate employee login has empty history and disabled practice"
+  ],
+  "providerCalls": 0,
+  "regression": {
+    "tests": 47,
+    "passed": 47,
+    "failed": 0
+  },
+  "limits": [
+    "Synthetic confirmations do not demonstrate real Canva operations or visual assessment",
+    "Development source UI, not newly packaged or published executable",
+    "Full finding-to-practice manual walkthrough, source conflict/revocation UI and actual restart acceptance remain separate gates",
+    "Other open tickets and physical-device gates remain open"
+  ]
+}

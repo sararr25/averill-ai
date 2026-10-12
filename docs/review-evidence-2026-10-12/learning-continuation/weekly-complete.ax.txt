@@ -1,0 +1,84 @@
+Window: "Averill", App: Electron.
+0 standard window Averill, Secondary Actions: Raise
+	1 container Averill
+		2 container
+			3 HTML content Averill, URL: file:///Users/sararuffini/Documents/Hackatons/Nvidia/averill-ai/travel-desktop/src/agent.html
+				4 container
+					5 heading Averill, Value: 1
+						6 text Averill
+					7 text NOT SHARING
+				8 container
+					9 text QA Owner Owner / CEO / admin
+					10 button Sign out
+				11 container Averill areas
+					12 button Review
+					13 button Work
+					14 button Learn
+					15 button Research
+					16 button Knowledge
+					17 button Setup
+				18 container
+					19 heading Learn while you work, Value: 2
+						20 text Learn while you work
+					21 text Private learning Guided Canva practice and your weekly review. You perform and confirm each step. Nothing here automatically controls Canva or assesses design geometry.
+					22 text Learning for QA Owner. Week beginning 2026-10-12 · Europe/Copenhagen.
+					23 container
+						24 heading Canva layout essentials, Value: 3
+							25 text Canva layout essentials
+						26 text Practise selecting, positioning, aligning and grouping elements. Start with an open Canva design. A shared window is optional; use Work for explicit OCR capture. Optional company context
+						27 pop-up button Optional company context, Value: Tool practice only
+							28 (selected) Tool practice only
+						29 button Start Canva lesson
+					30 disclosure triangle › Start a task-based exercise
+						31 text ›
+						32 text Start a task-based exercise
+					33 disclosure triangle › Ask about a Canva lesson step or inspect selected visible text
+						34 text ›
+						35 text Ask about a Canva lesson step or inspect selected visible text
+					36 disclosure triangle › Record something else you practised
+						37 text ›
+						38 text Record something else you practised
+					39 container
+						40 disclosure triangle › Your week and learning history
+							41 text ›
+							42 text Your week and learning history
+						43 heading Your week, Value: 3
+							44 text Your week
+						45 text Review your confirmed activities before starting practice. Excluding a session removes it from practice; the local record remains visible.
+						46 text Canva layout essentials
+						47 text 4 steps confirmed this week · lesson finished
+						48 button Exclude this session
+						49 button Resume or refresh weekly practice
+						50 button Delete my local learning history
+					51 container
+						52 heading Weekly practice complete, Value: 3
+							53 text Weekly practice complete
+						54 text Feedback supports learning. It is not an employee performance or mastery score.
+						55 heading Why can alignment options change when you select more than one element?, Value: 4
+							56 text Why can alignment options change when you select more than one element?
+						57 button Open official Canva guide
+						58 text Your answer: Alignment always changes the font Try this reasoning: A single element can align to the page; multiple selected elements can align with one another.
+						59 heading Which shortcut groups selected elements on a Mac?, Value: 4
+							60 text Which shortcut groups selected elements on a Mac?
+						61 button Open official Canva guide
+						62 text Your answer: Command+G That matches the guidance. Command+G groups the selected elements on a Mac. Use Ctrl+G on Windows.
+						63 heading Before using qa-marketing-policy-v2.md in your campaign, what should you check?, Value: 4
+							64 text Before using qa-marketing-policy-v2.md in your campaign, what should you check?
+						65 button Read qa-marketing-policy-v2.md · v2
+						66 text Your answer: Its current approval and version, then the instructions in the source That matches the guidance. Open the current approved source and read its actual instructions. Version 2 was linked to your session; this exercise does not infer its content.
+						67 heading Value: 4, Practise “Select the elements” in your design. Then explain what you did and one point you would check next time.
+							68 text Practise “Select the elements” in your design. Then explain what you did and one point you would check next time.
+						69 button Open official Canva guide
+						70 text Synthetic QA confirmation only: I checked the lesson controls and would verify selection in Canva separately. Practice reflection saved. Self-confirmed, not visually assessed. Start with two elements already on your page. If an element cannot be selected, stop and check the editor rather than guessing. Next practice: Practise alignment. Try it again in a new layout and consult the guide.
+					71 text Saved on this computer.
+	72 close button
+	73 full screen button Help: this button also has an action to zoom the window, Secondary Actions: zoom the window
+	74 minimise button
+75 menu bar
+	76 Electron
+	77 File
+	78 Edit
+	79 View
+	80 Window
+
+The focused UI element is 55 heading Why can alignment options change when you select more than one element?, Value: 4

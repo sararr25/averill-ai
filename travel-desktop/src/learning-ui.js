@@ -64,13 +64,15 @@ function renderLearning(){
  const sessions=data.sessions.filter(s=>s.confirmed.some(c=>c.week===data.week)||!s.finishedAt);
  if(!sessions.length)week.append(node('p','No learning recorded this week. Start a lesson and confirm a step.'));
  for(const s of sessions){const row=node('div',undefined,'learning-record');row.append(node('strong',s.title),node('p',`${s.note?'Activity confirmed this week':`${s.confirmed.filter(c=>c.week===data.week).length} steps confirmed this week`}${s.finishedAt&&!s.note?' · lesson finished':''}${s.excluded?' · excluded':''}`));if(s.note)row.append(node('p',s.note));if(s.exercise?.after)row.append(node('p',`Before: ${s.exercise.before} After: ${s.exercise.after} Employee confirmation and deterministic rule check are separate.`));if(!s.excluded)row.append(learningButton('Exclude this session','exclude',{sessionId:s.id}));week.append(row);}
- const begin=learningButton(data.quiz?'Resume or refresh weekly practice':'Start weekly practice','quiz');begin.classList.add('agent-primary');begin.disabled=!sessions.some(s=>!s.excluded&&s.confirmed.some(c=>c.week===data.week));week.append(begin);const weekly=node('details',undefined,'learning-week');weekly.open=Boolean(data.quiz);weekly.append(node('summary','Your week and learning history'),week);panel.append(weekly);
+ const canRefresh=sessions.some(s=>!s.excluded&&s.confirmed.some(c=>c.week===data.week));
+ const refreshInstruction=canRefresh?'Refresh weekly practice to include the latest confirmed activities.':'Start a lesson and confirm a new step, or record a confirmed activity, to create weekly practice.';
+ const begin=learningButton(data.quiz?'Resume or refresh weekly practice':'Start weekly practice','quiz');begin.classList.add('agent-primary');begin.disabled=!canRefresh;week.append(begin);const weekly=node('details',undefined,'learning-week');weekly.open=Boolean(data.quiz);weekly.append(node('summary','Your week and learning history'),week);panel.append(weekly);
  const remove=node('button','Delete my local learning history','secondary-button learning-delete');remove.type='button';remove.addEventListener('click',()=>{if(window.confirm('Delete all of your local lesson, activity and weekly practice records? This cannot be undone in Averill.'))learnAction('delete-history');});week.append(remove);
  const quiz=data.quiz;if(!quiz)return;
- if(quiz.outdated)panel.append(node('p','Your learning record changed. Refresh weekly practice to include the latest confirmed activities.','section-note'));
- const practice=node('article',undefined,'learning-card');practice.append(node('h3',quiz.finishedAt?'Weekly practice complete':'Weekly practice'),node('p','Feedback supports learning. It is not an employee performance or mastery score.'));
+ if(quiz.outdated)panel.append(node('p',`Your learning record changed. ${refreshInstruction}`,'section-note'));
+ const practice=node('article',undefined,'learning-card');practice.append(node('h3',quiz.outdated?'Weekly practice needs updating':quiz.finishedAt?'Weekly practice complete':'Weekly practice'),node('p','Feedback supports learning. It is not an employee performance or mastery score.'));
  for(const q of quiz.questions){const card=node('div',undefined,'learning-question');card.append(node('h4',q.prompt));
-  if(!q.available){card.append(node('p','This activity or source changed. Refresh weekly practice.'));practice.append(card);continue;}
+  if(!q.available){card.append(node('p',`This activity or source changed. ${refreshInstruction}`));practice.append(card);continue;}
   if(q.guide)card.append(guideLink(q.guide));if(q.source){const b=node('button',`Read ${q.source.title} · v${q.source.version}`,'source-link');b.type='button';b.addEventListener('click',()=>showSource(q.source.id,b));card.append(b);}
   const answer=quiz.answers[q.id];if(answer){card.append(node('p',['practice','work'].includes(q.type)?answer.text:`Your answer: ${q.options[answer.choice]}`),node('p',answer.feedback,'learning-feedback'));practice.append(card);continue;}
   const form=node('form');form.className='workspace-form';
@@ -85,5 +87,5 @@ function renderLearning(){
   }
   const submit=node('button',['practice','work'].includes(q.type)?'Save practice reflection':'Check my answer','secondary-button');submit.type='submit';form.append(submit);card.append(form);practice.append(card);
  }
- if(quiz.finishedAt){const revisit=quiz.questions.find(q=>quiz.answers[q.id]?.correct===false);const topic=data.steps.find(s=>s.id===revisit?.stepId);practice.append(node('p',topic?`Next practice: ${topic.title}. Try it again in a new layout and consult the guide.`:'Next practice: apply one of these operations in a new layout and check the result yourself.','learning-feedback'));}panel.append(practice);
+ if(quiz.finishedAt&&!quiz.outdated){const revisit=quiz.questions.find(q=>quiz.answers[q.id]?.correct===false);const topic=data.steps.find(s=>s.id===revisit?.stepId);practice.append(node('p',topic?`Next practice: ${topic.title}. Try it again in a new layout and consult the guide.`:'Next practice: apply one of these operations in a new layout and check the result yourself.','learning-feedback'));}panel.append(practice);
 }

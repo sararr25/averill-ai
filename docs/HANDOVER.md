@@ -1,3 +1,5 @@
+Latest continuation, 12 October: native Learn source-linked lesson/weekly practice, explicit reflection confirmation, exclusion/recovery and account isolation passed in a temporary profile. Fixed the instruction to refresh when no eligible activity remains; outdated practice no longer says complete or suggests a stale next exercise. 47/47 regression tests passed; zero provider requests. [Evidence and boundaries](review-evidence-2026-10-12/learning-continuation/verification.json). This source fix is not yet in the published preview; keep ticket #5 and final packaged/Canva acceptance open.
+
 # Testing and review continuation — 12 October 2026
 
 Owner-approved acceptance tickets are published as GitHub issues #1–#9 with native blocking links. [Testing plan](TESTING_PLAN_2026-10-12.md) and [short checklist](TESTING_CHECKLIST_2026-10-12.md) record fresh evidence and remaining gates. Offline source/release-resource rehearsals, native feedback/browser/task review and canonical simulator tests/build pass. Actual local Chrome media save/reload passes for Instagram, LinkedIn and Brevo; Brevo audience/Copenhagen schedule persistence and cancellation passed too.

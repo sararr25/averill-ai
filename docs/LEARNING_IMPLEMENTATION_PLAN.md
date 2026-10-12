@@ -29,3 +29,7 @@ Official guidance checked 26 September 2026: https://www.canva.com/help/layer-gr
 ## UI refinement — 4 October 2026
 
 The current Canva lesson confirmation is the primary action; weekly practice/history has its own disclosure. Lesson selection now excludes project/finding exercises and recorded activities. Native renderer smoke verifies continuing a step and moving focus to the next heading; the 47-test suite includes learning isolation and confirmation checks. No inferred mastery or automatic geometry check was added.
+
+## Native continuation — 12 October 2026
+
+A temporary profile passed source-linked lesson confirmation/focus, weekly question generation, correct/incorrect answer feedback, source reading/Escape return, required reflection confirmation, completion, exclusion and independent employee history. All confirmations are explicitly synthetic; no Canva design operation was performed. Excluding the sole eligible lesson exposed a misleading instruction to use a disabled refresh button. The UI now explains how to confirm new activity, marks outdated practice as needing an update, and hides stale next-practice guidance. A new confirmed step re-enables refresh and generates questions without the excluded lesson. 47/47 tests pass. [Receipt](review-evidence-2026-10-12/learning-continuation/verification.json). Published preview does not yet contain this source fix.

@@ -23,6 +23,8 @@ Completed in this review, using synthetic material and isolated profiles. [Plan 
 - [x] Source-dialog focus defect reproduced and fixed (`e1f05cb`); mouse-open then Escape returns to its read button. Source and bundle regressions cover staged close and saved-source Escape. New local candidate app/ZIP match 120 tracked files, both helpers and 3109 entries; packaged-resource offline restart rehearsal passed with zero provider requests.
 - [x] Native **207.36% zoom**: six areas reachable, no horizontal overflow observed; restored Actual Size. Main-app full screen and companion access passed without active external capture.
 
+- [x] Native Learn continuation: approved-source lesson, four synthetic confirmations with heading focus, weekly wrong/correct feedback, source read/Escape, required reflection confirmation, completion, exclusion/recovery and second-account empty history passed. Fixed misleading refresh instructions after excluding the only eligible lesson; native source UI retest and **47/47 tests** pass with zero provider calls. [Receipt](review-evidence-2026-10-12/learning-continuation/verification.json). Actual Canva operations and final executable remain separate gates.
+
 ## Still open
 
 - [ ] Clean target-Mac install and the full manual final-executable story.

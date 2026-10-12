@@ -1,0 +1,79 @@
+Window: "Averill", App: Electron.
+0 standard window Averill, Secondary Actions: Raise
+	1 container Averill
+		2 container
+			3 HTML content Averill, URL: file:///Users/sararuffini/Documents/Hackatons/Nvidia/averill-ai/travel-desktop/src/agent.html
+				4 container
+					5 heading Averill, Value: 1
+						6 text Averill
+					7 text NOT SHARING
+				8 container
+					9 text QA Owner Owner / CEO / admin
+					10 button Sign out
+				11 container Averill areas
+					12 button Review
+					13 button Work
+					14 button Learn
+					15 button Research
+					16 button Knowledge
+					17 button Setup
+				18 container
+					19 heading Learn while you work, Value: 2
+						20 text Learn while you work
+					21 text Private learning Guided Canva practice and your weekly review. You perform and confirm each step. Nothing here automatically controls Canva or assesses design geometry.
+					22 text Learning for QA Owner. Week beginning 2026-10-12 · Europe/Copenhagen.
+					23 container
+						24 heading Canva layout essentials, Value: 3
+							25 text Canva layout essentials
+						26 text Practise selecting, positioning, aligning and grouping elements. Start with an open Canva design. A shared window is optional; use Work for explicit OCR capture. Optional company context
+						27 pop-up button Optional company context, Value: Tool practice only
+							28 (selected) Tool practice only
+						29 button Start Canva lesson
+					30 disclosure triangle › Start a task-based exercise
+						31 text ›
+						32 text Start a task-based exercise
+					33 disclosure triangle › Ask about a Canva lesson step or inspect selected visible text
+						34 text ›
+						35 text Ask about a Canva lesson step or inspect selected visible text
+					36 disclosure triangle › Record something else you practised
+						37 text ›
+						38 text Record something else you practised
+					39 container
+						40 disclosure triangle › Your week and learning history
+							41 text ›
+							42 text Your week and learning history
+						43 heading Your week, Value: 3
+							44 text Your week
+						45 text Review your confirmed activities before starting practice. Excluding a session removes it from practice; the local record remains visible.
+						46 text Canva layout essentials
+						47 text 4 steps confirmed this week · lesson finished · excluded
+						48 button (disabled) Resume or refresh weekly practice
+						49 button Delete my local learning history
+					50 text Your learning record changed. Start a lesson and confirm a new step, or record a confirmed activity, to create weekly practice.
+					51 container
+						52 heading Weekly practice needs updating, Value: 3
+							53 text Weekly practice needs updating
+						54 text Feedback supports learning. It is not an employee performance or mastery score.
+						55 heading Why can alignment options change when you select more than one element?, Value: 4
+							56 text Why can alignment options change when you select more than one element?
+						57 text This activity or source changed. Start a lesson and confirm a new step, or record a confirmed activity, to create weekly practice.
+						58 heading Which shortcut groups selected elements on a Mac?, Value: 4
+							59 text Which shortcut groups selected elements on a Mac?
+						60 text This activity or source changed. Start a lesson and confirm a new step, or record a confirmed activity, to create weekly practice.
+						61 heading Before using qa-marketing-policy-v2.md in your campaign, what should you check?, Value: 4
+							62 text Before using qa-marketing-policy-v2.md in your campaign, what should you check?
+						63 text This activity or source changed. Start a lesson and confirm a new step, or record a confirmed activity, to create weekly practice.
+						64 heading Value: 4, Practise “Select the elements” in your design. Then explain what you did and one point you would check next time.
+							65 text Practise “Select the elements” in your design. Then explain what you did and one point you would check next time.
+						66 text This activity or source changed. Start a lesson and confirm a new step, or record a confirmed activity, to create weekly practice.
+	67 close button
+	68 full screen button Help: this button also has an action to zoom the window, Secondary Actions: zoom the window
+	69 minimise button
+70 menu bar
+	71 Electron
+	72 File
+	73 Edit
+	74 View
+	75 Window
+
+The focused UI element is 3 HTML content Averill, URL: file:///Users/sararuffini/Documents/Hackatons/Nvidia/averill-ai/travel-desktop/src/agent.html
