@@ -1,0 +1,10 @@
+{
+  "archiveSha256": "38499d6041da183209478f48a5bde3b1f363503733b761ac040da98cc91aa36b",
+  "onlyInZipCount": 204,
+  "onlyInZipAreElectronLocales": true,
+  "onlyInBundle": [],
+  "changedCommonEntries": [],
+  "firstZipOnlyExample": [
+    "Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/af.lproj/locale.pak"
+  ]
+}

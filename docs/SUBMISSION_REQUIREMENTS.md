@@ -2,7 +2,7 @@
 
 Current status, 4 October 2026: the Guided UI release is public at [v0.1.0-preview.20261004.2](https://github.com/sararr25/averill-ai/releases/tag/v0.1.0-preview.20261004.2). See [PROJECT_STATUS_2026-10-04.md](PROJECT_STATUS_2026-10-04.md) and [NEXT_STEPS_2026-10-04.md](NEXT_STEPS_2026-10-04.md) for current evidence, ordered checks and pending fixes. Dated earlier sections are historical where superseded.
 
-Verified 3 October 2026 through the event's Devpost rules, dates and submission schema. Sources: [event](https://nebiusglobalaihackathon.devpost.com/), [rules](https://nebiusglobalaihackathon.devpost.com/rules). Recheck before submitting; this is preparation, not registration or a submitted entry.
+Verified 3 October 2026 through the event's Devpost rules, dates and submission schema. The official overview was rechecked on 12 October and still lists the deadline and core deliverables below; detailed rules retrieval failed in this review, so legal eligibility/declarations and current registration were not reverified. Sources: [event](https://nebiusglobalaihackathon.devpost.com/), [rules](https://nebiusglobalaihackathon.devpost.com/rules). Recheck before submitting; this is preparation, not registration or a submitted entry.
 
 Deadline: **30 October 2026, 17:00 UTC / 18:00 Europe/Copenhagen**. Suggested track: **Best apps and agents**.
 
@@ -25,7 +25,7 @@ The schema retrieved on 3 October contains:
 | 28267: track | Best apps and agents proposed |
 | 28268–28269: new/existing before 26 August and significant updates | Confirm history and owner statement; describe updates if existing |
 | 28270: public repository | https://github.com/sararr25/averill-ai |
-| 28271: demo/test build | TODO: public judge-accessible test-build URL |
+| 28271: demo/test build | https://github.com/sararr25/averill-ai/releases/tag/v0.1.0-preview.20261004.2 — clean judge-Mac installation remains open |
 | 28272: models, variants and reason | Nemotron via Token Factory; draft in ../devpost-submission.md |
 | 28273: model quality, 1–10 | Owner rating after rehearsal |
 | 28274–28276: prompting/fine-tuning, comparison, Nebius capabilities | Draft technical description; comparisons require actual evidence |

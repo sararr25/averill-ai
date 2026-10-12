@@ -1,5 +1,7 @@
 # Averill current project status
 
+Latest testing continuation: [12 October plan and tickets](TESTING_PLAN_2026-10-12.md) and [short checklist](TESTING_CHECKLIST_2026-10-12.md). Local release integrity is restored; fresh local media/persistence acceptance is recorded there. The public binary remains the 4 October preview.
+
 The Guided UI preview is public: [v0.1.0-preview.20261004.2](https://github.com/sararr25/averill-ai/releases/tag/v0.1.0-preview.20261004.2). Build source is `50e5c610f89bfc6437a435638d92122fdd4a0f47`. This is an unsigned macOS 13+ Apple Silicon preview, not a hosted web application. The previous release remains available.
 
 ZIP SHA-256: `38499d6041da183209478f48a5bde3b1f363503733b761ac040da98cc91aa36b`. GitHub's uploaded digest matches the locally verified ZIP. Public checksum download returned HTTP 200. A fresh unauthenticated archive download matches that digest, and the public release page returns HTTP 200.
