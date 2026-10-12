@@ -46,6 +46,8 @@ Completed in this review, using synthetic material and isolated profiles. [Plan 
 
 The date-control automation initially showed a date without committing the native segments; native keyboard entry committed it and scheduling passed. This was not treated as a demonstrated app persistence defect. The cause of the previously missing local Electron locales is unknown; no product source or published ZIP changed.
 
-## Candidate release
+## Published release
 
-The focus fix is committed/pushed at `e1f05cb`. The rebuilt local app and ZIP contain that change; the public release remains `v0.1.0-preview.20261004.2`. New candidate ZIP SHA-256: `b40ea24e9fe96f407be7f7139c7809ef1dcb1ffe96b6359d484f3b6e7780e80f`. Publishing `v0.1.0-preview.20261012` was rejected by automatic approval review because a new public artifact was not explicitly authorized; publication awaits owner approval. No new release was created.
+The owner explicitly authorized publication after the initial automatic-review rejection. The focus fix is now public in [v0.1.0-preview.20261012](https://github.com/sararr25/averill-ai/releases/tag/v0.1.0-preview.20261012), built from `e1f05cb`. GitHub's uploaded ZIP digest matches local verification: `b40ea24e9fe96f407be7f7139c7809ef1dcb1ffe96b6359d484f3b6e7780e80f`. The page and checksum are publicly accessible; the previous release is retained. This unsigned macOS 13+ Apple Silicon preview does not complete the still-open manual/hardware gates above.
+
+Publication verification: a fresh unauthenticated ZIP download matches the local and GitHub-uploaded SHA-256. [Public-download receipt](review-evidence-2026-10-12/continuation/publication-verification.json).

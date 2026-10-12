@@ -1,4 +1,4 @@
-Current continuation: [12 October checklist](TESTING_CHECKLIST_2026-10-12.md) supersedes completed items below. Source focus fix `e1f05cb` is pushed and locally packaged/verified; public preview is still 4 October, pending explicit approval to upload the new candidate. Keep incomplete manual/hardware/installed-browser checks open.
+Current continuation: [12 October checklist](TESTING_CHECKLIST_2026-10-12.md) supersedes completed items below. The source focus fix `e1f05cb` is packaged, verified and public in [v0.1.0-preview.20261012](https://github.com/sararr25/averill-ai/releases/tag/v0.1.0-preview.20261012) after explicit owner authorization. Keep incomplete manual/hardware/installed-browser checks open; perform the final story on this new executable.
 
 # Averill next steps and acceptance handover
 
