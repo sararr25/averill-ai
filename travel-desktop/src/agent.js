@@ -163,7 +163,7 @@ function render() {
 }
 
 function renderHero() {
-  el('review-start').hidden=Boolean(externalReview||(current.shared||[]).length||(current.findings||[]).length);
+  el('review-start').hidden=Boolean(externalReview||(current.shared||[]).length||(current.findings||[]).length);el('review-steps').hidden=el('review-start').hidden;
   const workOutput=el('review-work-result');
   if(externalReview){
     el('hero-label').textContent='WORK REVIEW';const hasFindings=externalReview.result.findings.length>0;
@@ -235,8 +235,6 @@ function renderHero() {
     open.addEventListener('click', () => item.source.kind === 'asset' ? window.desktop.openSource(item.source.id) : showSource(item.source.id, open));
     source.append(open);
     appendFindingActions(source,item);
-  } else {
-    if(!sharedNames.length)source.append(node('p','1. Share one field or window. 2. Check approved rules. 3. Edit and recheck in your tool.','review-instructions'));
   }
 }
 

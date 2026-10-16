@@ -67,14 +67,14 @@ function renderLearning(){
  const canRefresh=sessions.some(s=>!s.excluded&&s.confirmed.some(c=>c.week===data.week));
  const refreshInstruction=canRefresh?'Refresh weekly practice to include the latest confirmed activities.':'Start a lesson and confirm a new step, or record a confirmed activity, to create weekly practice.';
  const begin=learningButton(data.quiz?'Resume or refresh weekly practice':'Start weekly practice','quiz');begin.classList.add('agent-primary');begin.disabled=!canRefresh;week.append(begin);const weekly=node('details',undefined,'learning-week');weekly.open=Boolean(data.quiz);weekly.append(node('summary','Your week and learning history'),week);panel.append(weekly);
- const remove=node('button','Delete my local learning history','secondary-button learning-delete');remove.type='button';remove.addEventListener('click',()=>{if(window.confirm('Delete all of your local lesson, activity and weekly practice records? This cannot be undone in Averill.'))learnAction('delete-history');});week.append(remove);
+ const remove=node('button','Delete my local learning history','learning-delete');remove.type='button';remove.addEventListener('click',()=>{if(window.confirm('Delete all of your local lesson, activity and weekly practice records? This cannot be undone in Averill.'))learnAction('delete-history');});week.append(remove);
  const quiz=data.quiz;if(!quiz)return;
  if(quiz.outdated)panel.append(node('p',`Your learning record changed. ${refreshInstruction}`,'section-note'));
  const practice=node('article',undefined,'learning-card');practice.append(node('h3',quiz.outdated?'Weekly practice needs updating':quiz.finishedAt?'Weekly practice complete':'Weekly practice'),node('p','Feedback supports learning. It is not an employee performance or mastery score.'));
  for(const q of quiz.questions){const card=node('div',undefined,'learning-question');card.append(node('h4',q.prompt));
   if(!q.available){card.append(node('p',`This activity or source changed. ${refreshInstruction}`));practice.append(card);continue;}
   if(q.guide)card.append(guideLink(q.guide));if(q.source){const b=node('button',`Read ${q.source.title} · v${q.source.version}`,'source-link');b.type='button';b.addEventListener('click',()=>showSource(q.source.id,b));card.append(b);}
-  const answer=quiz.answers[q.id];if(answer){card.append(node('p',['practice','work'].includes(q.type)?answer.text:`Your answer: ${q.options[answer.choice]}`),node('p',answer.feedback,'learning-feedback'));practice.append(card);continue;}
+  const answer=quiz.answers[q.id];if(answer){card.append(node('p',['practice','work'].includes(q.type)?answer.text:`Your answer: ${q.options[answer.choice]}`),node('p',answer.feedback,'learning-feedback'));if(typeof answer.correct==='boolean'){card.dataset.result=answer.correct?'correct':'retry';card.prepend(node('span',answer.correct?'✓ Correct':'↺ Not quite — try again','answer-badge'));}practice.append(card);continue;}
   const form=node('form');form.className='workspace-form';
   if(['practice','work'].includes(q.type)){
    const label=node('label','What did you try, and what would you check?');const text=node('textarea');text.id=`reflection-${q.id}`;label.htmlFor=text.id;text.required=true;text.minLength=10;text.maxLength=1000;text.rows=3;

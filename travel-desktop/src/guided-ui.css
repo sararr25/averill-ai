@@ -72,3 +72,22 @@
 .agent-body .ai-control .ai-toggle,.agent-body[data-area=review] .ai-control .ai-toggle{min-height:32px;padding:4px 12px;border:1px solid var(--ds-color-verified);border-radius:999px;font-size:12px;font-weight:600;color:var(--ds-color-verified)}
 .agent-body .ai-control .ai-toggle[aria-pressed=true]{background:var(--ds-color-verified);color:#00171d}
 .agent-body .ai-control .ai-toggle:disabled{opacity:.6;border-style:dashed}
+
+/* Phase 2 UI/UX review: primary vs secondary areas, Review start steps, answer states, Knowledge counts, quiet destructive actions. */
+.agent-body .agent-nav .nav-divider{width:1px;height:18px;align-self:center;margin:0 8px;background:var(--ds-color-border)}
+.agent-body .agent-nav .nav-secondary{font-size:11px}
+.agent-body .agent-nav .nav-secondary:not(.active){color:var(--ds-color-text-muted)}
+.review-steps{margin:0 0 20px;padding:0;list-style:none;counter-reset:step;display:grid;gap:8px;color:var(--ds-color-text-secondary);font-size:13px}
+.review-steps[hidden]{display:none}
+.review-steps li{counter-increment:step;display:flex;align-items:baseline;gap:10px}
+.review-steps li::before{content:counter(step);display:inline-grid;place-items:center;width:22px;height:22px;flex-shrink:0;border:1px solid var(--ds-color-verified);border-radius:50%;color:var(--ds-color-verified);font-size:11px}
+.review-steps strong{color:var(--ds-color-text)}
+.answer-badge{display:inline-block;margin-bottom:8px;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:600}
+.learning-question[data-result=correct] .answer-badge{background:var(--ds-color-verified);color:#00171d}
+.learning-question[data-result=retry] .answer-badge{border:1px solid var(--ds-color-signal);color:var(--ds-color-signal)}
+.learning-delete,.danger-link{min-height:40px;padding:4px 0;border:0;background:none;color:var(--ds-color-signal);font-size:12px;font-weight:600;text-decoration:underline;text-underline-offset:3px}
+.learning-delete{display:block;margin-top:24px;padding-top:12px;border-top:1px solid var(--ds-color-border);width:100%;text-align:left}
+.learning-delete:focus-visible,.danger-link:focus-visible{outline:2px solid var(--ds-color-verified);outline-offset:2px}
+#knowledge-summary,.knowledge-summary{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.count-chip{padding:2px 9px;border-radius:999px;border:1px solid var(--ds-color-border-strong,#397084);color:var(--ds-color-text-secondary);font-size:11px}
+.count-chip.attention{border-color:var(--ds-color-signal);color:var(--ds-color-signal)}
