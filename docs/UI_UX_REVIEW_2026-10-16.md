@@ -57,3 +57,7 @@ Constraint: no new dependencies, and keep the existing Electron HTML/CSS/JS plus
 - `npm test`, `verify:feedback`, `verify:task-review`, `verify:browser`.
 - Native screenshots in an isolated profile, compared with the previous ones.
 - No new claim beyond what is actually verified (AGENTS.md rules).
+
+## Phase 1 status — 16 October
+
+Implemented #1–#5 and #10: all-clear state, a shared Checked / Not checked block, a live session bar with a coral Stop, the success banner hidden when the result is already visible, a "Nemotron AI: on/off" toggle plus a "Nemotron suggestion" chip, a 760px content column and left-grouped tabs. `npm test` 47/47; `verify:feedback` and `verify:browser` pass (one earlier `verify:feedback` timing flake did not reproduce in two reruns). `verify:task-review` and `verify:external` fail with "Failed to get sources" both before and after this change: the session lacks macOS Screen Recording permission, so they were not verified here. Screenshots were taken in an isolated profile using the browser-field path. The findings layout was checked with a synthetic renderer-only result, not a real rule match or a live Nemotron call. Native capture of a real conflict (#11) remains open.

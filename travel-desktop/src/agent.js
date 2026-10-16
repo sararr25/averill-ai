@@ -103,7 +103,9 @@ function render() {
     el('external-task-result').replaceChildren();
   }
   el('answer-mode').textContent = current.aiEnabled ? 'Nebius AI enabled' : 'Local source answers';
-  el('ai-toggle').textContent = current.aiEnabled ? 'Disable Nebius AI' : current.services?.nebius ? 'Enable Nebius AI' : 'Nebius key needed in Setup';
+  el('ai-toggle').textContent = current.aiEnabled ? 'Nemotron AI: on' : current.services?.nebius ? 'Nemotron AI: off' : 'Nemotron AI: key needed in Setup';
+  el('ai-toggle').setAttribute('aria-pressed',String(Boolean(current.aiEnabled)));
+  el('ai-toggle').nextElementSibling.textContent = current.aiEnabled ? 'NVIDIA Nemotron via Nebius. Your question and relevant approved text sources are sent to Nebius.' : 'Optional NVIDIA Nemotron via Nebius. Off: answers stay local.';
   el('ai-toggle').disabled = !current.services?.nebius && !current.aiEnabled;
   const admin=current.workspace?.people?.find(person=>person.id===current.workspace.activePersonId)?.role==='admin';
   el('ai-setup').hidden=Boolean(current.services?.nebius)||!admin;
@@ -164,15 +166,17 @@ function renderHero() {
   el('review-start').hidden=Boolean(externalReview||(current.shared||[]).length||(current.findings||[]).length);
   const workOutput=el('review-work-result');
   if(externalReview){
-    el('hero-label').textContent='WORK REVIEW';el('hero-title').textContent=externalReview.result.findings.length?'Review these corrections.':'Rule check completed.';
-    el('hero-body').textContent='Use the evidence below to edit in your own tool. Recheck after your edit; layout and publication still need your review.';
+    el('hero-label').textContent='WORK REVIEW';const hasFindings=externalReview.result.findings.length>0;
+    el('hero-title').textContent=hasFindings?'Review these corrections.':'No conflicts with approved rules.';
+    el('hero-body').textContent=hasFindings?'Edit in your own tool using the evidence below, then recheck.':'Averill compared the shared text with your current approved company sources.';
+    document.body.classList.toggle('review-clear',!hasFindings);
     el('hero-selected').replaceChildren();el('hero-source').replaceChildren();el('finding-navigation').replaceChildren();
-    const context=el('review-context');context.textContent=`${current.externalWindow?.name||'Selected work'} · ${el('external-task').selectedOptions[0].textContent}`;
-    const stop=node('button','Stop sharing','secondary-button');stop.type='button';stop.addEventListener('click',()=>el('stop-external').click());context.append(stop);
+    const context=el('review-context');context.replaceChildren(node('span','','live-dot'),node('span',`Live · ${current.externalWindow?.name||'Selected work'} · ${el('external-task').selectedOptions[0].textContent}`));context.classList.add('is-live');
+    const stop=node('button','Stop sharing','stop-button');stop.type='button';stop.addEventListener('click',()=>el('stop-external').click());context.append(stop);
     if(workOutput.dataset.identity!==JSON.stringify([externalReview.identity,externalReview.result])){drawTaskReview(workOutput,externalReview.result);workOutput.dataset.identity=JSON.stringify([externalReview.identity,externalReview.result]);guidedMotion.enter(workOutput,320,8);}
     document.body.classList.add('has-finding');return;
   }
-  workOutput.replaceChildren();delete workOutput.dataset.identity;
+  workOutput.replaceChildren();delete workOutput.dataset.identity;document.body.classList.remove('review-clear');el('review-context').classList.remove('is-live');
   const findings=current.findings||[];
   let index=findings.findIndex(item=>`${item.kind}:${item.id}`===selectedFindingId);
   if(index<0)index=0;
@@ -506,15 +510,21 @@ el('watch-external').addEventListener('click', async () => {
 });
 el('stop-external').addEventListener('click', async () => { invalidateWorkReview();renderHero(); current = await window.desktop.shareExternal(null, null); el('external-result').textContent = 'Window sharing stopped.'; el('external-list').replaceChildren(); render(); });
 function drawTaskReview(output,result){
-  output.replaceChildren(node('p', `${result.status} ${result.mode === 'model' ? 'Nebius review completed.' : 'Local rule check.'}`));
-  if(result.mode==='model'&&result.model)output.append(node('small',`${result.provider||'Nebius Token Factory'} · ${result.model}`));
-  if(result.uncheckedFields?.length)output.append(node('p',`Not observed in this field: ${result.uncheckedFields.join(', ')}.`,'field-hint'));
+  output.replaceChildren();
+  if(result.findings.length)output.append(node('p',result.status));
+  // One consistent statement of what this review covered and what it did not.
+  const scope=node('div',undefined,'check-scope');
+  const method=result.mode==='model'?`NVIDIA Nemotron via ${result.provider||'Nebius Token Factory'}${result.model?` (${result.model})`:''}, validated against sources`:'Local rule check';
+  const checked=node('p');checked.append(node('strong','Checked'),document.createTextNode(` Visible shared text against current approved rules · ${method}.`));
+  const unchecked=node('p');unchecked.append(node('strong','Not checked'),document.createTextNode(` ${result.uncheckedFields?.length?`${result.uncheckedFields.join(', ')}, `:''}layout, images and publishing settings.`));
+  scope.append(checked,unchecked);
   for(const item of result.findings){
     const card=node('article',undefined,'workspace-source review-evidence');
-    card.append(node('strong',item.confidence==='model-suggestion'?'AI suggestion':'Approved rule match'),node('p',item.suggestion));
+    card.append(item.confidence==='model-suggestion'?node('span','Nemotron suggestion · excerpts validated','ai-chip'):node('strong','Approved rule match'),node('p',item.suggestion));
     if(item.observedExcerpt)card.append(node('p',`Observed: “${item.observedExcerpt}”`));
     card.append(sourceButton(item.source),node('small',`Source v${item.source.version}: “${item.source.quote}”`));output.append(card);
   }
+  output.append(scope);
   const recheck=node('button','Recheck after my edit','secondary-button');recheck.type='button';
   recheck.addEventListener('click',()=>{showTab('work');el('external-local-recheck').focus();});output.append(recheck);
 }
