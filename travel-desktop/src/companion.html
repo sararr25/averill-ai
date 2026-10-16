@@ -10,9 +10,13 @@ button{-webkit-app-region:no-drag;cursor:pointer;border:0;border-radius:9px;font
 button:focus-visible{outline:2px solid #f4f5f3;outline-offset:1px}
 #status{display:block;padding:0 10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#bdd5df;font-size:11px}
 button{transition:transform 140ms cubic-bezier(.22,1,.36,1),background-color 140ms}button:not(:disabled):active{transform:translateY(1px);transition-duration:80ms}#open:hover{background:var(--ds-color-signal-hover)}#stop:not(:disabled):hover{background:var(--ds-color-panel-hover)}@media(prefers-reduced-motion:reduce){button{transition:none}button:active{transform:none!important}}
+/* While work is shared, match the main window session bar: live dot and coral Stop; Open steps back. */
+.live #status::before{content:"";display:inline-block;width:7px;height:7px;margin-right:6px;border-radius:50%;background:var(--ds-color-signal);vertical-align:1px}
+.live #stop{background:var(--ds-color-signal);color:#002129}.live #stop:not(:disabled):hover{background:var(--ds-color-signal-hover)}
+.live #open{background:#0c303a;color:var(--ds-color-verified)}.live #open:hover{background:var(--ds-color-panel-hover)}
 </style></head><body><div class="shell"><div class="grip" aria-label="Drag Averill button">AVERILL · DRAG TO MOVE</div><div class="row"><button id="open" type="button">Ask Averill</button><button id="stop" type="button" disabled>Stop</button></div><span id="status" role="status">No work shared</span></div><script>
 const status=document.getElementById('status'),stop=document.getElementById('stop');
-function render(value){const time=value.capturedAt?` · read ${new Date(value.capturedAt).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}`:'';status.textContent=value.error||(value.watching?`Watching ${value.window}${time}`:value.window?`Selected: ${value.window}${time}`:'No work shared');status.title=status.textContent;stop.disabled=!value.window;stop.title=value.window?'Stop sharing the selected window':'No work shared';}
+function render(value){const time=value.capturedAt?` · read ${new Date(value.capturedAt).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}`:'';status.textContent=value.error||(value.watching?`Watching ${value.window}${time}`:value.window?`Selected: ${value.window}${time}`:'No work shared');status.title=status.textContent;stop.disabled=!value.window;document.body.classList.toggle('live',Boolean(value.window));stop.title=value.window?'Stop sharing the selected window':'No work shared';}
 document.getElementById('open').addEventListener('click',()=>window.desktop.openCompanion());
 stop.addEventListener('click',async()=>{await window.desktop.stopCompanion();});
 window.desktop.onCompanionStatus(render);
