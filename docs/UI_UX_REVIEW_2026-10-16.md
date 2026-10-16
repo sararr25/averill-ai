@@ -65,3 +65,13 @@ Implemented #1–#5 and #10: all-clear state, a shared Checked / Not checked blo
 ## Phase 2 status — 16 October
 
 Implemented #6–#9: Review · Work · Learn as primary areas with Knowledge · Research · Setup visually secondary after a divider (all still reachable for every role, so access is unchanged); a numbered Share → Check → Fix start in Review that replaces the old one-line instructions; Learn answers marked "✓ Correct" / "↺ Not quite" and the history deletion turned into a separated danger link (confirmation unchanged); Knowledge counts shown as chips, with an attention style when items need review, and the source deletion styled as a danger link. Approval details were already collapsed by default. `npm test` 47/47; `verify:feedback` and `verify:browser` pass. Review idle, Knowledge and Learn were checked at 520px in an isolated profile. The Learn answer badges and the deletion link were not captured on screen (that needs a completed weekly quiz); the Knowledge chips were only seen with an empty library. A role-based Knowledge badge for pending approvals was not added.
+
+## Phase 3 status — 16 October
+
+- #12: the floating companion now matches the session bar. While work is shared it shows a coral live dot, the coral Stop becomes the main button and Ask Averill steps back. Checked in an isolated profile: it turns on when a browser field is shared and clears after Stop.
+- Layout: 18 samples (six areas × 440×660, 520×850, 960×820) with no horizontal overflow in the document, the main area or the navigation.
+- Keyboard: tabbing through Review gives a visible focus indicator on every focused control, in a logical order (Sign out → areas → start → composer → Nemotron toggle).
+- Reduced motion: under an emulated `prefers-reduced-motion: reduce`, button and feedback transitions compute to 0s.
+- `npm test` 47/47; `verify:feedback`, `verify:browser` and `verify:intake` pass. `npm run package:release` rebuilt the local unsigned arm64 app/ZIP and verified 120 tracked files, both helpers and 3109 entries (SHA-256 `00fe52cd53a8767488add5a1162f8db8a2c70a7829d3658a6ce31a03210f61e2`). `verify:rehearsal` passes on packaged resources.
+
+Not done, needing a person or permissions this session lacks: VoiceOver, the real OS Reduce Motion setting, Screen Recording-dependent checks (`verify:task-review`, `verify:external`), the manual 2:50 rehearsal on the final executable, and the recording. The public GitHub release was not changed; the new ZIP is a local candidate only.
