@@ -39,3 +39,9 @@ The unused Tailwind build dependency was removed after an npm advisory. Its unch
 ## Acceptance update — 12 October 2026
 
 Real Chrome testing of the canonical copy on a separate loopback origin passed Instagram image/caption save, reload and reopened details; LinkedIn image/text save/reload and unsaved-composer cancellation; Brevo audience/subject/body/image persistence, desktop/mobile previews, cancelled design edits, empty-date rejection and native-entered Copenhagen scheduling/reload. This supersedes the historical image-persistence gate above. These are local simulations, not production platform or fresh installed-extension acceptance. See [the short checklist](../../docs/TESTING_CHECKLIST_2026-10-12.md) and [ticket #4](https://github.com/sararr25/averill-ai/issues/4).
+
+## Seeded Vamo content — 16 October 2026
+
+Instagram (`vamo.travel`) has 9 seeded posts: the four credited city photos plus designed brand cards in `public/vamo/posts/` (generated SVGs with embedded Fraunces/DM Sans), a profile bio, link and highlights. LinkedIn is a company page (cover, logo, industry, location, size, About, Posts tab) with 6 posts: how trip briefs work, an Operations coordinator role, team, Copenhagen, Prague, intro. Brevo adds a sent welcome email and September newsletter, a scheduled Prague guide (22 Oct) and a packing-list draft, all with the required footer, and its preview renders emails in the Vamo style. `public/vamo/avatar.svg` is the round logo used everywhere.
+
+Seeded copy avoids price, availability and partnership claims and does not pre-publish the Winter Escapes 2027 launch items (email 15 Oct, LinkedIn 16 Oct, Reel 17 Oct) that Averill reviews. The intentionally flawed `vamo-brevo-winter-v2` launch draft is unchanged. No follower, like or open counts are shown: Vamo's brand rules forbid fabricated engagement metrics. Photo credits appear in the captions.
