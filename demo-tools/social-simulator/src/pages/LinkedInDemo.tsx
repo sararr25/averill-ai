@@ -31,7 +31,7 @@ export function LinkedInDemo() {
             <img className="li-company-logo" src={AVATAR} alt="Vamo logo"/>
             <h1>Vamo</h1>
             <p className="li-company-tagline">{VAMO_HEADLINE}</p>
-            <p className="li-company-meta">Travel Arrangements · Copenhagen, Capital Region of Denmark · 2–10 employees</p>
+            <p className="li-company-meta">Travel Arrangements · Copenhagen, Capital Region of Denmark · 1,247 followers · 2–10 employees</p>
             <div className="li-company-actions"><button className="li-follow" disabled title="Outside the local demo"><Plus size={16}/> Follow</button><button className="li-outline" disabled title="Outside the local demo">Visit website <ExternalLink size={14}/></button><button className="li-outline" disabled title="Outside the local demo">Message</button></div>
           </div>
           <nav className="li-company-tabs" aria-label="Company page sections">{tabs.map(tab => <button key={tab} className={tab === 'Posts' ? 'active' : ''} disabled={tab !== 'Posts'} title={tab === 'Posts' ? undefined : 'Outside the local demo'}>{tab}</button>)}</nav>
