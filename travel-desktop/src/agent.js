@@ -68,6 +68,7 @@ function render() {
   renderWorkspace();
   renderKnowledge();
   renderRules();
+  renderPublicSite();
   renderLearning();
   renderHero();
   renderWorkStep();

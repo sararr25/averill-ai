@@ -29,6 +29,7 @@ const cloudActivity = require('./src/cloud-activity');
 const rules = require('./src/rules');
 const reviewAgent = require('./src/review-agent');
 const publicCheck = require('./src/public-check');
+const publicSite = require('./src/public-site');
 
 const workKinds = ['email', 'linkedin', 'social', 'handover'];
 const workWindows = new Map();
@@ -127,6 +128,7 @@ function snapshot() {
     externalObservation: signedIn() ? externalObservation : null,
     externalError: signedIn() ? externalError : '',
     services: { nebius: Boolean(runtimeKeys.nebius), tavily: Boolean(runtimeKeys.tavily) },
+    publicSite: signedIn() ? publicSite.snapshot(companyWorkspace) : null,
     cloudActivity: signedIn() ? { mine: cloudActivity.forPerson(companyWorkspace, companyWorkspace.activePersonId), totals: workspace.person(companyWorkspace)?.role === 'admin' ? cloudActivity.summary(companyWorkspace) : null } : null,
     shared: [...shared],
     open: [...workWindows.keys()],
@@ -657,6 +659,17 @@ app.whenReady().then(async () => {
     if (!observed) throw new Error('Read the selected window before checking its links.');
     return publicCheck.checkLinks(companyWorkspace, task, observed.text, urls, { tavilyKey: runtimeKeys.tavily });
   });
+  ipcMain.handle('site:configure', async (event, url) => { admin(event); await publicSite.configure(companyWorkspace, url); return persistWorkspace(); });
+  ipcMain.handle('site:crawl', async (event) => {
+    admin(event);
+    const personId = companyWorkspace.activePersonId;
+    await publicSite.crawl(companyWorkspace, { key: runtimeKeys.tavily });
+    if (personId !== companyWorkspace.activePersonId || !signedIn()) throw new Error('The signed-in person changed while reading the website.');
+    await publicSite.compare(companyWorkspace, { key: aiEnabled ? runtimeKeys.nebius : '' });
+    return persistWorkspace();
+  });
+  ipcMain.handle('site:compare', async (event) => { admin(event); await publicSite.compare(companyWorkspace, { key: aiEnabled ? runtimeKeys.nebius : '' }); return persistWorkspace(); });
+  ipcMain.handle('site:decide', (event, id, action, reason) => { admin(event); publicSite.decide(companyWorkspace, id, action, reason); return persistWorkspace(); });
   ipcMain.handle('agent:external-watch', (event, enabled) => {
     fromAgent(event);
     if (enabled && !selectedExternalWindow) throw new Error('Choose a work window first.');
