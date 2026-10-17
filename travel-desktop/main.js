@@ -23,6 +23,9 @@ const { nativeWindow, observation, windowNumber } = require('./src/external-obse
 const { clampCompanion } = require('./src/companion-position');
 const taskReview = require('./src/task-review');
 const { BrowserBridge } = require('./src/browser-bridge');
+const nebiusClient = require('./src/nebius');
+const tavilyClient = require('./src/tavily');
+const cloudActivity = require('./src/cloud-activity');
 
 const workKinds = ['email', 'linkedin', 'social', 'handover'];
 const workWindows = new Map();
@@ -50,6 +53,13 @@ const browserBridge = new BrowserBridge({
   },
   onStop: () => { stopExternal(); publish(); },
 });
+function logCloudCall(entry) {
+  if (!signedIn()) return;
+  cloudActivity.record(companyWorkspace, companyWorkspace.activePersonId, entry);
+  try { workspace.save(app.getPath('userData'), companyWorkspace); } catch {}
+}
+nebiusClient.onCall(logCloudCall);
+tavilyClient.onCall(logCloudCall);
 const runtimeKeys = { nebius: process.env.NEBIUS_API_KEY || '', tavily: process.env.TAVILY_API_KEY || '' };
 
 function secretPath() { return path.join(app.getPath('userData'), 'averill-secrets.enc.json'); }
@@ -114,6 +124,7 @@ function snapshot() {
     externalObservation: signedIn() ? externalObservation : null,
     externalError: signedIn() ? externalError : '',
     services: { nebius: Boolean(runtimeKeys.nebius), tavily: Boolean(runtimeKeys.tavily) },
+    cloudActivity: signedIn() ? { mine: cloudActivity.forPerson(companyWorkspace, companyWorkspace.activePersonId), totals: workspace.person(companyWorkspace)?.role === 'admin' ? cloudActivity.summary(companyWorkspace) : null } : null,
     shared: [...shared],
     open: [...workWindows.keys()],
     aiEnabled,
