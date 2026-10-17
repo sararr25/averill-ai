@@ -26,6 +26,7 @@ const { BrowserBridge } = require('./src/browser-bridge');
 const nebiusClient = require('./src/nebius');
 const tavilyClient = require('./src/tavily');
 const cloudActivity = require('./src/cloud-activity');
+const rules = require('./src/rules');
 
 const workKinds = ['email', 'linkedin', 'social', 'handover'];
 const workWindows = new Map();
@@ -489,6 +490,27 @@ app.whenReady().then(async () => {
     workspace.updateSource(companyWorkspace, id, action, priority, reason, supersedesId);
     return persistWorkspace();
   });
+  ipcMain.handle('rules:list', (event) => { fromAgent(event); return rules.publicRules(companyWorkspace); });
+  ipcMain.handle('rules:extract', async (event, sourceId, consent) => {
+    fromAgent(event);
+    if (consent !== true) throw new Error('Confirm sending this source text to Nebius first.');
+    const active = workspace.person(companyWorkspace);
+    const source = workspace.visibleSources(companyWorkspace).find(entry => entry.id === sourceId);
+    if (!source) throw new Error('Unknown source');
+    if (!(active.role === 'admin' || (active.role === 'lead' && source.scope !== 'company' && source.department === active.department))) throw new Error('Department lead or administrator access required');
+    const personId = companyWorkspace.activePersonId;
+    const result = await rules.extract(companyWorkspace, source, { key: runtimeKeys.nebius });
+    if (companyWorkspace.activePersonId !== personId || !signedIn()) throw new Error('The signed-in person changed during extraction.');
+    const added = rules.propose(companyWorkspace, source, result.candidates);
+    persistWorkspace();
+    return { added: added.length, rejected: result.rejected, rules: rules.publicRules(companyWorkspace) };
+  });
+  ipcMain.handle('rules:decide', (event, ruleId, action, value, reason) => {
+    fromAgent(event);
+    rules.decide(companyWorkspace, ruleId, action, { value: value === null ? undefined : value, reason });
+    persistWorkspace();
+    return rules.publicRules(companyWorkspace);
+  });
   ipcMain.handle('workspace:propose-source', (event, id) => {
     fromAgent(event);
     if (!companyWorkspace) throw new Error('Create a workspace first');
@@ -502,7 +524,7 @@ app.whenReady().then(async () => {
   });
   ipcMain.handle('workspace:knowledge',(event,query,status,filters)=>{fromAgent(event);return companyWorkspace?knowledge.list(companyWorkspace,query,status,filters):{documents:[],total:0,approved:0,uploaded:0};});
   ipcMain.handle('workspace:compare-sources',(event,newId,oldId)=>{fromAgent(event);return sourceReview.compare(companyWorkspace,newId,oldId);});
-  ipcMain.handle('workspace:remove-source',(event,id)=>{fromAgent(event);workspace.removeSource(app.getPath('userData'),companyWorkspace,id);publish();return snapshot();});
+  ipcMain.handle('workspace:remove-source',(event,id)=>{fromAgent(event);workspace.removeSource(app.getPath('userData'),companyWorkspace,id);rules.removeForSource(companyWorkspace,id);return persistWorkspace();});
   ipcMain.handle('workspace:request-clarification',(event,question)=>{fromAgent(event);workspace.requestClarification(companyWorkspace,question);return persistWorkspace();});
   ipcMain.handle('workspace:resolve-clarification',(event,id,reply,sourceId)=>{fromAgent(event);workspace.resolveClarification(companyWorkspace,id,reply,sourceId);return persistWorkspace();});
   ipcMain.handle('workspace:read-file', (event, id) => {

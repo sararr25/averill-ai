@@ -67,6 +67,7 @@ function render() {
   if (authority !== lastWorkAuthority) { lastWorkAuthority = authority; el('external-task-result').replaceChildren(); el('context-result').replaceChildren(); }
   renderWorkspace();
   renderKnowledge();
+  renderRules();
   renderLearning();
   renderHero();
   renderWorkStep();

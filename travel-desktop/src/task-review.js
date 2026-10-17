@@ -3,6 +3,7 @@ const privacy = require('./company-privacy');
 const { approvedSources, conflicts } = require('./workspace');
 
 const nebius = require('./nebius');
+const rules = require('./rules');
 const tasks = { email: 'Marketing', linkedin: 'Marketing', instagram: 'Marketing', canva: 'Marketing', operations: 'Operations', people: 'People' };
 
 function currentSources(data, task) {
@@ -20,6 +21,26 @@ function citation(source, quote) {
 function visibleMatch(observed, phrase) {
   const pattern = phrase.trim().split(/\s+/).map(word => word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('\\s+');
   return observed.match(new RegExp(pattern, 'i'))?.[0] || '';
+}
+
+const FIELD_LABELS = { audience: /audience|segment/i, date: /date/i, time: /time/i, asset: /asset|creative|file/i, disclosure: /disclosure|partnership/i };
+
+// Approved, model-extracted rules (AV-13). Hand-written source lines above stay authoritative and are not duplicated.
+function applyApprovedRules(data, task, observed, observedField, sources, findings, unchecked) {
+  const current = new Map(sources.map(item => [item.source.id, item.source]));
+  for (const rule of rules.active(data, task).filter(entry => entry.proposedBy === 'model' && current.has(entry.sourceId))) {
+    const source = current.get(rule.sourceId);
+    if (findings.some(f => f.source.id === source.id && f.source.quote === rule.quote)) continue;
+    if (rule.kind === 'claim-forbidden') {
+      const excerpt = visibleMatch(observed, rule.value);
+      if (excerpt && !findings.some(f => f.observedExcerpt.toLowerCase() === excerpt.toLowerCase())) findings.push({ type: 'forbidden-claim', observedExcerpt: excerpt, suggestion: `Review and remove the quoted claim. The approved source says: ${rule.quote}`, source: citation(source, rule.quote), confidence: 'approved-rule', ruleId: rule.id });
+    } else if (FIELD_LABELS[rule.kind]) {
+      if (!observedField || !FIELD_LABELS[rule.kind].test(observedField.label)) unchecked.add(rule.kind);
+      else if (observedField.value.trim().toLowerCase() !== rule.value.toLowerCase() && !findings.some(f => f.type === 'field-requirement')) findings.push({ type: 'field-requirement', observedExcerpt: observedField.value, suggestion: `The approved ${rule.kind} is “${rule.value}”. Check and update this selected field yourself.`, source: citation(source, rule.quote), confidence: 'approved-rule', ruleId: rule.id });
+    } else if (rule.kind === 'required-text' && (!observedField || /body|message|caption|post copy|email content/i.test(observedField.label)) && !visibleMatch(observed, rule.value) && !findings.some(f => f.type === 'missing-required-text' && f.source.id === source.id)) {
+      findings.push({ type: 'missing-required-text', observedExcerpt: '', suggestion: `Check whether this required text belongs in the draft: ${rule.value}`, source: citation(source, rule.quote), confidence: 'approved-rule', ruleId: rule.id });
+    }
+  }
 }
 
 function localReview(data, task, observedText, observedField = null) {
@@ -54,6 +75,7 @@ function localReview(data, task, observedText, observedField = null) {
       }
     }
   }
+  applyApprovedRules(data, task, observed, observedField, sources, findings, unchecked);
   return { mode: 'local', uncheckedFields: [...unchecked], findings: findings.slice(0, 6), status: findings.length ? 'Exact company rules matched the visible text. Check the surrounding editor state before acting.' : 'No exact rule conflict found in visible text. This is not a full content, layout or publication check.' };
 }
 
