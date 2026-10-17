@@ -70,6 +70,7 @@ function render() {
   renderRules();
   renderPublicSite();
   renderKnowledgeIndex();
+  renderPractice();
   renderLearning();
   renderHero();
   renderWorkStep();
@@ -539,7 +540,7 @@ function drawTaskReview(output,result){
     const card=node('article',undefined,'workspace-source review-evidence');
     card.append(item.confidence==='model-suggestion'?node('span','Nemotron suggestion · excerpts validated','ai-chip'):node('strong',item.confidence==='approved-rule'?'Approved rule match · extracted by Nemotron':'Approved rule match'),node('p',item.suggestion));
     if(item.observedExcerpt)card.append(node('p',`Observed: “${item.observedExcerpt}”`));
-    card.append(sourceButton(item.source),node('small',`Source v${item.source.version}: “${item.source.quote}”`));output.append(card);
+    card.append(sourceButton(item.source),node('small',`Source v${item.source.version}: “${item.source.quote}”`));appendPracticeLink(card,item.source.quote);output.append(card);
   }
   if(result.steps?.length){const steps=node('details',undefined,'knowledge-details agent-steps');steps.append(node('summary','How Averill checked this'));const list=node('ol');for(const step of result.steps)list.append(node('li',step.label));steps.append(list);output.append(steps);}
   output.append(scope);

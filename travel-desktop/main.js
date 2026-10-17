@@ -31,6 +31,8 @@ const reviewAgent = require('./src/review-agent');
 const publicCheck = require('./src/public-check');
 const publicSite = require('./src/public-site');
 const semanticIndex = require('./src/semantic-index');
+const versionBriefing = require('./src/version-briefing');
+const ruleExercises = require('./src/rule-exercises');
 
 const workKinds = ['email', 'linkedin', 'social', 'handover'];
 const workWindows = new Map();
@@ -303,7 +305,7 @@ app.whenReady().then(async () => {
     else if(action==='project-confirm')learning.confirmProject(companyWorkspace,payload.sessionId,payload.note);
     else if (action === 'confirm') learning.confirm(companyWorkspace, payload.sessionId, payload.stepId);
     else if (action === 'exclude') learning.exclude(companyWorkspace, payload.sessionId);
-    else if (action === 'delete-history') learning.deleteHistory(companyWorkspace);
+    else if (action === 'delete-history') { learning.deleteHistory(companyWorkspace); ruleExercises.deleteMine(companyWorkspace); }
     else if (action === 'quiz') learning.beginQuiz(companyWorkspace);
     else if (action === 'answer') learning.answer(companyWorkspace, payload.quizId, payload.questionId, payload.value);
     else throw new Error('Unknown learning action');
@@ -687,6 +689,19 @@ app.whenReady().then(async () => {
     const found = await semanticIndex.search(app.getPath('userData'), companyWorkspace, input, { key: runtimeKeys.nebius });
     return { mode: found.mode, results: found.results.map(hit => ({ sourceId: hit.source.id, title: hit.source.title, version: hit.source.version, quote: hit.quote, line: hit.line, page: hit.page, match: hit.match })) };
   });
+  ipcMain.handle('knowledge:briefing', async (event, sourceId, useAI) => {
+    fromAgent(event);
+    return versionBriefing.brief(companyWorkspace, sourceId, { key: runtimeKeys.nebius, useModel: useAI === true && aiEnabled });
+  });
+  ipcMain.handle('practice:snapshot', (event, quote) => { fromAgent(event); return ruleExercises.snapshot(companyWorkspace, typeof quote === 'string' ? quote : null); });
+  ipcMain.handle('practice:generate', async (event, useAI) => {
+    fromAgent(event);
+    const added = await ruleExercises.generate(companyWorkspace, { key: runtimeKeys.nebius, useModel: useAI === true && aiEnabled });
+    persistWorkspace();
+    return { added: added.length, ...ruleExercises.snapshot(companyWorkspace) };
+  });
+  ipcMain.handle('practice:decide', (event, id, action) => { fromAgent(event); ruleExercises.decide(companyWorkspace, id, action); persistWorkspace(); return ruleExercises.snapshot(companyWorkspace); });
+  ipcMain.handle('practice:answer', (event, id, choice) => { fromAgent(event); const result = ruleExercises.answer(companyWorkspace, id, choice); persistWorkspace(); return result; });
   ipcMain.handle('agent:external-watch', (event, enabled) => {
     fromAgent(event);
     if (enabled && !selectedExternalWindow) throw new Error('Choose a work window first.');
