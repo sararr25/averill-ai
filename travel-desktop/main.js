@@ -27,6 +27,8 @@ const nebiusClient = require('./src/nebius');
 const tavilyClient = require('./src/tavily');
 const cloudActivity = require('./src/cloud-activity');
 const rules = require('./src/rules');
+const reviewAgent = require('./src/review-agent');
+const publicCheck = require('./src/public-check');
 
 const workKinds = ['email', 'linkedin', 'social', 'handover'];
 const workWindows = new Map();
@@ -632,12 +634,28 @@ app.whenReady().then(async () => {
     if (!observed || !selectedExternalWindow || observed.windowId !== selectedExternalWindow.id) throw new Error('Read the selected window before reviewing its work.');
     const personId = companyWorkspace.activePersonId;
     const epoch = externalEpoch;
-    const result = await taskReview.reviewTask(companyWorkspace, task, observed.text, runtimeKeys.nebius, useAI === true && aiEnabled, observed.field);
+    const result = useAI === true && aiEnabled ? await reviewAgent.reviewWithAgent(companyWorkspace, task, observed.text, runtimeKeys.nebius, observed.field) : await taskReview.reviewTask(companyWorkspace, task, observed.text, runtimeKeys.nebius, false, observed.field);
     fromAgent(event);
     if (epoch !== externalEpoch || personId !== companyWorkspace.activePersonId || observed.contentHash !== externalObservation?.contentHash) throw new Error('The work changed or sharing stopped. Read it again.');
     const current = new Map(taskReview.currentSources(companyWorkspace, task).map(item => [item.source.id, item]));
     if (result.findings.some(item => { const entry = current.get(item.source.id); return !entry || entry.source.version !== item.source.version || entry.source.approvedAt !== item.source.approvedAt || !entry.text.includes(item.source.quote); })) throw new Error('The approved company sources changed. Review again.');
     return { ...result, observedAt: observed.capturedAt, method: observed.method, window: observed.windowName, contentHash: observed.contentHash };
+  });
+  ipcMain.handle('agent:public-check', async (event, task, claims) => {
+    fromAgent(event);
+    if (!taskReview.tasks[task]) throw new Error('Choose a supported work type.');
+    if (!Array.isArray(claims) || claims.some(claim => typeof claim !== 'string' || privacy.credentials(claim))) throw new Error('Remove credentials before public checking.');
+    const personId = companyWorkspace.activePersonId;
+    const result = await publicCheck.checkClaims(companyWorkspace, task, claims, { tavilyKey: runtimeKeys.tavily, nebiusKey: aiEnabled ? runtimeKeys.nebius : '' });
+    if (personId !== companyWorkspace.activePersonId || !signedIn()) throw new Error('The signed-in person changed during the public check.');
+    return result;
+  });
+  ipcMain.handle('agent:link-check', async (event, task, urls) => {
+    fromAgent(event);
+    if (!taskReview.tasks[task]) throw new Error('Choose a supported work type.');
+    const observed = externalObservation;
+    if (!observed) throw new Error('Read the selected window before checking its links.');
+    return publicCheck.checkLinks(companyWorkspace, task, observed.text, urls, { tavilyKey: runtimeKeys.tavily });
   });
   ipcMain.handle('agent:external-watch', (event, enabled) => {
     fromAgent(event);

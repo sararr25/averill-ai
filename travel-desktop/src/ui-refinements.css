@@ -93,3 +93,7 @@
 .rule-value{color:var(--ds-color-text);font-weight:600;margin:var(--ds-space-2) 0}
 .rule-quote{margin:0 0 var(--ds-space-2);padding:var(--ds-space-2) var(--ds-space-3);border-left:2px solid var(--ds-color-verified);color:var(--ds-color-text-secondary);font-size:12px;line-height:1.5}
 .rule-card[data-state="conflict"] .rule-quote{border-left-color:var(--ds-color-signal)}
+/* AV-23 / AV-25 agent steps and public checks */
+.agent-steps ol{margin:var(--ds-space-2) 0 0;padding-left:var(--ds-space-5);color:var(--ds-color-text-secondary);font-size:12px;line-height:1.6}
+.public-check{margin-top:var(--ds-space-4);padding-top:var(--ds-space-3);border-top:1px dashed var(--ds-color-border);display:grid;gap:var(--ds-space-2)}
+.public-verdict{border-left:3px solid var(--ds-color-border)}.public-verdict[data-verdict="supported"]{border-left-color:var(--ds-color-verified)}.public-verdict[data-verdict="contradicted"]{border-left-color:var(--ds-color-signal)}
