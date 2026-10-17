@@ -75,3 +75,7 @@ Implemented #6–#9: Review · Work · Learn as primary areas with Knowledge · 
 - `npm test` 47/47; `verify:feedback`, `verify:browser` and `verify:intake` pass. `npm run package:release` rebuilt the local unsigned arm64 app/ZIP and verified 120 tracked files, both helpers and 3109 entries (SHA-256 `00fe52cd53a8767488add5a1162f8db8a2c70a7829d3658a6ce31a03210f61e2`). `verify:rehearsal` passes on packaged resources.
 
 Not done, needing a person or permissions this session lacks: VoiceOver, the real OS Reduce Motion setting, Screen Recording-dependent checks (`verify:task-review`, `verify:external`), the manual 2:50 rehearsal on the final executable, and the recording. The public GitHub release was not changed; the new ZIP is a local candidate only.
+
+## Follow-up — 17 October
+
+A further UI pass and self-test, with draft tickets for what is still open, is in [UI_TEST_REPORT_2026-10-17.md](UI_TEST_REPORT_2026-10-17.md).
