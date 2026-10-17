@@ -53,14 +53,17 @@ async function chat(data, { key, purpose, messages, tools, toolChoice, json = fa
   guard(data, purpose, messageText(messages));
   const chosen = model || pickChat(await models(key, { fetcher }));
   if (!chosen) throw new Error('No NVIDIA Nemotron model is available for this key.');
-  const body = { model: chosen, temperature, max_tokens: maxTokens, messages };
+  // Nemotron reasons by default and can spend the whole token budget before answering; every caller wants the answer.
+  const body = { model: chosen, temperature, max_tokens: maxTokens, messages, chat_template_kwargs: { enable_thinking: false } };
   if (tools?.length) { body.tools = tools; body.tool_choice = toolChoice || 'auto'; }
   if (json) body.response_format = { type: 'json_object' };
   const started = Date.now();
   const response = await request(fetcher, `${API}/chat/completions`, { method: 'POST', headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' }, body: JSON.stringify(body), signal: AbortSignal.timeout(timeout) });
   notify({ service: 'nebius', purpose, kind: 'chat', model: chosen, ok: response.ok, status: response.status, items: messages.length, ms: Date.now() - started });
   if (!response.ok) throw new Error(`Nebius request failed (${response.status}).`);
-  const message = (await response.json()).choices?.[0]?.message || {};
+  const choice = (await response.json()).choices?.[0] || {};
+  const message = choice.message || {};
+  if (choice.finish_reason === 'length' && !message.content && !message.tool_calls?.length) throw new Error('Nebius reply was cut off before an answer.');
   return { model: chosen, message, content: typeof message.content === 'string' ? message.content : '' };
 }
 
