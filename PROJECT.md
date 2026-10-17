@@ -1,5 +1,7 @@
 # Averill project
 
+Current update, 17 October 2026: Nebius/Tavily integration implemented on branch `claude/charming-johnson-rhezro` (PR #21); live calls not yet verified. Start from [docs/HANDOVER_NEBIUS_TAVILY_2026-10-17.md](docs/HANDOVER_NEBIUS_TAVILY_2026-10-17.md).
+
 Current status, 4 October 2026: the Guided UI release is public at [v0.1.0-preview.20261004.2](https://github.com/sararr25/averill-ai/releases/tag/v0.1.0-preview.20261004.2). See [docs/PROJECT_STATUS_2026-10-04.md](docs/PROJECT_STATUS_2026-10-04.md) and [docs/NEXT_STEPS_2026-10-04.md](docs/NEXT_STEPS_2026-10-04.md) for current evidence, ordered checks and pending fixes. Dated earlier sections are historical where superseded.
 
 Current update, 3 October 2026: shipped source packs and fixtures use Vamo; old persisted credentials and source approvals remain unchanged. See docs/DEMO_MIGRATION.md. Earlier state descriptions below are historical until reconciled with the current milestone ledger.

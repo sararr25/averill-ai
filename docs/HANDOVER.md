@@ -1,5 +1,7 @@
 # Nebius and Tavily integration — 17 October 2026
 
+**Next session: start from [HANDOVER_NEBIUS_TAVILY_2026-10-17.md](HANDOVER_NEBIUS_TAVILY_2026-10-17.md).**
+
 Implemented the plan in [NEBIUS_TAVILY_PLAN.md](NEBIUS_TAVILY_PLAN.md) on branch `claude/charming-johnson-rhezro`: shared Nebius/Tavily clients, Nemotron rule extraction with lead/admin approval, a tool-calling Nemotron review agent with visible steps, Tavily public-statement and linked-page checks, public website vs approved sources, semantic Knowledge with Nebius embeddings, handover briefing, practice from approved rules and source freshness. See the table in [COMPANY_CONFIDENTIALITY.md](COMPANY_CONFIDENTIALITY.md) for what each feature sends.
 
 Verified: `npm test` 76/77 pass; the one failure (`XLSX onboarding bulk creates …`, version '1' vs '2') already failed on `main` before this work. `npm run verify:cloud-ui` passes in Electron on Linux with **faked** Nebius/Tavily responses and no renderer errors. **Not verified:** any live Nebius or Tavily request — no keys were available. Next: on the Mac with keys run `npm run probe:nebius` (AV-01: confirms Nemotron tool calling, JSON mode and an embedding model id), then exercise each feature once live on synthetic text and record receipts here. Until then, tool calling may fall back to the JSON reply path and search by meaning needs an available embedding model (`NEBIUS_EMBED_MODEL` overrides discovery). Not built: a scheduled freshness run, and an intentional mismatch page on the Vamo site for the website demo.
