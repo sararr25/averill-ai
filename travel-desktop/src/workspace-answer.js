@@ -23,12 +23,26 @@ function localWorkspaceAnswer(data, question) {
   return { text: `Matching passage in ${best.source.title}: “${best.passage?.quote||'Open the source to review the matching text.'}” This is an extract, not an inferred answer.`, sources: matches.map(({ source,passage }) => ({ id: source.id, title: source.title, kind: 'workspace', version:source.version,approvedAt:source.approvedAt,approvedBy:data.people.find(person=>person.id===source.approvedBy)?.name||'Unknown approver',quote:passage?.quote||'',page:passage?.page,line:passage?.line,reason:'Matches a term in your question' })), mode: 'local' };
 }
 
-async function answerWorkspace(data, question, key = process.env.NEBIUS_API_KEY, model = process.env.NEBIUS_MODEL) {
+// semantic: optional hybrid-search results ({ source, quote, line, page }) from semantic-index.search.
+function withSemantic(matches, semantic = []) {
+  const out = [...matches];
+  for (const hit of semantic) {
+    if (!hit?.source?.textPath || out.some(item => item.source.id === hit.source.id)) continue;
+    let content = '';
+    try { content = fs.readFileSync(hit.source.textPath, 'utf8').slice(0, 12000); } catch { continue; }
+    if (!content.replace(/\s+/g, ' ').includes(hit.quote.slice(0, 80))) continue;
+    out.push({ source: hit.source, content, passage: { quote: hit.quote, line: hit.line, page: hit.page }, score: hit.score, matches: 0, semantic: true });
+  }
+  return out.slice(0, 5);
+}
+
+async function answerWorkspace(data, question, key = process.env.NEBIUS_API_KEY, model = process.env.NEBIUS_MODEL, semantic = []) {
   const input = String(question || '').trim().slice(0, 5000);
   const fallback = localWorkspaceAnswer(data, input);
   if (!input || !key) return fallback;
   if (!privacy.allowed(data)) return { ...fallback, text: 'Company AI is disabled by the owner. Local source lookup remains available.' };
-  const matches = relevantSources(data, input).filter(({source})=>privacy.eligible(source));
+  const allowed = new Set(approvedSources(data).map(source => source.id));
+  const matches = withSemantic(relevantSources(data, input), semantic.filter(hit => allowed.has(hit.source?.id))).filter(({source})=>privacy.eligible(source));
   if (!matches.length) return fallback;
   try {
     const sourceText = matches.map(({ source, content }) => `SOURCE ${source.id} (${source.title}, version ${source.version}):\n${content}`).join('\n\n');
@@ -40,7 +54,7 @@ async function answerWorkspace(data, question, key = process.env.NEBIUS_API_KEY,
     if (!parsed) return fallback;
     const valid = new Map(matches.map(({ source }) => [source.id, source]));
     if (typeof parsed.answer !== 'string' || !parsed.answer.trim() || !Array.isArray(parsed.evidence) || !parsed.evidence.length || parsed.evidence.some(item=>!valid.has(item.source_id)||typeof item.quote!=='string'||item.quote.trim().length<10||!matches.find(match=>match.source.id===item.source_id)?.content.includes(item.quote)) || !parsed.evidence.some(item=>item.quote.includes(parsed.answer.trim()))) return fallback;
-    const citations=parsed.evidence.map(item=>{const source=valid.get(item.source_id),content=matches.find(match=>match.source.id===item.source_id).content,offset=content.indexOf(item.quote),before=content.slice(0,offset),page=[...before.matchAll(/^\[PDF page (\d+)\]$/gm)].at(-1)?.[1];return {id:source.id,title:source.title,kind:'workspace',version:source.version,approvedAt:source.approvedAt,approvedBy:data.people.find(person=>person.id===source.approvedBy)?.name||'Unknown approver',quote:item.quote,page:page?Number(page):null,line:before.split('\n').length,reason:'Exact passage returned by the model'};});
+    const citations=parsed.evidence.map(item=>{const source=valid.get(item.source_id),content=matches.find(match=>match.source.id===item.source_id).content,offset=content.indexOf(item.quote),before=content.slice(0,offset),page=[...before.matchAll(/^\[PDF page (\d+)\]$/gm)].at(-1)?.[1];return {id:source.id,title:source.title,kind:'workspace',version:source.version,approvedAt:source.approvedAt,approvedBy:data.people.find(person=>person.id===source.approvedBy)?.name||'Unknown approver',quote:item.quote,page:page?Number(page):null,line:before.split('\n').length,reason:matches.find(match=>match.source.id===item.source_id).semantic?'Exact passage · found by meaning':'Exact passage returned by the model'};});
     return { text:`Verified extract: “${parsed.answer.trim()}” Open the source before acting.`, sources:citations, mode: 'model' };
   } catch { return fallback; }
 }

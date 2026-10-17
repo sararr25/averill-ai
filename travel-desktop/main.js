@@ -30,6 +30,7 @@ const rules = require('./src/rules');
 const reviewAgent = require('./src/review-agent');
 const publicCheck = require('./src/public-check');
 const publicSite = require('./src/public-site');
+const semanticIndex = require('./src/semantic-index');
 
 const workKinds = ['email', 'linkedin', 'social', 'handover'];
 const workWindows = new Map();
@@ -528,7 +529,7 @@ app.whenReady().then(async () => {
   });
   ipcMain.handle('workspace:knowledge',(event,query,status,filters)=>{fromAgent(event);return companyWorkspace?knowledge.list(companyWorkspace,query,status,filters):{documents:[],total:0,approved:0,uploaded:0};});
   ipcMain.handle('workspace:compare-sources',(event,newId,oldId)=>{fromAgent(event);return sourceReview.compare(companyWorkspace,newId,oldId);});
-  ipcMain.handle('workspace:remove-source',(event,id)=>{fromAgent(event);workspace.removeSource(app.getPath('userData'),companyWorkspace,id);rules.removeForSource(companyWorkspace,id);return persistWorkspace();});
+  ipcMain.handle('workspace:remove-source',(event,id)=>{fromAgent(event);workspace.removeSource(app.getPath('userData'),companyWorkspace,id);rules.removeForSource(companyWorkspace,id);semanticIndex.removeSource(app.getPath('userData'),id);return persistWorkspace();});
   ipcMain.handle('workspace:request-clarification',(event,question)=>{fromAgent(event);workspace.requestClarification(companyWorkspace,question);return persistWorkspace();});
   ipcMain.handle('workspace:resolve-clarification',(event,id,reply,sourceId)=>{fromAgent(event);workspace.resolveClarification(companyWorkspace,id,reply,sourceId);return persistWorkspace();});
   ipcMain.handle('workspace:read-file', (event, id) => {
@@ -571,7 +572,9 @@ app.whenReady().then(async () => {
     fromAgent(event);
     if(aiEnabled&&privacy.credentials(question))throw new Error('Remove credentials before using external AI.');
     if (companyWorkspace) {
-      return aiEnabled && privacy.allowed(companyWorkspace) ? answerWorkspace(companyWorkspace, question, runtimeKeys.nebius) : localWorkspaceAnswer(companyWorkspace, question);
+      if (!(aiEnabled && privacy.allowed(companyWorkspace))) return localWorkspaceAnswer(companyWorkspace, question);
+      return semanticIndex.search(app.getPath('userData'), companyWorkspace, question, { key: runtimeKeys.nebius }).catch(() => ({ results: [] }))
+        .then(found => answerWorkspace(companyWorkspace, question, runtimeKeys.nebius, undefined, found.results));
     }
     return aiEnabled && privacy.allowed(companyWorkspace) ? answerQuestion(question, runtimeKeys.nebius) : { ...localAnswer(String(question || '').slice(0, 1000)), mode: 'local' };
   });
@@ -670,6 +673,20 @@ app.whenReady().then(async () => {
   });
   ipcMain.handle('site:compare', async (event) => { admin(event); await publicSite.compare(companyWorkspace, { key: aiEnabled ? runtimeKeys.nebius : '' }); return persistWorkspace(); });
   ipcMain.handle('site:decide', (event, id, action, reason) => { admin(event); publicSite.decide(companyWorkspace, id, action, reason); return persistWorkspace(); });
+  ipcMain.handle('knowledge:index', async (event) => {
+    fromAgent(event);
+    if (!['admin', 'lead'].includes(workspace.person(companyWorkspace)?.role)) throw new Error('Department lead or administrator access required');
+    return semanticIndex.build(app.getPath('userData'), companyWorkspace, { key: runtimeKeys.nebius });
+  });
+  ipcMain.handle('knowledge:index-status', (event) => { fromAgent(event); return semanticIndex.status(app.getPath('userData'), companyWorkspace); });
+  ipcMain.handle('knowledge:semantic', async (event, query) => {
+    fromAgent(event);
+    const input = String(query || '').trim().slice(0, 500);
+    if (!input || !aiEnabled || !privacy.allowed(companyWorkspace)) return { mode: 'keyword', results: [] };
+    if (privacy.credentials(input)) throw new Error('Remove credentials before searching.');
+    const found = await semanticIndex.search(app.getPath('userData'), companyWorkspace, input, { key: runtimeKeys.nebius });
+    return { mode: found.mode, results: found.results.map(hit => ({ sourceId: hit.source.id, title: hit.source.title, version: hit.source.version, quote: hit.quote, line: hit.line, page: hit.page, match: hit.match })) };
+  });
   ipcMain.handle('agent:external-watch', (event, enabled) => {
     fromAgent(event);
     if (enabled && !selectedExternalWindow) throw new Error('Choose a work window first.');

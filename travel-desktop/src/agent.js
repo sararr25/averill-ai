@@ -69,6 +69,7 @@ function render() {
   renderKnowledge();
   renderRules();
   renderPublicSite();
+  renderKnowledgeIndex();
   renderLearning();
   renderHero();
   renderWorkStep();
