@@ -39,7 +39,9 @@ function diff(data, older, newer) {
     const kept = after.some(entry => keyOf(entry) === keyOf(rule) && (single(rule) || entry.value.toLowerCase() === rule.value.toLowerCase()));
     if (!kept) changes.push({ type: 'removed', kind: rule.kind, task: rule.task, value: rule.value, older: cite(older, rule.quote) });
   }
-  return changes;
+  // A kind the old version never stated explicitly is "stated" in the new one, not proven new: the old text may say it in prose.
+  const oldKinds = new Set(before.map(keyOf));
+  return changes.map(change => change.type === 'added' && !oldKinds.has(`${change.kind}|${change.task}`) ? { ...change, type: 'stated' } : change);
 }
 
 const SUMMARY = `Write a short handover briefing about what changed between an OLD and a NEW version of a company document.

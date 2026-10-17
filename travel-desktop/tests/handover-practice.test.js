@@ -27,7 +27,7 @@ test('briefing lists changed, added and removed rules with quotes from both vers
   assert.equal(audience.from, 'All subscribers');
   assert.equal(audience.value, 'Travel subscribers — Denmark');
   assert.ok(fs.readFileSync(v1, 'utf8').includes(audience.older.quote) && fs.readFileSync(v2, 'utf8').includes(audience.newer.quote));
-  assert.ok(result.changes.some(change => change.type === 'added' && change.kind === 'time'));
+  assert.ok(result.changes.some(change => change.type === 'stated' && change.kind === 'time'));
   assert.ok(result.changes.some(change => change.type === 'removed' && change.value === 'best deal ever'));
   assert.ok(result.changes.some(change => change.type === 'added' && change.value === 'lowest prices guaranteed'));
 });

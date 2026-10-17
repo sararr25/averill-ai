@@ -21,6 +21,7 @@
     "verify:browser": "electron scripts/verify-browser.cjs",
     "verify:nebius": "node scripts/verify-nebius.cjs",
     "probe:nebius": "node scripts/nebius-capabilities.cjs",
+    "verify:cloud-ui": "electron scripts/verify-cloud-ui.cjs",
     "verify:rehearsal": "node scripts/verify-rehearsal.cjs"
   },
   "dependencies": {

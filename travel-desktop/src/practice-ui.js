@@ -17,7 +17,9 @@ function briefingButton(file) {
         for (const point of result.points) lines.push(`• ${point.text}`, `   New: “${point.newer.quote}”${point.older ? `\n   Old: “${point.older.quote}”` : ''}`);
         if (result.points.length) lines.push('', result.model ? `Summary by NVIDIA Nemotron (${result.model}); every point quotes the documents.` : '', '');
         lines.push('Rule changes:');
-        for (const change of result.changes) lines.push(change.type === 'changed' ? `• ${practiceKindLabels[change.kind] || change.kind} (${change.task}): “${change.from}” → “${change.value}”` : `• ${change.type === 'added' ? 'New' : 'Removed'} ${practiceKindLabels[change.kind] || change.kind} (${change.task}): “${change.value}”`);
+        const verbs = { added: 'New', removed: 'Removed', stated: 'Now required' };
+        for (const change of result.changes) lines.push(change.type === 'changed' ? `• ${practiceKindLabels[change.kind] || change.kind} (${change.task}): “${change.from}” → “${change.value}”` : `• ${verbs[change.type]} ${practiceKindLabels[change.kind] || change.kind} (${change.task}): “${change.value}”`);
+        if (result.changes.some(change => change.type === 'stated')) lines.push('  “Now required” means the older version did not state this as a rule; read it to see what it said instead.');
         if (!result.changes.length) lines.push('• No structured rule changed. Compare the full text before acting.');
       }
       activeSourceId = result.replacement?.id || null; el('open-source').hidden = !result.replacement;
