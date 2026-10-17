@@ -2,13 +2,40 @@
 let rulesRenderKey = null;
 const ruleKindLabels = { 'claim-forbidden': 'Forbidden claim', 'claim-approved': 'Approved claim', audience: 'Audience', date: 'Date', time: 'Time', asset: 'Asset', disclosure: 'Disclosure', 'required-text': 'Required text', procedure: 'Procedure' };
 
-function ruleCard(rule, { canDecide }) {
+const freshnessLabels = { 'still-consistent': 'Still in line with public sources', 'may-be-outdated': 'May be outdated', unclear: 'Public sources unclear' };
+
+function dependencyBlock(rule, freshness, canMark) {
+  const box = node('div', undefined, 'rule-dependency');
+  const entry = freshness?.dependencies.find(item => item.sourceId === rule.sourceId && item.quote === rule.quote);
+  if (entry) {
+    box.append(node('p', `Depends on a public rule: “${entry.query}”${entry.domains.length ? ` · ${entry.domains.join(', ')}` : ''}`, 'knowledge-meta'));
+    if (entry.lastCheck) {
+      const check = node('p', `${freshnessLabels[entry.lastCheck.verdict]} · checked against public sources on ${new Date(entry.lastCheck.at).toLocaleString()}${entry.lastCheck.explanation ? ` · ${entry.lastCheck.explanation}` : ''}`, 'knowledge-meta'); check.dataset.verdict = entry.lastCheck.verdict; box.append(check);
+      if (entry.lastCheck.snippet) box.append(node('blockquote', `${entry.lastCheck.url}: “${entry.lastCheck.snippet}”`, 'rule-quote'));
+    }
+    if (canMark) { const remove = node('button', 'Stop checking', 'source-link'); remove.type = 'button'; remove.addEventListener('click', async () => { await window.desktop.unmarkDependency(entry.id).catch(() => {}); rulesRenderKey = null; renderRules(); }); box.append(remove); }
+  } else if (canMark) {
+    const details = node('details'); details.append(node('summary', 'Depends on a public rule?'));
+    const form = node('form', undefined, 'workspace-form');
+    const queryLabel = node('label', 'Public search (no internal details)'); const query = node('input'); query.type = 'text'; query.required = true; query.maxLength = 200; query.placeholder = 'Instagram paid partnership label requirements'; queryLabel.append(query);
+    const domainLabel = node('label', 'Optional official domains, comma separated'); const domains = node('input'); domains.type = 'text'; domains.maxLength = 300; domains.placeholder = 'help.instagram.com'; domainLabel.append(domains);
+    const status = node('p', '', 'knowledge-meta');
+    const save = node('button', 'Save dependency', 'secondary-button'); save.type = 'submit';
+    form.append(queryLabel, domainLabel, save, status);
+    form.addEventListener('submit', async event => { event.preventDefault(); try { await window.desktop.markDependency({ sourceId: rule.sourceId, quote: rule.quote, query: query.value, domains: domains.value.split(',').map(item => item.trim()).filter(Boolean) }); rulesRenderKey = null; renderRules(); } catch (error) { status.textContent = error.message; } });
+    details.append(form); box.append(details);
+  }
+  return box;
+}
+
+function ruleCard(rule, { canDecide, freshness = null, canMark = false }) {
   const card = node('article', undefined, 'knowledge-card rule-card');
   card.dataset.state = rule.status;
   card.append(node('strong', `${ruleKindLabels[rule.kind] || rule.kind} · ${rule.task === 'any' ? 'every channel' : rule.task}`, 'knowledge-state'));
   card.append(node('p', rule.value, 'rule-value'));
   const quote = node('blockquote', rule.quote, 'rule-quote');
   card.append(quote, node('p', `${rule.sourceTitle || 'Source'} · v${rule.sourceVersion}${rule.line ? ` · line ${rule.line}` : ''} · ${rule.proposedBy === 'model' ? (rule.status === 'approved' ? 'Extracted by Nemotron, approved' : 'Proposed by Nemotron') : 'Written in the approved source'}`, 'knowledge-meta'));
+  if (freshness) card.append(dependencyBlock(rule, freshness, canMark));
   if (canDecide) {
     const form = node('div', undefined, 'knowledge-approval');
     const valueLabel = node('label', 'Value'); const value = node('input'); value.type = 'text'; value.maxLength = 200; value.value = rule.value; valueLabel.append(value);
@@ -46,6 +73,8 @@ async function renderRules() {
   let data;
   try { data = await window.desktop.listRules(); } catch (error) { host.replaceChildren(node('p', `Could not load rules: ${error.message}`)); return; }
   const canDecide = me && ['admin', 'lead'].includes(me.role);
+  let freshness = null;
+  if (canDecide) { try { freshness = await window.desktop.freshnessSnapshot(); } catch {} }
   const section = node('details', undefined, 'knowledge-details rules-section');
   section.open = Boolean(data.pending.length || data.conflicts.length);
   section.append(node('summary', `Company rules · ${data.active.length} in use${data.pending.length ? ` · ${data.pending.length} to review` : ''}${data.conflicts.length ? ` · ${data.conflicts.length} possible conflicts` : ''}`));
@@ -76,8 +105,25 @@ async function renderRules() {
   if (data.pending.length) { section.append(node('h3', 'Proposed by Nemotron · waiting for your decision')); for (const rule of data.pending) section.append(ruleCard(rule, { canDecide })); }
   if (data.active.length) {
     const list = node('details', undefined, 'knowledge-details'); list.append(node('summary', `Rules in use · ${data.active.length}`));
-    for (const rule of data.active) list.append(ruleCard(rule, { canDecide: false }));
+    const manageable = rule => me.role === 'admin' || current.workspace.sources.some(source => source.id === rule.sourceId && source.scope !== 'company' && source.department === me.department);
+    for (const rule of data.active) list.append(ruleCard(rule, { canDecide: false, freshness, canMark: canDecide && manageable(rule) }));
     section.append(list);
+  }
+  if (freshness?.dependencies.length) {
+    const fresh = node('div', undefined, 'rules-freshness');
+    fresh.append(node('h3', `Public rule checks · ${freshness.dependencies.length}${freshness.queue.length ? ` · ${freshness.queue.length} may be outdated` : ''}`));
+    for (const entry of freshness.queue) fresh.append(node('p', `May be outdated: ${entry.sourceTitle} — “${entry.value}”. Review the source; its approval has not changed.`, 'knowledge-meta'));
+    if (me.role === 'admin') {
+      const run = node('button', 'Check against public sources now', 'secondary-button'); run.type = 'button'; run.disabled = !current.services?.tavily;
+      run.addEventListener('click', async () => {
+        const ok = await confirmOutbound({ service: 'Tavily', title: 'Check guidance against public rules', note: 'Only these saved public searches are sent to Tavily.', items: freshness.dependencies.filter(entry => entry.current).map(entry => entry.query) });
+        if (!ok?.length) return;
+        run.disabled = true; status.textContent = 'Checking public sources…';
+        try { await window.desktop.runFreshness(); rulesRenderKey = null; await renderRules(); } catch (error) { status.textContent = error.message; run.disabled = false; }
+      });
+      fresh.append(run);
+    }
+    section.append(fresh);
   }
   host.replaceChildren(section);
 }

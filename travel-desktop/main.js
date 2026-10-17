@@ -33,6 +33,7 @@ const publicSite = require('./src/public-site');
 const semanticIndex = require('./src/semantic-index');
 const versionBriefing = require('./src/version-briefing');
 const ruleExercises = require('./src/rule-exercises');
+const freshness = require('./src/source-freshness');
 
 const workKinds = ['email', 'linkedin', 'social', 'handover'];
 const workWindows = new Map();
@@ -702,6 +703,17 @@ app.whenReady().then(async () => {
   });
   ipcMain.handle('practice:decide', (event, id, action) => { fromAgent(event); ruleExercises.decide(companyWorkspace, id, action); persistWorkspace(); return ruleExercises.snapshot(companyWorkspace); });
   ipcMain.handle('practice:answer', (event, id, choice) => { fromAgent(event); const result = ruleExercises.answer(companyWorkspace, id, choice); persistWorkspace(); return result; });
+  ipcMain.handle('freshness:snapshot', (event) => { fromAgent(event); return freshness.snapshot(companyWorkspace); });
+  ipcMain.handle('freshness:mark', (event, payload) => { fromAgent(event); if (!payload || typeof payload !== 'object') throw new Error('Invalid dependency'); freshness.mark(companyWorkspace, payload); persistWorkspace(); return freshness.snapshot(companyWorkspace); });
+  ipcMain.handle('freshness:unmark', (event, id) => { fromAgent(event); freshness.unmark(companyWorkspace, id); persistWorkspace(); return freshness.snapshot(companyWorkspace); });
+  ipcMain.handle('freshness:run', async (event) => {
+    admin(event);
+    const personId = companyWorkspace.activePersonId;
+    await freshness.run(companyWorkspace, { tavilyKey: runtimeKeys.tavily, nebiusKey: aiEnabled ? runtimeKeys.nebius : '' });
+    if (personId !== companyWorkspace.activePersonId || !signedIn()) throw new Error('The signed-in person changed during the check.');
+    persistWorkspace();
+    return freshness.snapshot(companyWorkspace);
+  });
   ipcMain.handle('agent:external-watch', (event, enabled) => {
     fromAgent(event);
     if (enabled && !selectedExternalWindow) throw new Error('Choose a work window first.');

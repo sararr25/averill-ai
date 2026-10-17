@@ -97,3 +97,6 @@
 .agent-steps ol{margin:var(--ds-space-2) 0 0;padding-left:var(--ds-space-5);color:var(--ds-color-text-secondary);font-size:12px;line-height:1.6}
 .public-check{margin-top:var(--ds-space-4);padding-top:var(--ds-space-3);border-top:1px dashed var(--ds-color-border);display:grid;gap:var(--ds-space-2)}
 .public-verdict{border-left:3px solid var(--ds-color-border)}.public-verdict[data-verdict="supported"]{border-left-color:var(--ds-color-verified)}.public-verdict[data-verdict="contradicted"]{border-left-color:var(--ds-color-signal)}
+/* AV-60 – AV-63 public rule dependencies */
+.rule-dependency{margin-top:var(--ds-space-2)}.rule-dependency [data-verdict="may-be-outdated"]{color:var(--ds-color-signal)}.rule-dependency [data-verdict="still-consistent"]{color:var(--ds-color-verified)}
+.rules-freshness{margin-top:var(--ds-space-4);padding-top:var(--ds-space-3);border-top:1px dashed var(--ds-color-border)}
