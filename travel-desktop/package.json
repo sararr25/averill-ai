@@ -23,6 +23,7 @@
     "probe:nebius": "node scripts/nebius-capabilities.cjs",
     "verify:cloud-ui": "electron scripts/verify-cloud-ui.cjs",
     "verify:live-cloud": "node scripts/verify-live-cloud.cjs",
+    "verify:live-ui": "electron scripts/verify-live-ui.cjs",
     "verify:rehearsal": "node scripts/verify-rehearsal.cjs"
   },
   "dependencies": {
