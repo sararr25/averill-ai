@@ -98,9 +98,10 @@ Size: S ≤ ½ day, M ≈ 1 day, L ≈ 2 days.
 - **Acceptance:** all existing task-review tests pass; a newly imported non-Vamo test company gets findings without any hand-written rule lines.
 
 ### AV-14 Cross-source conflict detection — M
-- After extraction, compare approved/proposed rules of the same kind and task across current sources (deterministic first: same kind, different value). Nemotron is only used to judge whether two differently worded claims contradict, with both quotes validated.
+- After extraction, compare approved/proposed rules across current sources. Deterministic comparison applies only to single-valued kinds (`audience`, `date`, `time`, `asset`, `disclosure` per task and campaign): different values are a candidate conflict. Additive kinds (`claim-forbidden`, `required-text`, `procedure`) never conflict just because values differ; only `claim-approved` vs `claim-forbidden` on the same claim is a candidate. Nemotron is only used to judge whether two differently worded claims contradict, with both quotes validated.
+- A candidate conflict is a rule-level proposal and must not exclude whole sources from Review until an admin confirms it.
 - Conflicts enter the existing conflict workflow; never auto-resolved.
-- **Acceptance:** a seeded fixture where the calendar says 19:00 and brief v2 says 18:00 produces one conflict citing both lines.
+- **Acceptance:** a seeded fixture where the calendar says 19:00 and brief v2 says 18:00 produces one conflict citing both lines; two different `claim-forbidden` rules in different sources produce no conflict and both stay active in Review.
 
 ---
 
