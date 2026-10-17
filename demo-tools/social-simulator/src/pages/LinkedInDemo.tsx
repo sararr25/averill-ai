@@ -43,8 +43,8 @@ export function LinkedInDemo() {
       <aside className="li-right">
         <div className="li-card li-about">
           <h2>About</h2>
-          <p>Vamo plans small-group city breaks for curious travellers who care as much about who they travel with as where they go. Our winter collection covers Copenhagen, Vienna and Prague — each city walked, mapped and rewritten by the team that plans it.</p>
-          <dl><div><dt><Globe size={15}/> Website</dt><dd>vamo.example</dd></div><div><dt><Building2 size={15}/> Industry</dt><dd>Travel Arrangements</dd></div><div><dt><Users size={15}/> Company size</dt><dd>2–10 employees</dd></div><div><dt><MapPin size={15}/> Headquarters</dt><dd>Copenhagen, Denmark</dd></div><div><dt><Hash size={15}/> Specialties</dt><dd>City breaks, small-group travel, trip planning</dd></div></dl>
+          <p>Vamo plans trips for young travellers who’d rather collect stories than souvenirs. City breaks with open time built in, for people travelling solo, with a friend or with the whole group chat. Right now: Copenhagen, Vienna and Prague — each one walked and tested by the small crew that plans it.</p>
+          <dl><div><dt><Globe size={15}/> Website</dt><dd>vamo.example</dd></div><div><dt><Building2 size={15}/> Industry</dt><dd>Travel Arrangements</dd></div><div><dt><Users size={15}/> Company size</dt><dd>2–10 employees</dd></div><div><dt><MapPin size={15}/> Headquarters</dt><dd>Copenhagen, Denmark</dd></div><div><dt><Hash size={15}/> Specialties</dt><dd>Youth travel, city breaks, group trips, trip planning</dd></div></dl>
         </div>
         <div className="li-foot">About · Accessibility · Help Center<br/>Privacy &amp; Terms<br/><span>Demo Social Simulator © 2026</span></div>
       </aside>

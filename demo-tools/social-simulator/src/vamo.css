@@ -39,3 +39,11 @@
 .vamo-li .li-post-image{aspect-ratio:auto;height:auto;max-height:640px;object-fit:cover;display:block}
 .vamo-li .li-post header small svg{display:inline;vertical-align:-1px}
 .vamo-email .br-email-brand small{display:inline;border:0;padding:0;width:auto}
+/* 17 Oct: align with the Vamo website identity (wordmark logo on cream, site email treatment). */
+.ig-profile-head>img,.vamo-ig .ig-post .avatar,.vamo-li .li-avatar,.vamo-li .li-navbar nav img,.ig-dialog .compose-user img,.li-dialog .compose-user img,.li-mobile-nav img{box-shadow:0 0 0 1px #0E576B22}
+.li-company-logo{background:#FFF8E9!important;border-radius:12px;box-shadow:0 0 0 1px #0E576B22}
+.vamo-wordmark{display:inline-block;font:italic 600 34px/.9 'DM Sans',Arial,sans-serif;letter-spacing:-.105em;color:#0E576B;transform:rotate(-3deg)}.vamo-wordmark i{font:400 14px/1 'DM Sans',Arial,sans-serif;color:#D52C85;vertical-align:top;margin-left:6px;letter-spacing:0}
+.vamo-wordmark.small{font-size:20px;margin-right:12px;vertical-align:-3px}.vamo-wordmark.small i{font-size:10px}
+.vamo-email .br-email-brand{font-family:'DM Sans',Arial,sans-serif}
+.vamo-email-ticker{background:#F16D73;color:#0E576B;font:600 11px/1 'DM Sans',Arial,sans-serif;letter-spacing:.13em;white-space:nowrap;overflow:hidden;padding:9px 0;text-align:center;transform:rotate(-1deg);margin:0 -6px 0}
+.vamo-email h2{font-style:normal}
