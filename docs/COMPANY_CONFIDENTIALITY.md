@@ -13,6 +13,24 @@ Updated 27 September 2026.
 - HTTPS download redirects are checked against private/local/reserved addresses, DNS is pinned and bearer tokens are removed on redirects. Files are bounded to 20 MB; each import batch allows up to 30 files.
 - Incoming sources remain subject to private personnel handling, source review, approval and department visibility. Import, source approval and external AI permission are separate decisions.
 
+## Nebius and Tavily features — 17 October 2026
+
+Every call below needs company AI on (Nebius) or a Tavily key, and an explicit action. Each send that the employee did not type directly goes through the "Sent to Nebius/Tavily" confirmation, which lists exactly what leaves the Mac. A per-person local log records service, purpose and counts only, never payload text; admins see totals only.
+
+| Feature | Sent to Nebius | Sent to Tavily | Who starts it |
+| --- | --- | --- | --- |
+| Rule extraction | Extracted text of one approved source with Nebius consent | — | Lead (own department) or admin |
+| Review agent | Observed work text; matching lines of eligible approved sources via local tools | — | Employee, with company AI on |
+| Public statement check | The claim and the public search results | Only statements the employee confirmed or edited; refused when they repeat internal source text or credentials | Employee |
+| Linked page check | — | Public HTTPS links that appear in the shared work | Employee |
+| Public website | Rule values/quotes with consent and public page text | The admin-entered site URL (same host, up to 30 pages) | Admin |
+| Search by meaning | Paragraphs of approved consented sources (once) and the person's question | — | Lead/admin builds; employees search |
+| Handover summary | Both versions of a superseded source, if both have consent | — | Person who can see both |
+| Practice drafts | Rule value and quote | — | Lead or admin |
+| Source freshness | Rule quote and public results | Stored public query and optional official domains | Admin runs; lead/admin marks |
+
+Restricted and credential-bearing sources never enter these prompts. Model output is always a proposal: rules, practice items, website findings and freshness results need a human decision and never change source approval. Vectors and website page text stay on this Mac. Provider retention and opt-out remain unverified as described above.
+
 ## Required provider verification
 
 Do not claim an NDA, zero retention, no training or a selected region from an API key alone. The owner must verify the agreement applicable to the account, confidentiality obligations, retention/region and training opt-out before enabling company AI. These settings are not checked automatically.
