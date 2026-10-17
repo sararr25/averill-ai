@@ -12,8 +12,8 @@ function showOperation(state,title,message,{actionable=false}={}){
 window.desktop.onOperation(event=>{
  if(event.id<feedbackOperation)return;feedbackOperation=event.id;
  const actionable=event.state==='success'&&(event.intake||event.channel==='onboarding:apply');
- // A finished rule check is already shown as the Review result; avoid repeating it in the banner.
- if(event.state==='success'&&event.channel==='agent:external-task-review'){clearTimeout(feedbackTimer);el('operation-feedback').hidden=true;return;}
+ // Results that are already visible (rule check in Review, sharing state in the live bar) are not repeated in the banner.
+ if(event.state==='success'&&['agent:external-task-review','agent:external-share'].includes(event.channel)){clearTimeout(feedbackTimer);el('operation-feedback').hidden=true;return;}
  showOperation(event.state,event.state==='pending'?'Working…':event.state==='error'?'Action failed':'',event.message,{actionable});
  el('operation-knowledge').hidden=!actionable;
 });

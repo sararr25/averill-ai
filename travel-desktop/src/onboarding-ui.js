@@ -35,8 +35,8 @@ function renderOnboarding(panel) {
   current=await window.desktop.uploadOnboarding();render();
  });
  addFiles.classList.add('agent-primary');
+ section.append(node('p','Excel .xlsx, CSV, PDF, SVG, text and images · up to 30 files. Legacy .xls needs an XLSX/CSV export.','field-hint'));
  renderIntakeOptions(section);
- section.append(node('p','Excel .xlsx, CSV, PDF, SVG, text and images · up to 30 files. Legacy .xls needs an XLSX/CSV export.'));
  const draft=current.onboarding;
  if(draft&&!draft.applied)addFiles.classList.remove('agent-primary');
  if(!draft){panel.append(section);return;}
@@ -168,7 +168,7 @@ function renderSession(){
  }
  if(current.auth?.signedIn&&current.auth.person){
   const person=current.auth.person;session.append(node('strong',person.name),node('span',`${person.jobTitle}${person.department?` · ${person.department}`:''}`));
-  const logout=node('button','Sign out','secondary-button');logout.type='button';logout.addEventListener('click',async()=>{try{current=await window.desktop.logout();el('conversation').replaceChildren(node('div','Ask about this campaign or an approved source.','assistant-message'));el('company-draft').value='';el('draft-result').replaceChildren();el('external-result').replaceChildren();el('question').value='';el('source-dialog').close();el('source-content').textContent='';onboardingReview=null;render();}catch(error){el('workspace-feedback').textContent=error.message;}});session.append(logout);
+  const logout=node('button','Sign out','text-button');logout.type='button';logout.addEventListener('click',async()=>{try{current=await window.desktop.logout();el('conversation').replaceChildren(node('div','Ask about this campaign or an approved source.','assistant-message'));el('company-draft').value='';el('draft-result').replaceChildren();el('external-result').replaceChildren();el('question').value='';el('source-dialog').close();el('source-content').textContent='';onboardingReview=null;render();}catch(error){el('workspace-feedback').textContent=error.message;}});session.append(logout);
  }
  return true;
 }

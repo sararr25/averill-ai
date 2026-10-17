@@ -162,8 +162,21 @@ function render() {
   }
 }
 
+// First-run guide: until the company has an approved source, the first step is Setup, not sharing.
+function renderFirstRun(){
+  const steps=el('review-steps');if(steps.hidden)return;
+  const approved=(current.workspace?.sources||[]).some(source=>source.status==='approved');
+  const admin=current.workspace?.people?.find(person=>person.id===current.workspace.activePersonId)?.role==='admin';
+  const items=[...(approved?[]:[['Add',admin?'and approve company files in Setup':'— ask your admin to approve company files']]),['Share','one draft field or app window'],['Check','it against approved company rules'],['Fix','it in your own tool, then recheck']];
+  const key=JSON.stringify(items);if(steps.dataset.key===key)return;steps.dataset.key=key;
+  steps.replaceChildren(...items.map(([verb,rest])=>{const li=node('li');li.append(node('strong',verb),document.createTextNode(` ${rest}`));return li;}));
+  el('review-start').textContent=approved||!admin?'Choose what to review':'Add company files';
+  el('review-start').dataset.target=approved||!admin?'work':'setup';
+}
 function renderHero() {
-  el('review-start').hidden=Boolean(externalReview||(current.shared||[]).length||(current.findings||[]).length);el('review-steps').hidden=el('review-start').hidden;
+  el('review-start').hidden=Boolean(externalReview||(current.shared||[]).length||(current.findings||[]).length);el('review-steps').hidden=el('review-start').hidden;renderFirstRun();
+  const awaitingCheck=!externalReview&&Boolean(current.externalObservation)&&!(current.shared||[]).length&&!(current.findings||[]).length;
+  if(awaitingCheck){el('review-steps').hidden=true;el('review-start').textContent='Check approved rules';el('review-start').dataset.target='check';el('review-start').disabled=reviewPending;}else el('review-start').disabled=false;
   const workOutput=el('review-work-result');
   if(externalReview){
     el('hero-label').textContent='WORK REVIEW';const hasFindings=externalReview.result.findings.length>0;
@@ -171,12 +184,12 @@ function renderHero() {
     el('hero-body').textContent=hasFindings?'Edit in your own tool using the evidence below, then recheck.':'Averill compared the shared text with your current approved company sources.';
     document.body.classList.toggle('review-clear',!hasFindings);
     el('hero-selected').replaceChildren();el('hero-source').replaceChildren();el('finding-navigation').replaceChildren();
-    const context=el('review-context');context.replaceChildren(node('span','','live-dot'),node('span',`Live · ${current.externalWindow?.name||'Selected work'} · ${el('external-task').selectedOptions[0].textContent}`));context.classList.add('is-live');
+    const context=el('review-context');context.replaceChildren(node('span','','live-dot'),node('span',`Live · ${current.externalWindow?.name||'Selected work'} · ${el('external-task').selectedOptions[0].textContent}`));context.classList.add('is-live');document.body.classList.add('has-live-review');
     const stop=node('button','Stop sharing','stop-button');stop.type='button';stop.addEventListener('click',()=>el('stop-external').click());context.append(stop);
     if(workOutput.dataset.identity!==JSON.stringify([externalReview.identity,externalReview.result])){drawTaskReview(workOutput,externalReview.result);workOutput.dataset.identity=JSON.stringify([externalReview.identity,externalReview.result]);guidedMotion.enter(workOutput,320,8);}
     document.body.classList.add('has-finding');return;
   }
-  workOutput.replaceChildren();delete workOutput.dataset.identity;document.body.classList.remove('review-clear');el('review-context').classList.remove('is-live');
+  workOutput.replaceChildren();delete workOutput.dataset.identity;document.body.classList.remove('review-clear');el('review-context').classList.remove('is-live');document.body.classList.remove('has-live-review');
   const findings=current.findings||[];
   let index=findings.findIndex(item=>`${item.kind}:${item.id}`===selectedFindingId);
   if(index<0)index=0;
@@ -194,7 +207,7 @@ function renderHero() {
   if(sharedNames.length){
     const label=node('span',`Demo work shared: ${sharedNames.join(', ')}`);context.append(label);
     for(const id of current.shared){const kind=kinds.find(entry=>entry.id===id);const stop=node('button',`Stop ${kind?.title||id}`,'secondary-button');stop.type='button';stop.setAttribute('aria-label',`Stop sharing ${kind?.title||id}`);stop.addEventListener('click',async()=>{current=await window.desktop.share(id,false);render();});context.append(stop);}
-  }else context.append(node('span','Company sources · no demo window shared'));
+  }
   if(current.externalWindow){context.append(node('span',`Work window selected: ${current.externalWindow.name} · one-frame capture on request`));const stop=node('button','Clear window selection','secondary-button');stop.type='button';stop.addEventListener('click',async()=>{current=await window.desktop.shareExternal(null,null);render();});context.append(stop);}
   const navigation=el('finding-navigation');navigation.replaceChildren();
   if(findings.length>1){
@@ -209,9 +222,12 @@ function renderHero() {
   const sourceLabel = item?.source ? 'Open current source' : 'Open Work to choose a window';
   sourceAction.setAttribute('aria-label', sourceLabel);
   sourceAction.title = sourceLabel;
+  sourceAction.textContent = item?.source ? 'Source' : 'Choose work';
   el('hero-label').textContent = item ? 'FINDING' : sharedNames.length ? 'CHECKED' : 'READY';
+  const connected=!item&&!sharedNames.length&&Boolean(current.externalObservation);
   el('hero-title').textContent = item?.kind === 'handover' ? 'This brief is out of date.' : item ? item.title : sharedNames.length ? 'No issues found.' : 'Ready when you are.';
-  el('hero-body').textContent = item?.kind === 'handover' ? 'You’re looking at an older version of this brief. A newer, approved version is available.' : item ? item.body : sharedNames.length ? 'The supported campaign fields have been checked. Keep editing to see new findings.' : 'Choose a work window in Work, then ask Averill to help with the visible draft and approved company guidance.';
+  el('hero-body').textContent = item?.kind === 'handover' ? 'You’re looking at an older version of this brief. A newer, approved version is available.' : item ? item.body : sharedNames.length ? 'The supported campaign fields have been checked. Keep editing to see new findings.' : 'Averill checks your drafts against your company’s approved rules and shows the source.';
+  if(connected){el('hero-label').textContent='CONNECTED';el('hero-title').textContent='Ready to check.';el('hero-body').textContent=`Averill has the latest text from ${current.externalWindow?.name||'your shared work'}. Check it against approved rules when you’re ready.`;}
   const selected = el('hero-selected'); selected.replaceChildren();
   if (item?.kind === 'handover') {
     const row = node('div', undefined, 'source-detail selected-detail');
@@ -553,7 +569,7 @@ async function checkWork(fresh){
 el('external-local-recheck').addEventListener('click',()=>checkWork(true));
 el('external-task-review').addEventListener('click',()=>checkWork(false));
 el('external-task').addEventListener('change',()=>{invalidateWorkReview();el('external-task-result').replaceChildren();renderHero();});
-el('review-start').addEventListener('click',()=>{showTab('work');el('browser-pair').focus();});
+el('review-start').addEventListener('click',()=>{if(el('review-start').dataset.target==='check'){checkWork(false);return;}if(el('review-start').dataset.target==='setup'){showTab('setup');return;}showTab('work');el('browser-pair').focus();});
 let workStepIdentity;
 function renderWorkStep(){
  const captured=Boolean(current.externalObservation),selected=Boolean(current.externalWindow),ready=Boolean(current.browserBridge?.ready);
@@ -622,7 +638,6 @@ window.desktop.onOpenContext(() => { showTab('work'); el(current.externalObserva
 window.desktop.snapshot().then((value) => { current = value; render(); showTab(preferredArea()); });
 
 for (const target of document.querySelectorAll('[data-icon]')) target.innerHTML = icon(target.dataset.icon);
-el('ask-form').querySelector('.composer-attach').innerHTML = icon('document');
 el('ask-form').querySelector('.composer-attach').addEventListener('click', (event) => {
   const source = (current.findings?.find(item=>`${item.kind}:${item.id}`===selectedFindingId)||current.findings?.[0])?.source;
   if (source) source.kind === 'asset' ? window.desktop.openSource(source.id) : showSource(source.id, event.currentTarget);
