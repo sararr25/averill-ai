@@ -7,7 +7,7 @@ const operationLabels={
  'onboarding:drop':'Reading dropped files', 'onboarding:upload':'Selecting and reading company files', 'onboarding:synced':'Reading synced files', 'onboarding:links':'Downloading and reading linked files', 'onboarding:analyze':'Interpreting selected files with Nebius', 'onboarding:apply':'Saving company onboarding', 'onboarding:read-file':'Opening uploaded text',
  'company:privacy':'Saving company AI policy', 'cloud:configure':'Saving cloud configuration', 'cloud:connect':'Waiting for cloud sign-in', 'cloud:cancel':'Cancelling cloud sign-in', 'cloud:disconnect':'Disconnecting cloud account', 'cloud:list':'Loading cloud folder', 'cloud:import':'Downloading selected cloud files',
  'workspace:create':'Creating company workspace', 'workspace:add-person':'Adding person', 'workspace:import':'Importing sources', 'workspace:import-folder':'Importing folder', 'workspace:update-source':'Saving source status and priority', 'workspace:remove-source':'Deleting local source copy', 'workspace:request-clarification':'Requesting private clarification', 'workspace:resolve-clarification':'Answering private clarification', 'workspace:propose-source':'Proposing source', 'workspace:open-source':'Opening source file', 'workspace:read-file':'Opening source text', 'workspace:save-key':'Saving service key securely',
- 'agent:source':'Opening source text', 'agent:open-work':'Opening work window', 'agent:copy-finding':'Copying suggested correction', 'agent:share':'Updating sharing', 'agent:ask':'Preparing answer', 'agent:ask-demo':'Preparing demo answer', 'agent:ai-mode':'Updating AI mode', 'agent:open-source':'Opening file', 'agent:open-web':'Opening browser', 'agent:web-search':'Searching public web', 'agent:fact-check':'Checking public claim', 'agent:external-windows':'Finding available windows', 'agent:external-share':'Updating selected window', 'agent:external-review':'Reading selected window', 'agent:external-watch':'Updating work observation', 'agent:browser-pair':'Starting local browser pairing', 'agent:browser-copy-pair':'Copying local pairing details', 'agent:external-recheck':'Reading and rechecking local work', 'agent:external-task-review':'Checking approved work rules', 'learning:action':'Saving learning activity', 'companion:open':'Opening Averill', 'companion:stop':'Stopping sharing'
+ 'practice:generate':'Preparing practice from approved rules', 'freshness:run':'Checking guidance against public rules with Tavily', 'knowledge:index':'Indexing approved sources with Nebius embeddings', 'site:configure':'Saving company website', 'site:crawl':'Reading the company website with Tavily', 'site:compare':'Comparing the website with approved sources', 'site:decide':'Saving website decision', 'agent:public-check':'Checking public statements with Tavily', 'agent:link-check':'Checking linked pages with Tavily', 'rules:extract':'Extracting rules with Nebius', 'rules:decide':'Saving rule decision', 'agent:source':'Opening source text', 'agent:open-work':'Opening work window', 'agent:copy-finding':'Copying suggested correction', 'agent:share':'Updating sharing', 'agent:ask':'Preparing answer', 'agent:ask-demo':'Preparing demo answer', 'agent:ai-mode':'Updating AI mode', 'agent:open-source':'Opening file', 'agent:open-web':'Opening browser', 'agent:web-search':'Searching public web', 'agent:fact-check':'Checking public claim', 'agent:external-windows':'Finding available windows', 'agent:external-share':'Updating selected window', 'agent:external-review':'Reading selected window', 'agent:external-watch':'Updating work observation', 'agent:browser-pair':'Starting local browser pairing', 'agent:browser-copy-pair':'Copying local pairing details', 'agent:external-recheck':'Reading and rechecking local work', 'agent:external-task-review':'Checking approved work rules', 'learning:action':'Saving learning activity', 'companion:open':'Opening Averill', 'companion:stop':'Stopping sharing'
 };
 function announce(value){for(const listener of operationListeners)try{listener(value);}catch{}}
 async function invoke(channel,...args){
@@ -77,6 +77,21 @@ contextBridge.exposeInMainWorld('desktop', {
   importFolder: (options) => invoke('workspace:import-folder', options),
   updateSource: (id, action, priority, reason, supersedesId) => invoke('workspace:update-source', id, action, priority, reason, supersedesId),
   compareSources: (newId,oldId) => invoke('workspace:compare-sources',newId,oldId),
+  listRules: () => invoke('rules:list'),
+  freshnessSnapshot: () => invoke('freshness:snapshot'),
+  markDependency: (payload) => invoke('freshness:mark', payload),
+  unmarkDependency: (id) => invoke('freshness:unmark', id),
+  runFreshness: () => invoke('freshness:run'),
+  versionBriefing: (sourceId, useAI) => invoke('knowledge:briefing', sourceId, useAI === true),
+  practiceSnapshot: (quote) => invoke('practice:snapshot', quote ?? null),
+  generatePractice: (useAI) => invoke('practice:generate', useAI === true),
+  decidePractice: (id, action) => invoke('practice:decide', id, action),
+  answerPractice: (id, choice) => invoke('practice:answer', id, choice),
+  buildKnowledgeIndex: () => invoke('knowledge:index'),
+  knowledgeIndexStatus: () => invoke('knowledge:index-status'),
+  semanticSearch: (query) => invoke('knowledge:semantic', query),
+  extractRules: (sourceId, consent) => invoke('rules:extract', sourceId, consent),
+  decideRule: (ruleId, action, value, reason) => invoke('rules:decide', ruleId, action, value ?? null, reason || ''),
   removeSource: id => invoke('workspace:remove-source',id),
   requestClarification: question => invoke('workspace:request-clarification',question),
   resolveClarification: (id,reply,sourceId) => invoke('workspace:resolve-clarification',id,reply,sourceId),
@@ -86,6 +101,12 @@ contextBridge.exposeInMainWorld('desktop', {
   saveApiKey: (service, value) => invoke('workspace:save-key', service, value),
   searchPublicWeb: (query) => invoke('agent:web-search', query),
   factCheckPublic: (query) => invoke('agent:fact-check', query),
+  checkPublicClaims: (task, claims) => invoke('agent:public-check', task, claims),
+  checkLinks: (task, urls) => invoke('agent:link-check', task, urls),
+  configureSite: (url) => invoke('site:configure', url),
+  crawlSite: () => invoke('site:crawl'),
+  compareSite: () => invoke('site:compare'),
+  decideSiteFinding: (id, action, reason) => invoke('site:decide', id, action, reason),
   openWeb: (url) => invoke('agent:open-web', url),
   externalWindows: () => invoke('agent:external-windows'),
   shareExternal: (id, name) => invoke('agent:external-share', id, name),

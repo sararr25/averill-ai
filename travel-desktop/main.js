@@ -23,6 +23,17 @@ const { nativeWindow, observation, windowNumber } = require('./src/external-obse
 const { clampCompanion } = require('./src/companion-position');
 const taskReview = require('./src/task-review');
 const { BrowserBridge } = require('./src/browser-bridge');
+const nebiusClient = require('./src/nebius');
+const tavilyClient = require('./src/tavily');
+const cloudActivity = require('./src/cloud-activity');
+const rules = require('./src/rules');
+const reviewAgent = require('./src/review-agent');
+const publicCheck = require('./src/public-check');
+const publicSite = require('./src/public-site');
+const semanticIndex = require('./src/semantic-index');
+const versionBriefing = require('./src/version-briefing');
+const ruleExercises = require('./src/rule-exercises');
+const freshness = require('./src/source-freshness');
 
 const workKinds = ['email', 'linkedin', 'social', 'handover'];
 const workWindows = new Map();
@@ -50,6 +61,13 @@ const browserBridge = new BrowserBridge({
   },
   onStop: () => { stopExternal(); publish(); },
 });
+function logCloudCall(entry) {
+  if (!signedIn()) return;
+  cloudActivity.record(companyWorkspace, companyWorkspace.activePersonId, entry);
+  try { workspace.save(app.getPath('userData'), companyWorkspace); } catch {}
+}
+nebiusClient.onCall(logCloudCall);
+tavilyClient.onCall(logCloudCall);
 const runtimeKeys = { nebius: process.env.NEBIUS_API_KEY || '', tavily: process.env.TAVILY_API_KEY || '' };
 
 function secretPath() { return path.join(app.getPath('userData'), 'averill-secrets.enc.json'); }
@@ -114,6 +132,8 @@ function snapshot() {
     externalObservation: signedIn() ? externalObservation : null,
     externalError: signedIn() ? externalError : '',
     services: { nebius: Boolean(runtimeKeys.nebius), tavily: Boolean(runtimeKeys.tavily) },
+    publicSite: signedIn() ? publicSite.snapshot(companyWorkspace) : null,
+    cloudActivity: signedIn() ? { mine: cloudActivity.forPerson(companyWorkspace, companyWorkspace.activePersonId), totals: workspace.person(companyWorkspace)?.role === 'admin' ? cloudActivity.summary(companyWorkspace) : null } : null,
     shared: [...shared],
     open: [...workWindows.keys()],
     aiEnabled,
@@ -286,7 +306,7 @@ app.whenReady().then(async () => {
     else if(action==='project-confirm')learning.confirmProject(companyWorkspace,payload.sessionId,payload.note);
     else if (action === 'confirm') learning.confirm(companyWorkspace, payload.sessionId, payload.stepId);
     else if (action === 'exclude') learning.exclude(companyWorkspace, payload.sessionId);
-    else if (action === 'delete-history') learning.deleteHistory(companyWorkspace);
+    else if (action === 'delete-history') { learning.deleteHistory(companyWorkspace); ruleExercises.deleteMine(companyWorkspace); }
     else if (action === 'quiz') learning.beginQuiz(companyWorkspace);
     else if (action === 'answer') learning.answer(companyWorkspace, payload.quizId, payload.questionId, payload.value);
     else throw new Error('Unknown learning action');
@@ -478,6 +498,27 @@ app.whenReady().then(async () => {
     workspace.updateSource(companyWorkspace, id, action, priority, reason, supersedesId);
     return persistWorkspace();
   });
+  ipcMain.handle('rules:list', (event) => { fromAgent(event); return rules.publicRules(companyWorkspace); });
+  ipcMain.handle('rules:extract', async (event, sourceId, consent) => {
+    fromAgent(event);
+    if (consent !== true) throw new Error('Confirm sending this source text to Nebius first.');
+    const active = workspace.person(companyWorkspace);
+    const source = workspace.visibleSources(companyWorkspace).find(entry => entry.id === sourceId);
+    if (!source) throw new Error('Unknown source');
+    if (!(active.role === 'admin' || (active.role === 'lead' && source.scope !== 'company' && source.department === active.department))) throw new Error('Department lead or administrator access required');
+    const personId = companyWorkspace.activePersonId;
+    const result = await rules.extract(companyWorkspace, source, { key: runtimeKeys.nebius });
+    if (companyWorkspace.activePersonId !== personId || !signedIn()) throw new Error('The signed-in person changed during extraction.');
+    const added = rules.propose(companyWorkspace, source, result.candidates);
+    persistWorkspace();
+    return { added: added.length, rejected: result.rejected, rules: rules.publicRules(companyWorkspace) };
+  });
+  ipcMain.handle('rules:decide', (event, ruleId, action, value, reason) => {
+    fromAgent(event);
+    rules.decide(companyWorkspace, ruleId, action, { value: value === null ? undefined : value, reason });
+    persistWorkspace();
+    return rules.publicRules(companyWorkspace);
+  });
   ipcMain.handle('workspace:propose-source', (event, id) => {
     fromAgent(event);
     if (!companyWorkspace) throw new Error('Create a workspace first');
@@ -491,7 +532,7 @@ app.whenReady().then(async () => {
   });
   ipcMain.handle('workspace:knowledge',(event,query,status,filters)=>{fromAgent(event);return companyWorkspace?knowledge.list(companyWorkspace,query,status,filters):{documents:[],total:0,approved:0,uploaded:0};});
   ipcMain.handle('workspace:compare-sources',(event,newId,oldId)=>{fromAgent(event);return sourceReview.compare(companyWorkspace,newId,oldId);});
-  ipcMain.handle('workspace:remove-source',(event,id)=>{fromAgent(event);workspace.removeSource(app.getPath('userData'),companyWorkspace,id);publish();return snapshot();});
+  ipcMain.handle('workspace:remove-source',(event,id)=>{fromAgent(event);workspace.removeSource(app.getPath('userData'),companyWorkspace,id);rules.removeForSource(companyWorkspace,id);semanticIndex.removeSource(app.getPath('userData'),id);return persistWorkspace();});
   ipcMain.handle('workspace:request-clarification',(event,question)=>{fromAgent(event);workspace.requestClarification(companyWorkspace,question);return persistWorkspace();});
   ipcMain.handle('workspace:resolve-clarification',(event,id,reply,sourceId)=>{fromAgent(event);workspace.resolveClarification(companyWorkspace,id,reply,sourceId);return persistWorkspace();});
   ipcMain.handle('workspace:read-file', (event, id) => {
@@ -534,7 +575,9 @@ app.whenReady().then(async () => {
     fromAgent(event);
     if(aiEnabled&&privacy.credentials(question))throw new Error('Remove credentials before using external AI.');
     if (companyWorkspace) {
-      return aiEnabled && privacy.allowed(companyWorkspace) ? answerWorkspace(companyWorkspace, question, runtimeKeys.nebius) : localWorkspaceAnswer(companyWorkspace, question);
+      if (!(aiEnabled && privacy.allowed(companyWorkspace))) return localWorkspaceAnswer(companyWorkspace, question);
+      return semanticIndex.search(app.getPath('userData'), companyWorkspace, question, { key: runtimeKeys.nebius }).catch(() => ({ results: [] }))
+        .then(found => answerWorkspace(companyWorkspace, question, runtimeKeys.nebius, undefined, found.results));
     }
     return aiEnabled && privacy.allowed(companyWorkspace) ? answerQuestion(question, runtimeKeys.nebius) : { ...localAnswer(String(question || '').slice(0, 1000)), mode: 'local' };
   });
@@ -599,12 +642,77 @@ app.whenReady().then(async () => {
     if (!observed || !selectedExternalWindow || observed.windowId !== selectedExternalWindow.id) throw new Error('Read the selected window before reviewing its work.');
     const personId = companyWorkspace.activePersonId;
     const epoch = externalEpoch;
-    const result = await taskReview.reviewTask(companyWorkspace, task, observed.text, runtimeKeys.nebius, useAI === true && aiEnabled, observed.field);
+    const result = useAI === true && aiEnabled ? await reviewAgent.reviewWithAgent(companyWorkspace, task, observed.text, runtimeKeys.nebius, observed.field) : await taskReview.reviewTask(companyWorkspace, task, observed.text, runtimeKeys.nebius, false, observed.field);
     fromAgent(event);
     if (epoch !== externalEpoch || personId !== companyWorkspace.activePersonId || observed.contentHash !== externalObservation?.contentHash) throw new Error('The work changed or sharing stopped. Read it again.');
     const current = new Map(taskReview.currentSources(companyWorkspace, task).map(item => [item.source.id, item]));
     if (result.findings.some(item => { const entry = current.get(item.source.id); return !entry || entry.source.version !== item.source.version || entry.source.approvedAt !== item.source.approvedAt || !entry.text.includes(item.source.quote); })) throw new Error('The approved company sources changed. Review again.');
     return { ...result, observedAt: observed.capturedAt, method: observed.method, window: observed.windowName, contentHash: observed.contentHash };
+  });
+  ipcMain.handle('agent:public-check', async (event, task, claims) => {
+    fromAgent(event);
+    if (!taskReview.tasks[task]) throw new Error('Choose a supported work type.');
+    if (!Array.isArray(claims) || claims.some(claim => typeof claim !== 'string' || privacy.credentials(claim))) throw new Error('Remove credentials before public checking.');
+    const personId = companyWorkspace.activePersonId;
+    const result = await publicCheck.checkClaims(companyWorkspace, task, claims, { tavilyKey: runtimeKeys.tavily, nebiusKey: aiEnabled ? runtimeKeys.nebius : '' });
+    if (personId !== companyWorkspace.activePersonId || !signedIn()) throw new Error('The signed-in person changed during the public check.');
+    return result;
+  });
+  ipcMain.handle('agent:link-check', async (event, task, urls) => {
+    fromAgent(event);
+    if (!taskReview.tasks[task]) throw new Error('Choose a supported work type.');
+    const observed = externalObservation;
+    if (!observed) throw new Error('Read the selected window before checking its links.');
+    return publicCheck.checkLinks(companyWorkspace, task, observed.text, urls, { tavilyKey: runtimeKeys.tavily });
+  });
+  ipcMain.handle('site:configure', async (event, url) => { admin(event); await publicSite.configure(companyWorkspace, url); return persistWorkspace(); });
+  ipcMain.handle('site:crawl', async (event) => {
+    admin(event);
+    const personId = companyWorkspace.activePersonId;
+    await publicSite.crawl(companyWorkspace, { key: runtimeKeys.tavily });
+    if (personId !== companyWorkspace.activePersonId || !signedIn()) throw new Error('The signed-in person changed while reading the website.');
+    await publicSite.compare(companyWorkspace, { key: aiEnabled ? runtimeKeys.nebius : '' });
+    return persistWorkspace();
+  });
+  ipcMain.handle('site:compare', async (event) => { admin(event); await publicSite.compare(companyWorkspace, { key: aiEnabled ? runtimeKeys.nebius : '' }); return persistWorkspace(); });
+  ipcMain.handle('site:decide', (event, id, action, reason) => { admin(event); publicSite.decide(companyWorkspace, id, action, reason); return persistWorkspace(); });
+  ipcMain.handle('knowledge:index', async (event) => {
+    fromAgent(event);
+    if (!['admin', 'lead'].includes(workspace.person(companyWorkspace)?.role)) throw new Error('Department lead or administrator access required');
+    return semanticIndex.build(app.getPath('userData'), companyWorkspace, { key: runtimeKeys.nebius });
+  });
+  ipcMain.handle('knowledge:index-status', (event) => { fromAgent(event); return semanticIndex.status(app.getPath('userData'), companyWorkspace); });
+  ipcMain.handle('knowledge:semantic', async (event, query) => {
+    fromAgent(event);
+    const input = String(query || '').trim().slice(0, 500);
+    if (!input || !aiEnabled || !privacy.allowed(companyWorkspace)) return { mode: 'keyword', results: [] };
+    if (privacy.credentials(input)) throw new Error('Remove credentials before searching.');
+    const found = await semanticIndex.search(app.getPath('userData'), companyWorkspace, input, { key: runtimeKeys.nebius });
+    return { mode: found.mode, results: found.results.map(hit => ({ sourceId: hit.source.id, title: hit.source.title, version: hit.source.version, quote: hit.quote, line: hit.line, page: hit.page, match: hit.match })) };
+  });
+  ipcMain.handle('knowledge:briefing', async (event, sourceId, useAI) => {
+    fromAgent(event);
+    return versionBriefing.brief(companyWorkspace, sourceId, { key: runtimeKeys.nebius, useModel: useAI === true && aiEnabled });
+  });
+  ipcMain.handle('practice:snapshot', (event, quote) => { fromAgent(event); return ruleExercises.snapshot(companyWorkspace, typeof quote === 'string' ? quote : null); });
+  ipcMain.handle('practice:generate', async (event, useAI) => {
+    fromAgent(event);
+    const added = await ruleExercises.generate(companyWorkspace, { key: runtimeKeys.nebius, useModel: useAI === true && aiEnabled });
+    persistWorkspace();
+    return { added: added.length, ...ruleExercises.snapshot(companyWorkspace) };
+  });
+  ipcMain.handle('practice:decide', (event, id, action) => { fromAgent(event); ruleExercises.decide(companyWorkspace, id, action); persistWorkspace(); return ruleExercises.snapshot(companyWorkspace); });
+  ipcMain.handle('practice:answer', (event, id, choice) => { fromAgent(event); const result = ruleExercises.answer(companyWorkspace, id, choice); persistWorkspace(); return result; });
+  ipcMain.handle('freshness:snapshot', (event) => { fromAgent(event); return freshness.snapshot(companyWorkspace); });
+  ipcMain.handle('freshness:mark', (event, payload) => { fromAgent(event); if (!payload || typeof payload !== 'object') throw new Error('Invalid dependency'); freshness.mark(companyWorkspace, payload); persistWorkspace(); return freshness.snapshot(companyWorkspace); });
+  ipcMain.handle('freshness:unmark', (event, id) => { fromAgent(event); freshness.unmark(companyWorkspace, id); persistWorkspace(); return freshness.snapshot(companyWorkspace); });
+  ipcMain.handle('freshness:run', async (event) => {
+    admin(event);
+    const personId = companyWorkspace.activePersonId;
+    await freshness.run(companyWorkspace, { tavilyKey: runtimeKeys.tavily, nebiusKey: aiEnabled ? runtimeKeys.nebius : '' });
+    if (personId !== companyWorkspace.activePersonId || !signedIn()) throw new Error('The signed-in person changed during the check.');
+    persistWorkspace();
+    return freshness.snapshot(companyWorkspace);
   });
   ipcMain.handle('agent:external-watch', (event, enabled) => {
     fromAgent(event);
