@@ -35,41 +35,41 @@ Not verified by me: VoiceOver, the real OS Reduce Motion setting, the window-cap
 
 ## Still not satisfying
 
-These are drafted as tickets below for the owner's review. Nothing has been filed on GitHub yet.
+The owner reviewed these tickets and approved publication; they are GitHub issues [#10](https://github.com/sararr25/averill-ai/issues/10)–[#20](https://github.com/sararr25/averill-ai/issues/20) (T1 = #10 … T11 = #20), labelled `ready-for-agent`.
 
 ### Draft tickets
 
-**T1 — Reword the conflict result copy** · UX copy · small
+**T1 ([#10](https://github.com/sararr25/averill-ai/issues/10)) — Reword the conflict result copy** · UX copy · small
 The status line reads "Exact company rules matched the visible text. Check the surrounding editor state before acting." and the footer finding starts "Check whether this required text belongs in the draft". Both sound like system output. Acceptance: one plain sentence per finding ("Remove the price guarantee", "Add the required footer"), same evidence underneath; the e2e script still passes.
 
-**T2 — Show how many corrections there are and keep them in view** · UX · small
+**T2 ([#11](https://github.com/sararr25/averill-ai/issues/11)) — Show how many corrections there are and keep them in view** · UX · small
 At 520px the second finding sits under the composer, with nothing saying there is more than one. Acceptance: "2 corrections" count under the headline; the first finding fully visible at 520×850; the list scrolls without hiding the composer.
 
-**T3 — Name the real site and field in the live bar and companion** · UX · medium
+**T3 ([#12](https://github.com/sararr25/averill-ai/issues/12)) — Name the real site and field in the live bar and companion** · UX · medium
 Both say "Shared browser field · Marketing email"; the companion truncates to "Watching Shared browser field · r…". Acceptance: show page origin and field label from the browser bridge (e.g. "Brevo · Email body"); companion text fits 208px; no new data leaves the main process.
 
-**T4 — Prove the missing-footer finding explicitly** · test coverage · small
+**T4 ([#13](https://github.com/sararr25/averill-ai/issues/13)) — Prove the missing-footer finding explicitly** · test coverage · small
 The e2e assertion for the footer passed by matching "unsubscribe", which also appears in the source quote. Acceptance: assert a footer finding exists before the fix and is gone after it.
 
-**T5 — Simplify Work actions** · UX · medium
+**T5 ([#14](https://github.com/sararr25/averill-ai/issues/14)) — Simplify Work actions** · UX · medium
 Work still shows browser pairing, app window, captured text, task type, "Read and recheck locally" and "Check approved rules" in one long page. The two check buttons look interchangeable. Acceptance: one primary check action per state; the local recheck appears only after a result; Work's height at 520px drops noticeably; the browser and task-review checks still pass.
 
-**T6 — Hide unconfigured cloud imports from first-time admins** · UX · small
+**T6 ([#15](https://github.com/sararr25/averill-ai/issues/15)) — Hide unconfigured cloud imports from first-time admins** · UX · small
 Setup lists "Google Drive · Client setup needed" and "Microsoft OneDrive · Client setup needed", which read as broken features to a judge. Acceptance: group them under "More import options" (collapsed), or show them only when a client ID exists; the intake check still passes.
 
-**T7 — Plain-language Learn copy** · UX copy · small
+**T7 ([#16](https://github.com/sararr25/averill-ai/issues/16)) — Plain-language Learn copy** · UX copy · small
 "use Work for explicit OCR capture", "Week beginning 2026-10-12 · Europe/Copenhagen" and "Ask about a Canva lesson step or inspect selected visible text" are technical. Acceptance: copy rewritten for an employee ("This week", no OCR jargon); learning tests pass.
 
-**T8 — Smaller banner dismiss button** · UI · trivial
+**T8 ([#17](https://github.com/sararr25/averill-ai/issues/17)) — Smaller banner dismiss button** · UI · trivial
 The banner's × sits in a 36px bordered square that dominates the row. Acceptance: borderless icon button with a ≥32px hit area and visible focus.
 
-**T9 — Capture Learn answer states and Knowledge chips with real data** · verification · small
+**T9 ([#18](https://github.com/sararr25/averill-ai/issues/18)) — Capture Learn answer states and Knowledge chips with real data** · verification · small
 The ✓ Correct / ↺ Not quite badges, the moved history-delete link and the Knowledge chips with approved/pending items were never seen on screen. Acceptance: screenshots from an isolated profile with a completed weekly quiz and a mixed library; fix anything that looks wrong.
 
-**T10 — Screen Recording path and OCR in the new UI** · verification · medium · relates to #7
+**T10 ([#19](https://github.com/sararr25/averill-ai/issues/19)) — Screen Recording path and OCR in the new UI** · verification · medium · relates to #7
 Rerun `verify:task-review` and `verify:external` with Screen Recording granted; check that the Ready to check state and live bar behave the same for an app window as for a browser field.
 
-**T11 — Owner-only acceptance** · verification · relates to #6, #9
+**T11 ([#20](https://github.com/sararr25/averill-ai/issues/20)) — Owner-only acceptance** · verification · relates to #6, #9
 VoiceOver pass, the real OS Reduce Motion setting, the Nemotron consent flow in the new composer toggle, and the 2:50 rehearsal on the final executable. These need the owner's Mac and permissions.
 
 Suggested order: T1–T4 before recording (on camera), then T5–T8, then T9–T11.
