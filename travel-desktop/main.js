@@ -579,12 +579,12 @@ app.whenReady().then(async () => {
       return semanticIndex.search(app.getPath('userData'), companyWorkspace, question, { key: runtimeKeys.nebius }).catch(() => ({ results: [] }))
         .then(found => answerWorkspace(companyWorkspace, question, runtimeKeys.nebius, undefined, found.results));
     }
-    return aiEnabled && privacy.allowed(companyWorkspace) ? answerQuestion(question, runtimeKeys.nebius) : { ...localAnswer(String(question || '').slice(0, 1000)), mode: 'local' };
+    return aiEnabled && privacy.allowed(companyWorkspace) ? answerQuestion(question, runtimeKeys.nebius, companyWorkspace) : { ...localAnswer(String(question || '').slice(0, 1000)), mode: 'local' };
   });
   ipcMain.handle('agent:ask-demo', (event, question) => {
     fromAgent(event);
     if(aiEnabled&&privacy.credentials(question))throw new Error('Remove credentials before using external AI.');
-    return aiEnabled && privacy.allowed(companyWorkspace) ? answerQuestion(question, runtimeKeys.nebius) : { ...localAnswer(String(question || '').slice(0, 1000)), mode: 'local' };
+    return aiEnabled && privacy.allowed(companyWorkspace) ? answerQuestion(question, runtimeKeys.nebius, companyWorkspace) : { ...localAnswer(String(question || '').slice(0, 1000)), mode: 'local' };
   });
   ipcMain.handle('agent:web-search', (event, query) => { fromAgent(event); if (privacy.credentials(query)) throw new Error('Remove credentials before public web research.'); return searchPublicWeb(query, runtimeKeys.tavily); });
   ipcMain.handle('agent:fact-check', (event, query) => { fromAgent(event); if (privacy.credentials(query)) throw new Error('Remove credentials before public fact-checking.'); return factCheckPublic(query, runtimeKeys.tavily); });
