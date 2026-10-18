@@ -132,6 +132,12 @@ app.whenReady().then(async () => {
     const fresh = await run('window.desktop.runFreshness()');
     assert.equal(fresh.dependencies.length, 1);
     assert.ok(fresh.dependencies[0].lastCheck);
+    // Weekly opt-in: the checkbox renders for the admin and saves the schedule.
+    await run("showTab('knowledge');rulesRenderKey=null;renderRules()"); await pause(500);
+    assert.ok(await run("Boolean(document.querySelector('.rules-weekly input'))"), 'weekly checkbox renders');
+    await run("document.querySelector('.rules-weekly input').click()"); await pause(500);
+    assert.equal((await run('window.desktop.freshnessSnapshot()')).schedule.enabled, true, 'weekly schedule saved');
+    assert.ok(await run("document.querySelector('.rules-weekly input').checked"));
 
     const snapshot = await run('window.desktop.snapshot()');
     assert.ok(snapshot.cloudActivity.mine.length > 0, 'cloud calls are logged for this person');

@@ -122,6 +122,13 @@ async function renderRules() {
         try { await window.desktop.runFreshness(); rulesRenderKey = null; await renderRules(); } catch (error) { status.textContent = error.message; run.disabled = false; }
       });
       fresh.append(run);
+      // Opting in sends the same saved public searches to Tavily once a week while an admin is signed in.
+      const weekly = node('label', undefined, 'rules-weekly'); const box = node('input'); box.type = 'checkbox'; box.checked = Boolean(freshness.schedule?.enabled); box.disabled = !current.services?.tavily;
+      weekly.append(box, document.createTextNode(' Check automatically once a week (sends only the saved public searches to Tavily)'));
+      box.addEventListener('change', async () => { box.disabled = true; try { await window.desktop.scheduleFreshness(box.checked); rulesRenderKey = null; await renderRules(); } catch (error) { status.textContent = error.message; box.checked = !box.checked; box.disabled = false; } });
+      fresh.append(weekly);
+      if (freshness.lastRunAt) fresh.append(node('p', `Last check: ${new Date(freshness.lastRunAt).toLocaleString()}`, 'knowledge-meta'));
+      if (freshness.schedule?.lastError) fresh.append(node('p', `The weekly check could not run: ${freshness.schedule.lastError}`, 'knowledge-meta'));
     }
     section.append(fresh);
   }

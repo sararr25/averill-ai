@@ -50,3 +50,24 @@ test('only admins run checks; only stored queries are sent; approval never chang
   await freshness.run(data, { tavilyKey: 't', nebiusKey: 'n', fetcher: invented });
   assert.equal(freshness.snapshot(data).dependencies[0].lastCheck.verdict, 'unclear');
 });
+
+test('weekly run needs admin opt-in, runs only when due and records failures', async () => {
+  const data = make();
+  freshness.mark(data, { sourceId: 'legal', quote, query: 'Instagram paid partnership label' });
+  assert.throws(() => freshness.setSchedule(data, { enabled: true }), /Administrator/);
+  data.activePersonId = 'owner';
+  const start = new Date('2026-10-19T09:00:00Z');
+  assert.equal(freshness.due(data, start), false, 'off until the admin opts in');
+  freshness.setSchedule(data, { enabled: true }, start);
+  assert.equal(freshness.due(data, start), true);
+  const tavilyOnly = async () => ok({ results: [{ title: 'Branded content', url: 'https://help.instagram.com/x', content: 'Use the Paid partnership label.' }] });
+  assert.equal(await freshness.runScheduled(data, { tavilyKey: 't', fetcher: tavilyOnly }, start), true);
+  assert.equal(freshness.due(data, new Date('2026-10-22T09:00:00Z')), false, 'not again within a week');
+  assert.equal(freshness.due(data, new Date('2026-10-26T09:00:00Z')), true);
+  await freshness.runScheduled(data, { tavilyKey: 't', fetcher: async () => ({ ok: false, status: 500, json: async () => ({}) }) }, new Date('2026-10-26T09:00:00Z'));
+  const snap = freshness.snapshot(data);
+  assert.equal(snap.lastRunAt, '2026-10-26T09:00:00.000Z');
+  assert.match(snap.dependencies[0].lastCheck.explanation, /could not finish/);
+  data.activePersonId = 'lead';
+  assert.equal(freshness.due(data, new Date('2026-11-05T09:00:00Z')), false, 'never runs for a non-admin session');
+});

@@ -714,6 +714,19 @@ app.whenReady().then(async () => {
     persistWorkspace();
     return freshness.snapshot(companyWorkspace);
   });
+  ipcMain.handle('freshness:schedule', (event, enabled) => {
+    admin(event);
+    freshness.setSchedule(companyWorkspace, { enabled: enabled === true, everyDays: 7 });
+    persistWorkspace();
+    return freshness.snapshot(companyWorkspace);
+  });
+  // Hourly check for the admin's weekly freshness run; it only sends the saved public searches.
+  setInterval(async () => {
+    if (!companyWorkspace || !signedIn() || !runtimeKeys.tavily || !freshness.due(companyWorkspace)) return;
+    const personId = companyWorkspace.activePersonId;
+    await freshness.runScheduled(companyWorkspace, { tavilyKey: runtimeKeys.tavily, nebiusKey: aiEnabled ? runtimeKeys.nebius : '' });
+    if (personId === companyWorkspace.activePersonId && signedIn()) { persistWorkspace(); publish(); }
+  }, 60 * 60 * 1000).unref();
   ipcMain.handle('agent:external-watch', (event, enabled) => {
     fromAgent(event);
     if (enabled && !selectedExternalWindow) throw new Error('Choose a work window first.');

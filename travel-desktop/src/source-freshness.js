@@ -1,5 +1,5 @@
 // AV-60 – AV-63: is approved guidance still in line with the public rules it depends on?
-// Admins start each run. Only the stored public query goes to Tavily; approval status never changes automatically.
+// Admins start each run, or opt in to a weekly run. Only the stored public query goes to Tavily; approval status never changes automatically.
 const crypto = require('node:crypto');
 const workspace = require('./workspace');
 const privacy = require('./company-privacy');
@@ -63,7 +63,32 @@ async function run(data, { tavilyKey, nebiusKey, fetcher, now = new Date() } = {
     } catch (error) { check.explanation = `The check could not finish: ${error.message}`; }
     entry.lastCheck = { ...check, at: now.toISOString(), method: useModel ? 'Tavily search, judged by NVIDIA Nemotron' : 'Tavily search' };
   }
+  state(data).lastRunAt = now.toISOString();
   return due.length;
+}
+
+const DAY = 24 * 60 * 60 * 1000;
+
+// The admin's opt-in is the consent for unattended runs of the saved public searches.
+function setSchedule(data, { enabled, everyDays = 7 } = {}, now = new Date()) {
+  if (workspace.person(data)?.role !== 'admin') throw new Error('Administrator access required.');
+  const days = [1, 7].includes(Number(everyDays)) ? Number(everyDays) : 7;
+  state(data).schedule = { enabled: enabled === true, everyDays: days, setBy: data.activePersonId, setAt: now.toISOString(), lastError: '' };
+  return state(data).schedule;
+}
+
+function due(data, now = new Date()) {
+  const { schedule, lastRunAt, dependencies } = state(data);
+  if (!schedule?.enabled || !dependencies.length || workspace.person(data)?.role !== 'admin') return false;
+  return !lastRunAt || now - new Date(lastRunAt) >= schedule.everyDays * DAY;
+}
+
+// Runs only when due; a failure is stored on the schedule and shown to the admin, never swallowed.
+async function runScheduled(data, keys, now = new Date()) {
+  if (!due(data, now)) return false;
+  try { await run(data, { ...keys, now }); state(data).schedule.lastError = ''; }
+  catch (error) { state(data).lastRunAt = now.toISOString(); state(data).schedule.lastError = error.message; }
+  return true;
 }
 
 // Visible to people who can manage the source; "may be outdated" items form the review queue.
@@ -71,7 +96,7 @@ function snapshot(data) {
   const sources = new Map(workspace.visibleSources(data).map(source => [source.id, source]));
   const list = state(data).dependencies.filter(entry => sources.has(entry.sourceId) && canManage(data, sources.get(entry.sourceId)))
     .map(entry => ({ ...entry, sourceTitle: sources.get(entry.sourceId).title, current: sources.get(entry.sourceId).version === entry.sourceVersion }));
-  return { dependencies: list, queue: list.filter(entry => entry.current && entry.lastCheck?.verdict === 'may-be-outdated') };
+  return { dependencies: list, queue: list.filter(entry => entry.current && entry.lastCheck?.verdict === 'may-be-outdated'), schedule: state(data).schedule || { enabled: false, everyDays: 7 }, lastRunAt: state(data).lastRunAt || null };
 }
 
-module.exports = { mark, unmark, run, snapshot };
+module.exports = { mark, unmark, run, snapshot, setSchedule, due, runScheduled };
