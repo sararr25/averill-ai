@@ -50,3 +50,15 @@ test('website decisions need a reason and survive a new comparison', async () =>
   assert.equal(again.find(item => item.id === first.id).decision.action, 'fix-site');
   assert.equal(data.sources[0].status, 'approved', 'website findings never change source approval');
 });
+
+test('the same page sentence forbidden by several rules is reported once', async () => {
+  const data = make('admin');
+  const second = path.join(root, 'legal.md');
+  fs.writeFileSync(second, 'Do not claim "lowest prices guaranteed".\n');
+  data.sources.push({ ...data.sources[0], id: 'legal', title: 'Legal', textPath: second });
+  await site.configure(data, 'https://vamo.example/', resolver);
+  await site.crawl(data, { key: 't', resolver, fetcher: async () => ok({ results: pages }) });
+  const findings = await site.compare(data, { useModel: false });
+  assert.equal(findings.filter(item => /lowest prices guaranteed/i.test(item.pageQuote)).length, 1);
+  assert.equal(findings[0].method, 'exact-rule');
+});

@@ -81,7 +81,8 @@ async function compare(data, { key, fetcher, useModel = true } = {}) {
       } catch { /* keep deterministic findings */ }
     }
   }
-  const unique = [...new Map(found.map(item => [item.id, item])).values()];
+  // One card per page sentence: several approved rules often forbid the same phrase. The first (exact-rule) citation wins.
+  const unique = [...new Map(found.reverse().map(item => [`${item.url}|${item.pageQuote.toLowerCase()}`, item])).values()].reverse();
   const decided = new Map((data.publicSite.decisions || []).map(decision => [decision.findingId, decision]));
   data.publicSite.findings = unique.map(item => ({ ...item, decision: decided.get(item.id) || null }));
   data.publicSite.comparedAt = new Date().toISOString();

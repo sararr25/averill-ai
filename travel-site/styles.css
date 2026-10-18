@@ -16,3 +16,5 @@ dialog{max-width:760px;width:calc(100% - 30px);max-height:90dvh;overflow:auto;ba
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{transition:none!important;animation:none!important}.photo-button:hover img{transform:none}}
 /* Darker ink keeps small labels legible on the coral surface. */
 .header-cta,.hero-sticker,.ticker,.place-number,.journal-card:not(.journal-mint),.submit-button,.dialog-action{color:var(--coral-ink)}
+.winter-page{min-height:60vh}.winter-copy{font-size:20px;max-width:560px}.winter-copy p{margin:0 0 18px}.winter-copy p:first-child{font:400 clamp(28px,3vw,40px)/1.1 var(--font-editorial);letter-spacing:-.03em}.winter-link{display:inline-block;margin-top:10px;color:var(--sea);font-weight:600}
+@media(max-width:700px){.winter-copy{font-size:17px}}
