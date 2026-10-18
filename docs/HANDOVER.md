@@ -1,6 +1,6 @@
 # Nebius and Tavily integration — 17 October 2026
 
-**Next session: start from [HANDOVER_NEBIUS_TAVILY_2026-10-17.md](HANDOVER_NEBIUS_TAVILY_2026-10-17.md).**
+**Next session: start from [HANDOVER_2026-10-18.md](HANDOVER_2026-10-18.md)** (UI tickets #10–#18, Vamo mismatch page, weekly freshness, packaging). Earlier: [HANDOVER_NEBIUS_TAVILY_2026-10-17.md](HANDOVER_NEBIUS_TAVILY_2026-10-17.md).
 
 Implemented the plan in [NEBIUS_TAVILY_PLAN.md](NEBIUS_TAVILY_PLAN.md) on branch `claude/charming-johnson-rhezro`: shared Nebius/Tavily clients, Nemotron rule extraction with lead/admin approval, a tool-calling Nemotron review agent with visible steps, Tavily public-statement and linked-page checks, public website vs approved sources, semantic Knowledge with Nebius embeddings, handover briefing, practice from approved rules and source freshness. See the table in [COMPANY_CONFIDENTIALITY.md](COMPANY_CONFIDENTIALITY.md) for what each feature sends.
 
@@ -16,7 +16,7 @@ Verified on 17 October 2026, before this live pass: `npm test` and `npm run veri
 
 Fix found by the live run: Nemotron Super reasons by default, so short-budget JSON calls (briefing 900, practice 400 tokens) returned an empty answer with `finish_reason: length` and silently fell back. `src/nebius.js` now sends `chat_template_kwargs: { enable_thinking: false }` and raises an explicit error when a reply is cut off before any answer.
 
-**Still not verified:** the Review agent on a draft actually shared from a browser field or external window (the Review UI was rendered with a drawn agent result; the live agent was verified at module level), a manual click-through by a person, and a crawl of a Vamo page with an intentional mismatch. Not built: a scheduled freshness run, the intentional mismatch page on the Vamo site, moving `src/assistant.js` to `src/nebius.js`, release packaging (AV-73).
+**Still not verified:** the Review agent on a draft actually shared from a browser field or external window (the Review UI was rendered with a drawn agent result; the live agent was verified at module level), a manual click-through by a person, and a crawl of a Vamo page with an intentional mismatch. Built later on 18 October: the scheduled freshness run, the Vamo mismatch page, `src/assistant.js` on `src/nebius.js` and local release packaging — see HANDOVER_2026-10-18.md.
 
 Latest Finder acceptance: human real Finder drop of synthetic Markdown passed in the isolated development app. Agent verified exact extracted text, pending save without automatic approval, explicit reasoned approval and renderer-reload persistence. Zero provider requests; no product code change. [Receipt](review-evidence-2026-10-12/finder-drop/verification.json). The cross-app automation limitation no longer blocks this Finder acceptance; final-executable/whole-process gates remain open.
 

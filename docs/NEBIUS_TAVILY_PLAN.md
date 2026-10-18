@@ -8,12 +8,12 @@ Status, 18 October 2026: **implemented; live Nebius/Tavily runs verified on the 
 | AV-02 – AV-05 | Done: `src/nebius.js`, `src/tavily.js`, outbound confirmation, `src/cloud-activity.js` |
 | AV-10 – AV-14 | Done: `src/rules.js`, Knowledge rules panel, Review uses approved extracted rules |
 | AV-20 – AV-26 | Done: `src/review-agent.js`, `src/public-check.js`, Review steps and public checks |
-| AV-30 – AV-33 | Done: `src/public-site.js`, Setup › Public website. The intentional Vamo site mismatch page is not added |
+| AV-30 – AV-33 | Done: `src/public-site.js`, Setup › Public website, intentional mismatch page `travel-site/winter.html` (needs a public HTTPS host for a live crawl) |
 | AV-40 – AV-43 | Done: `src/semantic-index.js`, Knowledge search by meaning |
 | AV-50 – AV-53 | Done: `src/version-briefing.js`, `src/rule-exercises.js`, Learn practice |
-| AV-60 – AV-63 | Done except the optional scheduled run: `src/source-freshness.js` |
+| AV-60 – AV-63 | Done: `src/source-freshness.js`, including the admin opt-in weekly run |
 | AV-70 – AV-72 | Done: `verify:cloud-ui` (faked), `verify:live-cloud` and `verify:live-ui` (live) pass |
-| AV-73 | Not started: live checks now pass; release packaging remains |
+| AV-73 | Local package built and verified (`package:release`, `verify:release`); no public release published |
 
 ## Product thesis
 
