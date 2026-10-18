@@ -1,5 +1,7 @@
 # Averill project
 
+Current update, 17 October 2026: Nebius/Tavily integration implemented on branch `claude/charming-johnson-rhezro` (PR #21); live calls not yet verified. Start from [docs/HANDOVER_NEBIUS_TAVILY_2026-10-17.md](docs/HANDOVER_NEBIUS_TAVILY_2026-10-17.md).
+
 Current status, 4 October 2026: the Guided UI release is public at [v0.1.0-preview.20261004.2](https://github.com/sararr25/averill-ai/releases/tag/v0.1.0-preview.20261004.2). See [docs/PROJECT_STATUS_2026-10-04.md](docs/PROJECT_STATUS_2026-10-04.md) and [docs/NEXT_STEPS_2026-10-04.md](docs/NEXT_STEPS_2026-10-04.md) for current evidence, ordered checks and pending fixes. Dated earlier sections are historical where superseded.
 
 Current update, 3 October 2026: shipped source packs and fixtures use Vamo; old persisted credentials and source approvals remain unchanged. See docs/DEMO_MIGRATION.md. Earlier state descriptions below are historical until reconciled with the current milestone ledger.
@@ -12,7 +14,7 @@ Averill is a standalone company agent assistant that helps an employee keep work
 
 The product identity is **Averill**. **Vamo** is the fictional travel-company brand used on the independent website. Their names, logos, visual styles and interfaces must never be shared. Current shipped campaign documents, new-demo accounts and work windows use Vamo; existing local accounts/imported copies retain their previous identity. Product copy, demo content, and developer documentation are in English.
 
-**Product boundary, corrected 28 September:** employees create and edit email, LinkedIn, Instagram, design and other work in the tools they already use. Averill is a separate companion with a floating button. A person chooses one external window for a local read or six-second observation; a bounded task review compares its text with approved company sources, with optional consented Nebius suggestions. Public fact-checks use Tavily with only the public question the employee types. Vamo has its own website in `travel-site/`; it is the example company, not an Averill work app. The supplied desktop work windows are Vamo-labeled synthetic fixtures. The four built-in editors remain reproducible hackathon fixtures, not the main employee workflow.
+**Product boundary, corrected 28 September:** employees create and edit email, LinkedIn, Instagram, design and other work in the tools they already use. Averill is a separate companion with a floating button. A person chooses one external window for a local read or six-second observation; a bounded task review compares its text with approved company sources, with optional consented Nebius suggestions. Tavily checks public facts: a typed question, statements from shared work that the employee confirms, linked pages in that work, the admin-entered company website and admin-run freshness checks of public rules; see docs/NEBIUS_TAVILY_PLAN.md and docs/COMPANY_CONFIDENTIALITY.md. Vamo has its own website in `travel-site/`; it is the example company, not an Averill work app. The supplied desktop work windows are Vamo-labeled synthetic fixtures. The four built-in editors remain reproducible hackathon fixtures, not the main employee workflow.
 
 ## Why this exists
 

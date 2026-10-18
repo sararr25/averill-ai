@@ -110,3 +110,10 @@
 .agent-body .onboarding-section .field-hint{margin:8px 0 14px;font-size:12px;color:var(--ds-color-text-muted)}
 .agent-body .agent-header{justify-content:flex-start;gap:10px}
 .agent-body .agent-tab .check-scope p{margin:0}
+/* #11: the plain correction sentence leads each card. */
+.agent-body .review-evidence .finding-action{display:block;font-size:15px;line-height:1.4;margin-bottom:2px}
+/* #17: borderless dismiss with a 32px hit area; focus outline comes from the shared rule above. */
+.agent-body .operation-feedback #operation-dismiss{border:0;background:transparent;width:32px;height:32px;min-height:32px;padding:0;border-radius:6px;color:var(--ds-color-text-secondary);font-size:18px;line-height:1;align-self:center}
+.agent-body .operation-feedback #operation-dismiss:hover{background:var(--ds-color-panel);color:var(--ds-color-text)}
+/* #14: Work hides controls that don't apply yet; component display rules must not override [hidden]. */
+.agent-body [data-tab=work] [hidden]{display:none!important}

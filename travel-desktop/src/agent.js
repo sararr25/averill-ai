@@ -67,6 +67,10 @@ function render() {
   if (authority !== lastWorkAuthority) { lastWorkAuthority = authority; el('external-task-result').replaceChildren(); el('context-result').replaceChildren(); }
   renderWorkspace();
   renderKnowledge();
+  renderRules();
+  renderPublicSite();
+  renderKnowledgeIndex();
+  renderPractice();
   renderLearning();
   renderHero();
   renderWorkStep();
@@ -181,7 +185,8 @@ function renderHero() {
   if(externalReview){
     el('hero-label').textContent='WORK REVIEW';const hasFindings=externalReview.result.findings.length>0;
     el('hero-title').textContent=hasFindings?'Review these corrections.':'No conflicts with approved rules.';
-    el('hero-body').textContent=hasFindings?'Edit in your own tool using the evidence below, then recheck.':'Averill compared the shared text with your current approved company sources.';
+    const count=externalReview.result.findings.length;
+    el('hero-body').textContent=hasFindings?`${count} correction${count===1?'':'s'}. Edit in your own tool, then recheck.`:'Averill compared the shared text with your current approved company sources.';
     document.body.classList.toggle('review-clear',!hasFindings);
     el('hero-selected').replaceChildren();el('hero-source').replaceChildren();el('finding-navigation').replaceChildren();
     const context=el('review-context');context.replaceChildren(node('span','','live-dot'),node('span',`Live · ${current.externalWindow?.name||'Selected work'} · ${el('external-task').selectedOptions[0].textContent}`));context.classList.add('is-live');document.body.classList.add('has-live-review');
@@ -525,22 +530,49 @@ el('watch-external').addEventListener('click', async () => {
 el('stop-external').addEventListener('click', async () => { invalidateWorkReview();renderHero(); current = await window.desktop.shareExternal(null, null); el('external-result').textContent = 'Window sharing stopped.'; el('external-list').replaceChildren(); render(); });
 function drawTaskReview(output,result){
   output.replaceChildren();
-  if(result.findings.length)output.append(node('p',result.status));
+  // In Review the headline already counts the corrections; the Work tab keeps the status sentence.
+  if(result.findings.length&&output.id!=='review-work-result')output.append(node('p',result.status));
   // One consistent statement of what this review covered and what it did not.
   const scope=node('div',undefined,'check-scope');
-  const method=result.mode==='model'?`NVIDIA Nemotron via ${result.provider||'Nebius Token Factory'}${result.model?` (${result.model})`:''}, validated against sources`:'Local rule check';
+  const method=result.mode==='model'||result.mode==='agent'?`NVIDIA Nemotron ${result.mode==='agent'?'review agent ':''}via ${result.provider||'Nebius Token Factory'}${result.model?` (${result.model})`:''}, validated against sources`:'Local rule check';
   const checked=node('p');checked.append(node('strong','Checked'),document.createTextNode(` Visible shared text against current approved rules · ${method}.`));
   const unchecked=node('p');unchecked.append(node('strong','Not checked'),document.createTextNode(` ${result.uncheckedFields?.length?`${result.uncheckedFields.join(', ')}, `:''}layout, images and publishing settings.`));
   scope.append(checked,unchecked);
   for(const item of result.findings){
-    const card=node('article',undefined,'workspace-source review-evidence');
-    card.append(item.confidence==='model-suggestion'?node('span','Nemotron suggestion · excerpts validated','ai-chip'):node('strong','Approved rule match'),node('p',item.suggestion));
+    const card=node('article',undefined,'workspace-source review-evidence');card.dataset.findingType=item.type||'';
+    card.append(node('strong',item.suggestion,'finding-action'),item.confidence==='model-suggestion'?node('span','Nemotron suggestion · excerpts validated','ai-chip'):node('span',item.confidence==='approved-rule'?'Approved rule · extracted by Nemotron':'Approved rule','knowledge-meta'));
     if(item.observedExcerpt)card.append(node('p',`Observed: “${item.observedExcerpt}”`));
-    card.append(sourceButton(item.source),node('small',`Source v${item.source.version}: “${item.source.quote}”`));output.append(card);
+    card.append(sourceButton(item.source),node('small',`Source v${item.source.version}: “${item.source.quote}”`));appendPracticeLink(card,item.source.quote);output.append(card);
   }
+  if(result.steps?.length){const steps=node('details',undefined,'knowledge-details agent-steps');steps.append(node('summary','How Averill checked this'));const list=node('ol');for(const step of result.steps)list.append(node('li',step.label));steps.append(list);output.append(steps);}
   output.append(scope);
+  drawPublicChecks(output,result);
   const recheck=node('button','Recheck after my edit','secondary-button');recheck.type='button';
   recheck.addEventListener('click',()=>{showTab('work');el('external-local-recheck').focus();});output.append(recheck);
+}
+function drawPublicChecks(output,result){
+  const task=el('external-task').value;const observed=current.externalObservation?.text||'';
+  const urls=[...new Set((observed.match(/https:\/\/[^\s<>"'”)]+/g)||[]).map(url=>url.replace(/[.,;:!?]+$/,'')))].slice(0,5);
+  const claims=result.publicClaims||[];
+  if(!current.services?.tavily||(!claims.length&&!urls.length))return;
+  const box=node('section',undefined,'public-check');box.append(node('div','PUBLIC CHECK · NOT COMPANY APPROVAL','eyebrow'),node('p','Public web sources can show whether a statement is still true. They never replace an approved company source.','section-note'));
+  const status=node('div');status.setAttribute('aria-live','polite');
+  if(claims.length){const button=node('button',`Check ${claims.length} public statement${claims.length>1?'s':''} with Tavily`,'secondary-button');button.type='button';
+    button.addEventListener('click',async()=>{const chosen=await confirmOutbound({service:'Tavily',title:'Check public statements',note:'Only these statements are searched on the public web. Untick or edit anything that is internal.',items:claims,editable:true});if(!chosen?.length)return;button.disabled=true;status.textContent='Searching public sources…';
+      try{const checked=await window.desktop.checkPublicClaims(task,chosen);status.replaceChildren(node('p',checked.method,'knowledge-meta'));for(const item of checked.claims)status.append(publicVerdict(item));}catch(error){status.textContent=error.message;}finally{button.disabled=false;}});box.append(button);}
+  if(urls.length){const button=node('button',`Check ${urls.length} linked page${urls.length>1?'s':''}`,'secondary-button');button.type='button';
+    button.addEventListener('click',async()=>{const chosen=await confirmOutbound({service:'Tavily',title:'Check linked pages',note:'Tavily opens these public links. Averill compares the pages with approved values your draft states.',items:urls});if(!chosen?.length)return;button.disabled=true;status.textContent='Reading linked pages…';
+      try{const pages=await window.desktop.checkLinks(task,chosen);status.replaceChildren();for(const page of pages){const card=node('article',undefined,'workspace-source review-evidence public-verdict');card.dataset.verdict=page.status==='consistent'?'supported':page.status==='differs'?'contradicted':'unclear';card.append(node('strong',page.status==='consistent'?'Linked page matches the draft':page.status==='differs'?'Linked page differs':'Linked page could not be read'),node('p',page.url,'knowledge-meta'));for(const finding of page.findings)card.append(node('p',finding.suggestion),sourceButton(finding.source));status.append(card);}}catch(error){status.textContent=error.message;}finally{button.disabled=false;}});box.append(button);}
+  box.append(status);output.append(box);
+}
+function publicVerdict(item){
+  const labels={supported:'Public sources support this',contradicted:'Public sources contradict this',unclear:'Public sources are unclear'};
+  const card=node('article',undefined,'workspace-source review-evidence public-verdict');card.dataset.verdict=item.verdict;
+  card.append(node('strong',labels[item.verdict]||labels.unclear),node('p',`“${item.claim}”`));
+  if(item.explanation)card.append(node('p',item.explanation));
+  if(item.snippet)card.append(node('small',`${item.title||item.url}: “${item.snippet}”`));
+  for(const link of item.results||[]){const open=node('button',link.title||link.url,'source-link');open.type='button';open.addEventListener('click',()=>window.desktop.openWeb(link.url).catch(()=>{}));card.append(open);}
+  return card;
 }
 function renderTaskReview(result){
   const output=el('external-task-result');
@@ -551,7 +583,7 @@ async function checkWork(fresh){
   if(reviewPending)return;
   const output=el('external-task-result');const task=el('external-task').value;
   const useAI=!fresh&&Boolean(current.aiEnabled&&current.privacy?.companyAI);
-  if(useAI&&!window.confirm(`Send the observed text from ${current.externalWindow?.name||'the selected window'} and eligible approved sources to Nebius for this review?`)){output.textContent='Review cancelled.';return;}
+  if(useAI&&!(await confirmOutbound({service:'Nebius',title:'Review with NVIDIA Nemotron',note:'The Nemotron review agent reads the observed text and can look up approved sources that have Nebius consent. It cannot edit, send or publish anything.',items:[`Observed text from ${current.externalWindow?.name||'the selected window'}`,'Matching passages from eligible approved sources']}))?.length){output.textContent='Review cancelled.';return;}
   invalidateWorkReview();
   const request=++reviewRequest;
   // A fresh capture may change the hash, but must keep its person, sources, task and selected window.
@@ -576,6 +608,11 @@ function renderWorkStep(){
  const identity=current.externalWindow?.id||null;
  if(identity!==workStepIdentity){workStepIdentity=identity;document.querySelector('.browser-adapter').open=!selected;document.querySelector('.native-adapter').open=selected&&!captured&&current.externalWindow.adapter!=='browser-dom';}
  el('work-next').textContent=reviewPending?'Checking your work… You can stop sharing at any time.':captured?'Text captured. Choose the work type below, then check approved rules.':selected?(current.externalWindow.adapter==='browser-dom'?'Finish editing the selected field. Advice clears while you type.':'Window selected. Read visible text to capture one frame.'):(ready?'Copy pairing details into the extension, then select a draft field.':'Start by connecting a browser field or choosing an app window.');
+ // One primary action per state: nothing to check or stop until work is shared; local recheck only after a result.
+ el('external-task').closest('.context-form').hidden=!selected;
+ el('stop-external').closest('.sharing-controls').hidden=!selected&&!ready;
+ document.querySelector('.work-question').hidden=!captured;document.querySelector('.captured-text').hidden=!captured;
+ el('external-local-recheck').hidden=!externalReview||current.externalWindow?.adapter==='browser-dom';
  for(const id of ['browser-pair','browser-copy-pair','review-external','external-task-review']){
    const primary=!reviewPending&&(captured?id==='external-task-review':selected?id==='review-external'&&current.externalWindow.adapter!=='browser-dom':ready?id==='browser-copy-pair':id==='browser-pair');
    el(id).classList.toggle('agent-primary',primary);el(id).classList.toggle('secondary-button',!primary);

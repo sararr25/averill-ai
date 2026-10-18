@@ -28,6 +28,8 @@ Optional Nebius Token Factory inference interprets permitted excerpts only after
 
 Model: `nvidia/nemotron-3-super-120b-a12b`, served by Nebius Token Factory. We use prompt-based inference, not fine-tuning. The model interprets bounded task and approved-source text; exact citation validation and local authority checks constrain what can appear. The selected variant was available from the provider model listing and completed the live synthetic smoke. No comparative performance claim is established by one request.
 
+On 18 October 2026 every Nebius/Tavily feature ran live on Vamo fixture text: Nemotron extracts company rules from source documents (every quote validated), runs a tool-calling review agent over approved sources, judges public search results, writes handover briefings between document versions and drafts practice questions. Nebius embeddings (`Qwen/Qwen3-Embedding-8B`) power search by meaning in Knowledge. Model output is shown only after exact-quote validation; humans approve rules and practice.
+
 TODO: include a consented runtime request in the recorded application demonstration. Do not show any key or private company material.
 
 ## Validation and challenges
@@ -49,5 +51,6 @@ Complete real-platform acceptance, signing/notarization, broader supported field
 - Model quality (1–10), Nebius recommendation (1–10), inference experience (1–10): TODO owner ratings.
 - Other-model comparison: no controlled comparison established; owner may add actual experience only.
 - Platform improvements / NVIDIA model-team wishes: TODO owner feedback.
-- Tavily runtime usage / IRL city: TODO confirm demonstrated runtime use and actual attendance.
+- Tavily runtime usage: verified live on 18 October 2026: `/search` checks public statements the employee confirms and source freshness, `/extract` reads linked pages, `/crawl` reads the company's public website for comparison with approved sources. Tavily never receives drafts or internal source text.
+- IRL city: TODO owner confirms actual attendance.
 - Age / non-affiliation eligibility: TODO owner declarations after reading rules.

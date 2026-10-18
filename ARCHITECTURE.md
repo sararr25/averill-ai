@@ -151,3 +151,7 @@ A persistent status banner reports pending, completed, cancelled and failed expl
 ## Guided renderer state
 
 `guided-ui.js` provides interruptible native entry motion and Setup grouping. `guided-ui.css` implements shared controls, disclosure hierarchy and native feedback/dialog exits. `agent.js` stores external results only with an identity over person/session/source authority/privacy/window/hash/task, clears them on invalidation and checks request generation before presentation. Fresh recheck clears the previous result before capture. This renderer defense supplements existing main-process authorization and observation checks; it does not replace them.
+
+## Nebius and Tavily modules (17 October 2026)
+
+`src/nebius.js` and `src/tavily.js` are the only network clients for these services; both enforce the company AI policy, credential checks and (for Tavily) an internal-text guard, and report calls to `src/cloud-activity.js`. `src/rules.js` holds structured rules (explicit source lines plus approved Nemotron extractions). `src/review-agent.js` runs the Nemotron tool loop over local read-only tools and falls back to `task-review.js`. `src/public-check.js`, `src/public-site.js` and `src/source-freshness.js` implement the "is it still true?" checks. `src/semantic-index.js` keeps embeddings in `averill-semantic-index.json` in userData. `src/version-briefing.js` and `src/rule-exercises.js` serve Handover and Learn. Renderer pieces: `outbound-gate.js`, `rules-ui.js`, `public-site-ui.js`, `semantic-ui.js`, `practice-ui.js`.
