@@ -58,7 +58,7 @@ contextBridge.exposeInMainWorld('desktop', {
   companionSnapshot: () => invoke('companion:snapshot'),
   stopCompanion: () => invoke('companion:stop'),
   onCompanionStatus: (callback) => { ipcRenderer.on('companion:status', (_, value) => callback(value)); },
-  onOpenContext: (callback) => { ipcRenderer.on('agent:open-context', () => callback()); },
+  onOpenContext: (callback) => { ipcRenderer.on('agent:open-context', (_, value) => callback(value)); },
   openWork: (kind) => invoke('agent:open-work', kind),
   copyFinding: (kind,id) => invoke('agent:copy-finding',kind,id),
   share: (kind, enable) => invoke('agent:share', kind, enable),

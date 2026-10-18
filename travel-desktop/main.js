@@ -23,11 +23,12 @@ const { nativeWindow, observation, windowNumber } = require('./src/external-obse
 const { clampCompanion } = require('./src/companion-position');
 const taskReview = require('./src/task-review');
 const { BrowserBridge } = require('./src/browser-bridge');
+const { BrowserConnect } = require('./src/browser-connect');
 const nebiusClient = require('./src/nebius');
 const tavilyClient = require('./src/tavily');
 const cloudActivity = require('./src/cloud-activity');
 const rules = require('./src/rules');
-const reviewAgent = require('./src/review-agent');
+const { ContextualReview, identity: reviewIdentity, reviewObserved } = require('./src/contextual-review');
 const publicCheck = require('./src/public-check');
 const publicSite = require('./src/public-site');
 const semanticIndex = require('./src/semantic-index');
@@ -53,13 +54,24 @@ let externalWatchTimer = null;
 let externalCaptureBusy = false;
 let externalError = '';
 let externalEpoch = 0;
+let browserSessionEpoch = 0;
 const browserBridge = new BrowserBridge({
   onObservation: result => {
     if (!signedIn() || browserBridge.personId !== companyWorkspace.activePersonId) { browserBridge.stop(); return; }
     selectedExternalWindow = { id: result?.windowId || selectedExternalWindow?.id || 'browser:pending', name: result?.windowName || selectedExternalWindow?.name || 'Shared browser field', adapter: 'browser-dom' };
+    if (!result || result.fieldId !== externalObservation?.fieldId || result.revision !== externalObservation?.revision || result.contentHash !== externalObservation?.contentHash) contextualReview.invalidate();
     externalObservation = result; externalWatching = true; externalError = result ? '' : 'Editing selected field. Review updates after a pause.'; publish();
   },
   onStop: () => { stopExternal(); publish(); },
+  onRequest: payload => {
+    requireSession();
+    if (browserBridge.personId !== companyWorkspace.activePersonId) throw new Error('Browser session changed');
+    if (payload.kind === 'status') return contextualReview.status();
+    if (payload.kind === 'review') return contextualReview.review(payload);
+    if (payload.kind === 'proposal') return contextualReview.proposal(payload);
+    if (payload.kind === 'open') return contextualReview.open(payload);
+    throw new Error('Unsupported contextual action');
+  },
 });
 function logCloudCall(entry) {
   if (!signedIn()) return;
@@ -69,6 +81,27 @@ function logCloudCall(entry) {
 nebiusClient.onCall(logCloudCall);
 tavilyClient.onCall(logCloudCall);
 const runtimeKeys = { nebius: process.env.NEBIUS_API_KEY || '', tavily: process.env.TAVILY_API_KEY || '' };
+function reviewState() { return { signedIn: signedIn(), workspace: companyWorkspace, observed: externalObservation, epoch: externalEpoch, aiEnabled, key: runtimeKeys.nebius }; }
+const contextualReview = new ContextualReview({
+  getState: reviewState,
+  openSource: sourceId => { agentWindow.show(); agentWindow.focus(); agentWindow.webContents.send('agent:open-context', { sourceId }); },
+});
+
+const browserConnect = new BrowserConnect({
+  port: !app.isPackaged && process.env.AVERILL_CONNECT_PORT === '0' ? 0 : undefined,
+  getSession: () => signedIn() ? `${browserSessionEpoch}:${companyWorkspace.activePersonId}` : null,
+  approve: async ({ origin, pageOrigin }) => {
+    agentWindow.show(); agentWindow.focus();
+    const result = await dialog.showMessageBox(agentWindow, { type: 'question', title: 'Connect the Averill browser companion', message: `Connect this browser companion to ${pageOrigin}?`, detail: `Extension: ${origin}\nOnly a field you choose will be shared locally. Use Stop sharing to end access. Approval lasts until sign-out or app restart. No sending or publication.`, buttons: ['Cancel', 'Connect'], defaultId: 0, cancelId: 0 });
+    return result.response === 1;
+  },
+  connect: async binding => {
+    requireSession(); const personId = companyWorkspace.activePersonId, session = browserSessionEpoch;
+    stopExternal(); const pair = await browserBridge.start(personId, binding);
+    if (!signedIn() || session !== browserSessionEpoch || personId !== companyWorkspace.activePersonId) { browserBridge.stop(); throw new Error('Account changed'); }
+    publish(); return pair;
+  },
+});
 
 function secretPath() { return path.join(app.getPath('userData'), 'averill-secrets.enc.json'); }
 async function loadSecrets() {
@@ -99,6 +132,7 @@ function signedIn() {
 }
 function requireSession() { if (!signedIn()) throw new Error('Sign in to your account first.'); }
 function stopExternal(clearSelection = true) {
+  contextualReview.invalidate();
   browserBridge.stop();
   externalEpoch += 1;
   if (externalWatchTimer) clearInterval(externalWatchTimer);
@@ -112,6 +146,7 @@ function isOwnWindowSource(source) {
   return [agentWindow, companionWindow, ...workWindows.values()].some(window => window && !window.isDestroyed() && window.getMediaSourceId() === source.id);
 }
 function clearSessionWork() {
+  browserSessionEpoch++; browserConnect.revoke();
   shared.clear(); aiEnabled = false; stopExternal();
   workState.clear();
   for (const window of workWindows.values()) if (!window.isDestroyed()) window.close();
@@ -234,6 +269,7 @@ function openWork(kind) {
 }
 
 app.whenReady().then(async () => {
+  await browserConnect.start().catch(() => { /* Extension shows a recoverable connection error; manual pairing remains available. */ });
   companyWorkspace = workspace.load(app.getPath('userData'));
   await cloud.load();
   const area = screen.getPrimaryDisplay().workArea;
@@ -640,13 +676,11 @@ app.whenReady().then(async () => {
     if (!taskReview.tasks[task]) throw new Error('Choose a supported work type.');
     const observed = externalObservation;
     if (!observed || !selectedExternalWindow || observed.windowId !== selectedExternalWindow.id) throw new Error('Read the selected window before reviewing its work.');
-    const personId = companyWorkspace.activePersonId;
-    const epoch = externalEpoch;
-    const result = useAI === true && aiEnabled ? await reviewAgent.reviewWithAgent(companyWorkspace, task, observed.text, runtimeKeys.nebius, observed.field) : await taskReview.reviewTask(companyWorkspace, task, observed.text, runtimeKeys.nebius, false, observed.field);
-    fromAgent(event);
-    if (epoch !== externalEpoch || personId !== companyWorkspace.activePersonId || observed.contentHash !== externalObservation?.contentHash) throw new Error('The work changed or sharing stopped. Read it again.');
-    const current = new Map(taskReview.currentSources(companyWorkspace, task).map(item => [item.source.id, item]));
-    if (result.findings.some(item => { const entry = current.get(item.source.id); return !entry || entry.source.version !== item.source.version || entry.source.approvedAt !== item.source.approvedAt || !entry.text.includes(item.source.quote); })) throw new Error('The approved company sources changed. Review again.');
+    const state = reviewState(), expected = reviewIdentity(state, task);
+    const result = await reviewObserved(state, task, useAI, () => {
+      fromAgent(event);
+      if (reviewIdentity(reviewState(), task) !== expected) throw new Error('The work or company guidance changed. Review again.');
+    });
     return { ...result, observedAt: observed.capturedAt, method: observed.method, window: observed.windowName, contentHash: observed.contentHash };
   });
   ipcMain.handle('agent:public-check', async (event, task, claims) => {
@@ -775,5 +809,5 @@ app.whenReady().then(async () => {
   app.on('activate', () => { if (BrowserWindow.getAllWindows().length === 0) app.quit(); });
 });
 
-app.on('before-quit', () => browserBridge.stop());
+app.on('before-quit', () => { browserConnect.stop(); browserBridge.stop(); });
 app.on('window-all-closed', () => app.quit());

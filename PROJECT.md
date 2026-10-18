@@ -1,5 +1,8 @@
 # Averill project
 
+Current update, 18 October 2026: Companion is the selected identity. The source now includes contextual in-page browser guidance, guided loopback connection and a bounded preview/Apply/Undo path for plain textarea/text controls. Shared orchestration and synthetic end-to-end checks are implemented; installed Chrome and actual email/social/design-platform acceptance remain open. The main desktop shell is still the legacy UI until CX-08. Read `docs/HANDOVER.md` for scope and evidence.
+
+
 Current update, 17 October 2026: Nebius/Tavily integration implemented on branch `claude/charming-johnson-rhezro` (PR #21); live calls not yet verified. Start from [docs/HANDOVER_NEBIUS_TAVILY_2026-10-17.md](docs/HANDOVER_NEBIUS_TAVILY_2026-10-17.md).
 
 Current status, 4 October 2026: the Guided UI release is public at [v0.1.0-preview.20261004.2](https://github.com/sararr25/averill-ai/releases/tag/v0.1.0-preview.20261004.2). See [docs/PROJECT_STATUS_2026-10-04.md](docs/PROJECT_STATUS_2026-10-04.md) and [docs/NEXT_STEPS_2026-10-04.md](docs/NEXT_STEPS_2026-10-04.md) for current evidence, ordered checks and pending fixes. Dated earlier sections are historical where superseded.
@@ -57,7 +60,7 @@ Approved launch email: 15 October 2026 at 10:00 Copenhagen time. Approved paid c
 
 ## Explicit non-goals for this prototype
 
-No arbitrary-window surveillance, external app control, automatic edit, email send, or post publication is implemented. Native observation runs only for the selected window after explicit Start, using a six-second local poll. A separate opt-in Chrome extension shares one clicked top-frame field locally after pause, blur or selection; it does not inspect hidden settings. Do not present visible text as full app understanding. The campaign source pack is synthetic; no real customer data is required for the demo.
+No arbitrary-window surveillance, arbitrary external app control, autonomous editing, email send or post publication is implemented. A user can explicitly preview and apply one validated forbidden-phrase removal in supported plain browser fields; richer editors require their own acceptance. Native observation runs only for the selected window after explicit Start, using a six-second local poll. A separate opt-in Chrome extension shares one clicked top-frame field locally after pause, blur or selection; it does not inspect hidden settings. Do not present visible text as full app understanding. The campaign source pack is synthetic; no real customer data is required for the demo.
 
 ## Product and design decisions
 

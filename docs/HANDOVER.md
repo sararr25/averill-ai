@@ -1,3 +1,9 @@
+# Contextual browser implementation — 18 October 2026
+
+The owner explicitly authorized push/ticket updates and continuation. Design commit `82f4377` is pushed and CX-01 / #24 is closed. Read [the implementation record](CONTEXTUAL_IMPLEMENTATION_2026-10-18.md) for the new shared review contract, guided loopback connection, actual in-page Companion UI and narrowly bounded plaintext preview/Apply/Undo. CX-02 contract is implemented; CX-03–CX-05 have source/synthetic-flow evidence but remain open for their installed-browser, placement/accessibility and editor acceptance gates. Brevo/LinkedIn origins are context hints, not validated rich-editor support. The main desktop shell is still legacy until CX-08.
+
+Latest checks: 89/89 unit tests; 13 contextual end-to-end synthetic checks with zero provider calls; existing browser regression and desktop UI 22/22 pass. Actual Chrome transport/permissions and the native approval click are not proved by the contextual harness. Normal accounts/sources and Vamo are untouched. Do not claim the old public/package build has these endpoints.
+
 # Companion identity selected — 18 October 2026
 
 The owner selected **03 Companion** (dark plum, pale lime, rounded contours, Plus Jakarta Sans). Start new visual work from [the selected foundation](../travel-desktop/design-system/companion/FOUNDATION.md): semantic tokens, developed SVG mark, refined reading/control sizes, card/panel/source/preview/Undo contracts, full state inventory and role-aware desktop hierarchy. The review prototype now defaults to Companion. CX-01 design scope is complete; CX-04/CX-08 runtime implementation and all real-platform acceptance remain separate. Current app CSS/behavior, accounts, sources and Vamo are untouched. Earlier exploration recommendations below are historical.

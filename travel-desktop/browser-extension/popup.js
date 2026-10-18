@@ -1,14 +1,16 @@
 const status = document.getElementById('status');
-document.getElementById('share').addEventListener('click', async () => {
- try {
-  const pair = JSON.parse(document.getElementById('pair').value);
-  if (!/^http:\/\/127\.0\.0\.1:\d+\/observation$/.test(pair.endpoint) || !/^[a-f0-9]{64}$/.test(pair.token)) throw new Error('Copy current pairing details from Averill.');
-  const [tab] = await chrome.tabs.query({active:true,currentWindow:true});
-  if (!/^https?:/.test(tab?.url || '')) throw new Error('Choose a normal HTTP/HTTPS draft page.');
-  await chrome.runtime.sendMessage({kind:'stop-pair'});
-  await chrome.storage.session.set({pair:{...pair,tabId:tab.id,pageOrigin:new URL(tab.url).origin,sequence:0}});
-  await chrome.scripting.executeScript({target:{tabId:tab.id},files:['content.js']});
-  document.getElementById('pair').value='';status.textContent='Click the draft field to share. Stop in Averill or here ends local sharing.';
- } catch(error){status.textContent=error.message;}
-});
-document.getElementById('stop').addEventListener('click',async()=>{await chrome.runtime.sendMessage({kind:'stop-pair'});status.textContent='Sharing stopped.';});
+async function connect(kind) {
+  const button = document.getElementById(kind === 'connect-tab' ? 'connect' : 'share'); button.disabled = true;
+  status.textContent = 'Connecting… Approve the first connection in Averill if prompted.';
+  try {
+    const pair = kind === 'pair-tab' ? JSON.parse(document.getElementById('pair').value) : undefined;
+    const result = await chrome.runtime.sendMessage({ kind, pair });
+    if (result.error) throw new Error(result.error);
+    document.getElementById('pair').value = '';
+    status.textContent = 'Connected. Choose a draft field, then Ask Averill in the page.';
+  } catch (error) { status.textContent = error.message; }
+  finally { button.disabled = false; }
+}
+document.getElementById('connect').addEventListener('click', () => connect('connect-tab'));
+document.getElementById('share').addEventListener('click', () => connect('pair-tab'));
+document.getElementById('stop').addEventListener('click', async () => { await chrome.runtime.sendMessage({ kind: 'stop-pair' }); status.textContent = 'Sharing stopped.'; });

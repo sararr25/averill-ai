@@ -671,7 +671,7 @@ el('login-form').addEventListener('submit', async (event) => {
   finally { submit.disabled = false; }
 });
 window.desktop.onSnapshot((value) => { current = value; render(); });
-window.desktop.onOpenContext(() => { showTab('work'); el(current.externalObservation?'external-task-review':current.externalWindow?'review-external':'browser-pair').focus(); });
+window.desktop.onOpenContext(value => { if (value?.sourceId) { showTab('knowledge'); showSource(value.sourceId); return; } showTab('work'); el(current.externalObservation?'external-task-review':current.externalWindow?'review-external':'browser-pair').focus(); });
 window.desktop.snapshot().then((value) => { current = value; render(); showTab(preferredArea()); });
 
 for (const target of document.querySelectorAll('[data-icon]')) target.innerHTML = icon(target.dataset.icon);

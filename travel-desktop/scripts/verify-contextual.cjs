@@ -1,0 +1,71 @@
+// Actual main process, bridge, review engine, background and content script; synthetic browser transport/approval only.
+const { app, BrowserWindow, ipcMain, dialog } = require('electron');
+const fs = require('node:fs'), path = require('node:path'), http = require('node:http'), vm = require('node:vm'), assert = require('node:assert/strict');
+const APP = path.resolve(__dirname, '..'), profile = fs.mkdtempSync('/tmp/averill-contextual-ui-');
+const workspace = require('../src/workspace'), { BrowserConnect } = require('../src/browser-connect');
+const file = path.join(profile, 'brand.md'); fs.writeFileSync(file, 'Do not claim "lowest prices guaranteed".');
+const data = workspace.create(profile, 'Synthetic contextual test', 'Owner'), source = workspace.importFile(profile, data, file, { department: 'Marketing', version: '2' }); workspace.updateSource(data, source.id, 'approved'); workspace.save(profile, data);
+app.setPath('userData', profile); process.env.AVERILL_CONNECT_PORT = '0';
+let connectPort, approvals = 0, editor, pageServer, backgroundListener, holdReviewReply = false; const storage = {};
+const originalStart = BrowserConnect.prototype.start;
+BrowserConnect.prototype.start = async function () { connectPort = await originalStart.call(this); return connectPort; };
+const originalDialog = dialog.showMessageBox;
+dialog.showMessageBox = async (...args) => { const options = args.at(-1); assert.equal(options.title, 'Connect the Averill browser companion'); approvals++; return { response: 1 }; };
+const originalFetch = global.fetch;
+global.fetch = (url, options) => { assert.equal(new URL(url).hostname, '127.0.0.1', 'No provider request allowed'); return originalFetch(url, options); };
+require('../main.js');
+const pause = ms => new Promise(resolve => setTimeout(resolve, ms)); const checks = [];
+const OUT = process.env.OUT || ''; if (OUT) fs.mkdirSync(OUT, { recursive: true });
+app.whenReady().then(async () => { try {
+ let agent; for (let i = 0; i < 100; i++) { agent = BrowserWindow.getAllWindows().find(w => w.webContents.getURL().includes('agent.html')); if (agent && !agent.webContents.isLoading() && await agent.webContents.executeJavaScript('Boolean(window.desktop)')) break; await pause(100); }
+ const run = s => agent.webContents.executeJavaScript(s);
+ await run("window.desktop.enableAccounts('owner@synthetic.example','Synthetic-password-123')");
+ pageServer = http.createServer((req, res) => {
+  if (req.url.startsWith('/assets/')) { const name = path.basename(req.url); if (!['mark.svg', 'plus-jakarta-sans.ttf'].includes(name)) { res.writeHead(404); res.end(); return; } res.setHeader('Content-Type', name.endsWith('.svg') ? 'image/svg+xml' : 'font/ttf'); res.end(fs.readFileSync(path.join(APP, 'browser-extension/assets', name))); return; }
+  res.setHeader('Content-Type', 'text/html; charset=utf-8'); res.end('<!doctype html><html><meta charset="utf-8"><title>Synthetic draft</title><body style="font:16px sans-serif;padding:35px;background:#f6f7fa"><h1>Synthetic email editor</h1><label>Email body<textarea id="draft" style="display:block;width:510px;height:450px;font:16px/1.7 sans-serif;margin-top:20px">  Hello 🌍\nOur lowest prices guaranteed.\nKeep https://example.test  </textarea></label><button id="publish" disabled>Send (disabled)</button></body></html>');
+ }); await new Promise(r => pageServer.listen(0, '127.0.0.1', r)); const pageOrigin = `http://127.0.0.1:${pageServer.address().port}`;
+ const extOrigin = 'chrome-extension://' + 'c'.repeat(32);
+ const chrome = { runtime: { id: 'c'.repeat(32), onMessage: { addListener: f => { backgroundListener = f; } } }, storage: { session: { get: async key => ({ [key]: storage[key] ? structuredClone(storage[key]) : undefined }), set: async object => Object.assign(storage, structuredClone(object)), remove: async key => { delete storage[key]; } } }, tabs: { query: async () => [{ id: 9, url: pageOrigin + '/draft' }], sendMessage: async (_id, message) => editor.webContents.send('test-extension-message', message), onRemoved: { addListener: () => {} } }, scripting: { executeScript: async ({ files }) => { for (const name of files) await editor.webContents.executeJavaScript(fs.readFileSync(path.join(APP, 'browser-extension', name), 'utf8')); } } };
+ vm.runInNewContext(fs.readFileSync(path.join(APP, 'browser-extension/background.js'), 'utf8').replace('http://127.0.0.1:43147/connect', `http://127.0.0.1:${connectPort}/connect`), { chrome, URL, AbortSignal, fetch: (url, options) => global.fetch(url, { ...options, headers: { ...options.headers, Origin: extOrigin } }) });
+ const relay = (payload, sender = { id: chrome.runtime.id, tab: { id: 9 }, frameId: 0, origin: pageOrigin }) => new Promise(resolve => backgroundListener(payload, sender, value => { if (payload.kind === 'review' && holdReviewReply) setTimeout(() => resolve(value), 250); else resolve(value); }));
+ const preload = path.join(profile, 'test-preload.cjs'); fs.writeFileSync(preload, "const {contextBridge,ipcRenderer}=require('electron');contextBridge.exposeInMainWorld('testExtension',{send:p=>ipcRenderer.invoke('test-extension',p),onMessage:f=>ipcRenderer.on('test-extension-message',(_,p)=>f(p))});");
+ editor = new BrowserWindow({ width: 1200, height: 900, show: false, webPreferences: { preload, contextIsolation: true, sandbox: true } });
+ ipcMain.handle('test-extension', (event, payload) => { assert.equal(event.sender, editor.webContents); return relay(payload); });
+ await editor.loadURL(pageOrigin + '/draft'); const page = s => editor.webContents.executeJavaScript(s);
+ await page(`window.testShadow=null;const originalShadow=Element.prototype.attachShadow;Element.prototype.attachShadow=function(o){const r=originalShadow.call(this,o);window.testShadow=r;return r};window.chrome={runtime:{getURL:p=>${JSON.stringify(pageOrigin + '/')}+p,sendMessage:p=>window.testExtension.send(p),onMessage:{addListener:f=>window.testExtension.onMessage(f)}}};void 0;`);
+ const connected = await relay({ kind: 'connect-tab' }, { id: chrome.runtime.id }); assert.equal(connected.connected, true); assert.equal(approvals, 1); checks.push('Guided connection: actual loopback rendezvous/bridge, synthetic approval, no JSON paste');
+ const bounds = await page("(()=>{const r=document.getElementById('draft').getBoundingClientRect();return {x:Math.round(r.x+20),y:Math.round(r.y+30)}})()");
+ editor.webContents.sendInputEvent({ type: 'mouseDown', button: 'left', clickCount: 1, ...bounds }); editor.webContents.sendInputEvent({ type: 'mouseUp', button: 'left', clickCount: 1, ...bounds }); await pause(180);
+ await page("testShadow.querySelector('select').value='email';testShadow.querySelector('select').dispatchEvent(new Event('change'));");
+ const click = label => page(`(()=>{const b=[...testShadow.querySelectorAll('button')].find(b=>b.textContent===${JSON.stringify(label)});if(!b)throw new Error('Missing action '+${JSON.stringify(label)});b.click()})()`);
+ async function until(expression) { for (let i = 0; i < 100; i++) { if (await page(expression)) return; await pause(60); } throw new Error('Timeout: ' + expression); }
+ const original = await page("document.getElementById('draft').value"); assert(original.includes('🌍'));
+ holdReviewReply=true;await click('Ask Averill');await until("testShadow.textContent.includes('Checking your draft.')");await click('×');await pause(350);assert(await page("Boolean(testShadow.querySelector('.chip'))"));checks.push('Dismissed pending review stays dismissed when its reply arrives');holdReviewReply=false;await click('Ask Averill');await click('Ask Averill');await until("testShadow.textContent.includes('Remove “lowest prices guaranteed”.')");
+ assert(await page("testShadow.textContent.includes('Approved · Version 2')")); assert(!(await page('testShadow.textContent')).includes(storage.pair.token)); checks.push('Ask shows the actual local cited finding in-page; no desktop navigation or token exposure');
+ await click('Preview change'); await until("testShadow.textContent.includes('Review this change.')");
+ if (OUT) fs.writeFileSync(path.join(OUT, 'preview.png'), (await editor.webContents.capturePage()).toPNG());
+ await click('Apply change'); await until("testShadow.textContent.includes('Change applied.')");
+ assert.equal(await page("document.getElementById('draft').value"), original.replace('lowest prices guaranteed', '')); checks.push('Explicit Apply changes only the validated phrase, preserving surrounding whitespace/link/newline');
+ await click('Undo change'); await until("testShadow.textContent.includes('Previous text restored.')"); assert.equal(await page("document.getElementById('draft').value"), original); checks.push('Undo restores the exact original text');
+ await click('Recheck selected text'); await until("testShadow.textContent.includes('Remove “lowest prices guaranteed”.')");
+ await click('Open in Averill ↗'); await pause(200); assert(await run("document.getElementById('source-dialog').open")); await run("document.getElementById('source-dialog').close()"); checks.push('Explicit deep link opens the authorized source in the desktop app');
+ await click('Preview change'); await until("testShadow.textContent.includes('Review this change.')");
+ await run(`window.desktop.updateSource(${JSON.stringify(source.id)},'superseded',0,'Synthetic test revocation')`);
+ await click('Apply change'); await until("testShadow.textContent.includes('changed')"); assert.equal(await page("document.getElementById('draft').value"), original); checks.push('Revoked source blocks Apply without changing the editor');
+ await click('Ask Averill'); await until("testShadow.textContent.includes('No approved source yet.')"); checks.push('Unavailable authority is insufficient evidence, never a clean result');
+ await run(`window.desktop.updateSource(${JSON.stringify(source.id)},'approved')`);
+ await click('Try again'); await until("testShadow.textContent.includes('Remove “lowest prices guaranteed”.')");
+ await click('Preview change'); await until("testShadow.textContent.includes('Review this change.')"); await click('Apply change'); await until("testShadow.textContent.includes('Change applied.')");
+ await page("document.getElementById('draft').value+=' New typing';document.getElementById('draft').dispatchEvent(new Event('input',{bubbles:true}));");
+ assert(!(await page('testShadow.textContent')).includes('Undo change')); assert((await page("document.getElementById('draft').value")).endsWith(' New typing')); assert((await page('testShadow.textContent')).includes('Undo will not overwrite'));await click('Show previous text for manual recovery');assert.equal(await page('testShadow.querySelector("textarea").value'),original);checks.push('Intervening typing blocks Undo and offers explicit manual recovery without overwriting newer work');
+ await click('Review current text'); await until("testShadow.textContent.includes('No conflicts found.')"); checks.push('Recheck clears the corrected conflict');
+ if (OUT) fs.writeFileSync(path.join(OUT, 'clear.png'), (await editor.webContents.capturePage()).toPNG());
+ await click('Stop sharing'); await until("!document.querySelector('[data-averill-companion]')"); assert.equal((await run('window.desktop.snapshot()')).browserBridge.ready, false); checks.push('Stop removes in-page UI, text sharing and the authenticated bridge');
+ await relay({ kind: 'connect-tab' }, { id: chrome.runtime.id }); assert.equal(approvals, 1); checks.push('Same-session explicit reconnect needs no repeated desktop approval');
+ const pair = storage.pair; await run('window.desktop.logout()'); assert.equal((await run('window.desktop.snapshot()')).browserBridge.ready, false); checks.push('Logout revokes the connection');
+ const response = await global.fetch(`http://127.0.0.1:${connectPort}/connect`, { method: 'POST', headers: { Origin: extOrigin, 'Content-Type': 'application/json' }, body: JSON.stringify({ tabId: 9, pageOrigin }) }); assert.equal(response.status, 401);
+ if (OUT) fs.writeFileSync(path.join(OUT, 'verification.json'), JSON.stringify({ checks, providerRequests: 0, limits: ['Synthetic transport and browser approval; not installed Chrome or real-platform acceptance', 'Plain text controls only; rich editor writes remain unsupported'] }, null, 2));
+ console.log(checks.join('\n')); console.log(`${checks.length} contextual checks passed; zero provider requests`);
+ } catch (error) { console.error(error.stack); process.exitCode = 1; }
+ finally { dialog.showMessageBox = originalDialog; global.fetch = originalFetch; editor?.destroy(); pageServer?.close(); pageServer?.closeAllConnections(); app.quit(); fs.rmSync(profile, { recursive: true, force: true }); }
+});

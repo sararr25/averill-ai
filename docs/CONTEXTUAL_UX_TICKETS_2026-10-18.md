@@ -4,6 +4,10 @@ Epic/specification: [#23](https://github.com/sararr25/averill-ai/issues/23).
 
 All thirteen tickets use `ready-for-agent`. Blocked tickets must wait for their dependencies. The label does not mean that a visual direction has already been selected or platform acceptance has passed.
 
+## Implementation progress — 18 October 2026
+
+CX-01 is closed after owner selection. CX-02 shared orchestration/contract is implemented and tested. Source implementations for CX-03/CX-04/CX-05 pass the synthetic in-page loop; those tickets remain open for their explicit remaining acceptance. See [the implementation record](CONTEXTUAL_IMPLEMENTATION_2026-10-18.md) for exact scope. No platform or parent acceptance ticket is closed by these tests.
+
 ## Selected identity — 18 October 2026
 
 The owner selected **03 Companion**. CX-01 design deliverables are complete: [selected foundation](../travel-desktop/design-system/companion/FOUNDATION.md), semantic tokens, developed vector mark, refined prototype and state specification. Runtime migration in CX-04/CX-08 remains open; no real-platform acceptance is implied.

@@ -1,25 +1,45 @@
-# Selected-field browser companion
+# Averill in-page browser companion
 
-Opt-in Chrome Manifest V3 extension, distributed as source for the hackathon prototype. It requests activeTab, scripting, session storage and **only loopback** host access (`http://127.0.0.1/*`); it does not request all-sites access, cookies or browsing history. Official design references: [activeTab](https://developer.chrome.com/docs/extensions/develop/concepts/activeTab), [extension network requests](https://developer.chrome.com/docs/extensions/develop/concepts/network-requests), [session storage](https://developer.chrome.com/docs/extensions/reference/api/storage).
+Version 0.2.0. Opt-in Chrome Manifest V3 extension, distributed as source for the hackathon prototype. The content script shows Companion guidance beside one chosen top-frame draft field. It uses the desktop app's real local review engine, exact approved source passages and optional consented Nemotron review. A complete synthetic flow is verified; actual-platform acceptance is still open.
 
-## Installation and pairing
+## Install or update
 
-1. Review the source and manifest. In Chrome's Extensions page, enable Developer mode and Load unpacked this directory. Installation/permission approval is an employee action; the app does not install the extension automatically.
-2. Sign in to Averill. Work → Share one browser draft field → Start browser pairing → Copy pairing details. Pairing expires after two minutes unless the extension connects.
-3. In the intended HTTP/HTTPS draft tab, click the extension. Paste the copied pairing JSON and choose Share this tab. Click **one** draft field. Clicking another eligible field explicitly changes the shared field.
-4. Averill clears the old observation as typing starts; it receives the chosen field after a 1.2-second pause, blur or selection. A periodic local read detects changes made by the editor itself when no typing debounce is pending. Whole draft/page extraction is not performed. A DOM field can include text beyond its current scroll position.
-5. Review current sources in Averill. The employee makes all edits. Stop in Averill, the floating control or the extension revokes local pairing. Hiding/closing/navigating the tab stops sharing; a lost connection expires after 15 seconds. Pair again to resume.
+Installation is an employee action. Review the source and manifest, then use Chrome Extensions → Developer mode → Load unpacked for this directory. If it is already installed from this directory, reload that existing extension after updating the files. Averill does not install or reload it automatically. This source version needs the matching updated desktop build; an old published binary does not expose the new endpoints.
 
-## Limits and privacy
+## Normal connection and review
 
-Only top-frame fields are supported. Cross-origin frames, shadow DOM, native select popups, closed editors and platform-specific controls require their own acceptance. Password/email/tel inputs and fields labelled as payment, credentials, recipient or personnel are excluded. Credential-shaped strings/payment numbers are redacted again in the desktop. The short-lived pairing token remains in extension session storage and is absent from public workspace snapshots. Paste it only into this extension, never a website. No provider request, edit, send or post is automatic.
+1. Open the matching Averill app and sign in.
+2. In the intended draft tab, click the extension and **Connect this tab**. On first use in that signed-in session, Averill displays a native Cancel/Connect prompt naming the extension and page origin. Approve the intended companion. The extension worker completes connection even if the popup closes while you approve.
+3. Choose one draft field. The page shows a small Averill card. Supported Brevo and LinkedIn origins infer the existing marketing email/organic-post work type; an unknown site asks for the work type. This is a context hint, not a claim that every editor on those platforms works.
+4. Click **Ask Averill**. The result, exact source passage and optional preview stay in-page. **Open in Averill** explicitly opens the cited source in the desktop app.
+5. A unique forbidden-phrase removal may offer **Apply change** for a plain textarea/text input. Confirm its preview. **Undo** restores the previous text only if nothing has changed since; otherwise the card offers explicit manual recovery. Rich contenteditable editors remain review-only until a dedicated adapter is validated. Arbitrary rewriting and new text insertion are not implemented.
+6. Editing immediately invalidates earlier advice. A 1.2-second pause, blur or selection sends the new selected field; periodic local reads detect editor-driven changes. Ask again to recheck. Stop in the page, popup, desktop or floating control revokes the current bridge. Dismiss only closes the card.
 
-The local server checks loopback Host, an extension Origin, a random 256-bit token, one tab/origin and monotonic event sequence. A new session/person, Stop, lost heartbeat or app exit invalidates it. The extension relay never accepts an arbitrary destination URL from a page. Installation in the owner's Chrome profile and field transport on local fake pages were verified on 4 October 2026. Real-platform drafts and the remaining installed-browser edge cases remain manual acceptance gates.
+After initial connection approval, an explicit reconnect within the same authenticated session needs no second desktop approval. Hiding/closing/navigating the shared tab stops the current field transport; reconnect from the desired tab. Sign-out/restart also revokes extension approval. Company source/policy changes invalidate cached advice at the next status exchange and are checked again on every Apply/open authorization.
 
-## Evidence and requirements
+If guided connection is unavailable, the popup explains how to open/sign in to Averill. **Advanced connection** retains legacy pairing JSON for diagnostics; it is no longer the normal route. A port conflict on 43147 can prevent guided connection without preventing the legacy fallback.
 
-`npm test` covers bridge authorization, stale/cross-tab rejection, edit invalidation, expiry, session rotation and source-backed structured field checks. `npm run verify:browser` exercises native IPC/UI and the actual content-script pause code in a synthetic DOM with a test extension client. This does not establish installed-extension or actual-platform success.
+## Privacy and capability boundary
 
-Approved files may contain explicit lines such as `Field requirement: email | audience | "Travel subscribers — Denmark".` Supported keys: audience, date, time, asset, procedure, version, disclosure. A requirement is checked only when its matching field was actually selected; other fields are labelled unobserved. OCR cannot invent field metadata, asset geometry, schedule state or publication.
+Permissions remain activeTab, scripting, session storage and loopback-only host access (`http://127.0.0.1/*`). The publicly accessible resources are the bundled font and mark; their match list does not grant persistent website host access. No cookies, history, all-sites reading permission or automatic extension installation is requested.
 
-Actual installed Chrome evidence: [4 October acceptance](../../docs/INSTALLED_EXTENSION_2026-10-04.md). Brevo selected-field correction/Stop passed; LinkedIn and Instagram transport were verified separately from task-specific rule acceptance.
+The no-data rendezvous on 127.0.0.1:43147 accepts only extension Origins and signed-in, explicitly approved sessions. It returns a short-lived random-port bridge bound to one extension/tab/origin. The bridge validates Host, Origin, token and monotonically increasing observation sequence. Contextual review requests are separate from that queue so a slow provider cannot block editing invalidation or heartbeats. The token exists only in extension session storage, never the host DOM, public snapshots or logs.
+
+Only one clicked top-frame field is shared. Credential/contact/payment/personnel-labelled fields and unsupported/oversized fields are excluded. The selected value is capped at 6000 UTF-16 code units; no whole-page extraction occurs. Selecting an excluded field clears the previous observation. Credential-shaped content and payment numbers are redacted in the main process; redacted observations do not get executable proposals. Cross-origin frames, closed shadow editors and visual geometry are not supported by the generic reader.
+
+Only bounded findings, minimal authorized source passages, work scope and validated optional patches go back to the page. Restricted/credential-bearing sources are not quoted there. Full documents, company/person snapshots, provider keys, model traces and public-claim suggestions are never returned through this capability. A closed shadow root isolates styling, not confidential data from the host site; therefore the company library remains in Averill.
+
+Nemotron requires the existing company AI policy, eligible source/file consent, session AI availability and an explicit in-page confirmation for the selected review. Local checks make no provider call. Tavily is not called by this flow. Nothing sends, posts, schedules or publishes. No automatic rich-editor manipulation is claimed.
+
+The plain-text adapter changes only a unique, exact server-authorized removal and verifies the editor's native value after an input event. It checks the full field value/id/revision, preserves unrelated whitespace and text, and never interprets model prose as code. Undo state stays ephemeral in the content-script closure. An editor that rejects/transforms a write is reported as uncertain rather than silently declared fixed. Dedicated real-editor acceptance is required for controlled rich editors and formatting preservation.
+
+## Evidence
+
+- `npm test`: bridge authorization, rendezvous approval/reconnect/logout, selected-field source authority, stale model replies, exact patch applicability and prior regressions.
+- `npm run verify:contextual`: real Electron main process, loopback servers, review engine, actual background/content scripts and native plaintext control. Chrome permission/transport and the native approval response are simulated in an isolated profile. It verifies preview/Apply/exact Undo, revoked-source rejection, manual recovery after typing, recheck, explicit source deep link, Stop/reconnect/logout and zero provider requests. This is **not** installed Chrome, Brevo, LinkedIn or live Nemotron acceptance.
+- `npm run verify:browser`: prior native pairing/typing/Stop/logout and real content-script code in a synthetic DOM; also verifies that clicking an excluded field clears the old selection without transmitting its value.
+- `npm run verify:ui-e2e`: regression for the existing desktop Review/Work flow.
+
+Recorded evidence: [contextual flow](../../docs/review-evidence-2026-10-18/contextual/). Older installed 0.1.0 evidence remains historical; it cannot establish 0.2.0 acceptance. Tickets CX-03/CX-04/CX-05 retain their remaining real-browser, layout, accessibility and failure-path gates; Brevo/LinkedIn rich editor adapters are separate CX-06/CX-07 work.
+
+Technical references: [activeTab](https://developer.chrome.com/docs/extensions/develop/concepts/activeTab), [content scripts](https://developer.chrome.com/docs/extensions/develop/concepts/content-scripts), [session storage](https://developer.chrome.com/docs/extensions/reference/api/storage).

@@ -28,5 +28,9 @@ app.whenReady().then(async()=>{try{
  assert.ok(await page.webContents.executeJavaScript("messages.some(x=>x.kind==='field'&&x.reason==='selection')"));
  await page.webContents.executeJavaScript("document.getElementById('body').value='Edited draft';document.getElementById('body').dispatchEvent(new Event('input',{bubbles:true}));");
  assert.equal(await page.webContents.executeJavaScript("messages.at(-1).kind"),'editing');await pause(1400);assert.ok(await page.webContents.executeJavaScript("messages.some(x=>x.kind==='field'&&x.reason==='pause'&&x.field.value==='Edited draft')"));
+ await page.webContents.executeJavaScript("document.getElementById('password').value='Sensitive-synthetic-only';document.getElementById('password').style.display='block'");
+ const secretBox=await page.webContents.executeJavaScript("(()=>{const r=document.getElementById('password').getBoundingClientRect();return {x:Math.round(r.x+10),y:Math.round(r.y+10)}})()");
+ page.webContents.sendInputEvent({type:'mouseDown',button:'left',clickCount:1,...secretBox});page.webContents.sendInputEvent({type:'mouseUp',button:'left',clickCount:1,...secretBox});await pause(80);
+ assert.equal(await page.webContents.executeJavaScript("messages.at(-1).kind"),'editing');assert.equal(await page.webContents.executeJavaScript("messages.some(m=>JSON.stringify(m).includes('Sensitive-synthetic-only'))"),false);
  console.log('PASS native pairing, selected field, typing invalidation, floating Stop/logout, content-script selection and edit pause; synthetic extension client only');app.quit();
 }catch(error){console.error(error.stack);app.exit(1);}});
