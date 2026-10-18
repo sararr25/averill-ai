@@ -14,6 +14,8 @@ function renderIntakeOptions(section) {
  links.append(node('p','Paste HTTPS file or public webpage links, one per line. Private cloud links need a cloud connection or an exported/synced file. Imports join the local review; URL access does not grant AI permission.'));
  const input=node('textarea');input.rows=3;input.setAttribute('aria-label','Company document HTTPS links');input.placeholder='https://…';links.append(input);
  onboardingButton(links,'Import links',async()=>{const urls=input.value.split(/\r?\n/).map(v=>v.trim()).filter(Boolean);el('workspace-feedback').textContent='Downloading selected links…';current=await window.desktop.linkOnboarding(urls);render();});section.append(links);
+ // Providers without a client ID are an admin setup task, not a broken feature: keep them collapsed.
+ const more=node('details',undefined,'intake-option intake-more');more.append(node('summary','More import options'));
  for(const connection of current.cloud||[]){
   const host=node('details',undefined,'intake-option');host.append(node('summary',`${connection.label} · ${connection.connected?'Connected':connection.configured?'Ready to connect':'Client setup needed'}`));
   host.append(node('p','Connect in your browser with read access. Browse folders and select files to import; connecting does not copy your whole drive or send anything to Nebius.'));
@@ -42,8 +44,9 @@ function renderIntakeOptions(section) {
    onboardingButton(host,'Disconnect',async()=>{current=await window.desktop.cloudDisconnect(connection.provider);delete intakeCloudBrowser[connection.provider];render();});
    host.append(node('p','Disconnect removes local access. You can revoke Averill permissions in your Google/Microsoft account. Access tokens expire; reconnect when needed.'));
   }
-  section.append(host);
+  (connection.configured||connection.connected?section:more).append(host);
  }
+ if(more.children.length>1)section.append(more);
  const privacyHost=node('details',undefined,'intake-option');privacyHost.append(node('summary',`Company confidentiality · ${current.privacy?.companyAI?'AI permitted for selected files':'Local processing only'}`));
  privacyHost.append(node('p','Files stay local by default. Restricted documents cannot be sent to Nebius. Cloud imports, staff accounts and source approval are separate from permission to use external AI.'));
  privacyHost.append(node('p','Before allowing company AI, verify your Nebius agreement, confidentiality obligations, retention/region and no-training/opt-out settings. Averill cannot verify those settings or create an NDA. Local document copies use OS file permissions, not application encryption.'));
