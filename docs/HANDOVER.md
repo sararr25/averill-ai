@@ -1,3 +1,9 @@
+# Contextual UX redesign planning — 18 October 2026
+
+The owner tested Averill and requested a full workflow/UI redesign. Start with [the contextual UX audit and delivery plan](CONTEXTUAL_UX_AUDIT_2026-10-18.md) and [the product specification](CONTEXTUAL_REVIEW_SPEC_2026-10-18.md). Confirmed: compact in-page card expanding into a side panel; individual preview/Apply/Undo; email and LinkedIn first; Instagram and Canva follow-ups; a complete palette/typography rethink; real-platform acceptance. These are planned capabilities, not shipped behavior. The new visual direction still needs selection from concrete alternatives. The planned explicit-edit capability supersedes the manual-only boundary only when implemented with its acceptance criteria. Existing runtime, credentials, approvals and Vamo identity are untouched.
+
+Live GitHub/history inspection for this plan found PR #21 merged and issues #10–#18 closed, superseding the unmerged status in the earlier dated handover. Existing acceptance issues remain open. The new plan does not close them or prove the requested flow. See [the new ticket index](CONTEXTUAL_UX_TICKETS_2026-10-18.md) for published scope and blocking links.
+
 # Nebius and Tavily integration — 17 October 2026
 
 **Next session: start from [HANDOVER_2026-10-18.md](HANDOVER_2026-10-18.md)** (UI tickets #10–#18, Vamo mismatch page, weekly freshness, packaging). Earlier: [HANDOVER_NEBIUS_TAVILY_2026-10-17.md](HANDOVER_NEBIUS_TAVILY_2026-10-17.md).
