@@ -5,7 +5,7 @@ const profile=fs.mkdtempSync('/tmp/averill-e2e-');const rule=path.join(profile,'
 fs.writeFileSync(rule,'Do not claim "lowest prices guaranteed".\nEvery marketing email must include this footer: "You are receiving this email because you subscribed to Vamo. Unsubscribe anytime."');
 const company=workspace.create(profile,'Vamo','Alex Holm');const policy=workspace.importFile(profile,company,rule,{department:'Marketing',version:'2'});workspace.updateSource(company,policy.id,'approved');workspace.save(profile,company);
 app.setPath('userData',profile);require(APP+'/main.js');
-const pause=ms=>new Promise(r=>setTimeout(r,ms));const log=[];const step=(name,ok,detail='')=>{log.push({name,ok,detail});};
+const WORK_HEIGHT_LIMIT=Number(process.env.WORK_HEIGHT_LIMIT||600);const pause=ms=>new Promise(r=>setTimeout(r,ms));const log=[];const step=(name,ok,detail='')=>{log.push({name,ok,detail});};
 app.whenReady().then(async()=>{try{
  let agent;for(let i=0;i<100;i++){agent=BrowserWindow.getAllWindows().find(w=>w.webContents.getURL().includes('agent.html'));if(agent&&!agent.webContents.isLoading()&&await agent.webContents.executeJavaScript('Boolean(window.desktop)'))break;await pause(100);}
  const run=s=>agent.webContents.executeJavaScript(s);const shot=async(n,w=520,h=850)=>{agent.setSize(w,h);await pause(450);if(OUT)fs.writeFileSync(path.join(OUT,n),(await agent.webContents.capturePage()).toPNG());};
@@ -17,7 +17,8 @@ app.whenReady().then(async()=>{try{
  await shot('01-review-idle.png');
  await run("document.querySelector('[data-tab-button=work]').click()");await pause(300);
  const dis=await run("['stop-external','external-local-recheck','external-task-review'].map(id=>{const e=document.getElementById(id);return [id,e.disabled,getComputedStyle(e).opacity]})");
- step('Unavailable Work actions are disabled and dimmed',dis.every(([,d,o])=>d&&Number(o)<0.6),JSON.stringify(dis));await shot('02-work-disabled.png');
+ step('Unavailable Work actions are hidden until work is shared',await run("['stop-external','external-local-recheck','external-task-review'].every(id=>!document.getElementById(id).offsetParent)"),JSON.stringify(dis));
+ const workHeight=await run("document.querySelector('[data-tab=work] > .section').scrollHeight");step('Work height at 520px before sharing',workHeight<WORK_HEIGHT_LIMIT,`${workHeight}px`);await shot('02-work-disabled.png');
  const pair=await run('window.desktop.pairBrowser()');
  const send=async(seq,value)=>{const r=await fetch(pair.endpoint,{method:'POST',headers:{Origin:'chrome-extension://'+'c'.repeat(32),'Content-Type':'application/json','X-Averill-Token':pair.token},body:JSON.stringify({tabId:9,pageOrigin:'https://brevo.example',kind:'field',sequence:seq,reason:'pause',field:{kind:'textarea',label:'Email body',value}})});assert.equal(r.status,200);await pause(400);};
  await send(1,'Winter Escapes 2027 — lowest prices guaranteed. Book Copenhagen, Vienna and Prague now.');

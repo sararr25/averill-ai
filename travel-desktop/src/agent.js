@@ -608,6 +608,11 @@ function renderWorkStep(){
  const identity=current.externalWindow?.id||null;
  if(identity!==workStepIdentity){workStepIdentity=identity;document.querySelector('.browser-adapter').open=!selected;document.querySelector('.native-adapter').open=selected&&!captured&&current.externalWindow.adapter!=='browser-dom';}
  el('work-next').textContent=reviewPending?'Checking your work… You can stop sharing at any time.':captured?'Text captured. Choose the work type below, then check approved rules.':selected?(current.externalWindow.adapter==='browser-dom'?'Finish editing the selected field. Advice clears while you type.':'Window selected. Read visible text to capture one frame.'):(ready?'Copy pairing details into the extension, then select a draft field.':'Start by connecting a browser field or choosing an app window.');
+ // One primary action per state: nothing to check or stop until work is shared; local recheck only after a result.
+ el('external-task').closest('.context-form').hidden=!selected;
+ el('stop-external').closest('.sharing-controls').hidden=!selected&&!ready;
+ document.querySelector('.work-question').hidden=!captured;document.querySelector('.captured-text').hidden=!captured;
+ el('external-local-recheck').hidden=!externalReview||current.externalWindow?.adapter==='browser-dom';
  for(const id of ['browser-pair','browser-copy-pair','review-external','external-task-review']){
    const primary=!reviewPending&&(captured?id==='external-task-review':selected?id==='review-external'&&current.externalWindow.adapter!=='browser-dom':ready?id==='browser-copy-pair':id==='browser-pair');
    el(id).classList.toggle('agent-primary',primary);el(id).classList.toggle('secondary-button',!primary);
