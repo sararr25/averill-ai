@@ -74,7 +74,7 @@ function renderLearning(){
  for(const q of quiz.questions){const card=node('div',undefined,'learning-question');card.append(node('h4',q.prompt));
   if(!q.available){card.append(node('p',`This activity or source changed. ${refreshInstruction}`));practice.append(card);continue;}
   if(q.guide)card.append(guideLink(q.guide));if(q.source){const b=node('button',`Read ${q.source.title} · v${q.source.version}`,'source-link');b.type='button';b.addEventListener('click',()=>showSource(q.source.id,b));card.append(b);}
-  const answer=quiz.answers[q.id];if(answer){card.append(node('p',['practice','work'].includes(q.type)?answer.text:`Your answer: ${q.options[answer.choice]}`),node('p',answer.feedback,'learning-feedback'));if(typeof answer.correct==='boolean'){card.dataset.result=answer.correct?'correct':'retry';card.prepend(node('span',answer.correct?'✓ Correct':'↺ Not quite — try again','answer-badge'));}practice.append(card);continue;}
+  const answer=quiz.answers[q.id];if(answer){card.append(node('p',['practice','work'].includes(q.type)?answer.text:`Your answer: ${q.options[answer.choice]}`),node('p',answer.feedback,'learning-feedback'));if(typeof answer.correct==='boolean'){card.dataset.result=answer.correct?'correct':'retry';card.prepend(node('span',answer.correct?'✓ Correct':'↺ Not quite','answer-badge'));}practice.append(card);continue;}
   const form=node('form');form.className='workspace-form';
   if(['practice','work'].includes(q.type)){
    const label=node('label','What did you try, and what would you check?');const text=node('textarea');text.id=`reflection-${q.id}`;label.htmlFor=text.id;text.required=true;text.minLength=10;text.maxLength=1000;text.rows=3;
