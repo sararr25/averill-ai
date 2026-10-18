@@ -33,12 +33,12 @@ function applyApprovedRules(data, task, observed, observedField, sources, findin
     if (findings.some(f => f.source.id === source.id && f.source.quote === rule.quote)) continue;
     if (rule.kind === 'claim-forbidden') {
       const excerpt = visibleMatch(observed, rule.value);
-      if (excerpt && !findings.some(f => f.observedExcerpt.toLowerCase() === excerpt.toLowerCase())) findings.push({ type: 'forbidden-claim', observedExcerpt: excerpt, suggestion: `Review and remove the quoted claim. The approved source says: ${rule.quote}`, source: citation(source, rule.quote), confidence: 'approved-rule', ruleId: rule.id });
+      if (excerpt && !findings.some(f => f.observedExcerpt.toLowerCase() === excerpt.toLowerCase())) findings.push({ type: 'forbidden-claim', observedExcerpt: excerpt, suggestion: `Remove “${excerpt}”. The approved rules don’t allow it.`, source: citation(source, rule.quote), confidence: 'approved-rule', ruleId: rule.id });
     } else if (FIELD_LABELS[rule.kind]) {
       if (!observedField || !FIELD_LABELS[rule.kind].test(observedField.label)) unchecked.add(rule.kind);
       else if (observedField.value.trim().toLowerCase() !== rule.value.toLowerCase() && !findings.some(f => f.type === 'field-requirement')) findings.push({ type: 'field-requirement', observedExcerpt: observedField.value, suggestion: `The approved ${rule.kind} is “${rule.value}”. Check and update this selected field yourself.`, source: citation(source, rule.quote), confidence: 'approved-rule', ruleId: rule.id });
     } else if (rule.kind === 'required-text' && (!observedField || /body|message|caption|post copy|email content/i.test(observedField.label)) && !visibleMatch(observed, rule.value) && !findings.some(f => f.type === 'missing-required-text' && f.source.id === source.id)) {
-      findings.push({ type: 'missing-required-text', observedExcerpt: '', suggestion: `Check whether this required text belongs in the draft: ${rule.value}`, source: citation(source, rule.quote), confidence: 'approved-rule', ruleId: rule.id });
+      findings.push({ type: 'missing-required-text', observedExcerpt: '', suggestion: `Add the required text: “${rule.value}”`, source: citation(source, rule.quote), confidence: 'approved-rule', ruleId: rule.id });
     }
   }
 }
@@ -64,19 +64,19 @@ function localReview(data, task, observedText, observedField = null) {
       for (const [, phrase] of banned) {
         const excerpt = visibleMatch(observed, phrase);
         if (!excerpt || findings.some(f => f.observedExcerpt.toLowerCase() === excerpt.toLowerCase())) continue;
-        findings.push({ type: 'forbidden-claim', observedExcerpt: excerpt, suggestion: `Review and remove the quoted claim. The approved source says: ${rule}`, source: citation(source, rule), confidence: 'exact-rule' });
+        findings.push({ type: 'forbidden-claim', observedExcerpt: excerpt, suggestion: `Remove “${excerpt}”. The approved rules don’t allow it.`, source: citation(source, rule), confidence: 'exact-rule' });
       }
       const required = task === 'email' && /every marketing email must include this footer/i.test(rule) || task === 'instagram' && /for paid creator content, include/i.test(rule) || task === 'linkedin' && /include [“"]explore the winter collection/i.test(rule);
       if (required && (!observedField || /body|message|caption|post copy|email content/i.test(observedField.label))) {
         const quoted = rule.match(/[“"]([^”"]{8,200})[”"]/);
         if (quoted && !visibleMatch(observed, quoted[1]) && !findings.some(f => f.source.id === source.id && f.type === 'missing-required-text')) {
-          findings.push({ type: 'missing-required-text', observedExcerpt: '', suggestion: `Check whether this required text belongs in the draft: ${quoted[1]}`, source: citation(source, rule), confidence: 'source-rule-visible-text' });
+          findings.push({ type: 'missing-required-text', observedExcerpt: '', suggestion: `Add the required text: “${quoted[1]}”`, source: citation(source, rule), confidence: 'source-rule-visible-text' });
         }
       }
     }
   }
   applyApprovedRules(data, task, observed, observedField, sources, findings, unchecked);
-  return { mode: 'local', uncheckedFields: [...unchecked], findings: findings.slice(0, 6), status: findings.length ? 'Exact company rules matched the visible text. Check the surrounding editor state before acting.' : 'No exact rule conflict found in visible text. This is not a full content, layout or publication check.' };
+  return { mode: 'local', uncheckedFields: [...unchecked], findings: findings.slice(0, 6), status: findings.length ? 'These parts of your draft don’t match the approved rules.' : 'No exact rule conflict found in visible text. This is not a full content, layout or publication check.' };
 }
 
 async function reviewTask(data, task, observedText, key, useAI = false, observedField = null) {

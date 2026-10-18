@@ -185,7 +185,8 @@ function renderHero() {
   if(externalReview){
     el('hero-label').textContent='WORK REVIEW';const hasFindings=externalReview.result.findings.length>0;
     el('hero-title').textContent=hasFindings?'Review these corrections.':'No conflicts with approved rules.';
-    el('hero-body').textContent=hasFindings?'Edit in your own tool using the evidence below, then recheck.':'Averill compared the shared text with your current approved company sources.';
+    const count=externalReview.result.findings.length;
+    el('hero-body').textContent=hasFindings?`${count} correction${count===1?'':'s'}. Edit in your own tool, then recheck.`:'Averill compared the shared text with your current approved company sources.';
     document.body.classList.toggle('review-clear',!hasFindings);
     el('hero-selected').replaceChildren();el('hero-source').replaceChildren();el('finding-navigation').replaceChildren();
     const context=el('review-context');context.replaceChildren(node('span','','live-dot'),node('span',`Live · ${current.externalWindow?.name||'Selected work'} · ${el('external-task').selectedOptions[0].textContent}`));context.classList.add('is-live');document.body.classList.add('has-live-review');
@@ -529,7 +530,8 @@ el('watch-external').addEventListener('click', async () => {
 el('stop-external').addEventListener('click', async () => { invalidateWorkReview();renderHero(); current = await window.desktop.shareExternal(null, null); el('external-result').textContent = 'Window sharing stopped.'; el('external-list').replaceChildren(); render(); });
 function drawTaskReview(output,result){
   output.replaceChildren();
-  if(result.findings.length)output.append(node('p',result.status));
+  // In Review the headline already counts the corrections; the Work tab keeps the status sentence.
+  if(result.findings.length&&output.id!=='review-work-result')output.append(node('p',result.status));
   // One consistent statement of what this review covered and what it did not.
   const scope=node('div',undefined,'check-scope');
   const method=result.mode==='model'||result.mode==='agent'?`NVIDIA Nemotron ${result.mode==='agent'?'review agent ':''}via ${result.provider||'Nebius Token Factory'}${result.model?` (${result.model})`:''}, validated against sources`:'Local rule check';
@@ -537,8 +539,8 @@ function drawTaskReview(output,result){
   const unchecked=node('p');unchecked.append(node('strong','Not checked'),document.createTextNode(` ${result.uncheckedFields?.length?`${result.uncheckedFields.join(', ')}, `:''}layout, images and publishing settings.`));
   scope.append(checked,unchecked);
   for(const item of result.findings){
-    const card=node('article',undefined,'workspace-source review-evidence');
-    card.append(item.confidence==='model-suggestion'?node('span','Nemotron suggestion · excerpts validated','ai-chip'):node('strong',item.confidence==='approved-rule'?'Approved rule match · extracted by Nemotron':'Approved rule match'),node('p',item.suggestion));
+    const card=node('article',undefined,'workspace-source review-evidence');card.dataset.findingType=item.type||'';
+    card.append(node('strong',item.suggestion,'finding-action'),item.confidence==='model-suggestion'?node('span','Nemotron suggestion · excerpts validated','ai-chip'):node('span',item.confidence==='approved-rule'?'Approved rule · extracted by Nemotron':'Approved rule','knowledge-meta'));
     if(item.observedExcerpt)card.append(node('p',`Observed: “${item.observedExcerpt}”`));
     card.append(sourceButton(item.source),node('small',`Source v${item.source.version}: “${item.source.quote}”`));appendPracticeLink(card,item.source.quote);output.append(card);
   }
