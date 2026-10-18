@@ -2,6 +2,14 @@ const http = require('node:http');
 const crypto = require('node:crypto');
 const { observation } = require('./external-observation');
 
+// "https://app.brevo.com" + "Email body" → "Brevo · Email body". Uses only the origin and label the extension already sends.
+function fieldName(pageOrigin, label) {
+  let host = '';
+  try { host = new URL(pageOrigin).hostname.replace(/^(www|app|my)\./, ''); } catch {}
+  const site = host.split('.')[0] || 'Browser';
+  return `${site.charAt(0).toUpperCase()}${site.slice(1)} · ${label}`.slice(0, 60);
+}
+
 class BrowserBridge {
   constructor({ onObservation, onStop, timeoutMs = 15000 }) {
     this.onObservation = onObservation; this.onStop = onStop; this.timeoutMs = timeoutMs;
@@ -49,7 +57,7 @@ class BrowserBridge {
           if (!field || !['text', 'textarea', 'contenteditable', 'select', 'date', 'time', 'checkbox'].includes(field.kind) || typeof field.value !== 'string' || field.value.length > 6000 || !['pause', 'blur', 'selection', 'read'].includes(payload.reason)) throw new Error('Invalid field');
           const label = String(field.label || 'Selected field').slice(0, 100);
           if (/password|token|secret|card|payment|recipient|e-?mail address|phone|personal|personnel/i.test(label)) throw new Error('Sensitive field');
-          const result = observation({ personId, windowId: `browser:${payload.tabId}`, windowName: 'Shared browser field', method: 'browser-dom', text: field.value });
+          const result = observation({ personId, windowId: `browser:${payload.tabId}`, windowName: fieldName(payload.pageOrigin, label), method: 'browser-dom', text: field.value });
           // Only one employee-selected field is represented; never infer the rest of a draft.
           result.field = { label, kind: field.kind, value: result.text };
           result.contentHash = crypto.createHash('sha256').update(JSON.stringify(result.field)).digest('hex');

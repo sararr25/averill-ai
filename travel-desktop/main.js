@@ -56,7 +56,7 @@ let externalEpoch = 0;
 const browserBridge = new BrowserBridge({
   onObservation: result => {
     if (!signedIn() || browserBridge.personId !== companyWorkspace.activePersonId) { browserBridge.stop(); return; }
-    selectedExternalWindow = { id: result?.windowId || selectedExternalWindow?.id || 'browser:pending', name: 'Shared browser field', adapter: 'browser-dom' };
+    selectedExternalWindow = { id: result?.windowId || selectedExternalWindow?.id || 'browser:pending', name: result?.windowName || selectedExternalWindow?.name || 'Shared browser field', adapter: 'browser-dom' };
     externalObservation = result; externalWatching = true; externalError = result ? '' : 'Editing selected field. Review updates after a pause.'; publish();
   },
   onStop: () => { stopExternal(); publish(); },

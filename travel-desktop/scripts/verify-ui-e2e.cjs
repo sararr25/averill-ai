@@ -25,6 +25,10 @@ app.whenReady().then(async()=>{try{
  const conflict=await run("({area:document.body.dataset.area,title:document.getElementById('hero-title').textContent,result:document.getElementById('review-work-result').innerText,outline:getComputedStyle(document.getElementById('hero-title')).outlineStyle,focused:document.activeElement.id,pill:getComputedStyle(document.getElementById('sharing-status')).visibility,banner:document.getElementById('operation-feedback').hidden})");
  step('Real rule conflict lands in Review',conflict.area==='review'&&conflict.title==='Review these corrections.'&&conflict.result.includes('lowest prices guaranteed'),conflict.result.slice(0,300));
  step('Headline focused without visible box',conflict.focused==='hero-title'&&conflict.outline==='none',`${conflict.focused} ${conflict.outline}`);
+ const live=await run("document.getElementById('review-context').textContent");step('Live bar names the real site and field',live.includes('Brevo · Email body'),live);
+ const companion=BrowserWindow.getAllWindows().find(w=>w.webContents.getURL().includes('companion.html'));
+ const fit=companion?await companion.webContents.executeJavaScript("(()=>{const s=document.getElementById('status');return {text:s.textContent,fits:s.scrollWidth<=s.clientWidth}})()"):{text:'no companion window',fits:false};
+ step('Companion names the field and fits 208px',fit.fits&&fit.text.includes('Brevo · Email body'),JSON.stringify(fit));
  step('Duplicate status pill hidden while live bar shows',conflict.pill==='hidden',conflict.pill);
  step('Success banner not repeated',conflict.banner===true,String(conflict.banner));
  const cards=await run("[...document.querySelectorAll('#review-work-result .review-evidence')].map(c=>({type:c.dataset.findingType,action:c.querySelector('.finding-action')?.textContent||''}))");
