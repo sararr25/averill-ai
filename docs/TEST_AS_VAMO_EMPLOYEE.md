@@ -96,8 +96,8 @@ cd ~/Documents/Hackatons/Nvidia/averill-ai && npm --prefix travel-desktop run ve
 Sign out › sign in as **Maya**: she can approve Marketing sources, cannot see the people roster.
 Sign out › **Demo Admin**: Setup, Account access, Knowledge › Company rules › Public rule checks
 ("Check automatically once a week" is off by default). Setup › Public website should flag the
-price guarantee on Vamo's `winter.html` (run `npm --prefix travel-site start`, site at
-`http://127.0.0.1:4173/`). Don't expect the "all European subscribers" audience to be flagged by AI.
+price guarantee on Vamo's public page `https://vamo-travel-site.vercel.app/winter.html`
+(local copy: `npm --prefix travel-site start`, `http://127.0.0.1:4173/`). Don't expect the "all European subscribers" audience to be flagged by AI.
 
 Sign out › Emma again: her Learn history is hers only. Quit and reopen: you must sign in again.
 
