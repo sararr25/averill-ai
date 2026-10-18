@@ -31,6 +31,10 @@ function preferredArea(){
 
 function showTab(name) {
   if(!areas.has(name))return;
+  const connectionRequested=name==='work';
+  if(connectionRequested)name='review';
+  if(connectionRequested)el('work-controls').open=true;
+  document.querySelector('.nav-more').open=false;
   const changed=document.body.dataset.area!==name;
   document.body.dataset.area = name;
   if(current.auth?.signedIn&&current.auth.person?.id)localStorage.setItem(`averill:last-area:${current.auth.person.id}`,name);
@@ -42,8 +46,13 @@ function showTab(name) {
   for (const panel of document.querySelectorAll('[data-tab]')) panel.classList.toggle('active', panel.dataset.tab === name);
   document.querySelector('.agent-main').scrollTop = 0;
   if(changed)guidedMotion.enter(document.querySelector(`[data-tab="${name}"]`),220,6);
+  if(connectionRequested)el('work-controls').scrollIntoView({block:'start'});
 }
-for (const button of document.querySelectorAll('[data-tab-button]')) button.addEventListener('click', () => showTab(button.dataset.tabButton));
+for (const button of document.querySelectorAll('[data-tab-button]')) button.addEventListener('click', () => {
+  const fromMore=Boolean(button.closest('.nav-more'));showTab(button.dataset.tabButton);
+  if(fromMore){const heading=document.querySelector('.agent-tab.active h2');if(heading){heading.tabIndex=-1;heading.focus();}}
+});
+document.querySelector('.nav-more').addEventListener('keydown',event=>{if(event.key==='Escape'){event.currentTarget.open=false;event.currentTarget.querySelector('summary').focus();}});
 
 function sourceButton(source) {
   const button = document.createElement('button');
@@ -577,6 +586,7 @@ function publicVerdict(item){
 function renderTaskReview(result){
   const output=el('external-task-result');
   if(result.contentHash!==current.externalObservation?.contentHash){output.textContent='The visible work changed. Check the current text again.';return;}
+  el('work-controls').open=false;
   externalReview={identity:workIdentity(),result};drawTaskReview(output,result);renderHero();showTab('review');el('hero-title').focus();
 }
 async function checkWork(fresh){
@@ -601,13 +611,13 @@ async function checkWork(fresh){
 el('external-local-recheck').addEventListener('click',()=>checkWork(true));
 el('external-task-review').addEventListener('click',()=>checkWork(false));
 el('external-task').addEventListener('change',()=>{invalidateWorkReview();el('external-task-result').replaceChildren();renderHero();});
-el('review-start').addEventListener('click',()=>{if(el('review-start').dataset.target==='check'){checkWork(false);return;}if(el('review-start').dataset.target==='setup'){showTab('setup');return;}showTab('work');el('browser-pair').focus();});
+el('review-start').addEventListener('click',()=>{if(el('review-start').dataset.target==='check'){checkWork(false);return;}if(el('review-start').dataset.target==='setup'){showTab('setup');return;}showTab('work');el('work-controls').querySelector('summary').focus();});
 let workStepIdentity;
 function renderWorkStep(){
  const captured=Boolean(current.externalObservation),selected=Boolean(current.externalWindow),ready=Boolean(current.browserBridge?.ready);
  const identity=current.externalWindow?.id||null;
  if(identity!==workStepIdentity){workStepIdentity=identity;document.querySelector('.browser-adapter').open=!selected;document.querySelector('.native-adapter').open=selected&&!captured&&current.externalWindow.adapter!=='browser-dom';}
- el('work-next').textContent=reviewPending?'Checking your work… You can stop sharing at any time.':captured?'Text captured. Choose the work type below, then check approved rules.':selected?(current.externalWindow.adapter==='browser-dom'?'Finish editing the selected field. Advice clears while you type.':'Window selected. Read visible text to capture one frame.'):(ready?'Copy pairing details into the extension, then select a draft field.':'Start by connecting a browser field or choosing an app window.');
+ el('work-next').textContent=reviewPending?'Checking your work… You can stop sharing at any time.':captured?'Text captured. Choose the work type below, then check approved rules.':selected?(current.externalWindow.adapter==='browser-dom'?'Finish editing the selected field. Advice clears while you type.':'Window selected. Read visible text to capture one frame.'):(ready?'Connect this tab in the extension, then select a draft field.':'Start by connecting a browser field or choosing an app window.');
  // One primary action per state: nothing to check or stop until work is shared; local recheck only after a result.
  el('external-task').closest('.context-form').hidden=!selected;
  el('stop-external').closest('.sharing-controls').hidden=!selected&&!ready;

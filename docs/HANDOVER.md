@@ -1,6 +1,18 @@
+## Library and Learn hierarchy increment — 18 October 2026
+
+Library reading leads with title, approval state, excerpt and Read. Metadata, originals, comparison and destructive actions expand separately. Approval forms move to a distinct queue, shown only for the authenticated person's matching `canReview` requests. Main-process role/reason/version validation is unchanged. Readers restore focus to their library or queue trigger. Private clarification/rule operations expand separately.
+
+Learn shows one leading activity: active weekly practice, otherwise an active lesson/project/finding or the starter lesson. Other activities expand as secondary choices. Existing private records, confirmations, source eligibility, weekly history and deletion confirmation are preserved. Native regression covers upload/read/search, separate pending approval/completion, queue-reader focus, one leading lesson/next-step focus, reduced motion and logout. CX-09/CX-10 remain open for full role/source-state and manual accessibility matrices.
+
+# Companion desktop and Vamo demo clarification — 18 October 2026
+
+The owner selected Vamo mock pages for demo acceptance, replacing the initial requirement for real platform accounts. Averill remains the product with its independent plum/lime identity. Runtime desktop now uses Companion, three primary destinations, unified Current work and expandable connection/chat controls. [Implementation and evidence](CONTEXTUAL_IMPLEMENTATION_2026-10-18.md).
+
+Both Vamo React editors pass 16 contextual checks each with actual Averill code/native pointer hit testing and simulated Chrome transport/approval. Desktop regression: 22/22. No post/campaign was saved, sent or published; normal accounts, sources and workspace are untouched. Installed Chrome and full keyboard/role/zoom/accessibility acceptance remain open. Previously packaged builds do not include this source increment. Earlier dated descriptions below are historical where superseded.
+
 # Contextual browser implementation — 18 October 2026
 
-The owner explicitly authorized push/ticket updates and continuation. Design commit `82f4377` is pushed and CX-01 / #24 is closed. Read [the implementation record](CONTEXTUAL_IMPLEMENTATION_2026-10-18.md) for the new shared review contract, guided loopback connection, actual in-page Companion UI and narrowly bounded plaintext preview/Apply/Undo. CX-02 contract is implemented; CX-03–CX-05 have source/synthetic-flow evidence but remain open for their installed-browser, placement/accessibility and editor acceptance gates. Brevo/LinkedIn origins are context hints, not validated rich-editor support. The main desktop shell is still legacy until CX-08.
+The owner explicitly authorized push/ticket updates and continuation. Design commit `82f4377` is pushed and CX-01 / #24 is closed. Read [the implementation record](CONTEXTUAL_IMPLEMENTATION_2026-10-18.md) for the new shared review contract, guided loopback connection, actual in-page Companion UI and narrowly bounded plaintext preview/Apply/Undo. CX-02 contract is implemented; CX-03–CX-05 have source/synthetic-flow evidence but remain open for their installed-browser, placement/accessibility and editor acceptance gates. Brevo/LinkedIn origins are context hints, not validated rich-editor support. Superseded by the Companion desktop increment above.
 
 Latest checks: 89/89 unit tests; 13 contextual end-to-end synthetic checks with zero provider calls; existing browser regression and desktop UI 22/22 pass. Actual Chrome transport/permissions and the native approval click are not proved by the contextual harness. Normal accounts/sources and Vamo are untouched. Do not claim the old public/package build has these endpoints.
 

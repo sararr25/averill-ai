@@ -3,7 +3,7 @@
  let selected=null,timer=null,heartbeat=null,alive=true,composing=false,sequence=0,generation=0,result=null,reviewValue='',expanded=false,uiState='ready',error='',undo=null;
  const identities=new WeakMap(),abort=new AbortController();
  const host=document.createElement('div');host.setAttribute('data-averill-companion','');
- host.style.cssText='position:fixed;z-index:2147483646;display:none;width:360px;max-width:calc(100vw - 24px);';
+ host.style.cssText='position:fixed;z-index:2147483646;display:none;pointer-events:auto;margin:0;padding:0;border:0;background:transparent;inset:auto;width:360px;max-width:calc(100vw - 24px);';
  const root=host.attachShadow({mode:'closed'});document.documentElement.append(host);
  const asset=file=>chrome.runtime.getURL?chrome.runtime.getURL(file):'';
  const style=document.createElement('style');style.textContent=`
@@ -34,11 +34,14 @@
  async function send(payload){if(!alive)return {};try{const value=await chrome.runtime.sendMessage(payload)||{};if(value.stopped)stop();return value}catch{stop();return {stopped:true}}}
  function invalidate(message=''){generation++;result=null;uiState='ready';error=message;expanded=false;render()}
  async function commit(reason){const request=generation;timer=null;if(!alive||composing||document.visibilityState!=='visible')return;const field=describe(selected);const value=await send(field?{kind:'field',field,reason}:{kind:'editing'});if(request===generation&&result&&Object.hasOwn(value,'reviewId')&&value.reviewId!==result.id)invalidate('The draft or approved guidance changed. Check again.');return field}
- function position(){if(!selected||!selected.isConnected)return;host.style.right='';host.style.bottom='';const r=selected.getBoundingClientRect(),width=Math.min(expanded?420:360,innerWidth-24);host.style.width=width+'px';const height=host.getBoundingClientRect().height;let left,top;
+ function position(){if(!selected||!selected.isConnected)return;const container=selected.closest('[role=dialog],dialog[open]')||document.documentElement;if(host.parentElement!==container)container.append(host);host.style.right='';host.style.bottom='';const r=selected.getBoundingClientRect(),width=Math.min(expanded?420:360,innerWidth-24);host.style.width=width+'px';const height=host.getBoundingClientRect().height;let left,top;
   if(r.right+width+24<=innerWidth){left=r.right+12;top=Math.max(12,Math.min(r.top,innerHeight-height-12))}
   else if(r.left-width-12>=12){left=r.left-width-12;top=Math.max(12,Math.min(r.top,innerHeight-height-12))}
   else{left=Math.max(12,innerWidth-width-12);top=Math.max(12,innerHeight-height-12)}
-  host.style.left=Math.min(left,innerWidth-width-12)+'px';host.style.top=top+'px';
+  left=Math.min(left,innerWidth-width-12);host.style.left=left+'px';host.style.top=top+'px';
+  // A transformed modal establishes its own fixed-position containing block.
+  if(container!==document.documentElement&&typeof host.showPopover==='function'){host.setAttribute('popover','manual');if(!host.matches(':popover-open'))host.showPopover();}
+  const actual=host.getBoundingClientRect();host.style.left=(left+left-actual.left)+'px';host.style.top=(top+top-actual.top)+'px';
  }
  async function ask(useAI=false,consent=false){if(!task){render();return}const request=++generation;result=null;error='';if(useAI&&!consent){uiState='consent';render();return}uiState='checking';render();const field=await commit('selection');if(!field||!alive||request!==generation)return;reviewValue=field.value;
   const value=await send({kind:'review',task,fieldId:field.id,revision:field.revision,useAI,consent});

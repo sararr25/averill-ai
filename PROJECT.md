@@ -1,6 +1,6 @@
 # Averill project
 
-Current update, 18 October 2026: Companion is the selected identity. The source now includes contextual in-page browser guidance, guided loopback connection and a bounded preview/Apply/Undo path for plain textarea/text controls. Shared orchestration and synthetic end-to-end checks are implemented; installed Chrome and actual email/social/design-platform acceptance remain open. The main desktop shell is still the legacy UI until CX-08. Read `docs/HANDOVER.md` for scope and evidence.
+Current update, 18 October 2026: Companion is the selected identity. The source now includes contextual in-page browser guidance, guided loopback connection and a bounded preview/Apply/Undo path for plain textarea/text controls. Shared orchestration and synthetic end-to-end checks are implemented; installed Chrome and actual email/social/design-platform acceptance remain open. Runtime desktop now uses Companion and unified Current work. The owner selected Vamo mock Brevo/LinkedIn pages for demo acceptance; both pass the contextual harness with simulated Chrome transport. Full accessibility and packaged/installed-browser checks remain open. Read `docs/HANDOVER.md` for scope and evidence.
 
 
 Current update, 17 October 2026: Nebius/Tavily integration implemented on branch `claude/charming-johnson-rhezro` (PR #21); live calls not yet verified. Start from [docs/HANDOVER_NEBIUS_TAVILY_2026-10-17.md](docs/HANDOVER_NEBIUS_TAVILY_2026-10-17.md).

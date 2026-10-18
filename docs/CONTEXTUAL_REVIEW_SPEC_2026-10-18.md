@@ -1,5 +1,9 @@
 # Ask Averill in the working page — product specification
 
+## Owner clarification — Vamo demo acceptance, 18 October 2026
+
+The owner chose the existing Vamo mock social/email pages as the hackathon demonstration environment. Averill remains the product; Vamo is the independent fictional customer. The first milestone uses `demo-tools/social-simulator` at `/brevo` and `/linkedin`, with synthetic drafts and no sending or publishing. This replaces the earlier requirement to obtain real platform accounts for this milestone. Installed-Chrome transport/permissions, manual accessibility and packaging remain separate checks. Older real-platform acceptance issues stay open.
+
 Status: owner product decisions confirmed on 18 October 2026; implementation planned. The audit, delivery order and evidence boundaries are recorded in the companion contextual UX audit. This specification does not claim the new experience is implemented.
 
 ## Problem Statement
@@ -88,9 +92,9 @@ Keep assistance in the employee's tool. After initial connection, selecting a su
 - Exercise local-only mode with zero outbound requests; company AI off; required consent accepted/cancelled; provider failure with local fallback; late results after typing, logout, navigation and Stop; changed source approval/version; tab/origin mismatch; duplicate passages; IME; host editor rerender; expired undo; intervening typing.
 - Verify immediate feedback within 150ms, waiting status within 300ms, and target p95 local result ≤1s on a named machine. Report cloud timings separately. Count post-setup actions and application switches; zero full-app switches are permitted in the ordinary supported correction loop.
 - Verify compact/panel/desktop layouts, source expansion, keyboard order and focus restoration, screen reader semantics, contrast, reduced motion, 200% zoom and edge-of-viewport placement. Stop remains visible while sharing.
-- Real installed-extension manual proof is mandatory per named platform/view. Use synthetic drafts in actual editors; capture preview, Apply, formatting preservation, Undo, recheck and Stop without sending/publishing. A simulated editor cannot close a real-platform ticket.
+- For the owner-selected demo milestone, use the existing Vamo mock Brevo and organic LinkedIn editors. Capture preview, Apply, formatting preservation, Undo, recheck and Stop without sending/publishing. Label simulated browser transport/approval separately. Older real-platform tickets remain open.
 - Rebuild and verify the final packaged desktop plus the corresponding extension. Rehearse email and LinkedIn as the first milestone. Keep Instagram/Canva support explicitly pending until separately accepted.
-- The owner confirmed the high-level seam and real-platform acceptance in the chat. Apply/Undo behavior follows the owner's selected correction mode and adds mandatory editor-adapter acceptance.
+- The owner initially confirmed real-platform acceptance, then replaced the first milestone environment with the Vamo mockups. Apply/Undo behavior follows the owner's selected correction mode and adds mandatory editor-adapter acceptance.
 
 ## Out of Scope
 

@@ -1,4 +1,22 @@
+## Library and Learn hierarchy increment — 18 October 2026
+
+Library reading leads with title, approval state, excerpt and Read. Metadata, originals, comparison and destructive actions expand separately. Approval forms move to a distinct queue, shown only for the authenticated person's matching `canReview` requests. Main-process role/reason/version validation is unchanged. Readers restore focus to their library or queue trigger. Private clarification/rule operations expand separately.
+
+Learn shows one leading activity: active weekly practice, otherwise an active lesson/project/finding or the starter lesson. Other activities expand as secondary choices. Existing private records, confirmations, source eligibility, weekly history and deletion confirmation are preserved. Native regression covers upload/read/search, separate pending approval/completion, queue-reader focus, one leading lesson/next-step focus, reduced motion and logout. CX-09/CX-10 remain open for full role/source-state and manual accessibility matrices.
+
 # Contextual browser implementation — 18 October 2026
+
+## Owner clarification — Vamo demo acceptance, 18 October 2026
+
+The owner chose the existing Vamo mock social/email pages as the hackathon demonstration environment. Averill remains the product; Vamo is the independent fictional customer. The first milestone uses `demo-tools/social-simulator` at `/brevo` and `/linkedin`, with synthetic drafts and no sending or publishing. This replaces the earlier requirement to obtain real platform accounts for this milestone. Installed-Chrome transport/permissions, manual accessibility and packaging remain separate checks. Older real-platform acceptance issues stay open.
+
+## Companion desktop and Vamo editor increment
+
+`src/companion-theme.css` maps the selected Companion tokens to existing desktop components and loads the locally bundled licensed Jakarta font. Current work unifies Work/Review. Company library and Learn are the other primary destinations; More contains research/settings. Connection tools and questions expand on request. The floating desktop control uses the same Averill identity. Vamo styling/data are unchanged.
+
+Both production-built Vamo React pages pass **16 checks each**, using the actual Averill main process, bridge, review engine, background and content scripts with simulated Chrome transport/approval. Checks cover native pointer hit testing for every card action, viewport fit, cited advice, exact phrase removal, Undo, input rerender, source revocation, typing/manual recovery, deep link, recheck, Stop, reconnect and logout. The card uses the browser top layer while remaining within the editor dialog DOM/focus scope to avoid modal overflow clipping. No post/campaign was saved, sent or published.
+
+Evidence: [LinkedIn](review-evidence-2026-10-18/vamo-linkedin/verification.json), [Brevo](review-evidence-2026-10-18/vamo-brevo/verification.json), [desktop captures](review-evidence-2026-10-18/desktop-companion/). Desktop regression: **22/22**. CX-08 remains open for the full role/zoom/manual accessibility matrix. The library/Learn hierarchy increment is implemented; full CX-09/CX-10 acceptance remains pending. These tests do not prove installed Chrome or real-platform compatibility.
 
 ## Delivered increment
 
@@ -40,4 +58,4 @@ No normal credentials, source approvals or user workspace were changed. No live 
 
 ## Next ordered work
 
-Finish CX-03's installed-browser connection/recovery gates and CX-04's actual-browser placement/accessibility checks, then CX-05 adapter failure/formatting gates. Implement and validate CX-06/CX-07 against named real Brevo/organic LinkedIn surfaces with synthetic draft content. CX-08 can then migrate the desktop shell using the selected foundation; the task hierarchy and library/Learn work remain distinct. Preserve the source/runtime/packaged/platform evidence boundaries in every ticket update.
+Complete installed-browser connection/recovery and manual accessibility checks on the Vamo mock pages, then the role/zoom matrix for CX-08. Complete CX-09/CX-10 role/source-state and manual accessibility acceptance. Instagram and Canva remain dedicated follow-ups. The existing mockup has Instagram, LinkedIn and Brevo routes; no Canva page exists. Keep package/release and real-platform claims separate.

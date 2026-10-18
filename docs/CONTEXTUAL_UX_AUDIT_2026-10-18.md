@@ -1,5 +1,9 @@
 # Averill contextual UX audit and delivery plan — 18 October 2026
 
+## Owner clarification — Vamo demo acceptance, 18 October 2026
+
+The owner chose the existing Vamo mock social/email pages as the hackathon demonstration environment. Averill remains the product; Vamo is the independent fictional customer. The first milestone uses `demo-tools/social-simulator` at `/brevo` and `/linkedin`, with synthetic drafts and no sending or publishing. This replaces the earlier requirement to obtain real platform accounts for this milestone. Installed-Chrome transport/permissions, manual accessibility and packaging remain separate checks. Older real-platform acceptance issues stay open.
+
 ## Outcome and decisions
 
 The owner tested Averill and found that asking for help takes too many steps, interrupts the current tool, and gives too many controls equal prominence. This is a product-flow redesign, including a new visual identity, rather than another isolated styling pass.

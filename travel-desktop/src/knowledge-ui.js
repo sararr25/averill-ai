@@ -9,8 +9,8 @@ function knowledgeExcerpt(text,query){
  return preview;
 }
 async function renderKnowledge(){
- const host=el('knowledge-list'),summary=el('knowledge-summary'),requests=el('knowledge-requests');
- if(!current.workspace?.configured||current.auth?.enabled&&!current.auth.signedIn){knowledgeRequest++;knowledgeRenderKey=null;host.replaceChildren();requests.replaceChildren();summary.textContent='';return;}
+ const host=el('knowledge-list'),summary=el('knowledge-summary'),requests=el('knowledge-requests'),decisions=el('knowledge-decisions'),queue=el('knowledge-review-queue');
+ if(!current.workspace?.configured||current.auth?.enabled&&!current.auth.signedIn){knowledgeRequest++;knowledgeRenderKey=null;host.replaceChildren();requests.replaceChildren();decisions.replaceChildren();queue.hidden=true;summary.textContent='';return;}
  const renderKey=JSON.stringify([current.workspace?.activePersonId,current.workspace?.sources,current.workspace?.clarifications,current.onboarding,el('knowledge-search').value,el('knowledge-filter').value,el('knowledge-department').value,el('knowledge-kind').value,el('knowledge-conflicts').checked]);
  if(renderKey===knowledgeRenderKey)return;knowledgeRenderKey=renderKey;
  const request=++knowledgeRequest;
@@ -38,34 +38,35 @@ async function renderKnowledge(){
   if(request!==knowledgeRequest)return;
   const awaitingDecision=result.documents.filter(file=>file.canReview&&['pending','clarification_requested'].includes(file.status)).length;
   summary.replaceChildren(node('span',`Showing ${result.documents.length} of ${result.total}`),node('span',`${result.approved} approved`,'count-chip'),node('span',`${awaitingDecision} to review`,awaitingDecision?'count-chip attention':'count-chip'),...(result.uploaded?[node('span',`${result.uploaded} uploaded`,'count-chip')]:[]));
-  host.replaceChildren();
+  host.replaceChildren();decisions.replaceChildren();queue.hidden=awaitingDecision===0;
   if(!result.documents.length){host.append(node('p',result.total?'No documents match this search or status.':'No company documents yet. Add files in Setup; they appear here immediately for review.'));return;}
   for(const file of result.documents){
    const card=node('article',undefined,'knowledge-card');
    const status=node('strong',file.kind==='uploaded'?'Uploaded · review needed':file.scope==='private'?`Private · ${file.status}`:file.status==='approved'?`Approved ${file.scope==='company'?'company-wide':'department'} knowledge`:`${file.status} · not used for answers`,'knowledge-state');
    status.dataset.state=file.kind==='uploaded'?'uploaded':file.status;
    card.append(node('h3',file.name),status);
-   card.append(node('p',`${file.kind==='uploaded'?'Upload proposal':file.scope==='company'?'Company-wide':file.scope==='private'?'Only you':file.department} · v${file.version||'1'} · ${file.readable?'Text extracted':'No readable text'} · ${file.confidentiality} · ${file.aiAllowed?'AI permission recorded':'Local only'}`,'knowledge-meta'));
+   const technical=node('details',undefined,'knowledge-details');technical.append(node('summary','Source details and tools'));
+   technical.append(node('p',`${file.kind==='uploaded'?'Upload proposal':file.scope==='company'?'Company-wide':file.scope==='private'?'Only you':file.department} · v${file.version||'1'} · ${file.readable?'Text extracted':'No readable text'} · ${file.confidentiality} · ${file.aiAllowed?'AI permission recorded':'Local only'}`,'knowledge-meta'));
    if(file.kind==='uploaded')card.append(node('p','This file has been received. Confirm the onboarding proposal in Setup to save it as a source; approval is a separate step.'));
    const metadata=node('details',undefined,'knowledge-details');metadata.append(node('summary','Approval details'));
    if(file.kind==='saved'){
     metadata.append(node('p',`Approved ${file.approvedAt?new Date(file.approvedAt).toLocaleString():'—'} · Approver ${file.approvedBy||'—'}${file.conflict?' · Conflict: excluded from answers':''}${file.supersedesId?' · Replaces an earlier source':''}${file.supersededBy?' · Replaced by a later source':''}`,'knowledge-meta'));
     if(file.latestDecision)metadata.append(node('p',`Latest decision: ${file.latestDecision.action} · ${file.latestDecision.reason} · ${new Date(file.latestDecision.at).toLocaleString()}`,'knowledge-decision'));
    }
-   if(file.kind==='saved')card.append(metadata);
+   if(file.kind==='saved')technical.append(metadata);
    card.append(knowledgeExcerpt(file.excerpt,el('knowledge-search').value));
    const read=node('button','Read extracted text','secondary-button');read.type='button';read.disabled=!file.readable;
-   read.addEventListener('click',async()=>{read.disabled=true;try{const content=await(file.kind==='uploaded'?window.desktop.readOnboardingFile(file.id):window.desktop.readWorkspaceFile(file.id));activeSourceId=null;el('open-source').hidden=true;el('source-title').textContent=content.title;el('source-content').textContent=content.text||'No readable text.';openSourceDialog(read);}catch{}finally{read.disabled=!file.readable;}});card.append(read);
+   const showFile=async(trigger)=>{read.disabled=true;try{const content=await(file.kind==='uploaded'?window.desktop.readOnboardingFile(file.id):window.desktop.readWorkspaceFile(file.id));activeSourceId=null;el('open-source').hidden=true;el('source-title').textContent=content.title;el('source-content').textContent=content.text||'No readable text.';openSourceDialog(trigger);}catch{}finally{read.disabled=!file.readable;}};read.addEventListener('click',()=>showFile(read));read.classList.replace('secondary-button','agent-primary');card.append(read,technical);
    if(file.kind==='saved'){
-    const open=node('button','Open original file','secondary-button');open.type='button';open.addEventListener('click',()=>window.desktop.openWorkspaceSource(file.id).catch(()=>{}));card.append(open);
+    const open=node('button','Open original file','secondary-button');open.type='button';open.addEventListener('click',()=>window.desktop.openWorkspaceSource(file.id).catch(()=>{}));technical.append(open);
     if(file.status==='superseded'&&file.supersededBy)card.append(briefingButton(file));
-    if(file.canDelete){const remove=node('button','Delete local source copy','danger-link');remove.type='button';remove.addEventListener('click',async()=>{if(!window.confirm(`Delete the local copy and extracted text of ${file.name}? The original outside Averill and system backups are not deleted.`))return;try{current=await window.desktop.removeSource(file.id);render();}catch(error){summary.textContent=error.message;}});card.append(remove);}
-    if(file.status!=='approved'){const manage=node('button','Manage in Setup','secondary-button');manage.type='button';manage.addEventListener('click',()=>{showTab('setup');const target=[...document.querySelectorAll('[data-source-id]')].find(element=>element.dataset.sourceId===file.id);if(target){for(let parent=target.parentElement;parent;parent=parent.parentElement)if(parent.tagName==='DETAILS')parent.open=true;target.scrollIntoView({block:'center'});target.tabIndex=-1;target.focus();}});card.append(manage);}
+    if(file.canDelete){const remove=node('button','Delete local source copy','danger-link');remove.type='button';remove.addEventListener('click',async()=>{if(!window.confirm(`Delete the local copy and extracted text of ${file.name}? The original outside Averill and system backups are not deleted.`))return;try{current=await window.desktop.removeSource(file.id);render();}catch(error){summary.textContent=error.message;}});technical.append(remove);}
+    if(file.status!=='approved'){const manage=node('button','Manage in Setup','secondary-button');manage.type='button';manage.addEventListener('click',()=>{showTab('setup');const target=[...document.querySelectorAll('[data-source-id]')].find(element=>element.dataset.sourceId===file.id);if(target){for(let parent=target.parentElement;parent;parent=parent.parentElement)if(parent.tagName==='DETAILS')parent.open=true;target.scrollIntoView({block:'center'});target.tabIndex=-1;target.focus();}});technical.append(manage);}
     const candidates=(current.workspace.sources||[]).filter(source=>source.id!==file.id&&source.status==='approved'&&source.scope===file.scope&&source.department===file.department);
     if(candidates.length){
       const label=node('label','Compare with an approved source');const select=node('select');select.append(new Option('Choose a document',''));
-      for(const candidate of candidates)select.append(new Option(`${candidate.title} · v${candidate.version}`,candidate.id));label.append(select);card.append(label);
-      const compare=node('button','Compare extracted versions','secondary-button');compare.type='button';compare.addEventListener('click',async()=>{if(!select.value)return;try{const diff=await window.desktop.compareSources(file.id,select.value);const lines=diff.changes.map(change=>`${change.type==='added'?'+':'−'} ${change.line}: ${change.text}`).join('\n');activeSourceId=null;el('open-source').hidden=true;el('source-title').textContent=`${diff.older.title} v${diff.older.version} → ${diff.newer.title} v${diff.newer.version}`;el('source-content').textContent=`${diff.method}\n${diff.truncated?'Comparison limited to first 250 lines per file and 200 changes.\n':''}\n${lines||'No line differences in the compared text.'}`;openSourceDialog(compare);}catch(error){summary.textContent=error.message;}});card.append(compare);
+      for(const candidate of candidates)select.append(new Option(`${candidate.title} · v${candidate.version}`,candidate.id));label.append(select);technical.append(label);
+      const compare=node('button','Compare extracted versions','secondary-button');compare.type='button';compare.addEventListener('click',async()=>{if(!select.value)return;try{const diff=await window.desktop.compareSources(file.id,select.value);const lines=diff.changes.map(change=>`${change.type==='added'?'+':'−'} ${change.line}: ${change.text}`).join('\n');activeSourceId=null;el('open-source').hidden=true;el('source-title').textContent=`${diff.older.title} v${diff.older.version} → ${diff.newer.title} v${diff.newer.version}`;el('source-content').textContent=`${diff.method}\n${diff.truncated?'Comparison limited to first 250 lines per file and 200 changes.\n':''}\n${lines||'No line differences in the compared text.'}`;openSourceDialog(compare);}catch(error){summary.textContent=error.message;}});technical.append(compare);
       if(file.canReview&&['pending','clarification_requested'].includes(file.status))card.dataset.versionSelect='available';
     }
     if(file.canReview&&['pending','clarification_requested'].includes(file.status)){
@@ -74,11 +75,11 @@ async function renderKnowledge(){
       for(const [value,text] of [['approved','Approve'],['rejected','Reject'],['clarification_requested','Ask for clarification']]){
        const button=node('button',text,'secondary-button');button.type='button';button.addEventListener('click',async()=>{if(!reason.value.trim()){reason.focus();summary.textContent='Add a reason before deciding.';return;}button.disabled=true;try{current=await window.desktop.updateSource(file.id,value,0,reason.value,value==='approved'&&previous?.value?previous.value:null);await renderKnowledge();renderWorkspace();}catch(error){summary.textContent=error.message;button.disabled=false;}});decision.append(button);
       }
-      card.append(decision);
+      const requestCard=node('article',undefined,'knowledge-card');requestCard.append(node('h3',file.name),node('p',`${file.department} · v${file.version} · ${file.status}`),knowledgeExcerpt(file.excerpt,''));const readProposal=node('button','Read proposal','secondary-button');readProposal.type='button';readProposal.addEventListener('click',()=>showFile(readProposal));requestCard.append(readProposal);if(previous){requestCard.append(previous.closest('label'));const compare=[...technical.querySelectorAll('button')].find(b=>b.textContent==='Compare extracted versions');if(compare)requestCard.append(compare);}requestCard.append(decision);decisions.append(requestCard);
     }
    }else{const review=node('button','Review this file in Setup','secondary-button');review.type='button';review.addEventListener('click',()=>{showTab('setup');const target=[...document.querySelectorAll('[data-file-id]')].find(element=>element.dataset.fileId===file.id);if(target){target.open=true;target.scrollIntoView({block:'center'});target.querySelector('summary')?.focus();}});card.append(review);}
    host.append(card);
   }
- }catch(error){if(request===knowledgeRequest){knowledgeRenderKey=null;summary.textContent=`Could not load knowledge: ${error.message}`;host.replaceChildren();}}
+ }catch(error){if(request===knowledgeRequest){knowledgeRenderKey=null;summary.textContent=`Could not load knowledge: ${error.message}`;host.replaceChildren();decisions.replaceChildren();queue.hidden=true;}}
 }
 let knowledgeSearchTimer;

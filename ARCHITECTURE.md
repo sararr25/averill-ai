@@ -1,3 +1,7 @@
+# Companion desktop and demo acceptance — 18 October 2026
+
+Averill's desktop shell imports the selected Companion tokens through `src/companion-theme.css`. Current work unifies the former Work/Review navigation; library/Learn are primary and research/settings are secondary. The contextual card stays in the selected editor, uses the top layer within modal editor DOM/focus scope, and exposes only the bounded review contract. The owner selected existing Vamo mock Brevo/LinkedIn pages for demo acceptance. Actual built React pages are tested with simulated Chrome transport; installed-browser and real-platform claims remain separate. Vamo design/data and normal workspaces are unchanged.
+
 # Averill system design
 
 Current status, 4 October 2026: the Guided UI release is public at [v0.1.0-preview.20261004.2](https://github.com/sararr25/averill-ai/releases/tag/v0.1.0-preview.20261004.2). See [docs/PROJECT_STATUS_2026-10-04.md](docs/PROJECT_STATUS_2026-10-04.md) and [docs/NEXT_STEPS_2026-10-04.md](docs/NEXT_STEPS_2026-10-04.md) for current evidence, ordered checks and pending fixes. Dated earlier sections are historical where superseded.

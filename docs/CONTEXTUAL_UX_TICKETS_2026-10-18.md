@@ -1,12 +1,16 @@
 # Contextual UX redesign tickets — 18 October 2026
 
+## Owner clarification — Vamo demo acceptance, 18 October 2026
+
+The owner chose the existing Vamo mock social/email pages as the hackathon demonstration environment. Averill remains the product; Vamo is the independent fictional customer. The first milestone uses `demo-tools/social-simulator` at `/brevo` and `/linkedin`, with synthetic drafts and no sending or publishing. This replaces the earlier requirement to obtain real platform accounts for this milestone. Installed-Chrome transport/permissions, manual accessibility and packaging remain separate checks. Older real-platform acceptance issues stay open.
+
 Epic/specification: [#23](https://github.com/sararr25/averill-ai/issues/23).
 
 All thirteen tickets use `ready-for-agent`. Blocked tickets must wait for their dependencies. The label does not mean that a visual direction has already been selected or platform acceptance has passed.
 
 ## Implementation progress — 18 October 2026
 
-CX-01 is closed after owner selection. CX-02 shared orchestration/contract is implemented and tested. Source implementations for CX-03/CX-04/CX-05 pass the synthetic in-page loop; those tickets remain open for their explicit remaining acceptance. See [the implementation record](CONTEXTUAL_IMPLEMENTATION_2026-10-18.md) for exact scope. No platform or parent acceptance ticket is closed by these tests.
+CX-01 is closed after owner selection. CX-02 shared orchestration/contract is implemented, tested and closed. Source implementations for CX-03/CX-04/CX-05 pass the synthetic in-page loop; those tickets remain open for their explicit remaining acceptance. See [the implementation record](CONTEXTUAL_IMPLEMENTATION_2026-10-18.md) for exact scope. CX-08 desktop, CX-09 reader/approval separation and CX-10 single leading Learn activity now have runtime implementations and native regressions. Full role/accessibility gates remain open. No older platform or parent acceptance ticket is closed by these tests.
 
 ## Selected identity — 18 October 2026
 
@@ -21,8 +25,8 @@ The owner selected **03 Companion**. CX-01 design deliverables are complete: [se
 | CX-03 | [#26 Guide first browser connection and remove routine pairing JSON](https://github.com/sararr25/averill-ai/issues/26) | [#25](https://github.com/sararr25/averill-ai/issues/25) |
 | CX-04 | [#27 Show the anchored correction card and expandable in-page panel](https://github.com/sararr25/averill-ai/issues/27) | [#24](https://github.com/sararr25/averill-ai/issues/24), [#25](https://github.com/sararr25/averill-ai/issues/25), [#26](https://github.com/sararr25/averill-ai/issues/26) |
 | CX-05 | [#28 Preview, apply and undo one validated suggestion](https://github.com/sararr25/averill-ai/issues/28) | [#25](https://github.com/sararr25/averill-ai/issues/25), [#27](https://github.com/sararr25/averill-ai/issues/27) |
-| CX-06 | [#29 Support the real email correction loop in Brevo](https://github.com/sararr25/averill-ai/issues/29) | [#28](https://github.com/sararr25/averill-ai/issues/28) |
-| CX-07 | [#30 Support the real organic LinkedIn post correction loop](https://github.com/sararr25/averill-ai/issues/30) | [#28](https://github.com/sararr25/averill-ai/issues/28) |
+| CX-06 | [#29 Demonstrate email corrections in the Vamo Brevo mockup](https://github.com/sararr25/averill-ai/issues/29) | [#28](https://github.com/sararr25/averill-ai/issues/28) |
+| CX-07 | [#30 Demonstrate organic post corrections in the Vamo LinkedIn mockup](https://github.com/sararr25/averill-ai/issues/30) | [#28](https://github.com/sararr25/averill-ai/issues/28) |
 | CX-08 | [#31 Rebuild desktop navigation and current-work hierarchy](https://github.com/sararr25/averill-ai/issues/31) | [#24](https://github.com/sararr25/averill-ai/issues/24), [#25](https://github.com/sararr25/averill-ai/issues/25) |
 | CX-09 | [#32 Separate the company library from source and rule approvals](https://github.com/sararr25/averill-ai/issues/32) | [#31](https://github.com/sararr25/averill-ai/issues/31) |
 | CX-10 | [#33 Simplify Learn and complete accessible state design](https://github.com/sararr25/averill-ai/issues/33) | [#31](https://github.com/sararr25/averill-ai/issues/31) |
@@ -257,7 +261,7 @@ Blocked by: [CX-02](https://github.com/sararr25/averill-ai/issues/25), [CX-04](h
 The owner selected in-page card/panel, preview/Apply/Undo, email and LinkedIn first, a full identity rethink, and actual-platform acceptance. This issue is planning; implementation has not been claimed.
 
 
-### [CX-06] Support the real email correction loop in Brevo
+### [CX-06] Demonstrate email corrections in the Vamo Brevo mockup
 
 ## Problem Statement
 
@@ -301,7 +305,7 @@ Blocked by: [CX-05](https://github.com/sararr25/averill-ai/issues/28).
 The owner selected in-page card/panel, preview/Apply/Undo, email and LinkedIn first, a full identity rethink, and actual-platform acceptance. This issue is planning; implementation has not been claimed.
 
 
-### [CX-07] Support the real organic LinkedIn post correction loop
+### [CX-07] Demonstrate organic post corrections in the Vamo LinkedIn mockup
 
 ## Problem Statement
 

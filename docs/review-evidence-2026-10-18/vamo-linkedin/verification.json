@@ -1,0 +1,25 @@
+{
+  "checks": [
+    "Actual Vamo linkedin React editor opened, synthetic draft only; no send/save",
+    "Guided connection: actual loopback rendezvous/bridge, synthetic approval, no JSON paste",
+    "Dismissed pending review stays dismissed when its reply arrives",
+    "Ask shows the actual local cited finding in-page; no desktop navigation or token exposure",
+    "Real pointer hit testing reaches each Averill action; modal preview fits without clipping",
+    "Explicit Apply changes only the validated phrase, preserving surrounding whitespace/link/newline",
+    "Undo restores the exact original text",
+    "React-controlled value preserved after input rerender",
+    "Explicit deep link opens the authorized source in the desktop app",
+    "Revoked source blocks Apply without changing the editor",
+    "Unavailable authority is insufficient evidence, never a clean result",
+    "Intervening typing blocks Undo and offers explicit manual recovery without overwriting newer work",
+    "Recheck clears the corrected conflict",
+    "Stop removes in-page UI, text sharing and the authenticated bridge",
+    "Same-session explicit reconnect needs no repeated desktop approval",
+    "Logout revokes the connection"
+  ],
+  "providerRequests": 0,
+  "limits": [
+    "Synthetic transport and browser approval; actual Vamo linkedin mock editor, not a real platform",
+    "Plain text controls only; rich editor writes remain unsupported"
+  ]
+}
