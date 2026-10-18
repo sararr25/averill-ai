@@ -1,4 +1,7 @@
-# Averill design system — v1
+# Averill design system — legacy runtime reference
+
+**18 October 2026: the owner selected [Companion](companion/FOUNDATION.md) as the new Averill identity.** New UI design and migration work must follow that foundation and its scoped tokens/mark. The v1 description below records the current petrol/coral implementation and is retained for migration. Its tokens remain loaded by the existing app until CX-04/CX-08 land; selecting the visual target does not itself migrate runtime CSS.
+
 
 **Status:** approved visual direction and design specification for Averill. The Review pane follows the reference hierarchy; setup, work controls, and web research live in separate tabs. The supplied work windows use the same palette and locally bundled fonts.
 

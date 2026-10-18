@@ -1,0 +1,37 @@
+/* Companion: selected visual target, 18 Oct 2026. Not imported by runtime yet. */
+:root {
+  --av-canvas: #211f2a;
+  --av-surface: #2b2835;
+  --av-surface-raised: #35313f;
+  --av-surface-hover: #403a4c;
+  --av-text: #f3f1f8;
+  --av-text-secondary: #b8b2c6;
+  --av-border: #484351;
+  --av-control-border: #8e879b;
+  --av-accent: #d6ef91;
+  --av-accent-hover: #e2f6b4;
+  --av-on-accent: #242a1b;
+  --av-accent-soft: #3a4030;
+  --av-warning: #ffc794;
+  --av-warning-soft: #44362e;
+  --av-error: #ffb8bf;
+  --av-error-soft: #492e38;
+  --av-success: #d6ef91;
+  --av-success-soft: #363e2d;
+  --av-focus: #d6ef91;
+  --av-font: 'Plus Jakarta Sans', sans-serif;
+  --av-space-1: 4px;
+  --av-space-2: 8px;
+  --av-space-3: 12px;
+  --av-space-4: 16px;
+  --av-space-5: 20px;
+  --av-space-6: 24px;
+  --av-space-8: 32px;
+  --av-radius-card: 22px;
+  --av-radius-panel: 18px;
+  --av-radius-control: 12px;
+  --av-radius-pill: 999px;
+  --av-ease: cubic-bezier(.16, 1, .3, 1);
+  --av-duration-feedback: 140ms;
+  --av-duration-panel: 220ms;
+}

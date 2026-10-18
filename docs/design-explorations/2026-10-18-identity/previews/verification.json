@@ -4,15 +4,15 @@
   "checks": [
     "a: preview, apply, exact example undo",
     "a: source expansion, panel, library search",
-    "a: checking, clear, no source, error, changed draft",
+    "a: checking/clear/error/changed draft; incomplete states expose no approved citation",
     "a: no horizontal overflow 440/520/960",
     "b: preview, apply, exact example undo",
     "b: source expansion, panel, library search",
-    "b: checking, clear, no source, error, changed draft",
+    "b: checking/clear/error/changed draft; incomplete states expose no approved citation",
     "b: no horizontal overflow 440/520/960",
     "c: preview, apply, exact example undo",
     "c: source expansion, panel, library search",
-    "c: checking, clear, no source, error, changed draft",
+    "c: checking/clear/error/changed draft; incomplete states expose no approved citation",
     "c: no horizontal overflow 440/520/960",
     "200% zoom: no horizontal overflow",
     "Reduced motion: spinner animation disabled",
@@ -23,5 +23,10 @@
     "No real editor, bridge, source or provider connection",
     "No manual screen reader acceptance",
     "No adopted identity or production token change"
-  ]
+  ],
+  "selectedCompanionPanel": {
+    "cardHeight": 680,
+    "stopWithinCard": true,
+    "detailsScroll": true
+  }
 }

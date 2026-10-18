@@ -4,6 +4,10 @@ Epic/specification: [#23](https://github.com/sararr25/averill-ai/issues/23).
 
 All thirteen tickets use `ready-for-agent`. Blocked tickets must wait for their dependencies. The label does not mean that a visual direction has already been selected or platform acceptance has passed.
 
+## Selected identity — 18 October 2026
+
+The owner selected **03 Companion**. CX-01 design deliverables are complete: [selected foundation](../travel-desktop/design-system/companion/FOUNDATION.md), semantic tokens, developed vector mark, refined prototype and state specification. Runtime migration in CX-04/CX-08 remains open; no real-platform acceptance is implied.
+
 ## Index
 
 | Key | Issue | Blocked by |

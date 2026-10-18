@@ -2,7 +2,7 @@
 
 18 October 2026 · CX-01 / [issue #24](https://github.com/sararr25/averill-ai/issues/24)
 
-**Status: exploration delivered; owner selection pending.** The current product, its approved design system and Vamo are unchanged. The owner's choice to rethink palette/type authorized these alternatives; it did not choose one of them.
+**Status: owner selected 03 Companion on 18 October 2026.** The [selected visual foundation](../../../travel-desktop/design-system/companion/FOUNDATION.md), semantic tokens and developed vector mark are now the target for new Averill UI work. The existing runtime still renders the old identity until its implementation tickets land. Vamo is unchanged. The alternatives remain as exploration history.
 
 Open [the interactive study](index.html) and use **Compare all** to see the alternatives side by side. Each direction includes a contextual card, expanded in-page panel, before/after preview, local Apply/Undo demonstration, company library and Learn. The state menu shows checking, no conflict, insufficient evidence, error and changed-draft states. All source/draft content is synthetic. No employee account, real document, provider, browser extension or platform is connected.
 
@@ -15,7 +15,7 @@ Open [the interactive study](index.html) and use **Compare all** to see the alte
 - Signature moment: original draft + a useful, cited suggestion + reversible change visible in the same working context.
 - Ambition: typography, information hierarchy and state craft, with a lightweight interface. No decorative scroll or cursor effects.
 - Fixed interaction: anchored compact card, expandable in-page panel, exact source, preview, explicit Apply, Undo and optional app opening. On a narrow viewport, the study docks the card before the synthetic editor rather than covering it.
-- Open decision: visual direction and final mark. The small marks shown are typographic concepts, not a finalized vector identity or a trademark search result.
+- Selected direction: Companion. Its developed local SVG mark and refined type/control sizes are recorded in the selected foundation. This is not a trademark clearance claim; alternative marks remain historical concepts.
 
 ## Compare the directions
 
@@ -29,13 +29,13 @@ Open [the interactive study](index.html) and use **Compare all** to see the alte
 | Tradeoff | Uses more space in review-heavy queues | More operational and less warm | Dark surface contrasts strongly with pale host editors |
 | Best next validation | Long finding titles and source reading at small width | Repeated review decisions and before/after scanning | Source legibility and unobtrusiveness in actual light editors |
 
-**Recommendation: develop Editorial first.** Its hierarchy fits the owner's reported problem: one correction, one action and then the source, with less competition from the application shell. This is a design judgment, not user research. Precise is the stronger alternative if review density becomes the main criterion. Companion is the most visibly distinctive if a dark assistant presence is preferred.
+**Historical recommendation before owner selection: develop Editorial first.** Its hierarchy fits the owner's reported problem: one correction, one action and then the source, with less competition from the application shell. This is a design judgment, not user research. Precise is the stronger alternative if review density becomes the main criterion. Companion is the most visibly distinctive if a dark assistant presence is preferred.
 
 The alternatives vary composition, density, type, shape, desktop navigation and source treatment as well as color. The underlying task is deliberately held constant for comparison.
 
 ## Candidate foundations
 
-The machine-readable [candidate tokens](candidate-tokens.json) are scoped to this study. Do not import them into the current product before selection.
+The machine-readable [candidate tokens](candidate-tokens.json) retain all three studies and record Companion as selected. Implementers must use the scoped selected foundation tokens; do not import the other candidates or change runtime CSS as part of this review artifact.
 
 | Role | Editorial | Precise | Companion |
 | --- | --- | --- | --- |
@@ -67,7 +67,7 @@ The [renderer receipt](previews/verification.json) records the local checks. Eac
 
 Calculated text contrast against the candidate flat surfaces is in [contrast.json](contrast.json): body 12.86–15.01:1, secondary 5.43–7.01:1, primary action 6.03–11.68:1 and observed-text treatment 5.29–7.64:1. These values verify those color pairs only; they do not establish complete accessibility or platform acceptance. No screen-reader study, frame profiling or real-editor geometry/obstruction test was performed.
 
-The earlier inspected product baseline was 4.25/10 in the audit. Subjective concept-stage visual assessment for this study is approximately **7/10**: hierarchy, typography and identity are intentional, but reaching the craft target still needs the owner's direction choice, a finalized mark, refined long-content/compact typography, full role-dependent states and real editor acceptance. These are not usability scores or a claim that a 10/10 product has shipped.
+The earlier inspected product baseline was 4.25/10 in the audit. Subjective concept-stage visual assessment for this study is approximately **7/10**: hierarchy, typography and identity are intentional, and the owner has since selected Companion. The selected foundation develops its vector mark, reading sizes and state inventory; reaching the craft target still needs runtime composition and real editor acceptance. These are not usability scores or a claim that a 10/10 product has shipped.
 
 ## Font provenance
 
@@ -81,6 +81,6 @@ Downloaded from the official [Google Fonts repository](https://github.com/google
 
 No external font or network request is made by the prototype.
 
-## Next increment after selection
+## Selected foundation and next increment
 
-Refine the chosen direction rather than regenerating all alternatives. Finalize the mark, complete the selected card/panel/desktop state specification, verify source and control semantics at real sizes, and only then promote selected tokens into the Averill visual source of truth. Keep CX-01 open until selection and the selected foundation specification are recorded. Subsequent runtime implementation belongs to CX-04/CX-08 and the remaining feature tickets.
+Companion is selected. Its developed vector mark, refined 14px reading text, 44px action targets, semantic colors, geometry, complete component/state inventory and implementation boundaries are recorded in the selected foundation. This study defaults to Companion. CX-01 design scope is complete; runtime work remains in CX-04/CX-08 and the remaining feature tickets. Do not regenerate the alternatives. Real-editor and full accessibility acceptance remain open.

@@ -1,5 +1,5 @@
 {
-  "status": "exploratory; no identity selected",
+  "status": "Companion selected by owner on 18 October 2026; other candidates retained as history",
   "candidates": {
     "Editorial": {
       "background": "#f6f5f1",
@@ -40,5 +40,6 @@
       "body": "Plus Jakarta Sans",
       "radius": 22
     }
-  }
+  },
+  "selected": "Companion"
 }
