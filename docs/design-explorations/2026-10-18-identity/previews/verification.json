@@ -1,0 +1,27 @@
+{
+  "date": "2026-10-18",
+  "artifact": "standalone identity prototype",
+  "checks": [
+    "a: preview, apply, exact example undo",
+    "a: source expansion, panel, library search",
+    "a: checking, clear, no source, error, changed draft",
+    "a: no horizontal overflow 440/520/960",
+    "b: preview, apply, exact example undo",
+    "b: source expansion, panel, library search",
+    "b: checking, clear, no source, error, changed draft",
+    "b: no horizontal overflow 440/520/960",
+    "c: preview, apply, exact example undo",
+    "c: source expansion, panel, library search",
+    "c: checking, clear, no source, error, changed draft",
+    "c: no horizontal overflow 440/520/960",
+    "200% zoom: no horizontal overflow",
+    "Reduced motion: spinner animation disabled",
+    "Keyboard Tab moves focus to next action with visible outline"
+  ],
+  "limits": [
+    "Synthetic local actions only",
+    "No real editor, bridge, source or provider connection",
+    "No manual screen reader acceptance",
+    "No adopted identity or production token change"
+  ]
+}
