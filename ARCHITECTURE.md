@@ -1,3 +1,7 @@
+# Explicit packaged QA profile and rendezvous recovery - 19 October 2026
+
+Before app readiness, an optional marked synthetic profile can override only the temporary test instance's userData/sessionData paths. It does not alter default launch or authentication. An occupied browser rendezvous leaves the existing listener intact and exposes an authenticated, actionable Current work message with manual recovery. [Acceptance boundaries](docs/PACKAGED_ACCEPTANCE_2026-10-19.md).
+
 # Canva editing and accessibility seam - 19 October 2026
 
 The extension selects either the existing plaintext adapter or a named Canva `.ql-editor` adapter. Canva writes require one paragraph with equivalent span formatting, an exact unique removal, native editing-pipeline confirmation after the editor frame, and a matching formatting signature. Undo revalidates text, revision and signature; uncertain writes expose prior text for manual recovery. Apply/Undo are serialized and completed operations cannot bind to a different selection. No arbitrary contenteditable support is introduced. Card focus/status persist across rerenders; keyboard events are scoped to the companion before host modal document handlers. Library dialog focus can resolve a stable source/action identity after its trigger is rerendered. [Evidence and limits](docs/CONTINUATION_2026-10-19.md).

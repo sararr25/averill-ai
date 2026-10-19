@@ -2,6 +2,7 @@ const { app, BrowserWindow, ipcMain, shell, dialog, desktopCapturer, systemPrefe
 const fs = require('node:fs');
 const path = require('node:path');
 const os = require('node:os');
+require('./src/qa-profile').apply(app);
 require('dotenv').config({ path: path.join(__dirname, '..', '.env.local'), quiet: true });
 const { inspect, answer: localAnswer } = require('./src/engine');
 const { answerQuestion } = require('./src/assistant');
@@ -53,6 +54,7 @@ let externalWatching = false;
 let externalWatchTimer = null;
 let externalCaptureBusy = false;
 let externalError = '';
+let browserConnectionError = '';
 let externalEpoch = 0;
 let browserSessionEpoch = 0;
 const browserBridge = new BrowserBridge({
@@ -162,6 +164,7 @@ function snapshot() {
     workspace: signedIn() ? workspace.publicSnapshot(companyWorkspace) : { configured: Boolean(companyWorkspace), company: companyWorkspace?.company },
     learning: learning.snapshot(signedIn() ? companyWorkspace : null),
     browserBridge: signedIn() ? browserBridge.status() : {ready:false,connected:false},
+    browserConnectionError: signedIn() ? browserConnectionError : '',
     externalWindow: signedIn() ? selectedExternalWindow : null,
     externalWatching: signedIn() && externalWatching,
     externalObservation: signedIn() ? externalObservation : null,
@@ -269,7 +272,9 @@ function openWork(kind) {
 }
 
 app.whenReady().then(async () => {
-  await browserConnect.start().catch(() => { /* Extension shows a recoverable connection error; manual pairing remains available. */ });
+  await browserConnect.start().catch(error => {
+    browserConnectionError = error.code === 'EADDRINUSE' ? 'Another app is using the browser connection. Close other Averill instances, then restart this app. Advanced connection recovery is still available below.' : 'The guided browser connection could not start. Restart Averill or use Advanced connection recovery below.';
+  });
   companyWorkspace = workspace.load(app.getPath('userData'));
   await cloud.load();
   const area = screen.getPrimaryDisplay().workArea;

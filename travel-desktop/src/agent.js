@@ -83,6 +83,8 @@ function render() {
   renderLearning();
   renderHero();
   renderWorkStep();
+  el('browser-guided-status').textContent = current.browserConnectionError || '';
+  el('browser-guided-status').hidden = !current.browserConnectionError;
   el('browser-copy-pair').disabled = !current.browserBridge?.ready;
   el('stop-external').disabled = !current.externalWindow && !current.browserBridge?.ready;
   if (current.browserBridge?.connected) el('browser-pair-status').textContent = 'Browser field connected. Finish editing to review the selected field.';

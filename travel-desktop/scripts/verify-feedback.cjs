@@ -1,11 +1,12 @@
 const {app,BrowserWindow,dialog}=require('electron');const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
-const root=process.env.AVERILL_NATIVE_APP||path.resolve(__dirname,'..');const profile=fs.mkdtempSync('/tmp/averill-feedback-');app.setPath('userData',profile);const fixture=path.join(profile,'company-guide.txt');fs.writeFileSync(fixture,'Company knowledge: cobalt palette and weekly planning.');let cancel=false;dialog.showOpenDialog=async()=>({canceled:cancel,filePaths:cancel?[]:[fixture]});require(path.join(root,'main.js'));
+const root=process.env.AVERILL_NATIVE_APP||path.resolve(__dirname,'..');const profile=fs.mkdtempSync('/tmp/averill-feedback-');app.setPath('userData',profile);const fixture=path.join(profile,'company-guide.txt');fs.writeFileSync(fixture,'Company knowledge: cobalt palette and weekly planning.');let cancel=false;dialog.showOpenDialog=async()=>({canceled:cancel,filePaths:cancel?[]:[fixture]});if(process.env.QA_PORT_CONFLICT==='1'){require(path.join(root,'src/browser-connect')).BrowserConnect.prototype.start=async function(){throw Object.assign(new Error('Synthetic occupied port'),{code:'EADDRINUSE'})}}require(path.join(root,'main.js'));
 const pause=ms=>new Promise(r=>setTimeout(r,ms));
 app.whenReady().then(async()=>{try{
  let win;for(let i=0;i<100;i++){win=BrowserWindow.getAllWindows().find(w=>w.webContents.getURL().includes('agent.html'));if(win&&!win.webContents.isLoading()&&await win.webContents.executeJavaScript('Boolean(window.desktop)'))break;await pause(100);}
  const rendererErrors=[];win.webContents.on('console-message',(_event,level,message)=>{if(level===3)rendererErrors.push(message)});
  const run=js=>win.webContents.executeJavaScript(js);
  await run("window.desktop.createWorkspace('Feedback Test','Owner','owner@example.test','Synthetic-password-123')");
+ if(process.env.QA_PORT_CONFLICT==='1'){assert.equal(await run("document.getElementById('browser-guided-status').hidden"),false);assert.match(await run("document.getElementById('browser-guided-status').textContent"),/Close other Averill instances/);}
  const companion=BrowserWindow.getAllWindows().find(w=>w.webContents.getURL().includes('companion.html'));
  assert.ok(companion && companion.isVisible());
  await companion.webContents.executeJavaScript("document.getElementById('open').click()");

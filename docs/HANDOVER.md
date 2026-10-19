@@ -1,3 +1,7 @@
+# Packaged-executable continuation - 19 October 2026
+
+Start from [PACKAGED_ACCEPTANCE_2026-10-19.md](PACKAGED_ACCEPTANCE_2026-10-19.md). Added an explicit, marked temporary synthetic profile option for the real executable; normal authentication remains required. Added occupied-port recovery copy and loopback restart/conflict acceptance tests. 91/91 tests and final bundle integrity pass (171 tracked files, both helpers, 3160 archive entries). After the initial Mac lock cleared, CUA repeatedly timed out on the exact QA bundle; no packaged login/browser/restart/VoiceOver success is claimed. See the report for the normal signed-out window briefly opened during app lookup and the precise validation boundary. Previous installed-browser and A/B receipts remain valid within their documented scope.
+
 # Installed Chrome, Canva and accessibility continuation - 19 October 2026
 
 Start from [the continuation report](CONTINUATION_2026-10-19.md). Installed Chrome was updated from extension 0.1.0 to 0.2.1. Actual Vamo LinkedIn and Instagram correction/Undo worked in-page; Instagram keyboard/Escape/Stop and native browser 200% zoom passed. A narrowly guarded adapter now supports one uniformly formatted paragraph in Canva's named design-text editor; actual Canva Apply/Undo and a saved correction after reload passed on the synthetic design. Mixed/rich/multiline text and geometry remain excluded.

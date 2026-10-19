@@ -6,7 +6,7 @@ async function setup(t, options = {}) {
  let session = 'first-person:1', approved = 0, connected = 0;
  const server = new BrowserConnect({ port: 0, getSession: () => session, approve: async () => { approved++; return true; }, connect: async binding => { connected++; return { endpoint: 'http://127.0.0.1:1234/observation', token: 'a'.repeat(64), binding }; }, ...options });
  t.after(() => server.stop()); const port = await server.start();
- const post = (payload = {}, headers = {}) => fetch(`http://127.0.0.1:${port}/connect`, { method: 'POST', headers: { Origin: origin, 'Content-Type': 'application/json', ...headers }, body: JSON.stringify({ tabId: 1, pageOrigin: 'https://draft.example', ...payload }) });
+ const post = (payload = {}, headers = {}) => fetch(`http://127.0.0.1:${port}/connect`, { method: 'POST', headers: { Origin: origin, 'Content-Type': 'application/json', Connection: 'close', ...headers }, body: JSON.stringify({ tabId: 1, pageOrigin: 'https://draft.example', ...payload }) });
  return { server, post, session: value => { session = value; }, counts: () => [approved, connected] };
 }
 test('loopback connection requires extension origin and one first-session approval; reconnect stays tab-bound', async t => {
@@ -29,4 +29,21 @@ test('cancelled approval and logout while a prompt is open issue no pairing secr
  f.session(null); resolve(true); assert.equal((await first).status, 403); assert.equal(connections, 0);
  const cancelled = await setup(t, { approve: async () => false, connect: () => { connections++; } });
  assert.equal((await cancelled.post()).status, 403); assert.equal(connections, 0);
+});
+
+test('a new process requires fresh approval and an occupied rendezvous port fails without taking over', async t => {
+ const first = await setup(t);
+ assert.equal((await first.post()).status, 200);
+ const occupiedPort = first.server.server.address().port;
+ let secondaryApprovals = 0, secondaryConnections = 0;
+ const second = new BrowserConnect({ port: occupiedPort, getSession: () => 'other-process', approve: async () => { secondaryApprovals++; return true; }, connect: async () => { secondaryConnections++; return {}; } });
+ await assert.rejects(second.start(), { code: 'EADDRINUSE' });
+ assert.equal(secondaryApprovals, 0); assert.equal(secondaryConnections, 0);
+ assert.equal((await first.post()).status, 200); assert.deepEqual(first.counts(), [1, 2]);
+ const closed = new Promise(resolve => first.server.server.once('close', resolve));
+ first.server.stop(); await closed;
+ const restarted = new BrowserConnect({ port: occupiedPort, getSession: () => 'first-person:1', approve: async () => { secondaryApprovals++; return true; }, connect: async () => { secondaryConnections++; return { synthetic: true }; } });
+ t.after(() => restarted.stop()); await restarted.start();
+ assert.equal((await first.post()).status, 200);
+ assert.equal(secondaryApprovals, 1); assert.equal(secondaryConnections, 1);
 });

@@ -1,3 +1,5 @@
+- Packaged acceptance may use `--averill-qa-profile=<directory>` only with the marked, temporary synthetic workspace prepared by `scripts/prepare-packaged-qa.cjs`. Preserve its fail-closed directory/account checks and normal login. Never point it at the normal profile or infer packaged acceptance from process launch; see `docs/PACKAGED_ACCEPTANCE_2026-10-19.md`.
+
 # Contributor rules for Averill
 
 Read `docs/HANDOVER.md`, `PROJECT.md`, `ARCHITECTURE.md`, and `travel-desktop/design-system/DESIGN_SYSTEM.md` before changing product behavior or UI.
