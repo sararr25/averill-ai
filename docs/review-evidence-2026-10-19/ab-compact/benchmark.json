@@ -1,0 +1,25 @@
+{
+  "variant": "compact",
+  "variable": "Default finding disclosure only",
+  "scriptedTrials": 20,
+  "warmups": 3,
+  "humans": 0,
+  "medianMs": 32.624542000000474,
+  "p95Ms": 33.18266700000004,
+  "geometry": {
+    "height": 500.171875,
+    "contentHeight": 386,
+    "visibleContentHeight": 386,
+    "controls": 7,
+    "visibleFindings": 1,
+    "primaryVisible": true
+  },
+  "previewApplyUndo": "pass",
+  "firstCorrectionActions": 3,
+  "routineAppSwitches": 0,
+  "limits": [
+    "Synthetic transport, native pointer hit-testing in actual Vamo editor",
+    "Harness elapsed times include polling/tool overhead; not pure product latency",
+    "No randomized human sample or simplicity/intuitiveness outcome"
+  ]
+}

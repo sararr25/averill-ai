@@ -26,7 +26,9 @@
     "verify:live-ui": "electron scripts/verify-live-ui.cjs",
     "verify:ui-e2e": "electron scripts/verify-ui-e2e.cjs",
     "verify:rehearsal": "node scripts/verify-rehearsal.cjs",
-    "verify:contextual": "electron scripts/verify-contextual.cjs"
+    "verify:contextual": "electron scripts/verify-contextual.cjs",
+    "verify:canva-adapter": "electron scripts/verify-canva-adapter.cjs",
+    "verify:accessibility": "electron scripts/verify-accessibility.cjs"
   },
   "dependencies": {
     "@fontsource/fragment-mono": "^5.3.0",

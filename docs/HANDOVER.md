@@ -1,3 +1,11 @@
+# Installed Chrome, Canva and accessibility continuation - 19 October 2026
+
+Start from [the continuation report](CONTINUATION_2026-10-19.md). Installed Chrome was updated from extension 0.1.0 to 0.2.1. Actual Vamo LinkedIn and Instagram correction/Undo worked in-page; Instagram keyboard/Escape/Stop and native browser 200% zoom passed. A narrowly guarded adapter now supports one uniformly formatted paragraph in Canva's named design-text editor; actual Canva Apply/Undo and a saved correction after reload passed on the synthetic design. Mixed/rich/multiline text and geometry remain excluded.
+
+Fixed keyboard-only field selection, closed-shadow modal traversal, persistent status and focus through card states. Library reader focus now survives replacement of its trigger during asynchronous rendering. Four authenticated role/source-state/zoom/reduced-motion renderer matrices passed. VoiceOver was toggled on and restored off but its reading/navigation acceptance is inconclusive; do not close #6 or claim complete accessibility.
+
+A/B technical comparison (20 scripted trials per variant, zero humans): expanded 844px/13 controls; compact 500.17px/7 controls; both pass Preview/Apply/Undo with three actions and zero routine app switches. No human simplicity/intuitiveness winner. See [the experiment plan](AB_TEST_PLAN.md). 89/89 unit tests, 18 Instagram seam checks, browser/native-feedback/Canva-adapter and four-role accessibility matrices pass. Local unsigned arm64 app/ZIP integrity passes (168 tracked source files, both helpers, 3157 archive entries). Existing acceptance parents and final-executable/clean-Mac/physical-display gates remain open. Normal workspace data and provider keys were not loaded. No message/post/export/public release was sent or published.
+
 ## Library and Learn hierarchy increment — 18 October 2026
 
 Library reading leads with title, approval state, excerpt and Read. Metadata, originals, comparison and destructive actions expand separately. Approval forms move to a distinct queue, shown only for the authenticated person's matching `canReview` requests. Main-process role/reason/version validation is unchanged. Readers restore focus to their library or queue trigger. Private clarification/rule operations expand separately.

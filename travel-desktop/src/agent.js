@@ -664,7 +664,9 @@ el('close-source').addEventListener('click', () => el('source-dialog').close());
 el('source-dialog').addEventListener('close', () => {
   const trigger = sourceDialogReturnFocus;
   sourceDialogReturnFocus = null;
-  if (trigger?.isConnected && !trigger.disabled) trigger.focus();
+  const target = trigger?.isConnected ? trigger : trigger?.dataset.focusKey ? [...document.querySelectorAll('[data-focus-key]')].find(element => element.dataset.focusKey === trigger.dataset.focusKey) : null;
+  if (target && !target.disabled) target.focus();
+  else if (document.body.dataset.area === 'knowledge') el('knowledge-search').focus();
 });
 el('ai-toggle').addEventListener('click', async () => {
   if (!current.aiEnabled && !window.confirm('Enable Nebius for this session? Your questions and relevant approved company text sources will be sent to Nebius. Images and window captures are not sent by this control.')) return;

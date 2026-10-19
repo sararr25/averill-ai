@@ -1,3 +1,7 @@
+## Accessibility continuation - 19 October 2026
+
+Companion card controls retain focus through preview/apply/result states; the closed-shadow host is keyboard reachable inside a host modal, and Escape preserves the draft. A persistent polite status announces changes. Library reader/proposal/compare actions have stable return-focus identities across rerenders. Authenticated four-role renderer checks cover narrow/wide/200% layouts and reduced motion. Installed Instagram 200% screenshot and actual Canva text proof are in [the report](../../docs/CONTINUATION_2026-10-19.md). Full VoiceOver acceptance is still open. No palette/type/brand change.
+
 ## Library and Learn hierarchy increment — 18 October 2026
 
 Library reading leads with title, approval state, excerpt and Read. Metadata, originals, comparison and destructive actions expand separately. Approval forms move to a distinct queue, shown only for the authenticated person's matching `canReview` requests. Main-process role/reason/version validation is unchanged. Readers restore focus to their library or queue trigger. Private clarification/rule operations expand separately.

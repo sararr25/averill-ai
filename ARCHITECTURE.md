@@ -1,3 +1,7 @@
+# Canva editing and accessibility seam - 19 October 2026
+
+The extension selects either the existing plaintext adapter or a named Canva `.ql-editor` adapter. Canva writes require one paragraph with equivalent span formatting, an exact unique removal, native editing-pipeline confirmation after the editor frame, and a matching formatting signature. Undo revalidates text, revision and signature; uncertain writes expose prior text for manual recovery. Apply/Undo are serialized and completed operations cannot bind to a different selection. No arbitrary contenteditable support is introduced. Card focus/status persist across rerenders; keyboard events are scoped to the companion before host modal document handlers. Library dialog focus can resolve a stable source/action identity after its trigger is rerendered. [Evidence and limits](docs/CONTINUATION_2026-10-19.md).
+
 # Companion desktop and demo acceptance — 18 October 2026
 
 Averill's desktop shell imports the selected Companion tokens through `src/companion-theme.css`. Current work unifies the former Work/Review navigation; library/Learn are primary and research/settings are secondary. The contextual card stays in the selected editor, uses the top layer within modal editor DOM/focus scope, and exposes only the bounded review contract. The owner selected existing Vamo mock Brevo/LinkedIn pages for demo acceptance. Actual built React pages are tested with simulated Chrome transport; installed-browser and real-platform claims remain separate. Vamo design/data and normal workspaces are unchanged.

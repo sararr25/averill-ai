@@ -1,3 +1,5 @@
+> 19 October continuation: installed Chrome/Instagram, named Canva adapter, role/zoom matrix and A/B technical receipts are recorded in [CONTINUATION_2026-10-19.md](CONTINUATION_2026-10-19.md). Its ticket table is the current evidence boundary. Original acceptance criteria below remain; this update does not silently close parent gates.
+
 # Contextual UX redesign tickets — 18 October 2026
 
 ## Owner clarification — Vamo demo acceptance, 18 October 2026

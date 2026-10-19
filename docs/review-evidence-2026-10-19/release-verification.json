@@ -1,0 +1,11 @@
+{
+  "verifiedAt": "2026-10-19T07:19:45.772Z",
+  "archive": "Averill-macOS-arm64.zip",
+  "archiveSha256": "916b9fec0af13694eded002831d5d0096569414e7f1126d5978231bc66433c87",
+  "bundleFiles": 3157,
+  "trackedSourceFiles": 168,
+  "signed": false,
+  "target": "macOS-arm64",
+  "scope": "Local working-tree package/resource integrity; not actual packaged executable acceptance",
+  "packagedResourceFeedback": "pass"
+}
