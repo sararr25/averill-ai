@@ -307,6 +307,17 @@ function renderWorkspace() {
   panel.replaceChildren();
   const data = current.workspace || { configured: false };
   if (!data.configured) {
+    const judge = node('div'); judge.className = 'workspace-form';
+    const judgeButton = node('button', 'Judge demo: start in one click', 'agent-primary');
+    judgeButton.type = 'button';
+    judgeButton.addEventListener('click', async () => {
+      judgeButton.disabled = true;
+      try { current = await window.desktop.startJudgeDemo(); render(); }
+      catch (error) { el('workspace-feedback').textContent = error.message; }
+      finally { judgeButton.disabled = false; }
+    });
+    judge.append(node('h3', 'Testing Averill?'), node('p', 'Opens a ready-made fictional Vamo company, signed in as Emma (Marketing). No account or file import needed.'), judgeButton);
+    panel.append(judge);
     const form = node('form'); form.className = 'workspace-form';
     form.append(node('h3', 'Create your company and owner account'), node('p', 'Start with your account, then import existing company files to add the team.'));
     const company = onboardingField(form, 'Company name', ''); company.placeholder = 'Vamo'; company.required = true; company.maxLength = 120;

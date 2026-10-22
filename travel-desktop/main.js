@@ -10,6 +10,7 @@ const { sourceFor } = require('./src/campaign');
 const workspace = require('./src/workspace');
 const accounts = require('./src/accounts');
 const accountDocuments = require('./src/account-documents');
+const judgeDemo = require('./src/judge-demo');
 const onboarding = require('./src/onboarding');
 const privacy = require('./src/company-privacy');
 const knowledge = require('./src/knowledge');
@@ -364,6 +365,12 @@ app.whenReady().then(async () => {
     Object.assign(owner, { email: accounts.email(email), profile: 'owner', jobTitle: accounts.profiles.owner.label, credential: hashed });
     companyWorkspace.authEnabled = true; authenticatedPersonId = owner.id;
     accountDocuments.save(app.getPath('userData'), companyWorkspace, [{ email: owner.email, password }]);
+    return persistWorkspace();
+  });
+  ipcMain.handle('workspace:judge-demo', async (event) => {
+    fromAgent(event, true);
+    const demo = await judgeDemo.create(app.getPath('userData'), path.join(__dirname, 'demo-company'));
+    companyWorkspace = demo.data; authenticatedPersonId = demo.personId;
     return persistWorkspace();
   });
   ipcMain.handle('account:login', async (event, email, password) => {
