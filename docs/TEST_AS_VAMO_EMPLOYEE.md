@@ -37,10 +37,10 @@ file for the person you want to be and copy Email + Password into the sign-in sc
 
 | Who | File | Role |
 | --- | --- | --- |
-| Demo Admin | `alex@elseweek.example.md` | Owner / admin |
-| Maya Jensen | `maya@elseweek.example.md` | Marketing manager |
-| Emma Larsen | `emma@elseweek.example.md` | Marketing strategy employee |
-| Oscar Lind | `oscar@elseweek.example.md` | Content creator |
+| Demo Admin | `alex@vamo.example.md` | Owner / admin |
+| Maya Jensen | `maya@vamo.example.md` | Marketing manager |
+| Emma Larsen | `emma@vamo.example.md` | Marketing strategy employee |
+| Oscar Lind | `oscar@vamo.example.md` | Content creator |
 
 Note: this prepared workspace is still called **Aurelia Demo** (legacy name); the content and
 documents inside are Vamo. For a clean "Vamo" company follow `docs/ONBOARDING_TUTORIAL.md`

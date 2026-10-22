@@ -67,7 +67,7 @@ Start future development from `docs/HANDOVER.md`, then `AGENTS.md`, `PROJECT.md`
 
 ## Prepared local demo accounts and services
 
-On this Mac, the existing legacy Aurelia Demo workspace retains four working logins: Demo Admin / alex@elseweek.example (Owner / CEO / admin), Maya Jensen / maya@elseweek.example (Marketing manager), Emma Larsen / emma@elseweek.example (Marketing strategy employee), Oscar Lind / oscar@elseweek.example (Content creator). Company name and original administrator ID are preserved. No existing password was reset. A timestamped pre-login workspace backup is adjacent to averill-workspace.json.
+On this Mac, the existing legacy Aurelia Demo workspace retains four working logins: Demo Admin / alex@vamo.example (Owner / CEO / admin), Maya Jensen / maya@vamo.example (Marketing manager), Emma Larsen / emma@vamo.example (Marketing strategy employee), Oscar Lind / oscar@vamo.example (Content creator). Company name and original administrator ID are preserved. No existing password was reset. A timestamped pre-login workspace backup is adjacent to averill-workspace.json.
 
 Actual emails/passwords are in separate documents under repository-root demo-login-documents, ignored by Git. Originals are in userData/Averill-login-documents. Open the owner document, then use its email/password on the packaged app sign-in screen. The owner can reopen the original folder from Account access. Never substitute /tmp synthetic test credentials.
 
