@@ -38,6 +38,8 @@ async function renderKnowledge(){
   if(request!==knowledgeRequest)return;
   const awaitingDecision=result.documents.filter(file=>file.canReview&&['pending','clarification_requested'].includes(file.status)).length;
   summary.replaceChildren(node('span',`Showing ${result.documents.length} of ${result.total}`),node('span',`${result.approved} approved`,'count-chip'),node('span',`${awaitingDecision} to review`,awaitingDecision?'count-chip attention':'count-chip'),...(result.uploaded?[node('span',`${result.uploaded} uploaded`,'count-chip')]:[]));
+  // A refresh replaces the cards; keep keyboard focus on the same control when it still exists.
+  const focusKey=(host.contains(document.activeElement)||decisions.contains(document.activeElement))?document.activeElement.dataset.focusKey:null;
   host.replaceChildren();decisions.replaceChildren();queue.hidden=awaitingDecision===0;
   if(!result.documents.length){host.append(node('p',result.total?'No documents match this search or status.':'No company documents yet. Add files in Setup; they appear here immediately for review.'));return;}
   for(const file of result.documents){
@@ -80,6 +82,7 @@ async function renderKnowledge(){
    }else{const review=node('button','Review this file in Setup','secondary-button');review.type='button';review.addEventListener('click',()=>{showTab('setup');const target=[...document.querySelectorAll('[data-file-id]')].find(element=>element.dataset.fileId===file.id);if(target){target.open=true;target.scrollIntoView({block:'center'});target.querySelector('summary')?.focus();}});card.append(review);}
    host.append(card);
   }
+ if(focusKey)[...document.querySelectorAll('[data-focus-key]')].find(element=>element.dataset.focusKey===focusKey&&!element.disabled)?.focus();
  }catch(error){if(request===knowledgeRequest){knowledgeRenderKey=null;summary.textContent=`Could not load knowledge: ${error.message}`;host.replaceChildren();decisions.replaceChildren();queue.hidden=true;}}
 }
 let knowledgeSearchTimer;

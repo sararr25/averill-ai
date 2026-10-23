@@ -527,11 +527,16 @@ el('choose-external').addEventListener('click', async () => {
   try {
     const result = await window.desktop.externalWindows();
     list.replaceChildren();
-    if (result.permission !== 'granted') list.append(node('p', `Screen Recording permission: ${result.permission}. macOS may require permission and an app restart.`));
+    if (['denied', 'restricted'].includes(result.permission)) { screenPermissionHelp(list); return; }
+    if (result.permission !== 'granted') list.append(node('p', 'macOS may ask for Screen Recording permission. After allowing it, quit and reopen Averill.'));
     if (!result.windows.length) list.append(node('p', 'No external windows found. Open your work tool, then try again.'));
     for (const item of result.windows) list.append(action(`Choose ${item.name}`, () => window.desktop.shareExternal(item.id, item.name)));
-  } catch (error) { list.replaceChildren(node('p', error.message)); }
+  } catch (error) { list.replaceChildren(); screenPermissionHelp(list, error.message); }
 });
+function screenPermissionHelp(list, message = 'Averill cannot see other app windows yet. Open System Settings › Privacy & Security › Screen Recording, turn on Averill, then quit and reopen Averill.') {
+  list.append(node('p', message));
+  list.append(action('Open Screen Recording settings', async () => { await window.desktop.openScreenSettings(); return current; }));
+}
 el('browser-pair').addEventListener('click', async () => {
   try { await window.desktop.pairBrowser(); el('browser-pair-status').textContent = 'Pairing is ready for two minutes. Copy details into the extension on your chosen draft tab.'; }
   catch (error) { el('browser-pair-status').textContent = error.message; }

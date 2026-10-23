@@ -145,6 +145,11 @@ function stopExternal(clearSelection = true) {
   externalError = '';
   if (clearSelection) selectedExternalWindow = null;
 }
+const screenPermissionHelp = 'Averill cannot see other app windows yet. Open System Settings › Privacy & Security › Screen Recording, turn on Averill, then quit and reopen Averill.';
+async function windowSources(thumbnailSize) {
+  try { return await desktopCapturer.getSources({ types: ['window'], thumbnailSize }); }
+  catch (error) { console.error('Window list unavailable:', error?.message || error); throw new Error(screenPermissionHelp); }
+}
 function isOwnWindowSource(source) {
   return [agentWindow, companionWindow, ...workWindows.values()].some(window => window && !window.isDestroyed() && window.getMediaSourceId() === source.id);
 }
@@ -202,7 +207,7 @@ async function captureExternal() {
   const chosen = selectedExternalWindow;
   const personId = companyWorkspace.activePersonId;
   const epoch = externalEpoch;
-  const sources = await desktopCapturer.getSources({ types: ['window'], thumbnailSize: { width: 1600, height: 1000 } });
+  const sources = await windowSources({ width: 1600, height: 1000 });
   const source = sources.find(item => item.id === chosen.id);
   if (!source) { if (epoch === externalEpoch && selectedExternalWindow?.id === chosen.id) { stopExternal(); publish(); } throw new Error('The selected window closed. Choose it again.'); }
   const identity = await nativeWindow('identity', chosen.id);
@@ -646,14 +651,22 @@ app.whenReady().then(async () => {
   ipcMain.handle('agent:external-windows', async (event) => {
     fromAgent(event);
     const permission = process.platform === 'darwin' ? systemPreferences.getMediaAccessStatus('screen') : 'granted';
-    const sources = await desktopCapturer.getSources({ types: ['window'], thumbnailSize: { width: 0, height: 0 } });
+    // macOS refuses the window list outright without Screen Recording; say so instead of failing.
+    if (['denied', 'restricted'].includes(permission)) return { permission, windows: [] };
+    const sources = await windowSources({ width: 0, height: 0 });
     return { permission, windows: sources.filter((source) => source.name && !isOwnWindowSource(source)).map((source) => ({ id: source.id, name: source.name })) };
+  });
+  ipcMain.handle('agent:open-screen-settings', async (event) => {
+    fromAgent(event);
+    if (process.platform !== 'darwin') throw new Error('Screen Recording settings are only needed on macOS.');
+    await shell.openExternal('x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture');
+    return true;
   });
   ipcMain.handle('agent:external-share', async (event, id, name) => {
     fromAgent(event);
     if (id) {
       if (!windowNumber(id)) throw new Error('Choose a listed work window.');
-      const available = await desktopCapturer.getSources({ types: ['window'], thumbnailSize: { width: 0, height: 0 } });
+      const available = await windowSources({ width: 0, height: 0 });
       if (!available.some(source => source.id === id && source.name === name && source.name && !isOwnWindowSource(source))) throw new Error('Choose an available external window.');
       fromAgent(event);
       const identity = await nativeWindow('identity', id);
