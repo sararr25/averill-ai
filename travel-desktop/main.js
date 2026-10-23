@@ -158,7 +158,7 @@ function clearSessionWork() {
 }
 function snapshot() {
   return {
-    auth: { enabled: Boolean(companyWorkspace?.authEnabled), signedIn: signedIn(), accounts: accounts.publicAccounts(companyWorkspace), person: signedIn() ? accounts.publicAccounts(companyWorkspace).find(p => p.id === companyWorkspace.activePersonId) || null : null },
+    auth: { enabled: Boolean(companyWorkspace?.authEnabled), demo: Boolean(companyWorkspace?.demoAccounts), signedIn: signedIn(), accounts: accounts.publicAccounts(companyWorkspace), person: signedIn() ? accounts.publicAccounts(companyWorkspace).find(p => p.id === companyWorkspace.activePersonId) || null : null },
     privacy: {companyAI:privacy.allowed(companyWorkspace)},
     cloud: signedIn() && workspace.person(companyWorkspace)?.role==='admin' ? cloud.status(companyWorkspace) : [],
     onboarding: signedIn() ? onboarding.snapshot(companyWorkspace) : null,
@@ -385,6 +385,13 @@ app.whenReady().then(async () => {
       loginFailures.count++; if (loginFailures.count >= 5) { loginFailures.until = Date.now() + 60000; loginFailures.count = 0; }
       throw error;
     }
+  });
+  ipcMain.handle('account:demo-login', (event, personId) => {
+    fromAgent(event, true);
+    if (onboardingBusy) throw new Error('Wait for onboarding to finish before changing accounts.');
+    const person = accounts.demoSignIn(companyWorkspace, personId);
+    clearSessionWork(); authenticatedPersonId = person.id; workspace.switchPerson(companyWorkspace, person.id);
+    return persistWorkspace();
   });
   ipcMain.handle('account:logout', (event) => {
     fromAgent(event); if (onboardingBusy) throw new Error('Wait for onboarding to finish before signing out.');

@@ -3,7 +3,7 @@ const { contextBridge, ipcRenderer, webUtils } = require('electron');
 let operationId=0;
 const operationListeners=new Set();
 const operationLabels={
- 'account:login':'Signing in', 'account:logout':'Signing out', 'account:enable':'Saving owner login', 'account:create':'Creating account', 'account:documents':'Opening login documents', 'account:disable':'Disabling account', 'account:recover':'Recovering account', 'account:change-password':'Changing password',
+ 'account:login':'Signing in', 'account:demo-login':'Signing in', 'account:logout':'Signing out', 'account:enable':'Saving owner login', 'account:create':'Creating account', 'account:documents':'Opening login documents', 'account:disable':'Disabling account', 'account:recover':'Recovering account', 'account:change-password':'Changing password',
  'onboarding:drop':'Reading dropped files', 'onboarding:upload':'Selecting and reading company files', 'onboarding:synced':'Reading synced files', 'onboarding:links':'Downloading and reading linked files', 'onboarding:analyze':'Interpreting selected files with Nebius', 'onboarding:apply':'Saving company onboarding', 'onboarding:read-file':'Opening uploaded text',
  'company:privacy':'Saving company AI policy', 'cloud:configure':'Saving cloud configuration', 'cloud:connect':'Waiting for cloud sign-in', 'cloud:cancel':'Cancelling cloud sign-in', 'cloud:disconnect':'Disconnecting cloud account', 'cloud:list':'Loading cloud folder', 'cloud:import':'Downloading selected cloud files',
  'workspace:create':'Creating company workspace', 'workspace:judge-demo':'Preparing the judge demo', 'workspace:add-person':'Adding person', 'workspace:import':'Importing sources', 'workspace:import-folder':'Importing folder', 'workspace:update-source':'Saving source status and priority', 'workspace:remove-source':'Deleting local source copy', 'workspace:request-clarification':'Requesting private clarification', 'workspace:resolve-clarification':'Answering private clarification', 'workspace:propose-source':'Proposing source', 'workspace:open-source':'Opening source file', 'workspace:read-file':'Opening source text', 'workspace:save-key':'Saving service key securely',
@@ -32,6 +32,7 @@ contextBridge.exposeInMainWorld('desktop', {
   listKnowledge: (query,status,filters) => invoke('workspace:knowledge',query,status,filters),
   readOnboardingFile: id => invoke('onboarding:read-file',id),
   login: (email, password) => invoke('account:login', email, password),
+  demoLogin: personId => invoke('account:demo-login', personId),
   logout: () => invoke('account:logout'),
   enableAccounts: (email, password) => invoke('account:enable', email, password),
   createAccount: (id, email, profile) => invoke('account:create', id, email, profile),

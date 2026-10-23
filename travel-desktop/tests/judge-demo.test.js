@@ -36,3 +36,26 @@ test('judge demo refuses to touch an existing workspace', async () => {
     assert.equal(workspace.load(root).company, 'Existing Co');
   } finally { fs.rmSync(root, { recursive: true, force: true }); }
 });
+
+test('judge demo accounts sign in without a password', async () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'averill-judge-'));
+  try {
+    const { data } = await judgeDemo.create(root, pack);
+    assert.equal(workspace.load(root).demoAccounts, true);
+    const maya = data.people.find(p => p.email === 'maya@vamo.example');
+    assert.equal(accounts.demoSignIn(data, maya.id).id, maya.id);
+    maya.disabledAt = new Date().toISOString();
+    assert.throws(() => accounts.demoSignIn(data, maya.id), /not available/);
+    assert.throws(() => accounts.demoSignIn(data, 'missing'), /not available/);
+  } finally { fs.rmSync(root, { recursive: true, force: true }); }
+});
+
+test('passwordless sign-in is refused outside the demo workspace', async () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'averill-judge-'));
+  try {
+    const data = workspace.create(root, 'Real Co', 'Real Owner');
+    const owner = workspace.person(data);
+    await accounts.configure(data, owner.id, 'owner@real.example', 'a-strong-password', 'owner');
+    assert.throws(() => accounts.demoSignIn(data, owner.id), /demo workspace/);
+  } finally { fs.rmSync(root, { recursive: true, force: true }); }
+});

@@ -26,6 +26,7 @@ async function create(userData, packRoot) {
     if (!fs.existsSync(path.join(marketing, file))) throw new Error(`Judge demo file is missing: ${file}`);
   }
   const data = workspace.create(userData, 'Vamo (judge demo)', 'Alex Holm');
+  data.demoAccounts = true;
   const credentials = [];
   const owner = workspace.person(data);
   const ownerPassword = accounts.temporaryPassword();

@@ -14,7 +14,7 @@ A Mac with Apple Silicon (M1 or newer) and Google Chrome. No Node.js, no termina
 
 1. Download `Averill-macOS-arm64.zip` from the [latest release](https://github.com/sararr25/averill-ai/releases/latest) and unzip it.
 2. Right-click `Averill.app` › **Open** › **Open** (the app is unsigned, so macOS asks once).
-3. Click **Judge demo: start in one click**. You are signed in as Emma, a Vamo marketing employee, with the company rules already approved.
+3. Click **Try the demo**. You are signed in as Emma, a Vamo marketing employee, with the company rules already approved. After a restart, pick any person on the sign-in screen: demo accounts need no password.
 
 ## 2. Open the online email tool
 

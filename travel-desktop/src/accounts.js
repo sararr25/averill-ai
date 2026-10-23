@@ -40,6 +40,13 @@ async function authenticate(data, address, password) {
  if (!person || person.disabledAt || expected.length !== hash.length || !crypto.timingSafeEqual(expected, hash)) throw new Error('Email or password is incorrect.');
  return person;
 }
+// Demo workspaces hold fictional people only, so their accounts open with one click.
+function demoSignIn(data,personId){
+ if(!data?.demoAccounts)throw new Error('Passwordless sign-in is only available in the demo workspace.');
+ const person=data.people.find(p=>p.id===personId&&p.credential);
+ if(!person||person.disabledAt)throw new Error('This demo account is not available.');
+ return person;
+}
 function disable(data,personId){
  const actor=data.people.find(p=>p.id===data.activePersonId),target=data.people.find(p=>p.id===personId);
  if(actor?.role!=='admin'||!target?.credential||target.id===actor.id||target.profile==='owner')throw new Error('An administrator may disable another non-owner account only.');
@@ -58,4 +65,4 @@ function temporaryPassword() { return `Av-${crypto.randomBytes(12).toString('bas
 function publicAccounts(data) {
  return (data?.people || []).filter(p => p.email && p.credential).map(p => ({ id: p.id, name: p.name, email: p.email, profile: p.profile, jobTitle: p.jobTitle, department: p.department, disabled:Boolean(p.disabledAt) }));
 }
-module.exports = { profiles, email, validEmail, validatePassword, credential, configure, authenticate, disable, recover, changePassword, temporaryPassword, publicAccounts };
+module.exports = { profiles, email, validEmail, validatePassword, credential, configure, authenticate, demoSignIn, disable, recover, changePassword, temporaryPassword, publicAccounts };

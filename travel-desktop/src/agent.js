@@ -308,7 +308,7 @@ function renderWorkspace() {
   const data = current.workspace || { configured: false };
   if (!data.configured) {
     const judge = node('div'); judge.className = 'workspace-form';
-    const judgeButton = node('button', 'Judge demo: start in one click', 'agent-primary');
+    const judgeButton = node('button', 'Try the demo', 'agent-primary');
     judgeButton.type = 'button';
     judgeButton.addEventListener('click', async () => {
       judgeButton.disabled = true;
@@ -316,10 +316,12 @@ function renderWorkspace() {
       catch (error) { el('workspace-feedback').textContent = error.message; }
       finally { judgeButton.disabled = false; }
     });
-    judge.append(node('h3', 'Testing Averill?'), node('p', 'Opens a ready-made fictional Vamo company, signed in as Emma (Marketing). No account or file import needed.'), judgeButton);
+    judge.append(node('h3', 'See Averill in action'), node('p', 'Opens Vamo, a fictional travel company with its rules already approved. You are signed in as Emma from Marketing. No password, no files to import.'), judgeButton);
     panel.append(judge);
+    const ownCompany = node('details', undefined, 'own-company');
+    ownCompany.append(node('summary', 'Set up your own company instead'));
     const form = node('form'); form.className = 'workspace-form';
-    form.append(node('h3', 'Create your company and owner account'), node('p', 'Start with your account, then import existing company files to add the team.'));
+    form.append(node('p', 'Start with your account, then import existing company files to add the team.'));
     const company = onboardingField(form, 'Company name', ''); company.placeholder = 'Vamo'; company.required = true; company.maxLength = 120;
     const admin = onboardingField(form, 'Your name', ''); admin.required = true; admin.maxLength = 120;
     const email = onboardingField(form, 'Your work email', '', 'email'); email.required = true; email.autocomplete = 'username';
@@ -331,7 +333,8 @@ function renderWorkspace() {
       catch (error) { el('workspace-feedback').textContent = error.message; }
       finally { submit.disabled = false; }
     });
-    panel.append(form);
+    ownCompany.append(form);
+    panel.append(ownCompany);
     return;
   }
   const active = data.people.find((entry) => entry.id === data.activePersonId);
