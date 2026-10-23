@@ -1,3 +1,40 @@
+# Judge release — 24 October 2026
+
+**State:** judge-ready build published and merged. Release [v0.1.0-judge.20261023](https://github.com/sararr25/averill-ai/releases/tag/v0.1.0-judge.20261023) is the repository's *latest* release (earlier releases were all pre-releases, so `releases/latest` used to 404). Built from `63e2922`; ZIP SHA-256 `5d1cc2559b1ac619b13c49772b1cf33b913fa647bad0734918b4cabbbcc8df27`, verified identical when downloaded through the `latest` link. PR #37 merged to `main` as `13830c5`.
+
+## What changed
+- **One-click demo:** first run shows a single **Try the demo** button; own-company setup is collapsed under "Set up your own company instead".
+- **Passwordless demo accounts:** the judge workspace is marked `demoAccounts: true`; its people sign in from "Continue as …" buttons (`accounts.demoSignIn`, IPC `account:demo-login`). Non-demo workspaces still require a password and refuse passwordless sign-in.
+- **Library focus fix:** a Library refresh no longer drops keyboard focus; it returns to the same control (`knowledge-ui.js`). `verify:feedback` now polls instead of a fixed 80 ms wait and asserts the refresh case (fails without the fix).
+- **Screen Recording:** choosing an app window without macOS Screen Recording permission now explains the setting and offers **Open Screen Recording settings**, instead of "Failed to get sources".
+- **Vercel:** Root Directory set to `demo-tools/social-simulator` (averill-demo-sim) and `travel-site` (vamo-travel-site). PR previews and production builds from `main` now pass; both live sites return 200.
+
+## Verified
+95/95 unit tests; accessibility, UI end-to-end, rehearsal, browser, feedback/library, contextual and cloud UI checks pass. A/B run against `ef833ca` showed no regressions. The unzipped release passed demo sign-in and non-demo password sign-in checks in the real app (temporary profiles; the owner's workspace untouched). The owner tested the ZIP before publishing.
+
+## Files to test
+| What | Path |
+|---|---|
+| Judge guide | `docs/JUDGE_QUICKSTART.md` |
+| Release ZIP (as judges get it) | `travel-desktop/dist/Averill-macOS-arm64.zip` |
+| Built app | `travel-desktop/dist/Averill-darwin-arm64/Averill.app` |
+| Chrome extension (inside the app) | `travel-desktop/dist/Averill-darwin-arm64/Averill.app/Contents/Resources/app/browser-extension` |
+| Chrome extension (source) | `travel-desktop/browser-extension` |
+| Hosted email/social mocks | https://averill-demo-sim.vercel.app/brevo · /linkedin · /instagram |
+
+To see the judge experience on a Mac that already has a workspace, move `~/Library/Application Support/averill-ai-desktop` aside first and restore it afterwards.
+
+## Open
+- `verify:task-review` needs Screen Recording permission for Electron; it is denied on the build Mac, so the app-window path is unverified end to end.
+- The Chrome extension still needs Developer mode › Load unpacked. This is the main remaining friction for judges; the owner chose to keep this flow for now. An in-app sample-email path (reusing the supplied demo windows) is the simpler alternative if needed.
+- The demo company is named "Vamo (judge demo)"; renaming would touch existing data.
+- The operation toast still says "Finding available windows: completed." when permission is missing.
+- VoiceOver, a clean-Mac install and signed/notarised distribution remain open.
+
+# Owner readiness audit — 21 October 2026
+
+See [the short check report and owner test plan](CHECK_REPORT_2026-10-21.md). Fresh checks: 91/91 unit tests, browser/Canva synthetic regression, nine accessibility matrix groups, offline packaged-resource rehearsal and simulator tests/build pass. `verify:feedback` fails twice on uploaded-reader return focus; default `verify:contextual` stops at the field-type selector. These require diagnosis; no fresh full contextual acceptance is claimed. Initial ZIP/app locale-resource mismatch was resolved by a local rebuild; integrity passes 171 tracked files, both helpers and 3160 archive entries, SHA-256 `eaeeeb1719d8701e2f3fc6cfb46132bf1a52e4d0e8db7d2af7ea6f5baf40c583`. No product code, normal workspace or public release changed. Final-executable/installed-browser, VoiceOver and owner acceptance stay open.
+
 # Packaged-executable continuation - 19 October 2026
 
 Start from [PACKAGED_ACCEPTANCE_2026-10-19.md](PACKAGED_ACCEPTANCE_2026-10-19.md). Added an explicit, marked temporary synthetic profile option for the real executable; normal authentication remains required. Added occupied-port recovery copy and loopback restart/conflict acceptance tests. 91/91 tests and final bundle integrity pass (171 tracked files, both helpers, 3160 archive entries). After the initial Mac lock cleared, CUA repeatedly timed out on the exact QA bundle; no packaged login/browser/restart/VoiceOver success is claimed. See the report for the normal signed-out window briefly opened during app lookup and the precise validation boundary. Previous installed-browser and A/B receipts remain valid within their documented scope.
