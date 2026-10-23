@@ -4,8 +4,6 @@ Everything is fictional: the company (Vamo), the people and the email tools. Not
 
 **No time to install anything?** Watch the demo video instead (link in the submission).
 
-> Maintainer note: the one-click **Judge demo** button exists in the source from commit `9c35e36`. The published release ZIP predates it, so run `npm run package:release` and publish a new release before sending this guide to judges.
-
 ## Requirements
 
 A Mac with Apple Silicon (M1 or newer) and Google Chrome. No Node.js, no terminal, no localhost.
