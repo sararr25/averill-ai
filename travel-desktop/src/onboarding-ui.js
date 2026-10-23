@@ -161,6 +161,24 @@ function renderSession(){
   knowledgeRequest++;knowledgeRenderKey=null;el('knowledge-list').replaceChildren();el('knowledge-requests').replaceChildren();el('knowledge-summary').replaceChildren();el('knowledge-search').value='';
   intakeCloudBrowser={};onboardingReceipt=null;el('account-receipt').replaceChildren();
   el('login-company').textContent=current.workspace?.company||'Your company';
+  const demo=Boolean(current.auth.demo);
+  el('login-form').hidden=demo;el('login-demo').hidden=!demo;
+  el('login-intro').textContent=demo?'Fictional demo company. Choose who you want to be — no password needed.':'Sign in to your workspace and personal learning.';
+  if(demo){
+   const list=el('login-demo');list.replaceChildren();
+   for(const person of current.auth.accounts.filter(person=>!person.disabled)){
+    const button=node('button',undefined,'login-demo-account');button.type='button';
+    button.append(node('strong',`Continue as ${person.name}`),node('span',`${person.jobTitle}${person.department?` · ${person.department}`:''}`));
+    button.addEventListener('click',async()=>{
+     for(const control of list.querySelectorAll('button'))control.disabled=true;el('login-feedback').textContent='Signing in…';
+     try{current=await window.desktop.demoLogin(person.id);el('login-feedback').textContent='';render();showTab(preferredArea());}
+     catch(error){el('login-feedback').textContent=error.message;}
+     finally{for(const control of list.querySelectorAll('button'))control.disabled=false;}
+    });
+    list.append(button);
+   }
+   return false;
+  }
   const accounts=el('login-account');const old=accounts.value;accounts.replaceChildren();
   const placeholder=node('option','Choose an account or enter your email');placeholder.value='';accounts.append(placeholder);
   for(const person of current.auth.accounts.filter(person=>!person.disabled)){const option=node('option',`${person.name} · ${person.jobTitle}`);option.value=person.email;accounts.append(option);}accounts.value=old;

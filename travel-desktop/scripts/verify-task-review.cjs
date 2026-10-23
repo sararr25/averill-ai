@@ -29,7 +29,9 @@ app.whenReady().then(async () => {
     external.show();
     let chosen;
     for (let attempt = 0; attempt < 30; attempt++) {
-      chosen = (await run('window.desktop.externalWindows()')).windows.find(item => item.name === 'Synthetic email editor');
+      const listed = await run('window.desktop.externalWindows()');
+      if (['denied', 'restricted'].includes(listed.permission)) throw new Error('This check needs macOS Screen Recording permission for Electron. Grant it in System Settings › Privacy & Security › Screen Recording, then rerun.');
+      chosen = listed.windows.find(item => item.name === 'Synthetic email editor');
       if (chosen) break;
       await pause(100);
     }

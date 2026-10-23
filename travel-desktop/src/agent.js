@@ -31,6 +31,10 @@ function preferredArea(){
 
 function showTab(name) {
   if(!areas.has(name))return;
+  const connectionRequested=name==='work';
+  if(connectionRequested)name='review';
+  if(connectionRequested)el('work-controls').open=true;
+  document.querySelector('.nav-more').open=false;
   const changed=document.body.dataset.area!==name;
   document.body.dataset.area = name;
   if(current.auth?.signedIn&&current.auth.person?.id)localStorage.setItem(`averill:last-area:${current.auth.person.id}`,name);
@@ -42,8 +46,13 @@ function showTab(name) {
   for (const panel of document.querySelectorAll('[data-tab]')) panel.classList.toggle('active', panel.dataset.tab === name);
   document.querySelector('.agent-main').scrollTop = 0;
   if(changed)guidedMotion.enter(document.querySelector(`[data-tab="${name}"]`),220,6);
+  if(connectionRequested)el('work-controls').scrollIntoView({block:'start'});
 }
-for (const button of document.querySelectorAll('[data-tab-button]')) button.addEventListener('click', () => showTab(button.dataset.tabButton));
+for (const button of document.querySelectorAll('[data-tab-button]')) button.addEventListener('click', () => {
+  const fromMore=Boolean(button.closest('.nav-more'));showTab(button.dataset.tabButton);
+  if(fromMore){const heading=document.querySelector('.agent-tab.active h2');if(heading){heading.tabIndex=-1;heading.focus();}}
+});
+document.querySelector('.nav-more').addEventListener('keydown',event=>{if(event.key==='Escape'){event.currentTarget.open=false;event.currentTarget.querySelector('summary').focus();}});
 
 function sourceButton(source) {
   const button = document.createElement('button');
@@ -74,6 +83,8 @@ function render() {
   renderLearning();
   renderHero();
   renderWorkStep();
+  el('browser-guided-status').textContent = current.browserConnectionError || '';
+  el('browser-guided-status').hidden = !current.browserConnectionError;
   el('browser-copy-pair').disabled = !current.browserBridge?.ready;
   el('stop-external').disabled = !current.externalWindow && !current.browserBridge?.ready;
   if (current.browserBridge?.connected) el('browser-pair-status').textContent = 'Browser field connected. Finish editing to review the selected field.';
@@ -296,8 +307,21 @@ function renderWorkspace() {
   panel.replaceChildren();
   const data = current.workspace || { configured: false };
   if (!data.configured) {
+    const judge = node('div'); judge.className = 'workspace-form';
+    const judgeButton = node('button', 'Try the demo', 'agent-primary');
+    judgeButton.type = 'button';
+    judgeButton.addEventListener('click', async () => {
+      judgeButton.disabled = true;
+      try { current = await window.desktop.startJudgeDemo(); render(); }
+      catch (error) { el('workspace-feedback').textContent = error.message; }
+      finally { judgeButton.disabled = false; }
+    });
+    judge.append(node('h3', 'See Averill in action'), node('p', 'Opens Vamo, a fictional travel company with its rules already approved. You are signed in as Emma from Marketing. No password, no files to import.'), judgeButton);
+    panel.append(judge);
+    const ownCompany = node('details', undefined, 'own-company');
+    ownCompany.append(node('summary', 'Set up your own company instead'));
     const form = node('form'); form.className = 'workspace-form';
-    form.append(node('h3', 'Create your company and owner account'), node('p', 'Start with your account, then import existing company files to add the team.'));
+    form.append(node('p', 'Start with your account, then import existing company files to add the team.'));
     const company = onboardingField(form, 'Company name', ''); company.placeholder = 'Vamo'; company.required = true; company.maxLength = 120;
     const admin = onboardingField(form, 'Your name', ''); admin.required = true; admin.maxLength = 120;
     const email = onboardingField(form, 'Your work email', '', 'email'); email.required = true; email.autocomplete = 'username';
@@ -309,7 +333,8 @@ function renderWorkspace() {
       catch (error) { el('workspace-feedback').textContent = error.message; }
       finally { submit.disabled = false; }
     });
-    panel.append(form);
+    ownCompany.append(form);
+    panel.append(ownCompany);
     return;
   }
   const active = data.people.find((entry) => entry.id === data.activePersonId);
@@ -502,11 +527,16 @@ el('choose-external').addEventListener('click', async () => {
   try {
     const result = await window.desktop.externalWindows();
     list.replaceChildren();
-    if (result.permission !== 'granted') list.append(node('p', `Screen Recording permission: ${result.permission}. macOS may require permission and an app restart.`));
+    if (['denied', 'restricted'].includes(result.permission)) { screenPermissionHelp(list); return; }
+    if (result.permission !== 'granted') list.append(node('p', 'macOS may ask for Screen Recording permission. After allowing it, quit and reopen Averill.'));
     if (!result.windows.length) list.append(node('p', 'No external windows found. Open your work tool, then try again.'));
     for (const item of result.windows) list.append(action(`Choose ${item.name}`, () => window.desktop.shareExternal(item.id, item.name)));
-  } catch (error) { list.replaceChildren(node('p', error.message)); }
+  } catch (error) { list.replaceChildren(); screenPermissionHelp(list, error.message); }
 });
+function screenPermissionHelp(list, message = 'Averill cannot see other app windows yet. Open System Settings › Privacy & Security › Screen Recording, turn on Averill, then quit and reopen Averill.') {
+  list.append(node('p', message));
+  list.append(action('Open Screen Recording settings', async () => { await window.desktop.openScreenSettings(); return current; }));
+}
 el('browser-pair').addEventListener('click', async () => {
   try { await window.desktop.pairBrowser(); el('browser-pair-status').textContent = 'Pairing is ready for two minutes. Copy details into the extension on your chosen draft tab.'; }
   catch (error) { el('browser-pair-status').textContent = error.message; }
@@ -577,6 +607,7 @@ function publicVerdict(item){
 function renderTaskReview(result){
   const output=el('external-task-result');
   if(result.contentHash!==current.externalObservation?.contentHash){output.textContent='The visible work changed. Check the current text again.';return;}
+  el('work-controls').open=false;
   externalReview={identity:workIdentity(),result};drawTaskReview(output,result);renderHero();showTab('review');el('hero-title').focus();
 }
 async function checkWork(fresh){
@@ -601,13 +632,13 @@ async function checkWork(fresh){
 el('external-local-recheck').addEventListener('click',()=>checkWork(true));
 el('external-task-review').addEventListener('click',()=>checkWork(false));
 el('external-task').addEventListener('change',()=>{invalidateWorkReview();el('external-task-result').replaceChildren();renderHero();});
-el('review-start').addEventListener('click',()=>{if(el('review-start').dataset.target==='check'){checkWork(false);return;}if(el('review-start').dataset.target==='setup'){showTab('setup');return;}showTab('work');el('browser-pair').focus();});
+el('review-start').addEventListener('click',()=>{if(el('review-start').dataset.target==='check'){checkWork(false);return;}if(el('review-start').dataset.target==='setup'){showTab('setup');return;}showTab('work');el('work-controls').querySelector('summary').focus();});
 let workStepIdentity;
 function renderWorkStep(){
  const captured=Boolean(current.externalObservation),selected=Boolean(current.externalWindow),ready=Boolean(current.browserBridge?.ready);
  const identity=current.externalWindow?.id||null;
  if(identity!==workStepIdentity){workStepIdentity=identity;document.querySelector('.browser-adapter').open=!selected;document.querySelector('.native-adapter').open=selected&&!captured&&current.externalWindow.adapter!=='browser-dom';}
- el('work-next').textContent=reviewPending?'Checking your work… You can stop sharing at any time.':captured?'Text captured. Choose the work type below, then check approved rules.':selected?(current.externalWindow.adapter==='browser-dom'?'Finish editing the selected field. Advice clears while you type.':'Window selected. Read visible text to capture one frame.'):(ready?'Copy pairing details into the extension, then select a draft field.':'Start by connecting a browser field or choosing an app window.');
+ el('work-next').textContent=reviewPending?'Checking your work… You can stop sharing at any time.':captured?'Text captured. Choose the work type below, then check approved rules.':selected?(current.externalWindow.adapter==='browser-dom'?'Finish editing the selected field. Advice clears while you type.':'Window selected. Read visible text to capture one frame.'):(ready?'Connect this tab in the extension, then select a draft field.':'Start by connecting a browser field or choosing an app window.');
  // One primary action per state: nothing to check or stop until work is shared; local recheck only after a result.
  el('external-task').closest('.context-form').hidden=!selected;
  el('stop-external').closest('.sharing-controls').hidden=!selected&&!ready;
@@ -654,7 +685,9 @@ el('close-source').addEventListener('click', () => el('source-dialog').close());
 el('source-dialog').addEventListener('close', () => {
   const trigger = sourceDialogReturnFocus;
   sourceDialogReturnFocus = null;
-  if (trigger?.isConnected && !trigger.disabled) trigger.focus();
+  const target = trigger?.isConnected ? trigger : trigger?.dataset.focusKey ? [...document.querySelectorAll('[data-focus-key]')].find(element => element.dataset.focusKey === trigger.dataset.focusKey) : null;
+  if (target && !target.disabled) target.focus();
+  else if (document.body.dataset.area === 'knowledge') el('knowledge-search').focus();
 });
 el('ai-toggle').addEventListener('click', async () => {
   if (!current.aiEnabled && !window.confirm('Enable Nebius for this session? Your questions and relevant approved company text sources will be sent to Nebius. Images and window captures are not sent by this control.')) return;
@@ -671,7 +704,7 @@ el('login-form').addEventListener('submit', async (event) => {
   finally { submit.disabled = false; }
 });
 window.desktop.onSnapshot((value) => { current = value; render(); });
-window.desktop.onOpenContext(() => { showTab('work'); el(current.externalObservation?'external-task-review':current.externalWindow?'review-external':'browser-pair').focus(); });
+window.desktop.onOpenContext(value => { if (value?.sourceId) { showTab('knowledge'); showSource(value.sourceId); return; } showTab('work'); el(current.externalObservation?'external-task-review':current.externalWindow?'review-external':'browser-pair').focus(); });
 window.desktop.snapshot().then((value) => { current = value; render(); showTab(preferredArea()); });
 
 for (const target of document.querySelectorAll('[data-icon]')) target.innerHTML = icon(target.dataset.icon);

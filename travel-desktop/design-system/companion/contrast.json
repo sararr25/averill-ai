@@ -1,0 +1,13 @@
+{
+  "scope": "flat color pairs only; rendered accessibility acceptance remains open",
+  "ratios": {
+    "body": 12.86,
+    "supporting": 7.01,
+    "source supporting": 6.15,
+    "primary action": 11.68,
+    "warning": 7.64,
+    "error": 7.43,
+    "control boundary": 4.18,
+    "focus": 11.4
+  }
+}

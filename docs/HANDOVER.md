@@ -1,3 +1,47 @@
+# Packaged-executable continuation - 19 October 2026
+
+Start from [PACKAGED_ACCEPTANCE_2026-10-19.md](PACKAGED_ACCEPTANCE_2026-10-19.md). Added an explicit, marked temporary synthetic profile option for the real executable; normal authentication remains required. Added occupied-port recovery copy and loopback restart/conflict acceptance tests. 91/91 tests and final bundle integrity pass (171 tracked files, both helpers, 3160 archive entries). After the initial Mac lock cleared, CUA repeatedly timed out on the exact QA bundle; no packaged login/browser/restart/VoiceOver success is claimed. See the report for the normal signed-out window briefly opened during app lookup and the precise validation boundary. Previous installed-browser and A/B receipts remain valid within their documented scope.
+
+# Installed Chrome, Canva and accessibility continuation - 19 October 2026
+
+Start from [the continuation report](CONTINUATION_2026-10-19.md). Installed Chrome was updated from extension 0.1.0 to 0.2.1. Actual Vamo LinkedIn and Instagram correction/Undo worked in-page; Instagram keyboard/Escape/Stop and native browser 200% zoom passed. A narrowly guarded adapter now supports one uniformly formatted paragraph in Canva's named design-text editor; actual Canva Apply/Undo and a saved correction after reload passed on the synthetic design. Mixed/rich/multiline text and geometry remain excluded.
+
+Fixed keyboard-only field selection, closed-shadow modal traversal, persistent status and focus through card states. Library reader focus now survives replacement of its trigger during asynchronous rendering. Four authenticated role/source-state/zoom/reduced-motion renderer matrices passed. VoiceOver was toggled on and restored off but its reading/navigation acceptance is inconclusive; do not close #6 or claim complete accessibility.
+
+A/B technical comparison (20 scripted trials per variant, zero humans): expanded 844px/13 controls; compact 500.17px/7 controls; both pass Preview/Apply/Undo with three actions and zero routine app switches. No human simplicity/intuitiveness winner. See [the experiment plan](AB_TEST_PLAN.md). 89/89 unit tests, 18 Instagram seam checks, browser/native-feedback/Canva-adapter and four-role accessibility matrices pass. Local unsigned arm64 app/ZIP integrity passes (168 tracked source files, both helpers, 3157 archive entries). Existing acceptance parents and final-executable/clean-Mac/physical-display gates remain open. Normal workspace data and provider keys were not loaded. No message/post/export/public release was sent or published.
+
+## Library and Learn hierarchy increment — 18 October 2026
+
+Library reading leads with title, approval state, excerpt and Read. Metadata, originals, comparison and destructive actions expand separately. Approval forms move to a distinct queue, shown only for the authenticated person's matching `canReview` requests. Main-process role/reason/version validation is unchanged. Readers restore focus to their library or queue trigger. Private clarification/rule operations expand separately.
+
+Learn shows one leading activity: active weekly practice, otherwise an active lesson/project/finding or the starter lesson. Other activities expand as secondary choices. Existing private records, confirmations, source eligibility, weekly history and deletion confirmation are preserved. Native regression covers upload/read/search, separate pending approval/completion, queue-reader focus, one leading lesson/next-step focus, reduced motion and logout. CX-09/CX-10 remain open for full role/source-state and manual accessibility matrices.
+
+# Companion desktop and Vamo demo clarification — 18 October 2026
+
+The owner selected Vamo mock pages for demo acceptance, replacing the initial requirement for real platform accounts. Averill remains the product with its independent plum/lime identity. Runtime desktop now uses Companion, three primary destinations, unified Current work and expandable connection/chat controls. [Implementation and evidence](CONTEXTUAL_IMPLEMENTATION_2026-10-18.md).
+
+Both Vamo React editors pass 16 contextual checks each with actual Averill code/native pointer hit testing and simulated Chrome transport/approval. Desktop regression: 22/22. No post/campaign was saved, sent or published; normal accounts, sources and workspace are untouched. Installed Chrome and full keyboard/role/zoom/accessibility acceptance remain open. Previously packaged builds do not include this source increment. Earlier dated descriptions below are historical where superseded.
+
+# Contextual browser implementation — 18 October 2026
+
+The owner explicitly authorized push/ticket updates and continuation. Design commit `82f4377` is pushed and CX-01 / #24 is closed. Read [the implementation record](CONTEXTUAL_IMPLEMENTATION_2026-10-18.md) for the new shared review contract, guided loopback connection, actual in-page Companion UI and narrowly bounded plaintext preview/Apply/Undo. CX-02 contract is implemented; CX-03–CX-05 have source/synthetic-flow evidence but remain open for their installed-browser, placement/accessibility and editor acceptance gates. Brevo/LinkedIn origins are context hints, not validated rich-editor support. Superseded by the Companion desktop increment above.
+
+Latest checks: 89/89 unit tests; 13 contextual end-to-end synthetic checks with zero provider calls; existing browser regression and desktop UI 22/22 pass. Actual Chrome transport/permissions and the native approval click are not proved by the contextual harness. Normal accounts/sources and Vamo are untouched. Do not claim the old public/package build has these endpoints.
+
+# Companion identity selected — 18 October 2026
+
+The owner selected **03 Companion** (dark plum, pale lime, rounded contours, Plus Jakarta Sans). Start new visual work from [the selected foundation](../travel-desktop/design-system/companion/FOUNDATION.md): semantic tokens, developed SVG mark, refined reading/control sizes, card/panel/source/preview/Undo contracts, full state inventory and role-aware desktop hierarchy. The review prototype now defaults to Companion. CX-01 design scope is complete; CX-04/CX-08 runtime implementation and all real-platform acceptance remain separate. Current app CSS/behavior, accounts, sources and Vamo are untouched. Earlier exploration recommendations below are historical.
+
+# Identity exploration delivered — 18 October 2026
+
+CX-01 / issue #24 now has [three reviewable visual directions](design-explorations/2026-10-18-identity/README.md) and a local interactive prototype with comparison, contextual card/panel, preview/Apply/Undo example, company library, Learn and result states. Editorial (Newsreader/Manrope, paper/ink-blue), Precise (Space Grotesk/IBM Plex Sans, grey/graphite/rust), Companion (Plus Jakarta Sans, plum/lime). Recommendation: refine Editorial for calm in-editor assistance. **Update: the owner selected Companion; see the selected foundation above.** Current runtime/design-system/Vamo are unchanged. Renderer and contrast receipts are in the exploration folder; real-platform and full accessibility acceptance are not claimed. Next: obtain direction choice from the concrete visuals, then refine that direction and finalize its foundation.
+
+# Contextual UX redesign planning — 18 October 2026
+
+The owner tested Averill and requested a full workflow/UI redesign. Start with [the contextual UX audit and delivery plan](CONTEXTUAL_UX_AUDIT_2026-10-18.md) and [the product specification](CONTEXTUAL_REVIEW_SPEC_2026-10-18.md). Confirmed: compact in-page card expanding into a side panel; individual preview/Apply/Undo; email and LinkedIn first; Instagram and Canva follow-ups; a complete palette/typography rethink; real-platform acceptance. These are planned capabilities, not shipped behavior. The new visual direction still needs selection from concrete alternatives. The planned explicit-edit capability supersedes the manual-only boundary only when implemented with its acceptance criteria. Existing runtime, credentials, approvals and Vamo identity are untouched.
+
+Live GitHub/history inspection for this plan found PR #21 merged and issues #10–#18 closed, superseding the unmerged status in the earlier dated handover. Existing acceptance issues remain open. The new plan does not close them or prove the requested flow. See [the new ticket index](CONTEXTUAL_UX_TICKETS_2026-10-18.md) for published scope and blocking links.
+
 # Nebius and Tavily integration — 17 October 2026
 
 **Next session: start from [HANDOVER_2026-10-18.md](HANDOVER_2026-10-18.md)** (UI tickets #10–#18, Vamo mismatch page, weekly freshness, packaging). Earlier: [HANDOVER_NEBIUS_TAVILY_2026-10-17.md](HANDOVER_NEBIUS_TAVILY_2026-10-17.md).

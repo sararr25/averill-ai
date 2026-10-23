@@ -1,4 +1,21 @@
-# Averill design system — v1
+## Accessibility continuation - 19 October 2026
+
+Companion card controls retain focus through preview/apply/result states; the closed-shadow host is keyboard reachable inside a host modal, and Escape preserves the draft. A persistent polite status announces changes. Library reader/proposal/compare actions have stable return-focus identities across rerenders. Authenticated four-role renderer checks cover narrow/wide/200% layouts and reduced motion. Installed Instagram 200% screenshot and actual Canva text proof are in [the report](../../docs/CONTINUATION_2026-10-19.md). Full VoiceOver acceptance is still open. No palette/type/brand change.
+
+## Library and Learn hierarchy increment — 18 October 2026
+
+Library reading leads with title, approval state, excerpt and Read. Metadata, originals, comparison and destructive actions expand separately. Approval forms move to a distinct queue, shown only for the authenticated person's matching `canReview` requests. Main-process role/reason/version validation is unchanged. Readers restore focus to their library or queue trigger. Private clarification/rule operations expand separately.
+
+Learn shows one leading activity: active weekly practice, otherwise an active lesson/project/finding or the starter lesson. Other activities expand as secondary choices. Existing private records, confirmations, source eligibility, weekly history and deletion confirmation are preserved. Native regression covers upload/read/search, separate pending approval/completion, queue-reader focus, one leading lesson/next-step focus, reduced motion and logout. CX-09/CX-10 remain open for full role/source-state and manual accessibility matrices.
+
+# Runtime Companion migration — 18 October 2026
+
+The selected [Companion foundation](companion/FOUNDATION.md) now drives the contextual card, extension popup, desktop shell and floating control. `src/companion-theme.css` maps existing semantics to Companion and loads the local licensed Jakarta font. Current work, Company library and Learn lead; research/settings, connection controls and chat use progressive disclosure. Root `tokens.css` and the earlier descriptions below are legacy reference. Library/Learn composition refinements and full accessibility acceptance remain pending. Vamo's independent design system is unchanged.
+
+# Averill design system — legacy runtime reference
+
+**18 October 2026: the owner selected [Companion](companion/FOUNDATION.md) as the new Averill identity.** New UI design and migration work must follow that foundation and its scoped tokens/mark. The v1 description below records the current petrol/coral implementation and is retained for migration. Its tokens remain loaded by the existing app until CX-04/CX-08 land; selecting the visual target does not itself migrate runtime CSS.
+
 
 **Status:** approved visual direction and design specification for Averill. The Review pane follows the reference hierarchy; setup, work controls, and web research live in separate tabs. The supplied work windows use the same palette and locally bundled fonts.
 

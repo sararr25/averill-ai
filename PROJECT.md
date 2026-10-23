@@ -1,4 +1,9 @@
+Current update, 19 October 2026: installed Chrome and Vamo Instagram keyboard/edit/Undo/Stop/200% flows have concrete evidence. Canva has a named single-paragraph, uniform-format text adapter with actual design Apply/Undo/reload proof; richer editors and design geometry are excluded. Authenticated role/zoom renderer checks passed; full VoiceOver and packaged/physical acceptance remain open. A/B technical comparison shows lower initial control density for the existing compact default, with no human usability winner. See `docs/CONTINUATION_2026-10-19.md`.
+
 # Averill project
+
+Current update, 18 October 2026: Companion is the selected identity. The source now includes contextual in-page browser guidance, guided loopback connection and a bounded preview/Apply/Undo path for plain textarea/text controls. Shared orchestration and synthetic end-to-end checks are implemented; installed Chrome and actual email/social/design-platform acceptance remain open. Runtime desktop now uses Companion and unified Current work. The owner selected Vamo mock Brevo/LinkedIn pages for demo acceptance; both pass the contextual harness with simulated Chrome transport. Full accessibility and packaged/installed-browser checks remain open. Read `docs/HANDOVER.md` for scope and evidence.
+
 
 Current update, 17 October 2026: Nebius/Tavily integration implemented on branch `claude/charming-johnson-rhezro` (PR #21); live calls not yet verified. Start from [docs/HANDOVER_NEBIUS_TAVILY_2026-10-17.md](docs/HANDOVER_NEBIUS_TAVILY_2026-10-17.md).
 
@@ -57,7 +62,7 @@ Approved launch email: 15 October 2026 at 10:00 Copenhagen time. Approved paid c
 
 ## Explicit non-goals for this prototype
 
-No arbitrary-window surveillance, external app control, automatic edit, email send, or post publication is implemented. Native observation runs only for the selected window after explicit Start, using a six-second local poll. A separate opt-in Chrome extension shares one clicked top-frame field locally after pause, blur or selection; it does not inspect hidden settings. Do not present visible text as full app understanding. The campaign source pack is synthetic; no real customer data is required for the demo.
+No arbitrary-window surveillance, arbitrary external app control, autonomous editing, email send or post publication is implemented. A user can explicitly preview and apply one validated forbidden-phrase removal in supported plain browser fields; richer editors require their own acceptance. Native observation runs only for the selected window after explicit Start, using a six-second local poll. A separate opt-in Chrome extension shares one clicked top-frame field locally after pause, blur or selection; it does not inspect hidden settings. Do not present visible text as full app understanding. The campaign source pack is synthetic; no real customer data is required for the demo.
 
 ## Product and design decisions
 

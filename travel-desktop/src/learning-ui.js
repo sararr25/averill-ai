@@ -9,6 +9,12 @@ async function learnAction(kind,payload={}) {
 }
 function learningButton(label,kind,payload){const b=node('button',label,'secondary-button');b.type='button';b.addEventListener('click',()=>learnAction(kind,payload));return b;}
 function guideLink(guide){const b=node('button','Open official Canva guide','source-link');b.type='button';b.addEventListener('click',()=>window.desktop.openWeb(guide.url));return b;}
+function prioritizeLearning(panel,preferred){
+ const cards=[...panel.children].filter(child=>child.classList.contains('learning-card')&&child.tagName!=='DETAILS');
+ const lead=preferred||cards[0];if(!lead)return;
+ lead.dataset.currentLearning='true';panel.insertBefore(lead,panel.children[1]||null);
+ for(const card of cards){if(card===lead)continue;const details=node('details',undefined,'learning-secondary');details.append(node('summary',card.querySelector('h3')?.textContent||'Other learning'));card.before(details);details.append(card);for(const button of card.querySelectorAll('.agent-primary')){button.classList.replace('agent-primary','secondary-button');}}
+}
 function renderLearning(){
  const data=current.learning||{configured:false};const key=JSON.stringify([data,current.workspace?.sources,current.workspace?.activePersonId]);if(key===learningRenderKey)return;learningRenderKey=key;
  const panel=el('learning-panel');panel.replaceChildren();
@@ -17,7 +23,7 @@ function renderLearning(){
  const active=data.sessions.find(s=>!s.finishedAt&&!s.excluded&&!s.exercise&&!s.project&&!s.note);
  const lesson=node('article',undefined,'learning-card');lesson.append(node('h3','Canva layout essentials'));
  if(!active){
-  lesson.append(node('p','Practise selecting, positioning, aligning and grouping elements. Open any Canva design to start. If you want Averill to see your screen, share the window from Work.'));
+  lesson.append(node('p','Practise selecting, positioning, aligning and grouping elements. Open any Canva design to start. If you want Averill to see your screen, open Connection and review tools in Current work.'));
   const label=node('label','Optional company context');label.htmlFor='learning-source';const select=node('select');select.id='learning-source';select.append(new Option('Tool practice only',''));
   const conflicts=new Set((current.workspace.conflicts||[]).flat());for(const source of current.workspace.sources.filter(s=>s.status==='approved'&&!conflicts.has(s.id)))select.append(new Option(`${source.title} · v${source.version}`,source.id));
   const start=node('button','Start Canva lesson','agent-primary');start.type='button';start.addEventListener('click',()=>learnAction('start',{sourceId:select.value||null}));lesson.append(label,select,start);
@@ -68,7 +74,7 @@ function renderLearning(){
  const refreshInstruction=canRefresh?'Refresh weekly practice to include the latest confirmed activities.':'Start a lesson and confirm a new step, or record a confirmed activity, to create weekly practice.';
  const begin=learningButton(data.quiz?'Resume or refresh weekly practice':'Start weekly practice','quiz');begin.classList.add('agent-primary');begin.disabled=!canRefresh;week.append(begin);const weekly=node('details',undefined,'learning-week');weekly.open=Boolean(data.quiz);weekly.append(node('summary','Your week and learning history'),week);panel.append(weekly);
  const remove=node('button','Delete my local learning history','learning-delete');remove.type='button';remove.addEventListener('click',()=>{if(window.confirm('Delete all of your local lesson, activity and weekly practice records? This cannot be undone in Averill.'))learnAction('delete-history');});week.append(remove);
- const quiz=data.quiz;if(!quiz)return;
+ const quiz=data.quiz;if(!quiz){prioritizeLearning(panel,active?lesson:panel.querySelector('.project-exercise')||panel.querySelector('.finding-exercise')||lesson);return;}
  if(quiz.outdated)panel.append(node('p',`Your learning record changed. ${refreshInstruction}`,'section-note'));
  const practice=node('article',undefined,'learning-card');practice.append(node('h3',quiz.outdated?'Weekly practice needs updating':quiz.finishedAt?'Weekly practice complete':'Weekly practice'),node('p','Feedback supports learning. It is not an employee performance or mastery score.'));
  for(const q of quiz.questions){const card=node('div',undefined,'learning-question');card.append(node('h4',q.prompt));
@@ -87,5 +93,5 @@ function renderLearning(){
   }
   const submit=node('button',['practice','work'].includes(q.type)?'Save practice reflection':'Check my answer','secondary-button');submit.type='submit';form.append(submit);card.append(form);practice.append(card);
  }
- if(quiz.finishedAt&&!quiz.outdated){const revisit=quiz.questions.find(q=>quiz.answers[q.id]?.correct===false);const topic=data.steps.find(s=>s.id===revisit?.stepId);practice.append(node('p',topic?`Next practice: ${topic.title}. Try it again in a new layout and consult the guide.`:'Next practice: apply one of these operations in a new layout and check the result yourself.','learning-feedback'));}panel.append(practice);
+ if(quiz.finishedAt&&!quiz.outdated){const revisit=quiz.questions.find(q=>quiz.answers[q.id]?.correct===false);const topic=data.steps.find(s=>s.id===revisit?.stepId);practice.append(node('p',topic?`Next practice: ${topic.title}. Try it again in a new layout and consult the guide.`:'Next practice: apply one of these operations in a new layout and check the result yourself.','learning-feedback'));}panel.append(practice);prioritizeLearning(panel,!quiz.finishedAt&&!quiz.outdated?practice:active?lesson:panel.querySelector('.project-exercise')||lesson);
 }

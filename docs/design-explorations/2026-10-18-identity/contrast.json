@@ -1,0 +1,20 @@
+{
+  "Editorial": {
+    "body": 13.64,
+    "secondary": 5.67,
+    "primary action": 6.76,
+    "observed text": 5.29
+  },
+  "Precise": {
+    "body": 15.01,
+    "secondary": 5.43,
+    "primary action": 6.03,
+    "observed text": 5.51
+  },
+  "Companion": {
+    "body": 12.86,
+    "secondary": 7.01,
+    "primary action": 11.68,
+    "observed text": 7.64
+  }
+}

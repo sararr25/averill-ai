@@ -81,7 +81,7 @@ if (!process.versions.electron) {
       app.quit(); return;
     }
     await run('window.desktop.companyPrivacy(true)');
-    await run("document.querySelector('[data-tab-button=work]').click();window.confirmMessages=[];window.confirm=message=>{confirmMessages.push(message);return false;};document.getElementById('ai-toggle').click();");
+    await run("showTab('work');window.confirmMessages=[];window.confirm=message=>{confirmMessages.push(message);return false;};document.getElementById('ai-toggle').click();");
     await pause(120);
     assert.equal((await snap()).aiEnabled,false);
     assert.equal(calls,0);

@@ -13,7 +13,7 @@ Open `http://localhost:5173/`. The production build is `npm run build`.
 
 Instagram and LinkedIn show fictional Vamo editorial posts. Neither page connects to a real account or reports engagement metrics. Posts created in the demo are stored locally in the browser under `demo-social-simulator:vamo-posts:v1`; the older generic seed namespace remains untouched. `src/services/social-posts.ts` is the persistence boundary. `src/services/external-events.ts` dispatches `demo-social-post-created` with `{ platform, post }` and logs a demo notification; it does not publish externally. Uploaded images are stored as data URLs, so very large images may exceed browser storage quota.
 
-The visual source is `../averill-ai/travel-site/design-system/` and the brand voice is `../averill-ai/travel-site/docs/BRAND.md`. The copied local photos and mark in `public/vamo/` come from that site; provenance is in `../averill-ai/travel-site/docs/ASSETS.md`. The ferry image is generated concept imagery. LinkedIn and Instagram posts are fictional editorial examples.
+The visual source is `../../travel-site/design-system/` and the brand voice is `../../travel-site/docs/BRAND.md`. The copied local photos and mark in `public/vamo/` come from that site; provenance is in `../../travel-site/docs/ASSETS.md`. The ferry image is generated concept imagery. LinkedIn and Instagram posts are fictional editorial examples.
 
 ## Brevo demo
 
@@ -47,3 +47,7 @@ The Vamo website (`../../travel-site/`) is the base identity; the social pages f
 Instagram has 9 posts with a youthful bio and highlights. LinkedIn is a company page with 5 posts (how trips are planned, an Operations coordinator role, the crew, why Vamo exists, intro). Brevo has a sent welcome email and Vienna newsletter, a scheduled Prague email (22 Oct) and a carry-on draft, all with the required footer; the preview renders the site wordmark and ticker. SVGs embed the bundled fonts and downscaled site photos so they render inside `<img>`; the asterisk is drawn as a shape because the bundled font subset has no ✳ glyph.
 
 Copy avoids price, availability and partnership claims and does not pre-publish the Winter Escapes 2027 launch items (email 15 Oct, LinkedIn 16 Oct, Reel 17 Oct) that Averill reviews. The intentionally flawed `vamo-brevo-winter-v2` launch draft is unchanged. At the owner's request the profiles show illustrative follower counts (Instagram 2,184 followers / 312 following, LinkedIn 1,247 followers); posts show no like, comment or open counts. Photo credits appear in the captions.
+
+## Averill contextual demo verification
+
+Build this app, then run from `travel-desktop/`: `VAMO_PAGE=brevo npm run verify:contextual` and `VAMO_PAGE=linkedin npm run verify:contextual`. Each uses a temporary workspace/profile and the actual built React page with simulated Chrome transport/approval. No campaign/post is saved or sent. This demonstrates Averill on Vamo mockups; it does not certify real-platform compatibility.

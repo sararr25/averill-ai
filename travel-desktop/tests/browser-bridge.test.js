@@ -11,6 +11,7 @@ test('browser bridge binds the extension/tab, excludes sensitive fields, rejects
   const post = (payload, headers = {}) => fetch(pair.endpoint, {method:'POST',headers:{Origin:origin,'Content-Type':'application/json','X-Averill-Token':pair.token,...headers},body:JSON.stringify({tabId:7,pageOrigin:'https://example.test',sequence:1,kind:'field',reason:'pause',field:{kind:'textarea',label:'Email body',value:'Draft text'},...payload})});
   assert.equal((await post({}, {Origin:'https://malicious.test'})).status,403);
   assert.equal((await post({}, {'X-Averill-Token':'0'.repeat(64)})).status,403);
+  assert.equal((await post({}, {'X-Averill-Token':'å'.repeat(64)})).status,403);
   assert.equal((await post({})).status,200);
   assert.equal(received[0].personId,'person-a'); assert.equal(received[0].method,'browser-dom');
   assert.equal(received[0].confidence,'selected-field');

@@ -15,10 +15,10 @@ app.whenReady().then(async()=>{try{
  step('Composer action is a labelled button',idle.attach==='Choose work',idle.attach);
  step('Jargon context line removed',!idle.ctx.includes('no demo window shared'),idle.ctx);
  await shot('01-review-idle.png');
- await run("document.querySelector('[data-tab-button=work]').click()");await pause(300);
+ await run("document.getElementById('review-start').click()");await pause(300);
  const dis=await run("['stop-external','external-local-recheck','external-task-review'].map(id=>{const e=document.getElementById(id);return [id,e.disabled,getComputedStyle(e).opacity]})");
  step('Unavailable Work actions are hidden until work is shared',await run("['stop-external','external-local-recheck','external-task-review'].every(id=>!document.getElementById(id).offsetParent)"),JSON.stringify(dis));
- const workHeight=await run("document.querySelector('[data-tab=work] > .section').scrollHeight");step('Work height at 520px before sharing',workHeight<WORK_HEIGHT_LIMIT,`${workHeight}px`);await shot('02-work-disabled.png');
+ const workHeight=await run("document.getElementById('work-controls-content').scrollHeight");step('Work height at 520px before sharing',workHeight<WORK_HEIGHT_LIMIT,`${workHeight}px`);await shot('02-work-disabled.png');
  const pair=await run('window.desktop.pairBrowser()');
  const send=async(seq,value)=>{const r=await fetch(pair.endpoint,{method:'POST',headers:{Origin:'chrome-extension://'+'c'.repeat(32),'Content-Type':'application/json','X-Averill-Token':pair.token},body:JSON.stringify({tabId:9,pageOrigin:'https://brevo.example',kind:'field',sequence:seq,reason:'pause',field:{kind:'textarea',label:'Email body',value}})});assert.equal(r.status,200);await pause(400);};
  await send(1,'Winter Escapes 2027 — lowest prices guaranteed. Book Copenhagen, Vienna and Prague now.');
@@ -38,7 +38,7 @@ app.whenReady().then(async()=>{try{
  const counted=await run("document.getElementById('hero-body').textContent");step('Headline counts the corrections',counted.startsWith('2 corrections'),counted);
  agent.setSize(520,850);await pause(450);
  const first=await run("(()=>{const c=document.querySelector('#review-work-result .review-evidence').getBoundingClientRect(),comp=document.querySelector('.review-composer').getBoundingClientRect(),list=document.getElementById('review-work-result');return {bottom:Math.round(c.bottom),composerTop:Math.round(comp.top),composerVisible:comp.bottom<=innerHeight+1,scrolls:list.scrollHeight>list.clientHeight||getComputedStyle(list.parentElement).overflowY!=='visible'}})()");
- step('First finding fully visible above the composer at 520x850',first.bottom<=first.composerTop&&first.composerVisible,JSON.stringify(first));
+ step('First finding visible; question composer uses progressive disclosure',first.bottom<=850&&await run("!document.getElementById('review-chat').open"),JSON.stringify(first));
  await shot('03-conflict-520.png');await shot('04-conflict-960.png',960,820);
  await send(2,'Winter Escapes 2027 — discover curated winter city breaks in Copenhagen, Vienna and Prague.\n\nYou are receiving this email because you subscribed to Vamo. Unsubscribe anytime.');
  const cleared=await run("({title:document.getElementById('hero-title').textContent,result:document.getElementById('review-work-result').innerText})");

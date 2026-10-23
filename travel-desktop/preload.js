@@ -3,11 +3,11 @@ const { contextBridge, ipcRenderer, webUtils } = require('electron');
 let operationId=0;
 const operationListeners=new Set();
 const operationLabels={
- 'account:login':'Signing in', 'account:logout':'Signing out', 'account:enable':'Saving owner login', 'account:create':'Creating account', 'account:documents':'Opening login documents', 'account:disable':'Disabling account', 'account:recover':'Recovering account', 'account:change-password':'Changing password',
+ 'account:login':'Signing in', 'account:demo-login':'Signing in', 'account:logout':'Signing out', 'account:enable':'Saving owner login', 'account:create':'Creating account', 'account:documents':'Opening login documents', 'account:disable':'Disabling account', 'account:recover':'Recovering account', 'account:change-password':'Changing password',
  'onboarding:drop':'Reading dropped files', 'onboarding:upload':'Selecting and reading company files', 'onboarding:synced':'Reading synced files', 'onboarding:links':'Downloading and reading linked files', 'onboarding:analyze':'Interpreting selected files with Nebius', 'onboarding:apply':'Saving company onboarding', 'onboarding:read-file':'Opening uploaded text',
  'company:privacy':'Saving company AI policy', 'cloud:configure':'Saving cloud configuration', 'cloud:connect':'Waiting for cloud sign-in', 'cloud:cancel':'Cancelling cloud sign-in', 'cloud:disconnect':'Disconnecting cloud account', 'cloud:list':'Loading cloud folder', 'cloud:import':'Downloading selected cloud files',
- 'workspace:create':'Creating company workspace', 'workspace:add-person':'Adding person', 'workspace:import':'Importing sources', 'workspace:import-folder':'Importing folder', 'workspace:update-source':'Saving source status and priority', 'workspace:remove-source':'Deleting local source copy', 'workspace:request-clarification':'Requesting private clarification', 'workspace:resolve-clarification':'Answering private clarification', 'workspace:propose-source':'Proposing source', 'workspace:open-source':'Opening source file', 'workspace:read-file':'Opening source text', 'workspace:save-key':'Saving service key securely',
- 'practice:generate':'Preparing practice from approved rules', 'freshness:run':'Checking guidance against public rules with Tavily', 'freshness:schedule':'Saving weekly public check', 'knowledge:index':'Indexing approved sources with Nebius embeddings', 'site:configure':'Saving company website', 'site:crawl':'Reading the company website with Tavily', 'site:compare':'Comparing the website with approved sources', 'site:decide':'Saving website decision', 'agent:public-check':'Checking public statements with Tavily', 'agent:link-check':'Checking linked pages with Tavily', 'rules:extract':'Extracting rules with Nebius', 'rules:decide':'Saving rule decision', 'agent:source':'Opening source text', 'agent:open-work':'Opening work window', 'agent:copy-finding':'Copying suggested correction', 'agent:share':'Updating sharing', 'agent:ask':'Preparing answer', 'agent:ask-demo':'Preparing demo answer', 'agent:ai-mode':'Updating AI mode', 'agent:open-source':'Opening file', 'agent:open-web':'Opening browser', 'agent:web-search':'Searching public web', 'agent:fact-check':'Checking public claim', 'agent:external-windows':'Finding available windows', 'agent:external-share':'Updating selected window', 'agent:external-review':'Reading selected window', 'agent:external-watch':'Updating work observation', 'agent:browser-pair':'Starting local browser pairing', 'agent:browser-copy-pair':'Copying local pairing details', 'agent:external-recheck':'Reading and rechecking local work', 'agent:external-task-review':'Checking approved work rules', 'learning:action':'Saving learning activity', 'companion:open':'Opening Averill', 'companion:stop':'Stopping sharing'
+ 'workspace:create':'Creating company workspace', 'workspace:judge-demo':'Preparing the judge demo', 'workspace:add-person':'Adding person', 'workspace:import':'Importing sources', 'workspace:import-folder':'Importing folder', 'workspace:update-source':'Saving source status and priority', 'workspace:remove-source':'Deleting local source copy', 'workspace:request-clarification':'Requesting private clarification', 'workspace:resolve-clarification':'Answering private clarification', 'workspace:propose-source':'Proposing source', 'workspace:open-source':'Opening source file', 'workspace:read-file':'Opening source text', 'workspace:save-key':'Saving service key securely',
+ 'practice:generate':'Preparing practice from approved rules', 'freshness:run':'Checking guidance against public rules with Tavily', 'freshness:schedule':'Saving weekly public check', 'knowledge:index':'Indexing approved sources with Nebius embeddings', 'site:configure':'Saving company website', 'site:crawl':'Reading the company website with Tavily', 'site:compare':'Comparing the website with approved sources', 'site:decide':'Saving website decision', 'agent:public-check':'Checking public statements with Tavily', 'agent:link-check':'Checking linked pages with Tavily', 'rules:extract':'Extracting rules with Nebius', 'rules:decide':'Saving rule decision', 'agent:source':'Opening source text', 'agent:open-work':'Opening work window', 'agent:copy-finding':'Copying suggested correction', 'agent:share':'Updating sharing', 'agent:ask':'Preparing answer', 'agent:ask-demo':'Preparing demo answer', 'agent:ai-mode':'Updating AI mode', 'agent:open-source':'Opening file', 'agent:open-web':'Opening browser', 'agent:web-search':'Searching public web', 'agent:fact-check':'Checking public claim', 'agent:external-windows':'Finding available windows', 'agent:open-screen-settings':'Opening Screen Recording settings', 'agent:external-share':'Updating selected window', 'agent:external-review':'Reading selected window', 'agent:external-watch':'Updating work observation', 'agent:browser-pair':'Starting local browser pairing', 'agent:browser-copy-pair':'Copying local pairing details', 'agent:external-recheck':'Reading and rechecking local work', 'agent:external-task-review':'Checking approved work rules', 'learning:action':'Saving learning activity', 'companion:open':'Opening Averill', 'companion:stop':'Stopping sharing'
 };
 function announce(value){for(const listener of operationListeners)try{listener(value);}catch{}}
 async function invoke(channel,...args){
@@ -32,6 +32,7 @@ contextBridge.exposeInMainWorld('desktop', {
   listKnowledge: (query,status,filters) => invoke('workspace:knowledge',query,status,filters),
   readOnboardingFile: id => invoke('onboarding:read-file',id),
   login: (email, password) => invoke('account:login', email, password),
+  demoLogin: personId => invoke('account:demo-login', personId),
   logout: () => invoke('account:logout'),
   enableAccounts: (email, password) => invoke('account:enable', email, password),
   createAccount: (id, email, profile) => invoke('account:create', id, email, profile),
@@ -58,7 +59,7 @@ contextBridge.exposeInMainWorld('desktop', {
   companionSnapshot: () => invoke('companion:snapshot'),
   stopCompanion: () => invoke('companion:stop'),
   onCompanionStatus: (callback) => { ipcRenderer.on('companion:status', (_, value) => callback(value)); },
-  onOpenContext: (callback) => { ipcRenderer.on('agent:open-context', () => callback()); },
+  onOpenContext: (callback) => { ipcRenderer.on('agent:open-context', (_, value) => callback(value)); },
   openWork: (kind) => invoke('agent:open-work', kind),
   copyFinding: (kind,id) => invoke('agent:copy-finding',kind,id),
   share: (kind, enable) => invoke('agent:share', kind, enable),
@@ -71,6 +72,7 @@ contextBridge.exposeInMainWorld('desktop', {
   onSnapshot: (callback) => { ipcRenderer.on('agent:snapshot', (_, value) => callback(value)); },
   onSharing: (callback) => { ipcRenderer.on('work:sharing', (_, value) => callback(value)); },
   createWorkspace: (company, adminName, email, password) => invoke('workspace:create', company, adminName, email, password),
+  startJudgeDemo: () => invoke('workspace:judge-demo'),
   addPerson: (name, role, department) => invoke('workspace:add-person', name, role, department),
   switchPerson: (id) => invoke('workspace:switch-person', id),
   importSources: (options) => invoke('workspace:import', options),
@@ -110,6 +112,7 @@ contextBridge.exposeInMainWorld('desktop', {
   decideSiteFinding: (id, action, reason) => invoke('site:decide', id, action, reason),
   openWeb: (url) => invoke('agent:open-web', url),
   externalWindows: () => invoke('agent:external-windows'),
+  openScreenSettings: () => invoke('agent:open-screen-settings'),
   shareExternal: (id, name) => invoke('agent:external-share', id, name),
   reviewExternal: () => invoke('agent:external-review'),
   watchExternal: (enabled) => invoke('agent:external-watch', enabled),

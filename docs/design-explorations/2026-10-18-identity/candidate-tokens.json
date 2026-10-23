@@ -1,0 +1,45 @@
+{
+  "status": "Companion selected by owner on 18 October 2026; other candidates retained as history",
+  "candidates": {
+    "Editorial": {
+      "background": "#f6f5f1",
+      "surface": "#fcfbf8",
+      "text": "#202b43",
+      "muted": "#5b6578",
+      "accent": "#244ecb",
+      "onAccent": "#fbfcff",
+      "warning": "#a1472a",
+      "warningSurface": "#f8ede7",
+      "display": "Newsreader",
+      "body": "Manrope",
+      "radius": 14
+    },
+    "Precise": {
+      "background": "#eef0f2",
+      "surface": "#fafbfc",
+      "text": "#20242c",
+      "muted": "#606875",
+      "accent": "#ad3614",
+      "onAccent": "#fff8f4",
+      "warning": "#ad3614",
+      "warningSurface": "#f8ede6",
+      "display": "Space Grotesk",
+      "body": "IBM Plex Sans",
+      "radius": 5
+    },
+    "Companion": {
+      "background": "#211f2a",
+      "surface": "#2b2835",
+      "text": "#f3f1f8",
+      "muted": "#b8b2c6",
+      "accent": "#d6ef91",
+      "onAccent": "#242a1b",
+      "warning": "#ffc794",
+      "warningSurface": "#44362e",
+      "display": "Plus Jakarta Sans",
+      "body": "Plus Jakarta Sans",
+      "radius": 22
+    }
+  },
+  "selected": "Companion"
+}
