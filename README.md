@@ -1,5 +1,7 @@
 # Averill
 
+**Judges:** to test Averill, follow [test-averill.md](test-averill.md) (about 5 minutes).
+
 Current status, 4 October 2026: the Guided UI release is public at [v0.1.0-preview.20261004.2](https://github.com/sararr25/averill-ai/releases/tag/v0.1.0-preview.20261004.2). See [docs/PROJECT_STATUS_2026-10-04.md](docs/PROJECT_STATUS_2026-10-04.md) and [docs/NEXT_STEPS_2026-10-04.md](docs/NEXT_STEPS_2026-10-04.md) for current evidence, ordered checks and pending fixes. Dated earlier sections are historical where superseded.
 
 Averill is a source-grounded company agent assistant for people working across applications. The employee chooses what to share. Averill points out relevant inconsistencies after a field edit or asset selection, explains the issue, and links to the approved source. The employee decides what to change and whether to publish.

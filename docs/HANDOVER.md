@@ -15,7 +15,7 @@
 ## Files to test
 | What | Path |
 |---|---|
-| Judge guide | `docs/JUDGE_QUICKSTART.md` |
+| Judge guide (stays in the repo) | `test-averill.md` |
 | Release ZIP (as judges get it) | `travel-desktop/dist/Averill-macOS-arm64.zip` |
 | Built app | `travel-desktop/dist/Averill-darwin-arm64/Averill.app` |
 | Chrome extension (inside the app) | `travel-desktop/dist/Averill-darwin-arm64/Averill.app/Contents/Resources/app/browser-extension` |
