@@ -1,5 +1,7 @@
 const {app,BrowserWindow}=require('electron');
 const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
+// The content script stops sharing when its page is hidden; macOS occlusion of this test window must not count as hidden.
+app.commandLine.appendSwitch('disable-backgrounding-occluded-windows');
 const profile=fs.mkdtempSync('/tmp/averill-browser-ui-');app.setPath('userData',profile);require('../main.js');
 const pause=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 app.whenReady().then(async()=>{try{
@@ -27,7 +29,7 @@ app.whenReady().then(async()=>{try{
  page.webContents.sendInputEvent({type:'mouseDown',button:'left',clickCount:1,...box});page.webContents.sendInputEvent({type:'mouseUp',button:'left',clickCount:1,...box});await pause(80);
  assert.ok(await page.webContents.executeJavaScript("messages.some(x=>x.kind==='field'&&x.reason==='selection')"));
  await page.webContents.executeJavaScript("document.getElementById('body').value='Edited draft';document.getElementById('body').dispatchEvent(new Event('input',{bubbles:true}));");
- assert.equal(await page.webContents.executeJavaScript("messages.at(-1).kind"),'editing');await pause(1400);assert.ok(await page.webContents.executeJavaScript("messages.some(x=>x.kind==='field'&&x.reason==='pause'&&x.field.value==='Edited draft')"));
+ assert.equal(await page.webContents.executeJavaScript("messages.at(-1).kind"),'editing');let paused=false;for(let i=0;i<30&&!paused;i++){await pause(100);paused=await page.webContents.executeJavaScript("messages.some(x=>x.kind==='field'&&x.reason==='pause'&&x.field.value==='Edited draft')");}assert.ok(paused,'Edit pause must send the edited field');
  await page.webContents.executeJavaScript("document.getElementById('password').value='Sensitive-synthetic-only';document.getElementById('password').style.display='block'");
  const secretBox=await page.webContents.executeJavaScript("(()=>{const r=document.getElementById('password').getBoundingClientRect();return {x:Math.round(r.x+10),y:Math.round(r.y+10)}})()");
  page.webContents.sendInputEvent({type:'mouseDown',button:'left',clickCount:1,...secretBox});page.webContents.sendInputEvent({type:'mouseUp',button:'left',clickCount:1,...secretBox});await pause(80);

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Averill selected-field companion",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Ask for source-backed guidance beside one explicitly shared draft field. Local connection; no sending or publication.",
   "permissions": [
     "activeTab",

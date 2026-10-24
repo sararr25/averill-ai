@@ -16,7 +16,7 @@ async function connectTab(message) {
   if (message.kind === 'connect-tab') {
     let response;
     try { response = await fetch(CONNECT_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tabId: tab.id, pageOrigin: new URL(tab.url).origin }), signal: AbortSignal.timeout(90000) }); }
-    catch { throw new Error('Open Averill and sign in, then connect again.'); }
+    catch { throw new Error('Averill is not reachable. Open the latest Averill app, sign in, then connect again. An older Averill version cannot connect.'); }
     pair = await response.json();
     if (!response.ok) throw new Error(pair.error || 'Connect the browser in Averill first.');
   } else pair = message.pair;
