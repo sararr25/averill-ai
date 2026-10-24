@@ -133,3 +133,4 @@
 @media (prefers-reduced-motion:no-preference){.agent-body .guide-panel,.agent-body .guide-offer{animation:guide-in var(--ds-duration-base,200ms) var(--ds-ease-out,ease-out)}}
 @keyframes guide-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 .agent-body #guide-title:focus{outline:none}
+.agent-body .ai-notice{margin:0 0 12px;padding:10px 12px;border:1px solid var(--ds-color-border);border-left:3px solid var(--ds-color-signal);border-radius:var(--ds-radius-sm);color:var(--ds-color-text);font-size:13px;line-height:1.45}

@@ -12,6 +12,7 @@ const accounts = require('./src/accounts');
 const accountDocuments = require('./src/account-documents');
 const judgeDemo = require('./src/judge-demo');
 const guide = require('./src/guide');
+const judgeServer = require('./src/judge-server');
 const onboarding = require('./src/onboarding');
 const privacy = require('./src/company-privacy');
 const knowledge = require('./src/knowledge');
@@ -717,10 +718,16 @@ app.whenReady().then(async () => {
     const observed = externalObservation;
     if (!observed || !selectedExternalWindow || observed.windowId !== selectedExternalWindow.id) throw new Error('Read the selected window before reviewing its work.');
     const state = reviewState(), expected = reviewIdentity(state, task);
-    const result = await reviewObserved(state, task, useAI, () => {
+    const validate = () => {
       fromAgent(event);
       if (reviewIdentity(reviewState(), task) !== expected) throw new Error('The work or company guidance changed. Review again.');
-    });
+    };
+    // Judge demo: Nemotron through the owner's capped server instead of a local key. Real workspaces never take this path.
+    const demoAI = useAI === true && companyWorkspace?.demoAccounts === true;
+    const result = demoAI
+      ? await judgeServer.review(companyWorkspace, task, observed.text, observed.field)
+      : await reviewObserved(state, task, useAI, validate);
+    if (demoAI) { validate(); workspace.save(app.getPath('userData'), companyWorkspace); }
     return { ...result, observedAt: observed.capturedAt, method: observed.method, window: observed.windowName, contentHash: observed.contentHash };
   });
   ipcMain.handle('agent:public-check', async (event, task, claims) => {

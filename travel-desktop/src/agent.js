@@ -21,7 +21,7 @@ let lastExternalWindowId = null;
 let lastObservationHash = null;
 
 const el = (id) => document.getElementById(id);
-const DEMO_NO_AI = 'AI review is not available in this demo build. The approved-rules check still applies: share a draft field or app window, then choose Check approved rules.';
+const DEMO_NO_AI = 'AI review of library files is not available in this demo. Share a draft field or app window and choose Check approved rules: it checks the approved rules locally and can also ask NVIDIA Nemotron.';
 const areas=new Set(['review','work','learn','research','knowledge','setup']);
 function preferredArea(){
   if(!current.workspace?.configured||current.onboarding&&!current.onboarding.applied)return 'setup';
@@ -565,6 +565,8 @@ function drawTaskReview(output,result){
   output.replaceChildren();
   // In Review the headline already counts the corrections; the Work tab keeps the status sentence.
   if(result.findings.length&&output.id!=='review-work-result')output.append(node('p',result.status));
+  // Demo AI server limit or outage: always visible, next to the local findings it did not replace.
+  if(result.aiNotice){const notice=node('p',result.aiNotice,'ai-notice');notice.setAttribute('role','status');output.append(notice);}
   // One consistent statement of what this review covered and what it did not.
   const scope=node('div',undefined,'check-scope');
   const method=result.mode==='model'||result.mode==='agent'?`NVIDIA Nemotron ${result.mode==='agent'?'review agent ':''}via ${result.provider||'Nebius Token Factory'}${result.model?` (${result.model})`:''}, validated against sources`:'Local rule check';
@@ -616,8 +618,10 @@ function renderTaskReview(result){
 async function checkWork(fresh){
   if(reviewPending)return;
   const output=el('external-task-result');const task=el('external-task').value;
-  const useAI=!fresh&&Boolean(current.aiEnabled&&current.privacy?.companyAI);
-  if(useAI&&!(await confirmOutbound({service:'Nebius',title:'Review with NVIDIA Nemotron',note:'The Nemotron review agent reads the observed text and can look up approved sources that have Nebius consent. It cannot edit, send or publish anything.',items:[`Observed text from ${current.externalWindow?.name||'the selected window'}`,'Matching passages from eligible approved sources']}))?.length){output.textContent='Review cancelled.';return;}
+  const demoAI=!fresh&&Boolean(current.auth?.demo);
+  const useAI=demoAI||(!fresh&&Boolean(current.aiEnabled&&current.privacy?.companyAI));
+  if(demoAI&&!(await confirmOutbound({service:'Averill demo server',title:'Also ask NVIDIA Nemotron',note:'The approved-rules check runs on this Mac first. The text below then goes to averill-judge-ai.vercel.app, which asks NVIDIA Nemotron on Nebius with the demo owner’s key. Daily limits apply. Nemotron findings are shown only when their quotes match your draft and an approved source.',items:[`Observed text from ${current.externalWindow?.name||'the selected window'}`,'Up to five approved Marketing sources for this work type']}))?.length){output.textContent='Review cancelled.';return;}
+  if(useAI&&!demoAI&&!(await confirmOutbound({service:'Nebius',title:'Review with NVIDIA Nemotron',note:'The Nemotron review agent reads the observed text and can look up approved sources that have Nebius consent. It cannot edit, send or publish anything.',items:[`Observed text from ${current.externalWindow?.name||'the selected window'}`,'Matching passages from eligible approved sources']}))?.length){output.textContent='Review cancelled.';return;}
   invalidateWorkReview();
   const request=++reviewRequest;
   // A fresh capture may change the hash, but must keep its person, sources, task and selected window.
