@@ -1,3 +1,23 @@
+# Judge demo upgrade — implemented, 24 October 2026
+
+**State:** JD-01 … JD-11 done on branch `fix/judge-demo-c-block` (pushed up to `d5a3743`; `b15de32` JD-11 and the JD-13 commit are local only). JD-12 done by the owner. JD-13: guide updated and verified; **no release published** — waits for the owner.
+
+## What exists now
+- Fixes: Learn › Start exercise (JD-01), semantic search listener (JD-02), demo AI wording (JD-03).
+- Simulator: 9 Brevo campaigns with stats; LinkedIn/Instagram posts with numbers and comments; flawed drafts in `demo-tools/social-simulator/src/data/flawed-drafts.json`; flaw matrix `docs/JUDGE_DEMO_FLAW_MATRIX_2026-10-24.md` + `tests/flaw-matrix.test.js` (JD-04…06).
+- Judge workspace: Emma's pending note, Maya's review queue and v1/v2 conflict, Alex's roster, Operations/People documents (JD-07).
+- In-app guide: first-run offer, ? per screen, 2–3 steps per role, progress per person (JD-08/09; `npm run verify:guide`).
+- Judge AI server `judge-ai-server/`, live at <https://averill-judge-ai.vercel.app> (Vercel project `averill-judge-ai`, production deployed by hand from the branch; production branch is `main`). Daily caps on Nemotron tokens and Tavily units; counters in Redis `averill_storage_REDIS_URL` (JD-10).
+- App: in the demo workspace, Check approved rules also asks Nemotron through that server after consent; only verbatim-quoted findings are kept; limit/outage shown explicitly (JD-11; `npm run verify:demo-ai`, `LIVE=1` for the real server).
+
+## Verified (24 October)
+109/109 unit tests; intake, feedback, browser, cloud-ui, ui-e2e 23/23, rehearsal, contextual, canva-adapter, accessibility, guide 27/27, demo-ai 5/5 (outage and live). Release ZIP built locally and verified (SHA-256 `08548cca83f998de684c814b0804d54e051c420fa6be7a661c487eeb96731097`); its unzipped code passed the three roles, the guide and the live AI check (run with development Electron, not a manual click in the packaged app).
+
+## Open
+- `verify:external` and `verify:native-window` fail here because Electron has no Screen Recording permission on this Mac; they fail identically on `6fec662` (before this work).
+- Before a release: merge the branch into `main` so `averill-demo-sim` (new drafts) and `averill-judge-ai` deploy from `main`; then rebuild the ZIP and publish only on the owner's word.
+- Alex's website check needs a local Tavily key; it does not use the judge server. The extension's in-page review stays local-only (no Nemotron).
+
 # Judge demo upgrade planning — 24 October 2026
 
 **State:** planned and approved by the owner, not implemented. Read [the plan](JUDGE_DEMO_PLAN_2026-10-24.md), then [the tickets](JUDGE_DEMO_TICKETS_2026-10-24.md) (JD-01 … JD-13).
