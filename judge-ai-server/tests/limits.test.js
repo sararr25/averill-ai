@@ -95,3 +95,15 @@ test('Tavily search and crawl use units, refuse past the cap and release on fail
   assert.equal((await call(handlers.search, { kind: 'crawl', url: 'https://vamo.example' }, { 'x-averill-client': 'client-zzzz', 'x-forwarded-for': '8.8.8.8' })).status, 429, 'crawl costs 5 units, over the per-client cap of 3');
   assert.deepEqual(paths, ['/search', '/search', '/search', '/search']);
 });
+
+test('a prefixed Redis URL from the Vercel integration is found and used for counters', async () => {
+  const { redisUrlFromEnv, redisStore } = require('../lib/store');
+  assert.equal(redisUrlFromEnv({ averill_storage_REDIS_URL: 'redis://x' }), 'redis://x');
+  assert.equal(redisUrlFromEnv({ REDIS_URL: 'redis://plain', other_REDIS_URL: 'redis://y' }), 'redis://plain');
+  assert.equal(redisUrlFromEnv({}), null);
+  const ops = [];
+  const fake = { on() {}, async connect() {}, multi() { const chain = { incrBy(k, n) { ops.push(['incrBy', k, n]); return chain; }, expire(k, s) { ops.push(['expire', k, s]); return chain; }, async exec() { return [7, true]; } }; return chain; } };
+  const store = redisStore({ url: 'redis://x', createClient: () => fake });
+  assert.equal(await store.incrby('k', 3, 60), 7);
+  assert.deepEqual(ops, [['incrBy', 'k', 3], ['expire', 'k', 60]]);
+});

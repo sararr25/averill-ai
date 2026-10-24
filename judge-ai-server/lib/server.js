@@ -1,6 +1,6 @@
-// Shared wiring for the Vercel functions: Upstash counters and the caps from environment variables.
+// Shared wiring for the Vercel functions: usage counters (Upstash REST or Redis URL) and caps from environment variables.
 const { createLimiter } = require('./limits');
-const { upstashStore } = require('./store');
+const { upstashStore, redisStore } = require('./store');
 const { createHandlers } = require('./handlers');
-const store = upstashStore();
+const store = upstashStore() || redisStore();
 module.exports = createHandlers({ limiter: store ? createLimiter({ store }) : null });
