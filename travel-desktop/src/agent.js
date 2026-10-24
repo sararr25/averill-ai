@@ -70,6 +70,7 @@ function render() {
     invalidateWorkReview();
     lastExternalText = ''; lastExternalWindowId = null; lastObservationHash = null;
     el('context-question').value = ''; el('context-result').replaceChildren(); el('external-result').replaceChildren(); el('external-task-result').replaceChildren();
+    if (typeof renderGuide === 'function') renderGuide();
     return;
   }
   if(externalReview&&externalReview.identity!==workIdentity())invalidateWorkReview();
@@ -78,6 +79,7 @@ function render() {
   renderWorkspace();
   renderKnowledge();
   renderRules();
+  if (typeof renderGuide === 'function') renderGuide();
   renderPublicSite();
   renderKnowledgeIndex();
   renderPractice();

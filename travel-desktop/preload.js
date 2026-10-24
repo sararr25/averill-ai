@@ -54,6 +54,7 @@ contextBridge.exposeInMainWorld('desktop', {
   analyzeOnboarding: (consent, selections) => invoke('onboarding:analyze', consent, selections),
   applyOnboarding: (review) => invoke('onboarding:apply', review),
   learningAction: (action, payload) => invoke('learning:action', action, payload),
+  guideUpdate: (action, screen) => ipcRenderer.invoke('guide:update', action, screen),
   snapshot: () => invoke('agent:snapshot'),
   openCompanion: () => invoke('companion:open'),
   companionSnapshot: () => invoke('companion:snapshot'),

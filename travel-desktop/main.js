@@ -11,6 +11,7 @@ const workspace = require('./src/workspace');
 const accounts = require('./src/accounts');
 const accountDocuments = require('./src/account-documents');
 const judgeDemo = require('./src/judge-demo');
+const guide = require('./src/guide');
 const onboarding = require('./src/onboarding');
 const privacy = require('./src/company-privacy');
 const knowledge = require('./src/knowledge');
@@ -169,6 +170,7 @@ function snapshot() {
     onboarding: signedIn() ? onboarding.snapshot(companyWorkspace) : null,
     workspace: signedIn() ? workspace.publicSnapshot(companyWorkspace) : { configured: Boolean(companyWorkspace), company: companyWorkspace?.company },
     learning: learning.snapshot(signedIn() ? companyWorkspace : null),
+    guide: signedIn() ? guide.snapshot(companyWorkspace) : null,
     browserBridge: signedIn() ? browserBridge.status() : {ready:false,connected:false},
     browserConnectionError: signedIn() ? browserConnectionError : '',
     externalWindow: signedIn() ? selectedExternalWindow : null,
@@ -330,6 +332,12 @@ app.whenReady().then(async () => {
     requireSession(); stopExternal(); publish(); return true;
   });
   const persistWorkspace = () => { workspace.save(app.getPath('userData'), companyWorkspace); publish(); return snapshot(); };
+  ipcMain.handle('guide:update', (event, action, screen) => {
+    fromAgent(event, true);
+    if (!signedIn()) throw new Error('Sign in first.');
+    guide.update(companyWorkspace, action, screen);
+    return persistWorkspace();
+  });
   ipcMain.handle('learning:action', (event, action, payload = {}) => {
     fromAgent(event);
     if (!companyWorkspace) throw new Error('Create a workspace first');
@@ -353,7 +361,7 @@ app.whenReady().then(async () => {
     else if(action==='project-confirm')learning.confirmProject(companyWorkspace,payload.sessionId,payload.note);
     else if (action === 'confirm') learning.confirm(companyWorkspace, payload.sessionId, payload.stepId);
     else if (action === 'exclude') learning.exclude(companyWorkspace, payload.sessionId);
-    else if (action === 'delete-history') { learning.deleteHistory(companyWorkspace); ruleExercises.deleteMine(companyWorkspace); }
+    else if (action === 'delete-history') { learning.deleteHistory(companyWorkspace); ruleExercises.deleteMine(companyWorkspace); guide.clearMine(companyWorkspace); }
     else if (action === 'quiz') learning.beginQuiz(companyWorkspace);
     else if (action === 'answer') learning.answer(companyWorkspace, payload.quizId, payload.questionId, payload.value);
     else throw new Error('Unknown learning action');
