@@ -158,7 +158,7 @@ test('Vamo pack retains approval, exact versions and department visibility after
       assert.equal(workspace.approvedSources(restored).some(item => item.id === old.id), false);
     }
     workspace.switchPerson(restored, admin.id);
-    assert.equal(workspace.approvedSources(restored).length, 10);
+    assert.equal(workspace.approvedSources(restored).length, 15);
     assert.deepEqual(workspace.conflicts(restored), []);
   } finally { fs.rmSync(root, { recursive: true, force: true }); }
 });

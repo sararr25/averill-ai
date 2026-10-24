@@ -34,3 +34,7 @@ The manual pack duplicates brand context per department. The mixed-format intake
 The four supplied work windows are fixed synthetic Vamo fixtures. Their deterministic findings use `travel-desktop/sources/`, independently of imported workspace approvals. With no supplied window shared, Review uses approved visible workspace sources. Do not present approval changes as controlling the supplied checks. Source texts in Marketing mirror the supplied fixture; the intentional v1 and square asset are preserved.
 
 Organic LinkedIn: 16 October 2026, 09:00 Copenhagen; email: 15 October, 10:00; paid Instagram Reel: 17 October, 18:00. Only the LinkedIn slot is newly specified for this fictional pack. The LinkedIn visual derives from the existing supplied email illustration; the historical square asset retains its old Aurelia artwork intentionally.
+
+## One-click judge demo
+
+`src/judge-demo.js` builds the judge workspace from this pack: all Marketing sources plus `newsletter-style-guide.md`; `social-media-guidelines-v1.md` and `-v2.md` approved under one title so Maya sees a version conflict; Operations and People sources approved; Noah, Oliver, Lina and Freja on the roster without sign-in accounts; and Emma's personal note proposed and pending Maya's review.
