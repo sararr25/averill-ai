@@ -1,5 +1,6 @@
 import type { SocialPlatform, SocialPost } from '../types/social';
 import { notifyExternalSystem } from './external-events';
+import flawedDrafts from '../data/flawed-drafts.json';
 
 const KEY = 'demo-social-simulator:vamo-posts:v1';
 const mark = '/vamo/avatar.svg';
@@ -52,10 +53,7 @@ const engagement: Record<string, Partial<SocialPost>> = {
 
 // Unpublished drafts for the Winter Escapes 2027 launch. They are intentionally flawed so Averill can review them
 // against the approved Marketing sources; the expected findings are listed in the flaw matrix (ticket JD-06).
-export const draftPosts: SocialPost[] = [
-  { id: 'vamo-li-winter-draft', platform: 'linkedin', authorName: 'Vamo', authorHeadline: VAMO_HEADLINE, authorAvatar: mark, status: 'draft', scheduledFor: '2026-10-16T07:00:00Z', imageUrl: '/vamo/winter/winter-linkedin-landscape.svg', createdAt: '2026-10-14T13:20:00Z', draftNote: 'Organic company post · planned 16 Oct, 09:00', text: 'Winter Escapes 2027 is here ❄️\n\nThree cities, planned by the people who walk them: harbour mornings in Copenhagen, slow cafés in Vienna and early bridges in Prague.\n\nLowest prices guaranteed — book before the end of October.\n\n#travel #citybreaks #winter' },
-  { id: 'vamo-ig-winter-reel-draft', platform: 'instagram', authorName: 'vamo.travel', authorAvatar: mark, status: 'draft', scheduledFor: '2026-10-17T16:00:00Z', imageUrl: '/vamo/winter/winter-reel-vertical.svg', paidPartner: 'Creator: @ida.on.tour', createdAt: '2026-10-15T10:00:00Z', draftNote: 'Paid creator Reel · planned 17 Oct, 18:00', text: 'three cities, one winter ❄️ copenhagen → vienna → prague with @ida.on.tour\n\nharbour mornings, café afternoons, a bridge at sunrise. discover curated winter city breaks ✳\n\n#vamotravel #winterescapes #citybreak' },
-];
+export const draftPosts = flawedDrafts.social as SocialPost[];
 export const seedPosts: SocialPost[] = publishedPosts.map(post => ({ ...post, ...engagement[post.id] }));
 
 function storedPosts(): SocialPost[] { try { const parsed: unknown = JSON.parse(localStorage.getItem(KEY) || '[]'); return Array.isArray(parsed) ? parsed.filter((p): p is SocialPost => !!p && typeof p === 'object' && typeof p.id === 'string' && (p.platform === 'instagram' || p.platform === 'linkedin')) : []; } catch { return []; } }
