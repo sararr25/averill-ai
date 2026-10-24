@@ -16,7 +16,7 @@ app.whenReady().then(async()=>{try{
  const help=await run("[...document.querySelectorAll('.guide-help')].filter(b=>!b.hidden).map(b=>b.dataset.guide).sort()");
  step('? control on Work, Review, Learn, Library and Setup',JSON.stringify(help)===JSON.stringify(['knowledge','learn','review','setup','work']),JSON.stringify(help));
  await run("[...document.querySelectorAll('#guide-offer button')].find(b=>b.textContent==='1-minute tour').focus()");await key('Return');
- const seen=[];for(let i=0;i<10;i++){const s=await run("(()=>{const p=document.getElementById('guide-panel');return p&&{count:p.querySelector('.guide-count').textContent,focus:document.activeElement?.id,target:!!document.querySelector('.guide-target')}})()");if(!s)break;seen.push(s);await run("[...document.querySelectorAll('#guide-panel button')].find(b=>/Next|Done/.test(b.textContent)).click()");await pause(500);}
+ const seen=[];for(let i=0;i<30;i++){const s=await run("(()=>{const p=document.getElementById('guide-panel');return p&&{count:p.querySelector('.guide-count').textContent,focus:document.activeElement?.id,target:!!document.querySelector('.guide-target')}})()");if(!s)break;seen.push(s);await run("[...document.querySelectorAll('#guide-panel button')].find(b=>/Next|Done/.test(b.textContent)).click()");await pause(500);}
  step('Enter starts the tour; every step focuses its title and highlights a control',seen.length>=5&&seen.every(s=>s.focus==='guide-title'&&s.target),JSON.stringify(seen));
  await pause(500);const done=await run("current.guide");step('Finished tour is saved for this person',done.offered&&done.done.length===5,JSON.stringify(done));
  await run("document.querySelector('[data-tab-button=knowledge]').click()");await pause(300);
@@ -31,6 +31,23 @@ app.whenReady().then(async()=>{try{
  await run("window.confirm=()=>true;document.querySelector('[data-tab-button=learn]').click()");await pause(400);
  await run("[...document.querySelectorAll('button')].find(b=>b.textContent==='Delete my local learning history').click()");await pause(1000);
  step('Deleting her local learning history clears her guide progress',await run("current.guide.offered===false&&current.guide.done.length===0"));
+ // Every step for every role points at its real, visible control; Skip works at every step.
+ for(const who of ['Emma','Maya','Alex']){
+  await signOut();await signIn(who);
+  await run("document.getElementById('guide-offer')?.querySelector('button')?.click()");await pause(600);
+  for(const screen of ['review','work','knowledge','learn','setup']){
+   const total=await run(`guideSteps('${screen}').length`);
+   const checks=[];
+   for(let i=0;i<total;i++){
+    await run(`document.querySelector('[data-tab-button=${screen==='work'?'review':screen}]').click();document.querySelector('.guide-help[data-guide=${screen}]').click()`);await pause(400);
+    for(let j=0;j<i;j++){await run("[...document.querySelectorAll('#guide-panel button')].find(b=>b.textContent==='Next').click()");await pause(350);}
+    checks.push(await run(`(()=>{const step=guideRun.steps[${i}];const want=guideTarget(step);const got=document.querySelector('.guide-target');return {title:step.title,real:!!want&&want===got,visible:!!got&&got.getClientRects().length>0}})()`));
+    await run("[...document.querySelectorAll('#guide-panel button')].find(b=>b.textContent==='Skip tour').click()");await pause(400);
+    checks.at(-1).skipped=await run("!document.getElementById('guide-panel')&&!document.querySelector('.guide-target')");
+   }
+   step(`${who} · ${screen}: ${total} steps on real visible controls, Skip works at each`,total>=2&&total<=3&&checks.every(c=>c.real&&c.visible&&c.skipped),JSON.stringify(checks));
+  }
+ }
  step('No renderer errors',errors.length===0,JSON.stringify(errors));
 }catch(e){step('Run completed',false,e.stack);}
 for(const s of log)console.log(`${s.ok?'ok  ':'FAIL'} ${s.name}${s.ok?'':` — ${s.detail}`}`);const passed=log.filter(s=>s.ok).length;console.log(`${passed}/${log.length} pass`);
