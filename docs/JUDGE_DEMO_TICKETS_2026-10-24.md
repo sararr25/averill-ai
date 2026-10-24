@@ -1,6 +1,6 @@
 # Judge demo tickets — 24 October 2026
 
-Plan: [JUDGE_DEMO_PLAN_2026-10-24.md](JUDGE_DEMO_PLAN_2026-10-24.md). These are local tickets; they are not GitHub issues yet. Each ticket is done only when its acceptance list is met and verified by running the app or the tests, not by reading code.
+Plan: [JUDGE_DEMO_PLAN_2026-10-24.md](JUDGE_DEMO_PLAN_2026-10-24.md). GitHub issues (opened 24 October 2026): JD-01 [#41](https://github.com/sararr25/averill-ai/issues/41), JD-02 [#42](https://github.com/sararr25/averill-ai/issues/42), JD-03 [#43](https://github.com/sararr25/averill-ai/issues/43), JD-04 [#44](https://github.com/sararr25/averill-ai/issues/44), JD-05 [#45](https://github.com/sararr25/averill-ai/issues/45), JD-06 [#49](https://github.com/sararr25/averill-ai/issues/49), JD-07 [#46](https://github.com/sararr25/averill-ai/issues/46), JD-08 [#47](https://github.com/sararr25/averill-ai/issues/47), JD-09 [#50](https://github.com/sararr25/averill-ai/issues/50), JD-10 [#51](https://github.com/sararr25/averill-ai/issues/51), JD-11 [#52](https://github.com/sararr25/averill-ai/issues/52), JD-12 [#48](https://github.com/sararr25/averill-ai/issues/48), JD-13 [#53](https://github.com/sararr25/averill-ai/issues/53). Each ticket is done only when its acceptance list is met and verified by running the app or the tests, not by reading code.
 
 Order: A and C first (no owner action needed), then B, then D.
 
