@@ -30,3 +30,4 @@ Press **Stop** in Averill at any time to end sharing.
 
 - **No "Try the demo" button:** Averill already has a company on this Mac. Quit Averill, move the folder `~/Library/Application Support/averill-ai-desktop` to the Trash, then reopen Averill.
 - **After a restart:** pick any person on the sign-in screen. Demo accounts need no password.
+- **Extension says "Averill is not reachable":** make sure the Averill you just downloaded is open (quit any older copy), then click **Connect this tab** again.
