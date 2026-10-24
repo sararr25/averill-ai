@@ -21,6 +21,7 @@ let lastExternalWindowId = null;
 let lastObservationHash = null;
 
 const el = (id) => document.getElementById(id);
+const DEMO_NO_AI = 'AI review of library files is not available in this demo. Share a draft field or app window and choose Check approved rules: it checks the approved rules locally and can also ask NVIDIA Nemotron.';
 const areas=new Set(['review','work','learn','research','knowledge','setup']);
 function preferredArea(){
   if(!current.workspace?.configured||current.onboarding&&!current.onboarding.applied)return 'setup';
@@ -69,6 +70,7 @@ function render() {
     invalidateWorkReview();
     lastExternalText = ''; lastExternalWindowId = null; lastObservationHash = null;
     el('context-question').value = ''; el('context-result').replaceChildren(); el('external-result').replaceChildren(); el('external-task-result').replaceChildren();
+    if (typeof renderGuide === 'function') renderGuide();
     return;
   }
   if(externalReview&&externalReview.identity!==workIdentity())invalidateWorkReview();
@@ -77,6 +79,7 @@ function render() {
   renderWorkspace();
   renderKnowledge();
   renderRules();
+  if (typeof renderGuide === 'function') renderGuide();
   renderPublicSite();
   renderKnowledgeIndex();
   renderPractice();
@@ -421,7 +424,7 @@ function renderWorkspace() {
     if (source.extractionStatus === 'text available') row.append(action('Review text', async () => {
       const file = await window.desktop.readWorkspaceFile(source.id);
       if (!file.text) { el('workspace-feedback').textContent = 'No readable text was extracted.'; return current; }
-      if (!current.aiEnabled) { el('workspace-feedback').textContent = 'Enable Nebius, then choose Review text for a source-backed comparison.'; return current; }
+      if (!current.aiEnabled) { el('workspace-feedback').textContent = current.auth?.demo ? DEMO_NO_AI : 'Enable Nebius, then choose Review text for a source-backed comparison.'; return current; }
       if (!window.confirm(`Send extracted text from ${file.title} and relevant approved sources to Nebius for review?`)) return current;
       const response = await window.desktop.ask(`Review this marketing work for conflicts with approved sources. Cite the exact source. If unsupported, say so.\n\nWORK TEXT:\n${file.text.slice(0, 4000)}`);
       addMessage(`${response.mode === 'local' ? 'Local fallback: ' : ''}${response.text}`, 'assistant', response.sources);
@@ -513,7 +516,7 @@ el('review-draft').addEventListener('click', async () => {
   const result = el('draft-result'); result.replaceChildren();
   if (!draft) { result.textContent = 'Enter a draft first.'; return; }
   if (!current.workspace?.configured) { result.textContent = 'Create a company workspace and approve sources first.'; return; }
-  if (!current.aiEnabled) { result.textContent = 'Enable Nebius to review the draft against approved sources.'; return; }
+  if (!current.aiEnabled) { result.textContent = current.auth?.demo ? DEMO_NO_AI : 'Enable Nebius to review the draft against approved sources.'; return; }
   if (!window.confirm('Send this draft and relevant approved company sources to Nebius for review?')) return;
   result.textContent = 'Checking the draft against approved sources…';
   try {
@@ -562,6 +565,8 @@ function drawTaskReview(output,result){
   output.replaceChildren();
   // In Review the headline already counts the corrections; the Work tab keeps the status sentence.
   if(result.findings.length&&output.id!=='review-work-result')output.append(node('p',result.status));
+  // Demo AI server limit or outage: always visible, next to the local findings it did not replace.
+  if(result.aiNotice){const notice=node('p',result.aiNotice,'ai-notice');notice.setAttribute('role','status');output.append(notice);}
   // One consistent statement of what this review covered and what it did not.
   const scope=node('div',undefined,'check-scope');
   const method=result.mode==='model'||result.mode==='agent'?`NVIDIA Nemotron ${result.mode==='agent'?'review agent ':''}via ${result.provider||'Nebius Token Factory'}${result.model?` (${result.model})`:''}, validated against sources`:'Local rule check';
@@ -613,8 +618,10 @@ function renderTaskReview(result){
 async function checkWork(fresh){
   if(reviewPending)return;
   const output=el('external-task-result');const task=el('external-task').value;
-  const useAI=!fresh&&Boolean(current.aiEnabled&&current.privacy?.companyAI);
-  if(useAI&&!(await confirmOutbound({service:'Nebius',title:'Review with NVIDIA Nemotron',note:'The Nemotron review agent reads the observed text and can look up approved sources that have Nebius consent. It cannot edit, send or publish anything.',items:[`Observed text from ${current.externalWindow?.name||'the selected window'}`,'Matching passages from eligible approved sources']}))?.length){output.textContent='Review cancelled.';return;}
+  const demoAI=!fresh&&Boolean(current.auth?.demo);
+  const useAI=demoAI||(!fresh&&Boolean(current.aiEnabled&&current.privacy?.companyAI));
+  if(demoAI&&!(await confirmOutbound({service:'Averill demo server',title:'Also ask NVIDIA Nemotron',note:'The approved-rules check runs on this Mac first. The text below then goes to averill-judge-ai.vercel.app, which asks NVIDIA Nemotron on Nebius with the demo owner’s key. Daily limits apply. Nemotron findings are shown only when their quotes match your draft and an approved source.',items:[`Observed text from ${current.externalWindow?.name||'the selected window'}`,'Up to five approved Marketing sources for this work type']}))?.length){output.textContent='Review cancelled.';return;}
+  if(useAI&&!demoAI&&!(await confirmOutbound({service:'Nebius',title:'Review with NVIDIA Nemotron',note:'The Nemotron review agent reads the observed text and can look up approved sources that have Nebius consent. It cannot edit, send or publish anything.',items:[`Observed text from ${current.externalWindow?.name||'the selected window'}`,'Matching passages from eligible approved sources']}))?.length){output.textContent='Review cancelled.';return;}
   invalidateWorkReview();
   const request=++reviewRequest;
   // A fresh capture may change the hash, but must keep its person, sources, task and selected window.

@@ -1,11 +1,13 @@
-let learningRenderKey;
+let learningRenderKey,learningLead;
 async function learnAction(kind,payload={}) {
  const status=el('learning-status');status.textContent='Saving…';
- try {current=await window.desktop.learningAction(kind,payload);render();status.textContent='Saved on this computer.';
+ try {learningLead=kind==='project-start'?payload.projectId:null;current=await window.desktop.learningAction(kind,payload);render();learningLead=null;
+  const started=kind==='project-start'&&current.learning?.sessions?.find(s=>s.project?.id===payload.projectId&&!s.finishedAt&&!s.excluded);
+  status.textContent=started?`Started “${started.title}”. Step ${started.project.notes.length+1} of ${started.project.steps.length} is shown below.`:'Saved on this computer.';
   const next=kind==='confirm'?el('learning-panel').querySelector('.learning-card h4')||el('learning-panel').querySelector('.learning-card h3'):['quiz','answer'].includes(kind)?el('learning-panel').querySelector('.learning-question form')?.closest('.learning-question')?.querySelector('h4')||el('learning-panel').querySelector('.learning-question h4'):['project-start','project-confirm'].includes(kind)?el('learning-panel').querySelector('.project-exercise h4')||el('learning-panel').querySelector('.project-exercise h3'):null;
   if(next){next.tabIndex=-1;next.focus();}
  }
- catch(error){status.textContent=error.message;}
+ catch(error){learningLead=null;status.textContent=error.message;}
 }
 function learningButton(label,kind,payload){const b=node('button',label,'secondary-button');b.type='button';b.addEventListener('click',()=>learnAction(kind,payload));return b;}
 function guideLink(guide){const b=node('button','Open official Canva guide','source-link');b.type='button';b.addEventListener('click',()=>window.desktop.openWeb(guide.url));return b;}
@@ -49,7 +51,7 @@ function renderLearning(){
  const projectSourceLabel=node('label','Optional approved company source');const projectSource=node('select');projectSource.append(new Option('Use supplied demo guidance only',''));const projectBlocked=new Set((current.workspace.conflicts||[]).flat());for(const source of current.workspace.sources.filter(source=>source.status==='approved'&&!projectBlocked.has(source.id)))projectSource.append(new Option(`${source.title} · v${source.version}`,source.id));projectSourceLabel.append(projectSource);
  const projectButton=node('button','Start exercise','agent-primary');projectButton.type='submit';projectForm.append(projectLabel,projectSelect,projectSourceLabel,projectSource,projectButton);projectForm.addEventListener('submit',e=>{e.preventDefault();learnAction('project-start',{projectId:projectSelect.value,sourceId:projectSource.value||null});});projectStart.append(projectForm);panel.append(projectStart);
  for(const session of data.sessions.filter(s=>s.project&&!s.finishedAt&&!s.excluded)){
-  const project=node('article',undefined,'learning-card project-exercise');const index=session.project.notes.length;project.append(node('h3',session.title),node('p',`Step ${index+1} of ${session.project.steps.length} · ${session.project.tool} · employee confirmed`,'section-note'));
+  const project=node('article',undefined,'learning-card project-exercise');project.dataset.projectId=session.project.id;const index=session.project.notes.length;project.append(node('h3',session.title),node('p',`Step ${index+1} of ${session.project.steps.length} · ${session.project.tool} · employee confirmed`,'section-note'));
   if(session.source){project.append(node('p',`${session.source.title} · v${session.source.version}${session.sourceAvailable?'':' · approval/version changed; verify the current source'}`));if(session.sourceAvailable){const read=node('button','Read linked source','source-link');read.type='button';read.addEventListener('click',()=>showSource(session.source.id,read));project.append(read);}}
   if(session.project.demoSource){const demo=node('button','Read supplied demo guidance','source-link');demo.type='button';demo.addEventListener('click',()=>showSource(session.project.demoSource,demo));project.append(demo);}else project.append(guideLink(data.guide));
   for(const [i,note] of session.project.notes.entries())project.append(node('p',`Step ${i+1} confirmed by you: ${note}`,'learning-feedback'));
@@ -74,7 +76,7 @@ function renderLearning(){
  const refreshInstruction=canRefresh?'Refresh weekly practice to include the latest confirmed activities.':'Start a lesson and confirm a new step, or record a confirmed activity, to create weekly practice.';
  const begin=learningButton(data.quiz?'Resume or refresh weekly practice':'Start weekly practice','quiz');begin.classList.add('agent-primary');begin.disabled=!canRefresh;week.append(begin);const weekly=node('details',undefined,'learning-week');weekly.open=Boolean(data.quiz);weekly.append(node('summary','Your week and learning history'),week);panel.append(weekly);
  const remove=node('button','Delete my local learning history','learning-delete');remove.type='button';remove.addEventListener('click',()=>{if(window.confirm('Delete all of your local lesson, activity and weekly practice records? This cannot be undone in Averill.'))learnAction('delete-history');});week.append(remove);
- const quiz=data.quiz;if(!quiz){prioritizeLearning(panel,active?lesson:panel.querySelector('.project-exercise')||panel.querySelector('.finding-exercise')||lesson);return;}
+ const quiz=data.quiz;if(!quiz){prioritizeLearning(panel,learningLead&&panel.querySelector(`.project-exercise[data-project-id="${learningLead}"]`)||(active?lesson:panel.querySelector('.project-exercise'))||panel.querySelector('.finding-exercise')||lesson);return;}
  if(quiz.outdated)panel.append(node('p',`Your learning record changed. ${refreshInstruction}`,'section-note'));
  const practice=node('article',undefined,'learning-card');practice.append(node('h3',quiz.outdated?'Weekly practice needs updating':quiz.finishedAt?'Weekly practice complete':'Weekly practice'),node('p','Feedback supports learning. It is not an employee performance or mastery score.'));
  for(const q of quiz.questions){const card=node('div',undefined,'learning-question');card.append(node('h4',q.prompt));
@@ -93,5 +95,5 @@ function renderLearning(){
   }
   const submit=node('button',['practice','work'].includes(q.type)?'Save practice reflection':'Check my answer','secondary-button');submit.type='submit';form.append(submit);card.append(form);practice.append(card);
  }
- if(quiz.finishedAt&&!quiz.outdated){const revisit=quiz.questions.find(q=>quiz.answers[q.id]?.correct===false);const topic=data.steps.find(s=>s.id===revisit?.stepId);practice.append(node('p',topic?`Next practice: ${topic.title}. Try it again in a new layout and consult the guide.`:'Next practice: apply one of these operations in a new layout and check the result yourself.','learning-feedback'));}panel.append(practice);prioritizeLearning(panel,!quiz.finishedAt&&!quiz.outdated?practice:active?lesson:panel.querySelector('.project-exercise')||lesson);
+ if(quiz.finishedAt&&!quiz.outdated){const revisit=quiz.questions.find(q=>quiz.answers[q.id]?.correct===false);const topic=data.steps.find(s=>s.id===revisit?.stepId);practice.append(node('p',topic?`Next practice: ${topic.title}. Try it again in a new layout and consult the guide.`:'Next practice: apply one of these operations in a new layout and check the result yourself.','learning-feedback'));}panel.append(practice);prioritizeLearning(panel,learningLead&&panel.querySelector(`.project-exercise[data-project-id="${learningLead}"]`)||(!quiz.finishedAt&&!quiz.outdated?practice:active?lesson:panel.querySelector('.project-exercise')||lesson));
 }

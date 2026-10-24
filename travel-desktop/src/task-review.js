@@ -37,7 +37,7 @@ function applyApprovedRules(data, task, observed, observedField, sources, findin
     } else if (FIELD_LABELS[rule.kind]) {
       if (!observedField || !FIELD_LABELS[rule.kind].test(observedField.label)) unchecked.add(rule.kind);
       else if (observedField.value.trim().toLowerCase() !== rule.value.toLowerCase() && !findings.some(f => f.type === 'field-requirement')) findings.push({ type: 'field-requirement', observedExcerpt: observedField.value, suggestion: `The approved ${rule.kind} is “${rule.value}”. Check and update this selected field yourself.`, source: citation(source, rule.quote), confidence: 'approved-rule', ruleId: rule.id });
-    } else if (rule.kind === 'required-text' && (!observedField || /body|message|caption|post copy|email content/i.test(observedField.label)) && !visibleMatch(observed, rule.value) && !findings.some(f => f.type === 'missing-required-text' && f.source.id === source.id)) {
+    } else if (rule.kind === 'required-text' && (!observedField || /body|message|caption|post copy|post text|email content/i.test(observedField.label)) && !visibleMatch(observed, rule.value) && !findings.some(f => f.type === 'missing-required-text' && f.source.id === source.id)) {
       findings.push({ type: 'missing-required-text', observedExcerpt: '', suggestion: `Add the required text: “${rule.value}”`, source: citation(source, rule.quote), confidence: 'approved-rule', ruleId: rule.id });
     }
   }
@@ -67,7 +67,7 @@ function localReview(data, task, observedText, observedField = null) {
         findings.push({ type: 'forbidden-claim', observedExcerpt: excerpt, suggestion: `Remove “${excerpt}”. The approved rules don’t allow it.`, source: citation(source, rule), confidence: 'exact-rule' });
       }
       const required = task === 'email' && /every marketing email must include this footer/i.test(rule) || task === 'instagram' && /for paid creator content, include/i.test(rule) || task === 'linkedin' && /include [“"]explore the winter collection/i.test(rule);
-      if (required && (!observedField || /body|message|caption|post copy|email content/i.test(observedField.label))) {
+      if (required && (!observedField || /body|message|caption|post copy|post text|email content/i.test(observedField.label))) {
         const quoted = rule.match(/[“"]([^”"]{8,200})[”"]/);
         if (quoted && !visibleMatch(observed, quoted[1]) && !findings.some(f => f.source.id === source.id && f.type === 'missing-required-text')) {
           findings.push({ type: 'missing-required-text', observedExcerpt: '', suggestion: `Add the required text: “${quoted[1]}”`, source: citation(source, rule), confidence: 'source-rule-visible-text' });

@@ -18,10 +18,12 @@ test('judge demo creates approved Marketing sources and a signed-in-ready employ
     assert.equal(active.name, 'Emma Larsen');
     assert.equal(active.role, 'employee');
     assert.equal(data.authEnabled, true);
-    assert.equal(data.sources.length, judgeDemo.marketingSources.length);
-    assert.ok(data.sources.every(source => source.status === 'approved'));
+    const marketing = judgeDemo.marketingSources.length + judgeDemo.conflictingVersions.length;
+    const others = Object.values(judgeDemo.otherSources).flat().length;
+    assert.equal(data.sources.length, marketing + others + 1);
     assert.equal(accounts.publicAccounts(data).length, 3);
-    assert.equal(workspace.approvedSources(data).length, judgeDemo.marketingSources.length);
+    assert.equal(workspace.approvedSources(data).length, marketing);
+    assert.ok(workspace.approvedSources(data).every(source => source.department === 'Marketing'));
     const saved = workspace.load(root);
     assert.equal(saved.activePersonId, personId);
     assert.equal(fs.readdirSync(path.join(root, 'Averill-login-documents')).length, 3);
@@ -57,5 +59,32 @@ test('passwordless sign-in is refused outside the demo workspace', async () => {
     const owner = workspace.person(data);
     await accounts.configure(data, owner.id, 'owner@real.example', 'a-strong-password', 'owner');
     assert.throws(() => accounts.demoSignIn(data, owner.id), /demo workspace/);
+  } finally { fs.rmSync(root, { recursive: true, force: true }); }
+});
+
+test('judge demo gives each role real work: Emma a pending note, Maya a review queue and a version conflict, Alex the roster', async () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'averill-judge-'));
+  try {
+    const { data } = await judgeDemo.create(root, pack);
+    const byName = name => data.people.find(person => person.name === name);
+    const note = data.sources.find(source => source.title === 'marketing-personal-note-v1.md');
+    assert.equal(note.ownerId, byName('Emma Larsen').id);
+    assert.equal(note.scope, 'department');
+    assert.equal(note.status, 'pending');
+    assert.ok(workspace.visibleSources(data).some(source => source.id === note.id));
+
+    workspace.switchPerson(data, byName('Maya Jensen').id);
+    assert.ok(workspace.visibleSources(data).some(source => source.id === note.id && source.status === 'pending'));
+    const [conflict] = workspace.conflicts(data);
+    assert.deepEqual(conflict.map(id => data.sources.find(source => source.id === id).version).sort(), ['1', '2']);
+    assert.ok(workspace.visibleSources(data).every(source => source.department === 'Marketing'));
+
+    workspace.switchPerson(data, byName('Alex Holm').id);
+    assert.deepEqual([...data.departments].sort(), ['Marketing', 'Operations', 'People']);
+    assert.equal(data.people.length, 7);
+    for (const department of ['Operations', 'People']) {
+      assert.equal(workspace.approvedSources(data).filter(source => source.department === department).length, judgeDemo.otherSources[department].length);
+    }
+    assert.ok(judgeDemo.roster.every(member => !accounts.publicAccounts(data).some(account => account.name === member.name)));
   } finally { fs.rmSync(root, { recursive: true, force: true }); }
 });

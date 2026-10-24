@@ -1,5 +1,6 @@
 import type { SocialPlatform, SocialPost } from '../types/social';
 import { notifyExternalSystem } from './external-events';
+import flawedDrafts from '../data/flawed-drafts.json';
 
 const KEY = 'demo-social-simulator:vamo-posts:v1';
 const mark = '/vamo/avatar.svg';
@@ -14,7 +15,7 @@ const li = (id: string, imageUrl: string, createdAt: string, text: string): Soci
 // Seeded Vamo content in the voice of the Vamo website (travel-site/): young, social, unpolished, never luxury.
 // Captions avoid price, availability and partnership claims so they never pre-empt the Winter Escapes 2027
 // launch items (email 15 Oct, LinkedIn 16 Oct, Reel 17 Oct) that Averill reviews.
-export const seedPosts: SocialPost[] = [
+const publishedPosts: SocialPost[] = [
   ig('vamo-ig-good-people', card('good-people'), '2026-10-13T17:00:00Z', 'came for the city. left with a group chat. 📱✳\n\nhonestly the best souvenir. tag the person you met on a trip and still text 👇\n\n#vamotravel #collectpeoplenotthings #travelfriends #solotravel'),
   ig('vamo-ig-copenhagen', card('copenhagen-story'), '2026-10-10T16:30:00Z', 'canal days. good company. 🚲\n\ncopenhagen in winter = harbour bus at golden hour, a bakery stop every 400 metres, and someone always suggesting “one more bar”.\n\nsave for your next long weekend 📌\n📷 heino eisner / Unsplash\n\n#copenhagen #københavn #citybreak #vamotravel'),
   ig('vamo-ig-carry-on', card('carry-on'), '2026-10-07T12:00:00Z', 'one backpack. three cities. zero checked bags. 🎒\n\nlayers over one big coat, shoes you can walk in all day, a tote for the market — and a power bank, always.\n\nwhat’s the one thing you never travel without? 👀\n\n#packlight #backpacking #carryononly #vamotravel'),
@@ -31,7 +32,32 @@ export const seedPosts: SocialPost[] = [
   li('vamo-li-intro', image('vamo-friends-ferry.png'), '2026-09-12T08:00:00Z', 'Hello LinkedIn 👋 We’re Vamo.\n\nWe plan trips for young travellers who’d rather collect stories than souvenirs: city breaks, friends of friends, and taking the long way to a good story.\n\nFollow along for city notes, how we work, and what we’re building next.\n\n#travel #startup #citybreaks'),
 ];
 
+const c = (author: string, text: string) => ({ author, text });
+// Fictional engagement so the feeds read like an active page. Commenters are invented handles, not real people.
+const engagement: Record<string, Partial<SocialPost>> = {
+  'vamo-ig-good-people': { likes: 412, comments: 38, topComments: [c('liv.rejser', '@jonas_kbh this is literally us after lisbon 😂'), c('marta.goes', 'met my best friend on a hostel walking tour, still texting 4 years later')] },
+  'vamo-ig-copenhagen': { likes: 287, comments: 19, topComments: [c('andreasbikes', 'harbour bus at golden hour is so underrated'), c('noemi.travels', 'saving this for december ✨')] },
+  'vamo-ig-carry-on': { likes: 198, comments: 44, topComments: [c('backpack.bea', 'earplugs. always earplugs.'), c('tomasz.on.trains', 'a tote bag saved my life in prague markets')] },
+  'vamo-ig-vienna': { likes: 341, comments: 22, topComments: [c('sofie.wien', 'second coffee is mandatory, correct'), c('kasper_k', 'which café is this??')] },
+  'vamo-ig-unplanned': { likes: 156, comments: 27, topComments: [c('ida.on.tour', 'number 4 is how I ended up in a karaoke bar in vienna')] },
+  'vamo-ig-prague': { likes: 233, comments: 15, topComments: [c('pavla.praha', 'locals approve the side streets advice 👌')] },
+  'vamo-ig-manifesto': { likes: 129, comments: 9 },
+  'vamo-ig-ferry': { likes: 305, comments: 21, topComments: [c('emil.sails', 'the ferry is always the best part')] },
+  'vamo-ig-long-way': { likes: 88, comments: 12 },
+  'vamo-li-trip-brief': { likes: 64, comments: 7, reposts: 3, topComments: [c('Freja Holm · Product designer', 'Love that unconfirmed items are labelled as unconfirmed. More travel companies should do this.')] },
+  'vamo-li-hiring': { likes: 112, comments: 18, reposts: 14, topComments: [c('Jakob Andersen · Student at CBS', 'Shared with my interrail group chat 🙌'), c('Lea Nørgaard · Operations at a hostel group', 'Applied! The checklist line is very me.')] },
+  'vamo-li-crew': { likes: 57, comments: 4, reposts: 2 },
+  'vamo-li-why': { likes: 143, comments: 21, reposts: 9, topComments: [c('Mikkel Sørensen · Founder, small travel podcast', '“They start with who they met” — so true.')] },
+  'vamo-li-intro': { likes: 96, comments: 11, reposts: 5 },
+};
+
+// Unpublished drafts for the Winter Escapes 2027 launch. They are intentionally flawed so Averill can review them
+// against the approved Marketing sources; the expected findings are listed in the flaw matrix (ticket JD-06).
+export const draftPosts = flawedDrafts.social as SocialPost[];
+export const seedPosts: SocialPost[] = publishedPosts.map(post => ({ ...post, ...engagement[post.id] }));
+
 function storedPosts(): SocialPost[] { try { const parsed: unknown = JSON.parse(localStorage.getItem(KEY) || '[]'); return Array.isArray(parsed) ? parsed.filter((p): p is SocialPost => !!p && typeof p === 'object' && typeof p.id === 'string' && (p.platform === 'instagram' || p.platform === 'linkedin')) : []; } catch { return []; } }
+export function getDrafts(platform: SocialPlatform): SocialPost[] { return draftPosts.filter(p => p.platform === platform); }
 export function getPosts(platform: SocialPlatform): SocialPost[] { return [...storedPosts().filter(p => p.platform === platform), ...seedPosts.filter(p => p.platform === platform)]; }
 export function createPost(post: SocialPost): SocialPost { localStorage.setItem(KEY, JSON.stringify([post, ...storedPosts()])); notifyExternalSystem(post); return post; }
 export function imageFileToDataUrl(file: File): Promise<string> { return new Promise((resolve,reject) => { const reader = new FileReader(); reader.onload = () => resolve(String(reader.result)); reader.onerror = () => reject(new Error('Image could not be read')); reader.readAsDataURL(file); }); }

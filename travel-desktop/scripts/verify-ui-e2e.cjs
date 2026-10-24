@@ -13,6 +13,8 @@ app.whenReady().then(async()=>{try{
  const idle=await run("({steps:document.getElementById('review-steps').innerText,cta:document.getElementById('review-start').textContent,attach:document.querySelector('.composer-attach').textContent,ctx:document.getElementById('review-context').textContent})");
  step('Review idle with approved source shows Share/Check/Fix, no Setup step',!idle.steps.includes('Add')&&idle.cta==='Choose what to review',JSON.stringify(idle));
  step('Composer action is a labelled button',idle.attach==='Choose work',idle.attach);
+ const semantic=await run("(async()=>{const original=renderSemantic;let hits=0;renderSemantic=()=>{hits++};const s=document.getElementById('knowledge-search');s.value='lowest prices';s.dispatchEvent(new Event('input'));await new Promise(r=>setTimeout(r,700));renderSemantic=original;s.value='';return hits})()");
+ step('Typing in Library search triggers semantic search',semantic===1,String(semantic));
  step('Jargon context line removed',!idle.ctx.includes('no demo window shared'),idle.ctx);
  await shot('01-review-idle.png');
  await run("document.getElementById('review-start').click()");await pause(300);

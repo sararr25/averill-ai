@@ -13,7 +13,22 @@ const marketingSources = [
   ['content-calendar.md', '1', 80],
   ['brand-and-legal.md', '1', 70],
   ['brand-and-company-context-v2.md', '2', 60],
+  ['newsletter-style-guide.md', '1', 50],
 ];
+// Two approved versions under one title: Maya sees a version conflict to resolve by superseding v1.
+const conflictingVersions = [['social-media-guidelines-v1.md', '1'], ['social-media-guidelines-v2.md', '2']];
+const otherSources = {
+  Operations: [['trip-brief-procedure-v1.md', '1', 80], ['supplier-checklist-v1.md', '1', 70], ['brand-and-company-context-v2.md', '2', 60]],
+  People: [['employee-onboarding-v2.md', '2', 80], ['time-off-and-travel-policy-v1.md', '1', 70], ['brand-and-company-context-v2.md', '2', 60]],
+};
+// Roster only: these people have no sign-in account, so the judge sign-in screen still lists Alex, Maya and Emma.
+const roster = [
+  { name: 'Noah Berg', role: 'lead', department: 'Operations' },
+  { name: 'Oliver Madsen', role: 'employee', department: 'Operations' },
+  { name: 'Lina Sørensen', role: 'lead', department: 'People' },
+  { name: 'Freja Nielsen', role: 'employee', department: 'People' },
+];
+const privateNote = path.join('Proposals', 'marketing-personal-note-v1.md');
 const team = [
   { name: 'Maya Jensen', role: 'lead', department: 'Marketing', email: 'maya@vamo.example', profile: 'marketing_manager' },
   { name: 'Emma Larsen', role: 'employee', department: 'Marketing', email: 'emma@vamo.example', profile: 'marketing_strategy' },
@@ -22,8 +37,10 @@ const team = [
 async function create(userData, packRoot) {
   if (workspace.load(userData)) throw new Error('A workspace already exists on this Mac. The judge demo only starts on a fresh install.');
   const marketing = path.join(packRoot, 'vamo', 'Marketing');
-  for (const [file] of marketingSources) {
-    if (!fs.existsSync(path.join(marketing, file))) throw new Error(`Judge demo file is missing: ${file}`);
+  const required = [...marketingSources, ...conflictingVersions].map(([file]) => path.join('Marketing', file))
+    .concat(Object.entries(otherSources).flatMap(([department, files]) => files.map(([file]) => path.join(department, file))), privateNote);
+  for (const file of required) {
+    if (!fs.existsSync(path.join(packRoot, 'vamo', file))) throw new Error(`Judge demo file is missing: ${file}`);
   }
   const data = workspace.create(userData, 'Vamo (judge demo)', 'Alex Holm');
   data.demoAccounts = true;
@@ -44,10 +61,24 @@ async function create(userData, packRoot) {
     const source = workspace.importFile(userData, data, path.join(marketing, file), { department: 'Marketing', version });
     workspace.updateSource(data, source.id, 'approved', priority, 'Pre-approved for the judge demo');
   }
+  for (const [file, version] of conflictingVersions) {
+    const source = workspace.importFile(userData, data, path.join(marketing, file), { department: 'Marketing', version, title: 'social-media-guidelines.md' });
+    workspace.updateSource(data, source.id, 'approved', 40, 'Pre-approved for the judge demo');
+  }
+  for (const member of roster) workspace.addPerson(data, member.name, member.role, member.department);
+  for (const [department, files] of Object.entries(otherSources)) {
+    for (const [file, version, priority] of files) {
+      const source = workspace.importFile(userData, data, path.join(packRoot, 'vamo', department, file), { department, version });
+      workspace.updateSource(data, source.id, 'approved', priority, 'Pre-approved for the judge demo');
+    }
+  }
   accountDocuments.save(userData, data, credentials);
   workspace.switchPerson(data, emma.id);
+  // Emma's own note: imported privately, then proposed, so it waits for Maya's review.
+  const note = workspace.importFile(userData, data, path.join(packRoot, 'vamo', privateNote), { scope: 'private', version: '1' });
+  workspace.proposeSource(data, note.id);
   workspace.save(userData, data);
   return { data, personId: emma.id };
 }
 
-module.exports = { create, marketingSources, team };
+module.exports = { create, marketingSources, conflictingVersions, otherSources, roster, team };
