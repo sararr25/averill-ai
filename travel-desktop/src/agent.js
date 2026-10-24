@@ -21,6 +21,7 @@ let lastExternalWindowId = null;
 let lastObservationHash = null;
 
 const el = (id) => document.getElementById(id);
+const DEMO_NO_AI = 'AI review is not available in this demo build. The approved-rules check still applies: share a draft field or app window, then choose Check approved rules.';
 const areas=new Set(['review','work','learn','research','knowledge','setup']);
 function preferredArea(){
   if(!current.workspace?.configured||current.onboarding&&!current.onboarding.applied)return 'setup';
@@ -421,7 +422,7 @@ function renderWorkspace() {
     if (source.extractionStatus === 'text available') row.append(action('Review text', async () => {
       const file = await window.desktop.readWorkspaceFile(source.id);
       if (!file.text) { el('workspace-feedback').textContent = 'No readable text was extracted.'; return current; }
-      if (!current.aiEnabled) { el('workspace-feedback').textContent = 'Enable Nebius, then choose Review text for a source-backed comparison.'; return current; }
+      if (!current.aiEnabled) { el('workspace-feedback').textContent = current.auth?.demo ? DEMO_NO_AI : 'Enable Nebius, then choose Review text for a source-backed comparison.'; return current; }
       if (!window.confirm(`Send extracted text from ${file.title} and relevant approved sources to Nebius for review?`)) return current;
       const response = await window.desktop.ask(`Review this marketing work for conflicts with approved sources. Cite the exact source. If unsupported, say so.\n\nWORK TEXT:\n${file.text.slice(0, 4000)}`);
       addMessage(`${response.mode === 'local' ? 'Local fallback: ' : ''}${response.text}`, 'assistant', response.sources);
@@ -513,7 +514,7 @@ el('review-draft').addEventListener('click', async () => {
   const result = el('draft-result'); result.replaceChildren();
   if (!draft) { result.textContent = 'Enter a draft first.'; return; }
   if (!current.workspace?.configured) { result.textContent = 'Create a company workspace and approve sources first.'; return; }
-  if (!current.aiEnabled) { result.textContent = 'Enable Nebius to review the draft against approved sources.'; return; }
+  if (!current.aiEnabled) { result.textContent = current.auth?.demo ? DEMO_NO_AI : 'Enable Nebius to review the draft against approved sources.'; return; }
   if (!window.confirm('Send this draft and relevant approved company sources to Nebius for review?')) return;
   result.textContent = 'Checking the draft against approved sources…';
   try {

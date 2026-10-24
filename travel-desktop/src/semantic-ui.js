@@ -45,4 +45,4 @@ async function renderSemantic() {
   host.replaceChildren(box);
 }
 
-el('knowledge-search').addEventListener('input', () => { clearTimeout(semanticTimer); semanticTimer = setTimeout(renderSemantic, 450); });
+document.getElementById('knowledge-search').addEventListener('input', () => { clearTimeout(semanticTimer); semanticTimer = setTimeout(renderSemantic, 450); });
