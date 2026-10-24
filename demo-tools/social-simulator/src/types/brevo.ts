@@ -12,6 +12,7 @@ export type BrevoCampaign = {
   body: string;
   imageUrl?: string;
   scheduledFor?: string;
+  stats?: { recipients: number; opens: number; clicks: number; unsubscribed: number };
   createdAt: string;
   updatedAt: string;
 };
