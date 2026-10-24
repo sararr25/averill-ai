@@ -1,0 +1,97 @@
+const test = require('node:test');
+const assert = require('node:assert/strict');
+const { createLimiter, limitsFromEnv, LimitError, MESSAGES } = require('../lib/limits');
+const { memoryStore } = require('../lib/store');
+const { createHandlers } = require('../lib/handlers');
+
+const caps = { nebius: { global: 1000, client: 400, ip: 600 }, tavily: { global: 6, client: 3, ip: 5 } };
+const who = (client = 'client-aaaa', ip = '1.1.1.1') => ({ client, ip });
+
+test('reservations stop at each cap and undo partial counts', async () => {
+  const store = memoryStore();
+  const limiter = createLimiter({ store, limits: caps, now: () => Date.parse('2026-10-24T10:00:00Z') });
+  await limiter.reserve('nebius', who(), 400);
+  await assert.rejects(() => limiter.reserve('nebius', who(), 1), error => error instanceof LimitError && error.message === MESSAGES.nebius);
+  assert.equal(store.counts.get('nebius:2026-10-24:global'), 400, 'refused call leaves no trace');
+  await limiter.reserve('nebius', who('client-bbbb'), 200);
+  await assert.rejects(() => limiter.reserve('nebius', who('client-cccc'), 1), LimitError, 'per-IP cap of 600 reached');
+  await limiter.reserve('nebius', who('client-cccc', '2.2.2.2'), 400);
+  await assert.rejects(() => limiter.reserve('nebius', who('client-dddd', '3.3.3.3'), 1), LimitError, 'global cap of 1000 reached');
+});
+
+test('settle corrects to real usage and a new UTC day starts from zero', async () => {
+  const store = memoryStore(); let now = Date.parse('2026-10-24T23:00:00Z');
+  const limiter = createLimiter({ store, limits: caps, now: () => now });
+  const reservation = await limiter.reserve('nebius', who(), 400);
+  await limiter.settle(reservation, 120);
+  assert.equal(store.counts.get('nebius:2026-10-24:client:client-aaaa'), 120);
+  await limiter.reserve('nebius', who(), 280);
+  now = Date.parse('2026-10-25T00:10:00Z');
+  await limiter.reserve('nebius', who(), 400);
+  const tavily = await limiter.reserve('tavily', who(), 3);
+  await limiter.release(tavily);
+  assert.equal(store.counts.get('tavily:2026-10-25:client:client-aaaa'), 0);
+});
+
+test('caps come from environment variables with safe defaults', () => {
+  assert.deepEqual(limitsFromEnv({}).nebius, { global: 200000, client: 20000, ip: 40000 });
+  assert.equal(limitsFromEnv({ TAVILY_DAILY_UNITS: '5', NEBIUS_DAILY_TOKENS: 'nonsense' }).tavily.global, 5);
+  assert.equal(limitsFromEnv({ NEBIUS_DAILY_TOKENS: 'nonsense' }).nebius.global, 200000);
+});
+
+function call(handler, body, headers = { 'x-averill-client': 'client-aaaa', 'x-forwarded-for': '9.9.9.9, 10.0.0.1' }, method = 'POST') {
+  return new Promise(resolve => {
+    const res = { code: 0, status(code) { this.code = code; return this; }, json(payload) { resolve({ status: this.code, body: payload }); } };
+    handler({ method, headers, body }, res);
+  });
+}
+const reviewBody = { task: 'email', draft: 'Lowest prices guaranteed.', sources: [{ title: 'brand-and-legal.md', version: '1', text: 'Do not claim "lowest prices guaranteed".' }] };
+
+test('endpoints refuse without a usage store instead of running uncapped', async () => {
+  let called = false;
+  const handlers = createHandlers({ limiter: null, review: async () => { called = true; } });
+  assert.deepEqual((await call(handlers.review, reviewBody)).status, 503);
+  assert.equal(called, false);
+});
+
+test('review charges real tokens, refuses past the cap without calling Nebius, and validates input', async () => {
+  const store = memoryStore(); let calls = 0;
+  const limiter = createLimiter({ store, limits: { ...caps, nebius: { global: 5000, client: 2000, ip: 5000 } } });
+  const handlers = createHandlers({ limiter, review: async () => { calls++; return { model: 'nemotron', findings: [{ draftQuote: 'Lowest prices guaranteed' }], usedTokens: 900 }; } });
+  const ok = await call(handlers.review, reviewBody);
+  assert.equal(ok.status, 200); assert.equal(ok.body.findings.length, 1);
+  assert.equal(store.counts.get(`nebius:${new Date().toISOString().slice(0, 10)}:ip:9.9.9.9`), 900);
+  await call(handlers.review, reviewBody);
+  const refused = await call(handlers.review, reviewBody);
+  assert.equal(refused.status, 429); assert.equal(refused.body.error, MESSAGES.nebius); assert.equal(refused.body.limit, true);
+  assert.equal(calls, 2);
+  assert.equal((await call(handlers.review, reviewBody, {})).status, 400, 'client id required');
+  assert.equal((await call(handlers.review, { ...reviewBody, task: 'sms' })).status, 400);
+  assert.equal((await call(handlers.review, { ...reviewBody, sources: [] })).status, 400);
+  assert.equal((await call(handlers.review, reviewBody, undefined, 'GET')).status, 405);
+});
+
+test('review caps draft length at 4000 characters before reserving', async () => {
+  let seen;
+  const handlers = createHandlers({ limiter: createLimiter({ store: memoryStore(), limits: { ...caps, nebius: { global: 9999, client: 9999, ip: 9999 } } }), review: async messages => { seen = messages; return { model: 'm', findings: [], usedTokens: 10 }; } });
+  await call(handlers.review, { ...reviewBody, draft: 'x'.repeat(9000) });
+  assert.ok(seen.at(-1).content.endsWith('x'.repeat(4000)) && !seen.at(-1).content.includes('x'.repeat(4001)));
+});
+
+test('Tavily search and crawl use units, refuse past the cap and release on failure', async () => {
+  const store = memoryStore(); const paths = [];
+  const limiter = createLimiter({ store, limits: caps });
+  let fail = false;
+  const handlers = createHandlers({ limiter, tavily: async path => { paths.push(path); if (fail) throw Object.assign(new Error('Tavily request failed (500).'), { status: 502 }); return { results: [] }; } });
+  assert.equal((await call(handlers.search, { kind: 'search', query: 'Vamo winter' })).status, 200);
+  assert.equal((await call(handlers.search, { kind: 'crawl', url: 'http://vamo.example' })).status, 400);
+  fail = true;
+  assert.equal((await call(handlers.search, { kind: 'search', query: 'again' })).status, 502);
+  fail = false;
+  assert.equal((await call(handlers.search, { kind: 'search', query: 'two' })).status, 200);
+  assert.equal((await call(handlers.search, { kind: 'search', query: 'three' })).status, 200);
+  const refused = await call(handlers.search, { kind: 'search', query: 'four' });
+  assert.equal(refused.status, 429); assert.equal(refused.body.error, MESSAGES.tavily);
+  assert.equal((await call(handlers.search, { kind: 'crawl', url: 'https://vamo.example' }, { 'x-averill-client': 'client-zzzz', 'x-forwarded-for': '8.8.8.8' })).status, 429, 'crawl costs 5 units, over the per-client cap of 3');
+  assert.deepEqual(paths, ['/search', '/search', '/search', '/search']);
+});
