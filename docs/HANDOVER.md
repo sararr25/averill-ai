@@ -1,3 +1,38 @@
+# Judge demo upgrade planning — 24 October 2026
+
+**State:** planned and approved by the owner, not implemented. Read [the plan](JUDGE_DEMO_PLAN_2026-10-24.md), then [the tickets](JUDGE_DEMO_TICKETS_2026-10-24.md) (JD-01 … JD-13).
+
+## What the owner found while testing the judge build
+- Review says "Enable Nebius, then choose Review text for a source-backed comparison" because judges have no key.
+- Learn › Start exercise appears to do nothing; only "Saving learning activity: completed." shows.
+- The Brevo, LinkedIn and Instagram mock drafts look too basic to be believable.
+- I also found `Uncaught ReferenceError: el is not defined` in `travel-desktop/src/semantic-ui.js:48` (script load order; present since commit `6e166f5`, also in the published release).
+
+## Decisions (owner, 24 October)
+- Judges get live NVIDIA Nemotron through a small server that holds the owner's Nebius key (separate Vercel project, strict limits). At the daily limit or on outage the app shows an explicit message and keeps the local rules check. No hidden fallback.
+- The demo is free exploration with an in-app, skippable guide that changes with the screen and role (Emma, Maya, Alex).
+- Order: Vamo content, guide and bug fixes first; the AI server after the owner completes JD-12.
+
+## Next actions
+1. Start with JD-01 (reproduce Learn › Start exercise on a clean profile), JD-02 and JD-03.
+2. Then JD-04 … JD-07 (believable Vamo), then JD-08/09 (guide).
+3. JD-10 … JD-12 need the owner: Nebius spend cap, Nebius key in Vercel environment variables, Upstash store.
+4. JD-13 only when the owner asks for a release; update `test-averill.md`, not this file.
+
+## Where things are
+| What | Path |
+| --- | --- |
+| App as judges get it (local copy, ignored by git) | `Averill.app` in the repository root |
+| Release | `v0.1.0-judge.20261024` (commit `6675d23`, ZIP SHA-256 `390bc1cd578ed381fcec0a697079120aed130149c9f1f973785962399eb3e58c`) |
+| Open pull request | [#40](https://github.com/sararr25/averill-ai/pull/40) |
+| Test profile used to see the judge view | `~/Library/Application Support/averill-judge-test` (separate from `averill-ai-desktop`) |
+| Owner's own demo logins | `demo-login-documents/` (ignored by git; emails are `@vamo.example`) |
+
+## Cautions
+- `/loop-me` is not a command in this setup; the decisions above were taken with the brainstorming skill.
+- The push approval in chat covered only branch `fix/judge-extension-and-fixtures` and the release; nothing else was published.
+- Do not touch the owner's `averill-ai-desktop` profile without a backup; it holds saved Nebius and Tavily keys.
+
 # Judge release — 24 October 2026
 
 **State:** judge-ready build published and merged. Release [v0.1.0-judge.20261023](https://github.com/sararr25/averill-ai/releases/tag/v0.1.0-judge.20261023) is the repository's *latest* release (earlier releases were all pre-releases, so `releases/latest` used to 404). Built from `63e2922`; ZIP SHA-256 `5d1cc2559b1ac619b13c49772b1cf33b913fa647bad0734918b4cabbbcc8df27`, verified identical when downloaded through the `latest` link. PR #37 merged to `main` as `13830c5`.
