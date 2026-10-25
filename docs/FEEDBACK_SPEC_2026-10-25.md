@@ -37,8 +37,8 @@ Research of 25 October 2026 (official docs, re-check before building):
 - The Canva Apps SDK can read the real page (text, text color, font size, position, page size, background fill) through `openDesign`, but that API is preview and "may change without warning" (https://www.canva.dev/docs/apps/api/beta/design-open-design). It cannot read the photo pixels under a text box, it has no documented change events (only polling, 10 calls per 10 seconds), it cannot block export, and it cannot call `127.0.0.1`, only HTTPS (https://www.canva.dev/docs/apps/content-security-policy). A development app is likely visible only to our own account or team (unconfirmed), so judges on their own Canva could not use it.
 - The Canva Connect API reads only design metadata and exports, not elements. It can import a PDF or PPTX into a design (https://www.canva.dev/docs/connect/api-reference/design-imports/).
 - The Chrome extension can take a screenshot of the visible Canva tab with `chrome.tabs.captureVisibleTab` under the existing `activeTab` permission, after the user clicks the extension (https://developer.chrome.com/docs/extensions/reference/api/tabs), at most 2 per second.
-Recommended: the extension route. Judges already install the extension, it works on any Canva account and plan, and the check stays local: the screenshot goes to the Averill desktop app over the existing loopback bridge, the existing macOS OCR finds the text and its boxes, and code computes the contrast between text and background pixels and the position against the Instagram safe zones. Averill warns with a blocking card in the page (per D4 it cannot stop Canva's own export or share). This changes two AGENTS.md rules (screenshots of the shared tab, and visual-geometry checks on Canva), which the owner approves with this decision.
-Stretch (only if time allows): a Canva app in development preview that reads exact text and colors with `openDesign`, as a second opinion for solid backgrounds.
+Recommended (before the spike): the extension route. Judges already install the extension, it works on any Canva account and plan, and the check stays local: the screenshot goes to the Averill desktop app over the existing loopback bridge, the existing macOS OCR finds the text and its boxes, and code computes the contrast between text and background pixels and the position against the Instagram safe zones. Averill warns with a blocking card in the page (per D4 it cannot stop Canva's own export or share). This changes two AGENTS.md rules (screenshots of the shared tab, and visual-geometry checks on Canva), which the owner approves with this decision.
+Update after the FB-13 spike: the extension reads the Canva page directly (text, color, position and background pixels), so screenshots and OCR are not needed and the AGENTS.md screenshot change is dropped; only the Canva geometry check is new. Stretch (only if time allows): a Canva app in development preview that reads exact text and colors with `openDesign`, as a second opinion for solid backgrounds.
 
 **D3. Photo check: how to check images. APPROVED: recommended option.**
 Recommended: local checks first. Check that an image is present, that it has alt text, its aspect ratio and size for each platform, and the text inside it (read with the existing macOS OCR and checked against approved rules). A vision model description is optional, and only if Nebius offers one (verify first).
@@ -65,7 +65,7 @@ Alternative: none needed now.
 | FB-11 | To do section | D | none |
 | FB-12 | UI hierarchy, button sizes and spacing | D | none |
 | FB-13 | Real Canva: starting post and capture spike | E | none |
-| FB-14 | Live Canva design checks with a blocking card | E | FB-13, FB-04 |
+| FB-14 | Live Canva design checks with a blocking card | E | FB-04 |
 | FB-15 | Update judge guide and release | F | FB-01 to FB-14 as shipped |
 
 ## FB-01 — Real-looking Brevo email
@@ -201,27 +201,25 @@ Accept:
 
 ## FB-13 — Real Canva: starting post and capture spike
 
-Files: none in code yet. Output: a short note in `docs/` with findings and screenshots.
-
-Two parts.
-1. Starting design. Make a half-finished Instagram post (1080 by 1350) in the owner's real Canva account: Vamo photo, finished headline, an empty body text box to complete. Share it as a Canva template link so each judge gets their own copy. If a file is needed instead, export it as PDF or PPTX, which Canva imports. Use Vamo brand assets only, not Averill ones.
-2. Spike in installed Chrome on that design, before any build: confirm `captureVisibleTab` works after one click on the extension with only `activeTab`; find how to locate the design page frame on screen (a stable DOM element and its rectangle, or a fallback such as the user dragging a frame once) at normal zoom and after zoom changes; run the macOS OCR on a capture and check that text boxes line up; measure how long one capture plus analysis takes.
+Status, 25 October 2026: spike done, see [CANVA_SPIKE_2026-10-25.md](CANVA_SPIKE_2026-10-25.md). The starting post exists in the owner's Canva (design DAHZAkgeHzA, 1080 by 1440, Instagram 3:4). Open: the owner creates the template link and tests it with a second account.
 
 Accept:
-- The template link opens a fresh copy for a second Canva account (tested).
-- The spike note states, with evidence, which parts work and which do not. If the page frame cannot be found reliably, the note proposes the fallback and FB-14 is updated before coding.
+- The template link opens a fresh copy for a second Canva account (tested). OPEN.
+- The spike note states, with evidence, which parts work and which do not. DONE.
 
 ## FB-14 — Live Canva design checks with a blocking card
 
-Files: `travel-desktop/browser-extension/background.js`, `content.js`, `manifest.json` (no new permissions), the bridge in `travel-desktop/src/browser-bridge.js` and `travel-desktop/main.js`, a new local design-check module in `travel-desktop/src/`, `travel-desktop/scripts/extract-text.swift` if text boxes are needed, and a Vamo brand or social guideline in `travel-desktop/demo-company/vamo/Marketing/` (imported and approved in the workspace; not the Vamo website design system).
+Route changed after the spike: read the page, no screenshots. Canva text is DOM with a readable color, the page frame and design positions are in the DOM, and the background images can be read as pixels from the page.
 
-Depends on FB-13 and FB-04. After the employee clicks Connect on the Canva tab and turns on "Watch my design", the extension captures the visible tab after an edit pause (at most once every 2 seconds, never while Averill is not connected) and sends it over the authenticated loopback bridge. Averill checks, locally: text contrast against the background (WCAG AA: 4.5:1 for normal text, 3:1 for large text; pistachio green on a light background fails), whether text sits inside the Instagram safe zone, and the approved-copy rules on the OCR text. Use Instagram's published safe margins (confirm the exact values before coding) and cite the approved Vamo guideline, instead of guessing pixel values. Add the contrast and safe-zone rules to that guideline so every finding cites an approved source. On a failure the in-page card shows a blocking warning ("Fix before you export") with the source, and stays until the problem is fixed or the employee chooses "Export anyway". Averill never edits, exports or shares the design. Screenshots stay on the device, are not stored, and are dropped after the check.
+Files: `travel-desktop/browser-extension/content.js` and a new Canva design reader next to `editor-adapter.js`, `travel-desktop/browser-extension/background.js` (new bridge kind), `travel-desktop/main.js` and `travel-desktop/src/contextual-review.js` (rule checks and citations on the text), and a Vamo brand or social guideline in `travel-desktop/demo-company/vamo/Marketing/` (imported and approved in the workspace; not the Vamo website design system). No new extension permissions.
+
+Depends on FB-04. After the employee clicks Connect on the Canva tab and turns on "Watch my design", the content script reads, after an edit pause: each text element (text, color, size, design box) and the background pixels under it. It computes in the page: text contrast (WCAG AA: 4.5:1 for normal text, 3:1 for large text, using the worst-case background area, not the mean) and whether text sits inside the Instagram safe zone (confirm the 3:4 margins before coding). It sends only the text and these numbers, never images, over the authenticated loopback bridge, where Averill checks the text against approved copy rules and attaches citations. Add the contrast and safe-zone rules to the Vamo guideline so every finding cites an approved source. On a failure the in-page card shows a blocking warning ("Fix before you export") with the source, until the problem is fixed or the employee chooses "Export anyway". Averill never edits, exports or shares the design. If Canva's page structure is not recognised, the card says "Averill cannot read this design" (fail closed, no guessing).
 
 Accept:
-- Unit tests for the contrast calculation, the safe-zone bounds and the mapping from screen pixels to design pixels.
-- Bridge tests: capture refused when not connected, when the tab or origin does not match, or after Stop.
-- Manual run in installed Chrome on the FB-13 copy: pistachio text on the light area triggers the block, dark text clears it; text dragged outside the guides triggers the block; a forbidden claim typed in the text box triggers a finding with its source. Screenshots of each.
-- AGENTS.md and `travel-desktop/browser-extension/README.md` updated to describe the approved screenshot and geometry check, and its limits (visible area only, accuracy depends on OCR).
+- Unit tests for the contrast calculation, the safe-zone bounds, and the DOM reader on a saved copy of the Canva page structure.
+- Bridge tests: request refused when not connected, when the tab or origin does not match, or after Stop; payload contains no image data.
+- Manual run in installed Chrome on a copy of the FB-13 post: pistachio green text on the cream panel triggers the block, dark text clears it; text dragged outside the safe zone triggers the block; "lowest prices guaranteed" typed in the body triggers a finding with its source; works at 40% and 100% zoom. Screenshots of each.
+- AGENTS.md and `travel-desktop/browser-extension/README.md` describe the approved Canva design check and its limits (Canva page structure can change; only readable DOM text and page images).
 
 ## FB-15 — Update judge guide and release
 
