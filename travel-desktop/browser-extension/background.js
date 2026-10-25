@@ -5,6 +5,7 @@ const CONTENT_FILES = ['end-reasons.js', 'editor-adapter.js', 'field-select.js',
 // Session-long connection (owner decision D1): 3 tries with backoff before Averill counts as closed.
 const RETRY_DELAYS_MS = [500, 1500];
 const RELAY_TIMEOUT_MS = 4000;
+const MAX_CLAIMS = 5, MAX_CLAIM_LENGTH = 300;
 let queue = Promise.resolve();
 function enqueue(task) { const run = queue.then(task); queue = run.catch(() => {}); return run; }
 function validPair(pair) { return /^http:\/\/127\.0\.0\.1:\d+\/observation$/.test(pair?.endpoint || '') && /^[a-f0-9]{64}$/.test(pair?.token || ''); }
@@ -129,10 +130,18 @@ async function relayContext(message, sender) {
     if (!question.trim()) return { error: 'Type a question first.' };
     Object.assign(payload, { question });
   }
+  if (message.kind === 'public-check') {
+    // FB-10: only the statements the employee ticked in the card, at most 5 of 300 characters, bound to one field revision.
+    // Averill checks them against the field text again and applies its own outbound guards before anything is searched.
+    const list = Array.isArray(message.claims) ? message.claims : [];
+    if (!list.length || list.length > MAX_CLAIMS || list.some(claim => typeof claim !== 'string' || !claim.trim() || claim.length > MAX_CLAIM_LENGTH)) return { error: `Choose 1 to ${MAX_CLAIMS} statements of up to ${MAX_CLAIM_LENGTH} characters.` };
+    Object.assign(payload, { claims: list.map(claim => claim.trim()) });
+  }
   try {
-    const response = await fetch(pair.endpoint.replace('/observation', '/context'), { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Averill-Token': pair.token }, body: JSON.stringify({ ...payload, tabId: pair.tabId, pageOrigin: pair.pageOrigin }), signal: AbortSignal.timeout(45000) });
+    const response = await fetch(pair.endpoint.replace('/observation', '/context'), { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Averill-Token': pair.token }, body: JSON.stringify({ ...payload, tabId: pair.tabId, pageOrigin: pair.pageOrigin }), signal: AbortSignal.timeout(message.kind === 'public-check' ? 120000 : 45000) });
     if (state.pair?.token !== pair.token) return { stopped: true, reason: endedFor(pair.tabId) };
     if (response.status === 400 && message.kind === 'ask') return { error: 'The question could not be answered. Check it and try again.' };
+    if (response.status === 400 && message.kind === 'public-check') return { error: 'The draft changed. Check the statements again.' };
     if (response.status === 400) return { error: 'The draft or company guidance changed. Review this field again.' };
     if (!response.ok) return { error: 'The check could not finish. Try again.' };
     return await response.json();
@@ -151,7 +160,7 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
     task.then(reply, error => reply({ error: error.message }));
     return true;
   }
-  if (['review', 'proposal', 'open', 'ask'].includes(message.kind)) { relayContext(message, sender).then(reply, () => reply({ error: 'Try a fresh review.' })); return true; }
+  if (['review', 'proposal', 'open', 'ask', 'public-check'].includes(message.kind)) { relayContext(message, sender).then(reply, () => reply({ error: 'Try a fresh review.' })); return true; }
   if (!['field', 'heartbeat', 'editing', 'stop'].includes(message.kind)) { reply({ error: 'Unsupported action.' }); return; }
   (message.kind === 'stop' ? relayEvent(message, sender) : enqueue(() => relayEvent(message, sender))).then(reply, () => reply({ stopped: true, reason: 'lost_contact' }));
   return true;

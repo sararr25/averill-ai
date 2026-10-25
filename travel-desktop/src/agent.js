@@ -92,6 +92,7 @@ function render() {
   renderHero();
   renderWorkStep();
   renderBrowserChecklist();
+  renderOnlineChecks();
   el('browser-guided-status').textContent = current.browserConnectionError || '';
   el('browser-guided-status').hidden = !current.browserConnectionError;
   el('browser-copy-pair').disabled = !current.browserBridge?.ready;
@@ -595,7 +596,7 @@ function drawPublicChecks(output,result){
   const task=el('external-task').value;const observed=current.externalObservation?.text||'';
   const urls=[...new Set((observed.match(/https:\/\/[^\s<>"'”)]+/g)||[]).map(url=>url.replace(/[.,;:!?]+$/,'')))].slice(0,5);
   const claims=result.publicClaims||[];
-  if(!current.services?.tavily||(!claims.length&&!urls.length))return;
+  if(!current.onlineCheck?.available||(!claims.length&&!urls.length))return;
   const box=node('section',undefined,'public-check');box.append(node('div','PUBLIC CHECK · NOT COMPANY APPROVAL','eyebrow'),node('p','Public web sources can show whether a statement is still true. They never replace an approved company source.','section-note'));
   const status=node('div');status.setAttribute('aria-live','polite');
   if(claims.length){const button=node('button',`Check ${claims.length} public statement${claims.length>1?'s':''} with Tavily`,'secondary-button');button.type='button';
@@ -661,6 +662,29 @@ function renderBrowserChecklist(){
  const end=!bridge.connected&&bridge.lastEnd?bridge.lastEnd.message:'';
  el('browser-end').textContent=end?`Last connection ended. ${end}`:'';el('browser-end').hidden=!end;
  el('browser-checklist').hidden=!current.auth?.signedIn;
+}
+// FB-10: Tavily use made visible. The last public check (from the browser card or this app) and recent activity lines.
+// The activity log keeps counts only; the last check lives in memory and lists the public statements the employee confirmed.
+function renderOnlineChecks(){
+ const section=el('online-checks'),box=el('online-checks-content'),online=current.onlineCheck,last=online?.last;
+ const entries=(current.cloudActivity?.mine||[]).filter(row=>row.service==='tavily'&&row.kind==='summary').slice(0,3);
+ section.hidden=!current.auth?.signedIn||(!last&&!entries.length&&!online?.available);
+ if(section.hidden){box.replaceChildren();return;}
+ const time=iso=>new Date(iso).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+ const parts=[node('p','PUBLIC CHECK · NOT COMPANY APPROVAL','eyebrow')];
+ if(last){
+  const total=last.claims.length;
+  parts.push(node('p',`Last check at ${time(last.at)} from ${last.origin === 'desktop' ? 'this app' : 'the browser card'}: ${total} statement${total===1?'':'s'}. ${last.counts.supported} supported, ${last.counts.contradicted} contradicted, ${last.counts.unclear} unclear.`));
+  const list=node('ul','','online-check-list');
+  for(const item of last.claims){
+   const line=node('li');line.append(node('strong',{supported:'Supported',contradicted:'Contradicted'}[item.verdict]||'Unclear'),document.createTextNode(` · “${item.claim}” `));
+   for(const link of item.results||[]){const open=node('button',link.title||link.url,'source-link');open.type='button';open.addEventListener('click',()=>window.desktop.openWeb(link.url).catch(()=>{}));line.append(open);}
+   list.append(line);
+  }
+  parts.push(list);
+ } else parts.push(node('p','No online check yet. In the Averill card in your browser, press Double-check online. In this app, use Check public statements after a review.'));
+ if(entries.length){const log=node('ul','','online-check-list');for(const row of entries)log.append(node('li',`${row.label||'Checked online with Tavily'} · ${time(row.at)}${row.via==='demo-server'?' · demo server':''}`));parts.push(node('h4','Recent activity'),log);}
+ box.replaceChildren(...parts);
 }
 function renderWorkStep(){
  const captured=Boolean(current.externalObservation),selected=Boolean(current.externalWindow),ready=Boolean(current.browserBridge?.ready);

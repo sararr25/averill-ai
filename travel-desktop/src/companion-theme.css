@@ -132,6 +132,9 @@
 .agent-body .connection-steps .step-text{display:flex;flex-direction:column;min-width:0}
 .agent-body .connection-steps strong{font:var(--av-type-label);color:var(--av-text);overflow-wrap:anywhere}
 .agent-body .connection-steps small{overflow-wrap:anywhere}
+.agent-body .online-checks h4{font:var(--av-type-label);margin:var(--av-space-4) 0 var(--av-space-2);color:var(--av-text-secondary)}
+.agent-body .online-check-list{list-style:none;margin:var(--av-space-2) 0 0;padding:0;display:grid;gap:var(--av-space-2);overflow-wrap:anywhere}
+.agent-body .online-check-list .source-link{min-height:24px}
 .agent-body #browser-end{margin:var(--av-space-4) 0 0;color:var(--av-warning)}
 .agent-body #browser-end[hidden]{display:none}
 @media(max-width:640px){.agent-body .agent-tab>.section:first-child>.section-head h2,.agent-body .review-hero h2{font:var(--av-type-title);letter-spacing:-.02em}}

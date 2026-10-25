@@ -1,6 +1,6 @@
 (() => {
  if(window.__averillStop)window.__averillStop();
- let selected=null,selectedSig=null,refinding=null,timer=null,heartbeat=null,alive=true,composing=false,sequence=0,generation=0,result=null,reviewValue='',expanded=false,uiState='ready',error='',undo=null,mutationPending=false;
+ let selected=null,selectedSig=null,refinding=null,timer=null,heartbeat=null,alive=true,composing=false,sequence=0,generation=0,result=null,claimSet=null,reviewValue='',expanded=false,uiState='ready',error='',undo=null,mutationPending=false;
  const FS=globalThis.AverillFieldSelect;if(!FS)throw new Error('Averill field-select.js was not loaded.');
  const identities=new WeakMap(),abort=new AbortController();
  const host=document.createElement('div');host.setAttribute('data-averill-companion','');host.tabIndex=0;host.setAttribute('aria-label','Averill review controls');
@@ -9,7 +9,7 @@
  const asset=file=>chrome.runtime.getURL?chrome.runtime.getURL(file):'';
  const style=document.createElement('style');style.textContent=`
  @font-face{font-family:AverillJakarta;src:url('${asset('assets/plus-jakarta-sans.ttf')}');font-weight:200 800;font-display:swap}
- :host{all:initial;color-scheme:dark}*{box-sizing:border-box}.card{font:14px/1.6 AverillJakarta,system-ui,sans-serif;color:#f3f1f8;background:#2b2835;border:1px solid #57505f;border-radius:22px;box-shadow:0 16px 50px #100f192b;max-height:calc(100vh - 24px);display:flex;flex-direction:column;overflow:hidden;text-align:left}.head{display:flex;align-items:center;gap:8px;padding:14px 12px 0 20px;flex:none}.head img{width:24px;height:24px}.brand{font-size:20px;letter-spacing:-.045em;font-weight:600}.pill{margin-left:auto;display:inline-flex;align-items:center;gap:6px;font:600 11px/16px AverillJakarta,system-ui,sans-serif;color:#d6ef91;background:#363e2d;border-radius:999px;padding:3px 10px;white-space:nowrap}.pill::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor}.pill.off{color:#ffc794;background:#44362e}.hint{font-size:13px}.main{padding:18px 20px;overflow:auto;min-height:0}.footer{padding:0 20px 14px;flex:none}h2{font-size:24px;line-height:1.3;letter-spacing:-.035em;font-weight:600;margin:0 0 12px}p{font-size:14px;color:#b8b2c6;margin:0 0 14px;line-height:1.6}.tag{font-size:11px;color:#b8b2c6;margin-bottom:9px}.observed{background:#44362e;color:#ffc794;border-radius:9px;padding:12px;font-size:13px;white-space:pre-wrap;overflow-wrap:anywhere;margin:12px 0}.primary{display:block;background:#d6ef91;color:#242a1b;border:0;border-radius:12px;padding:0 16px;font:600 13px/20px AverillJakarta,system-ui,sans-serif;min-height:36px;width:100%;text-align:center}.more .primary{display:inline-block;width:auto}.secondary{background:transparent;border:1px solid #8e879b;color:#f3f1f8;border-radius:12px;padding:0 12px;min-height:32px;font:600 13px/20px AverillJakarta,system-ui,sans-serif}.primary+.text,.primary+.secondary{margin-top:8px}.text{border:0;background:transparent;color:#b8b2c6;padding:0;text-decoration:underline;text-underline-offset:3px;min-height:24px;font:600 13px/20px AverillJakarta,system-ui,sans-serif}.text+.text{display:table;margin-top:8px}.close{border:0;background:transparent;color:#b8b2c6;font-size:20px;line-height:1;min-width:32px;min-height:32px;border-radius:12px}.row{display:flex;gap:15px;justify-content:space-between;align-items:center}.source{background:#35313f;border-radius:12px;padding:12px;font-size:13px;color:#f3f1f8;margin-bottom:4px}.source summary{cursor:pointer}.source small{display:block;font-size:12px;color:#b8b2c6}.quote{margin-top:12px;border-top:1px solid #484351;padding-top:12px;white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px;max-height:130px;overflow:auto}.diff{border:1px solid #484351;border-radius:12px;overflow:hidden;margin:12px 0}.diff div{padding:12px;white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px}.before{background:#44362e;color:#ffc794}.after{background:#363e2d;color:#d6ef91}.diff small{display:block;font-size:11px;margin-bottom:5px}.notice{color:#d6ef91}.error{color:#ffb8bf}.more{border-top:1px solid #484351;margin-top:14px;padding-top:14px}button,select{font:inherit;cursor:pointer}button:disabled{opacity:.6;cursor:default}button:focus-visible,summary:focus-visible,select:focus-visible{outline:3px solid #d6ef91;outline-offset:3px}select{width:100%;padding:10px;background:#35313f;color:#f3f1f8;border:1px solid #8e879b;border-radius:10px;margin-bottom:12px}.ask{border-top:1px solid #484351;padding:14px 20px;flex:none}.ask label{display:block;font-size:12px;font-weight:600;color:#b8b2c6;margin-bottom:6px}.ask textarea{display:block;width:100%;min-height:56px;resize:none;background:#35313f;color:#f3f1f8;border:1px solid #8e879b;border-radius:12px;padding:8px 12px;font:13px/1.5 AverillJakarta,system-ui,sans-serif}.ask textarea:focus-visible{outline:3px solid #d6ef91;outline-offset:2px}.askrow{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:8px}.askrow small{font-size:12px;color:#b8b2c6;line-height:1.4}.out{margin-top:12px;max-height:200px;overflow:auto}.out p{font-size:13px;margin:0 0 8px}.cite{background:#35313f;border-radius:12px;padding:12px;font-size:13px;margin-bottom:8px}.cite b{display:block;font-weight:600}.cite small{display:block;font-size:12px;color:#b8b2c6}.cite .quote{margin-top:8px;padding-top:8px;max-height:96px}.chip{border:1px solid #57505f;background:#2b2835;color:#f3f1f8;border-radius:12px;min-height:36px;padding:0 16px;font:600 13px AverillJakarta,system-ui,sans-serif;box-shadow:0 4px 18px #100f1920}button{transition:background-color 140ms cubic-bezier(.16,1,.3,1)}button:hover{filter:brightness(1.06)}@media(prefers-reduced-motion:reduce){button{transition:none}}
+ :host{all:initial;color-scheme:dark}*{box-sizing:border-box}.card{font:14px/1.6 AverillJakarta,system-ui,sans-serif;color:#f3f1f8;background:#2b2835;border:1px solid #57505f;border-radius:22px;box-shadow:0 16px 50px #100f192b;max-height:calc(100vh - 24px);display:flex;flex-direction:column;overflow:hidden;text-align:left}.head{display:flex;align-items:center;gap:8px;padding:14px 12px 0 20px;flex:none}.head img{width:24px;height:24px}.brand{font-size:20px;letter-spacing:-.045em;font-weight:600}.pill{margin-left:auto;display:inline-flex;align-items:center;gap:6px;font:600 11px/16px AverillJakarta,system-ui,sans-serif;color:#d6ef91;background:#363e2d;border-radius:999px;padding:3px 10px;white-space:nowrap}.pill::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor}.pill.off{color:#ffc794;background:#44362e}.hint{font-size:13px}.main{padding:18px 20px;overflow:auto;min-height:0}.footer{padding:0 20px 14px;flex:none}h2{font-size:24px;line-height:1.3;letter-spacing:-.035em;font-weight:600;margin:0 0 12px}p{font-size:14px;color:#b8b2c6;margin:0 0 14px;line-height:1.6}.tag{font-size:11px;color:#b8b2c6;margin-bottom:9px}.observed{background:#44362e;color:#ffc794;border-radius:9px;padding:12px;font-size:13px;white-space:pre-wrap;overflow-wrap:anywhere;margin:12px 0}.primary{display:block;background:#d6ef91;color:#242a1b;border:0;border-radius:12px;padding:0 16px;font:600 13px/20px AverillJakarta,system-ui,sans-serif;min-height:36px;width:100%;text-align:center}.more .primary{display:inline-block;width:auto}.secondary{background:transparent;border:1px solid #8e879b;color:#f3f1f8;border-radius:12px;padding:0 12px;min-height:32px;font:600 13px/20px AverillJakarta,system-ui,sans-serif}.primary+.text,.primary+.secondary{margin-top:8px}.text{border:0;background:transparent;color:#b8b2c6;padding:0;text-decoration:underline;text-underline-offset:3px;min-height:24px;font:600 13px/20px AverillJakarta,system-ui,sans-serif}.text+.text{display:table;margin-top:8px}.close{border:0;background:transparent;color:#b8b2c6;font-size:20px;line-height:1;min-width:32px;min-height:32px;border-radius:12px}.row{display:flex;gap:15px;justify-content:space-between;align-items:center}.source{background:#35313f;border-radius:12px;padding:12px;font-size:13px;color:#f3f1f8;margin-bottom:4px}.source summary{cursor:pointer}.source small{display:block;font-size:12px;color:#b8b2c6}.quote{margin-top:12px;border-top:1px solid #484351;padding-top:12px;white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px;max-height:130px;overflow:auto}.diff{border:1px solid #484351;border-radius:12px;overflow:hidden;margin:12px 0}.diff div{padding:12px;white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px}.before{background:#44362e;color:#ffc794}.after{background:#363e2d;color:#d6ef91}.diff small{display:block;font-size:11px;margin-bottom:5px}.notice{color:#d6ef91}.error{color:#ffb8bf}.more{border-top:1px solid #484351;margin-top:14px;padding-top:14px}button,select{font:inherit;cursor:pointer}button:disabled{opacity:.6;cursor:default}button:focus-visible,summary:focus-visible,select:focus-visible{outline:3px solid #d6ef91;outline-offset:3px}select{width:100%;padding:10px;background:#35313f;color:#f3f1f8;border:1px solid #8e879b;border-radius:10px;margin-bottom:12px}.ask{border-top:1px solid #484351;padding:14px 20px;flex:none}.ask label{display:block;font-size:12px;font-weight:600;color:#b8b2c6;margin-bottom:6px}.ask textarea{display:block;width:100%;min-height:56px;resize:none;background:#35313f;color:#f3f1f8;border:1px solid #8e879b;border-radius:12px;padding:8px 12px;font:13px/1.5 AverillJakarta,system-ui,sans-serif}.ask textarea:focus-visible{outline:3px solid #d6ef91;outline-offset:2px}.askrow{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:8px}.askrow small{font-size:12px;color:#b8b2c6;line-height:1.4}.out{margin-top:12px;max-height:200px;overflow:auto}.out p{font-size:13px;margin:0 0 8px}.cite{background:#35313f;border-radius:12px;padding:12px;font-size:13px;margin-bottom:8px}.cite b{display:block;font-weight:600}.cite small{display:block;font-size:12px;color:#b8b2c6}.cite .quote{margin-top:8px;padding-top:8px;max-height:96px}.check{border-top:1px solid #484351;margin-top:14px;padding-top:14px}.check h3,.results h3{font-size:14px;line-height:1.4;font-weight:600;margin:0 0 6px;color:#f3f1f8}.check .hint,.results .hint{font-size:13px;color:#b8b2c6;margin:0 0 10px;line-height:1.5}.claim{display:flex;gap:8px;align-items:flex-start;margin-bottom:8px}.claim input{flex:none;width:24px;height:24px;margin:4px 0 0;accent-color:#d6ef91;cursor:pointer}.claim textarea{flex:1;min-width:0;display:block;min-height:52px;resize:none;background:#35313f;color:#f3f1f8;border:1px solid #8e879b;border-radius:12px;padding:6px 10px;font:13px/1.5 AverillJakarta,system-ui,sans-serif}.claim.off textarea{opacity:.6}.claim input:focus-visible,.claim textarea:focus-visible{outline:3px solid #d6ef91;outline-offset:2px}.checkrow{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:4px}.checkrow small{font-size:12px;color:#b8b2c6;line-height:1.4}.checknote{font-size:12px;color:#b8b2c6;margin:8px 0 0;line-height:1.5}.results{margin-top:14px}.verdict{border-left:3px solid #8e879b;background:#35313f;border-radius:0 12px 12px 0;padding:10px 12px;margin-bottom:8px;font-size:13px}.verdict.supported{border-color:#d6ef91}.verdict.contradicted{border-color:#ffb8bf}.verdict b{display:block;font-weight:600}.verdict.supported b{color:#d6ef91}.verdict.contradicted b{color:#ffb8bf}.verdict p{font-size:13px;margin:4px 0 0;overflow-wrap:anywhere}.src{margin-top:8px;border-top:1px solid #484351;padding-top:8px}.src a{display:inline-block;min-height:24px;color:#f3f1f8;font-weight:600;text-decoration:underline;text-underline-offset:3px;overflow-wrap:anywhere}.src a:focus-visible{outline:3px solid #d6ef91;outline-offset:2px}.src small{display:block;font-size:12px;color:#b8b2c6;overflow-wrap:anywhere}.src .snip{font-size:12px;margin-top:4px;overflow-wrap:anywhere}.chip{border:1px solid #57505f;background:#2b2835;color:#f3f1f8;border-radius:12px;min-height:36px;padding:0 16px;font:600 13px AverillJakarta,system-ui,sans-serif;box-shadow:0 4px 18px #100f1920}button{transition:background-color 140ms cubic-bezier(.16,1,.3,1)}button:hover{filter:brightness(1.06)}@media(prefers-reduced-motion:reduce){button{transition:none}}
  `;root.append(style);const box=document.createElement('div');root.append(box);
  const status=node('div');status.setAttribute('role','status');status.setAttribute('aria-live','polite');status.setAttribute('aria-atomic','true');status.style.cssText='position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);';root.append(status);
  // FB-07: one persistent question box, moved into whichever card is showing. Plain text only.
@@ -17,7 +17,7 @@
  const askOut=node('div',undefined,'out');askOut.hidden=true;let askBusy=false;
  const askButton=button('Ask',()=>submitAsk(),'secondary');askButton.setAttribute('aria-label','Ask the question');
  askInput.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();submitAsk()}});
- for(const type of ['keydown','keyup','keypress'])host.addEventListener(type,e=>{if(e.composedPath()[0]===askInput)e.stopPropagation()});
+ for(const type of ['keydown','keyup','keypress'])host.addEventListener(type,e=>{const t=e.composedPath()[0];if(t===askInput||t?.classList?.contains('claimtext'))e.stopPropagation()});
  function askSection(){const wrap=node('div',undefined,'ask'),label=node('label','Ask about this draft or company rules');label.htmlFor='averill-ask';const row=node('div',undefined,'askrow');row.append(node('small','Enter to ask. Shift+Enter for a new line.'),askButton);wrap.append(label,askInput,row,askOut);return wrap}
  function showAsk(value,problem){
   askOut.replaceChildren();askOut.hidden=!value&&!problem;
@@ -34,9 +34,11 @@
   askBusy=true;askInput.readOnly=true;askButton.disabled=true;askOut.hidden=false;askOut.replaceChildren(node('p','Looking in approved sources.','hint'));status.textContent='Looking in approved sources.';
   // Syncing the selected field first lets the answer use its current text; a stale revision is simply ignored by Averill.
   const field=selected?await commit('selection'):null;
-  const value=alive?await send({kind:'ask',question,...(field?{fieldId:field.id,revision:field.revision}:{})}):{};
+  const value=alive?await send({kind:'ask',question,task,...(field?{fieldId:field.id,revision:field.revision}:{})}):{};
   askBusy=false;askInput.readOnly=false;askButton.disabled=false;if(!alive)return;
   if(value.error)showAsk(null,value.error);else showAsk(value);
+  // FB-10: after an answer the card may offer the draft's public statements for an online double-check. Nothing is sent from here.
+  if(!value.error&&field&&selected&&describe(selected)?.revision===field.revision){const next=offerClaims(field,value.publicCheck,claimSet);if(next&&next!==claimSet){claimSet=next;render()}}
   status.textContent=value.error||(value.state==='answered'?`Answer from ${value.citations?.[0]?.title||'an approved source'}.`:value.message||'No approved source answers this.');
   if(selected)position();
  }
@@ -79,7 +81,7 @@
   const main=node('div',undefined,'main');main.append(node('h2','Sharing ended.'),node('p',message),node('p',reasons.RECONNECT,'hint'),button('Close',remove,'secondary'));
   card.append(head,main);box.replaceChildren(card);status.textContent=`Sharing ended. ${message}`;
  }
- function invalidate(message=''){generation++;result=null;uiState='ready';error=message;expanded=false;render()}
+ function invalidate(message=''){generation++;result=null;claimSet=null;uiState='ready';error=message;expanded=false;render()}
  async function commit(reason){const request=generation;timer=null;if(!alive||composing||document.visibilityState!=='visible')return;if(reason==='pause'&&selected?.isConnected)selectedSig=sign(selected);const field=describe(selected);const value=await send(field?{kind:'field',field,reason}:{kind:'editing'});if(request===generation&&result&&Object.hasOwn(value,'reviewId')&&value.reviewId!==result.id)invalidate('The draft or approved guidance changed. Check again.');return field}
  function position(){if(!selected||!selected.isConnected)return;const container=selected.closest('[role=dialog],dialog[open]')||document.documentElement;if(host.parentElement!==container)container.append(host);host.style.right='';host.style.bottom='';const r=selected.getBoundingClientRect(),width=Math.min(expanded?420:360,innerWidth-24);host.style.width=width+'px';const height=host.getBoundingClientRect().height;let left,top;
   if(r.right+width+24<=innerWidth){left=r.right+12;top=Math.max(12,Math.min(r.top,innerHeight-height-12))}
@@ -90,10 +92,10 @@
   if(container!==document.documentElement&&typeof host.showPopover==='function'){host.setAttribute('popover','manual');if(!host.matches(':popover-open'))host.showPopover();}
   const actual=host.getBoundingClientRect();host.style.left=(left+left-actual.left)+'px';host.style.top=(top+top-actual.top)+'px';
  }
- async function ask(useAI=false,consent=false){if(mutationPending)return;if(!task){render();return}const request=++generation;result=null;error='';if(useAI&&!consent){uiState='consent';render();return}uiState='checking';render();const field=await commit('selection');if(!field||!alive||request!==generation)return;reviewValue=field.value;
+ async function ask(useAI=false,consent=false){if(mutationPending)return;if(!task){render();return}const request=++generation;result=null;claimSet=null;error='';if(useAI&&!consent){uiState='consent';render();return}uiState='checking';render();const field=await commit('selection');if(!field||!alive||request!==generation)return;reviewValue=field.value;
   const value=await send({kind:'review',task,fieldId:field.id,revision:field.revision,useAI,consent});
   if(!alive||request!==generation||describe(selected)?.id!==field.id||describe(selected)?.revision!==field.revision)return;
-  if(value.error){uiState='error';error=value.error}else{result=value;uiState=value.state||'error'}render();
+  if(value.error){uiState='error';error=value.error}else{claimSet=offerClaims(field,value.publicCheck,null);result=value;uiState=value.state||'error'}render();
  }
  async function preview(finding){if(!result)return;const request=++generation,value=await send({kind:'proposal',reviewId:result.id,findingId:finding.id});if(!alive||request!==generation)return;if(value.error){invalidate(value.error);return}uiState='preview';render(value.proposal)}
  async function apply(finding){
@@ -105,6 +107,62 @@
   mutationPending=true;try{const adapter=globalThis.AverillEditorAdapter.create(field,()=>describe(field));const record=await adapter.apply(authorized.proposal,{id:review.fieldId,revision:review.revision,value:reviewValue});mutationPending=false;if(!alive||field!==selected)return;undo={adapter,record};result=null;uiState='applied';error='';await commit('selection');render();if(restoreControlFocus)[...box.querySelectorAll('button')].find(b=>b.textContent==='Undo change')?.focus({preventScroll:true})}catch(e){mutationPending=false;if(!alive||field!==selected)return;result=null;if(e.recovery){undo={record:e.recovery};uiState='undo-conflict'}else uiState='error';error=e.message;render()}
  }
  async function undoChange(){if(mutationPending||!undo?.adapter)return;const target=selected,previous=undo;mutationPending=true;uiState='undoing';render();try{await previous.adapter.undo(previous.record);mutationPending=false;if(!alive||target!==selected)return;undo=null;result=null;uiState='restored';error='';commit('selection');render()}catch(e){mutationPending=false;if(!alive||target!==selected)return;error=e.message;uiState='undo-conflict';render()}}
+ // FB-10: double-check public statements online. The employee ticks or edits the exact text; only that text is sent, after the button press.
+ const CLAIM_BLOCKED=['checking','consent','preview','applying','undoing','applied','undo-conflict','recovery','restored'];
+ function offerClaims(field,offer,keep){
+  if(!field||!offer||!Array.isArray(offer.claims)||!offer.claims.length)return null;
+  if(keep&&keep.fieldId===field.id&&keep.revision===field.revision)return keep;
+  return {fieldId:field.id,revision:field.revision,task,items:offer.claims.slice(0,5).map(text=>({text:String(text).slice(0,300),on:true})),nemotron:offer.nemotron===true,quota:offer.quota==='demo'?'demo':null,busy:false,outcome:null,message:'',focusResults:false};
+ }
+ function chosenClaims(set){return set.items.filter(item=>item.on&&item.text.trim()).map(item=>item.text.trim())}
+ async function runCheck(set){
+  if(set.busy||!alive||claimSet!==set)return;const chosen=chosenClaims(set);if(!chosen.length)return;
+  set.busy=true;set.outcome=null;set.message='';render();status.textContent='Searching public sources.';
+  const value=await send({kind:'public-check',task:set.task,fieldId:set.fieldId,revision:set.revision,claims:chosen});
+  if(!alive||claimSet!==set)return;
+  set.busy=false;set.focusResults=true;
+  if(value.error)set.message=String(value.error).slice(0,300);else if(value.state==='checked'&&Array.isArray(value.claims))set.outcome=value;else set.message=String(value.message||'The online check could not finish. Try again.').slice(0,300);
+  render();status.textContent=set.outcome?`Public check finished for ${set.outcome.claims.length} statement${set.outcome.claims.length===1?'':'s'}.`:set.message;
+ }
+ function sourceLine(entry,withSnippet){
+  const box=node('div',undefined,'src');let ok=false;try{ok=new URL(entry.url).protocol==='https:'}catch{}
+  if(ok){const a=node('a',String(entry.title||entry.url).slice(0,160));a.href=entry.url;a.target='_blank';a.rel='noopener noreferrer';box.append(a)}else box.append(node('b',String(entry.title||'Source').slice(0,160)));
+  box.append(node('small',String(entry.url).slice(0,200)));
+  if(withSnippet&&entry.snippet)box.append(node('div',`“${String(entry.snippet).slice(0,240)}”`,'snip'));
+  return box;
+ }
+ function checkResults(out){
+  const wrap=node('div',undefined,'results'),title=node('h3','Public check, not company approval');title.tabIndex=-1;wrap.append(title,node('p','Public sources can show whether a statement is still true. They never replace an approved company source.','hint'));
+  const labels={supported:'Supported',contradicted:'Contradicted',unclear:'Unclear'};
+  for(const c of out.claims.slice(0,5)){
+   const verdict=labels[c.verdict]?c.verdict:'unclear',card=node('div',undefined,`verdict ${verdict}`);card.append(node('b',labels[verdict]),node('p',`“${String(c.claim).slice(0,300)}”`));
+   if(c.explanation)card.append(node('p',String(c.explanation).slice(0,300),'hint'));
+   if(c.evidence)card.append(sourceLine(c.evidence,true));else for(const entry of (c.sources||[]).slice(0,2))card.append(sourceLine(entry,true));
+   wrap.append(card);
+  }
+  wrap.append(node('p',`${String(out.method||'Tavily search').slice(0,80)}. Plain text only.`,'checknote'));
+  return wrap;
+ }
+ function checkSection(){
+  const set=claimSet,field=selected?describe(selected):null;
+  if(!set||!field||field.id!==set.fieldId||field.revision!==set.revision||CLAIM_BLOCKED.includes(uiState))return null;
+  const section=node('section',undefined,'check');section.setAttribute('aria-label','Double-check online');
+  section.append(node('h3','Double-check online'),node('p','Tick the public statements to search with Tavily. Nothing is sent until you press the button.','hint'));
+  const go=button('Check with Tavily',()=>runCheck(set),'secondary'),count=node('small');
+  const refresh=()=>{const n=chosenClaims(set).length;count.textContent=`${n} of ${set.items.length} will be sent`;go.disabled=set.busy||!n};
+  set.items.forEach((item,index)=>{
+   const row=node('div',undefined,item.on?'claim':'claim off'),box=node('input');box.type='checkbox';box.checked=item.on;box.setAttribute('aria-label',`Search statement ${index+1}`);
+   const text=node('textarea',undefined,'claimtext');text.value=item.text;text.rows=2;text.maxLength=300;text.setAttribute('aria-label',`Statement ${index+1}. This exact text is sent.`);text.readOnly=set.busy;box.disabled=set.busy;
+   box.addEventListener('change',()=>{item.on=box.checked;row.className=item.on?'claim':'claim off';refresh()});text.addEventListener('input',()=>{item.text=text.value;refresh()});
+   row.append(box,text);section.append(row);
+  });
+  const row=node('div',undefined,'checkrow');row.append(count,go);section.append(row);refresh();
+  if(set.busy)go.textContent='Searching';
+  section.append(node('p',`Only the ticked text above leaves this device. ${set.nemotron?'Averill then asks NVIDIA Nemotron to compare the results with each statement. ':''}${set.quota==='demo'?'Each statement uses one of the demo server’s 10 daily online searches.':''}`.trim(),'checknote'));
+  if(set.message)section.append(node('p',set.message,'error'));
+  if(set.outcome)section.append(checkResults(set.outcome));
+  return section;
+ }
  function source(finding){const details=node('details',undefined,'source'),summary=node('summary',finding.source.title);summary.append(node('small',`Approved · Version ${finding.source.version}`));details.append(summary,node('div',finding.source.quote,'quote'));return details}
  function render(proposal){if(!alive||!selected)return;const focused=root.activeElement;const focusLabel=focused?.getAttribute('aria-label')||focused?.textContent;host.style.display='block';box.replaceChildren();
   if(uiState==='dismissed'){box.append(button('Ask Averill',()=>{uiState='ready';render()},'chip'));position();return}
@@ -125,10 +183,13 @@
   else if(result?.state==='no-conflict')main.append(node('h2','No conflicts found.'),node('p','No conflict was found in the selected text against the approved rules checked. Other fields and visual layout were not reviewed.'),button('Recheck selected text',()=>ask(false),'primary'));
   else if(result?.state==='insufficient-evidence')main.append(node('h2','No approved source yet.'),node('p','There is not enough approved, visible guidance to check this text. Your draft has not changed.'),button('Try again',()=>ask(false),'primary'));
   else{main.append(node('h2',uiState==='error'?'The check could not finish.':'Help, right where you work.'),node('p','Check this selected field against approved company guidance.'));if(task)main.append(button(uiState==='error'?'Try again':'Ask Averill',()=>ask(false),'primary'))}
+  if(task){const check=checkSection();if(check)main.append(check)}
   if(task&&uiState!=='checking'&&uiState!=='consent'&&uiState!=='preview'&&uiState!=='applying'&&uiState!=='undoing'&&uiState!=='applied')main.append(button('Use Nemotron for this review',()=>ask(true)));
   const footer=node('div',undefined,'footer');footer.append(button('Stop sharing',async()=>{await send({kind:'stop'});stop('stopped_by_user')}));card.append(head,main,askSection(),footer);box.append(card);position();if(focused===askInput){askInput.focus({preventScroll:true})}
   status.textContent=main.querySelector('h2')?.textContent||error;
-  if(focused&&focused!==askInput){const controls=[...box.querySelectorAll('button,select,summary')];const next=controls.find(e=>(e.getAttribute('aria-label')||e.textContent)===focusLabel)||main.querySelector('.primary')||main.querySelector('h2');if(next){if(next.tagName==='H2')next.tabIndex=-1;next.focus({preventScroll:true})}}
+  const resultsFocus=Boolean(claimSet?.focusResults);if(claimSet)claimSet.focusResults=false;
+  if(focused&&focused!==askInput&&!resultsFocus){const controls=[...box.querySelectorAll('button,select,summary,a[href],input')];const next=controls.find(e=>(e.getAttribute('aria-label')||e.textContent)===focusLabel)||main.querySelector('.primary')||main.querySelector('h2');if(next){if(next.tagName==='H2')next.tabIndex=-1;next.focus({preventScroll:true})}}
+  if(resultsFocus){const heading=box.querySelector('.results h3')||box.querySelector('.check .error');if(heading){heading.tabIndex=-1;heading.focus()}}
  }
   const visible=element=>Boolean(describe(element));
   function sign(element){return FS.signature(element,document,visible)}
@@ -162,7 +223,7 @@
  host.addEventListener('focus',()=>{if(!root.activeElement)box.querySelector('button,select,summary')?.focus()},{signal:abort.signal});
  window.addEventListener('keydown',event=>{if(!event.composedPath().includes(host))return;if(event.key==='Escape'){event.preventDefault();event.stopPropagation();generation++;result=null;uiState='dismissed';render();selected?.focus()}else if(event.key==='Tab'){
   // Host modal focus scopes cannot enumerate controls inside a closed shadow root.
-  event.stopPropagation();const controls=[...box.querySelectorAll('button:not(:disabled),select,summary,textarea')].filter(e=>e.getClientRects().length);const index=controls.indexOf(root.activeElement);if((event.shiftKey&&index===0)||(!event.shiftKey&&index===controls.length-1)){event.preventDefault();selected?.focus()}
+  event.stopPropagation();const controls=[...box.querySelectorAll('button:not(:disabled),select,summary,textarea:not([readonly]),input:not(:disabled),a[href]')].filter(e=>e.getClientRects().length);const index=controls.indexOf(root.activeElement);if((event.shiftKey&&index===0)||(!event.shiftKey&&index===controls.length-1)){event.preventDefault();selected?.focus()}
  }},{signal:abort.signal,capture:true});
  heartbeat=setInterval(()=>{if(document.visibilityState!=='visible'){send({kind:'heartbeat',paused:true});return}
   // An editor that re-renders its field ends the selection, not the connection.

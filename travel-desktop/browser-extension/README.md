@@ -57,3 +57,7 @@ The plain-text adapter changes only a unique, exact server-authorized removal an
 Recorded evidence: [contextual flow](../../docs/review-evidence-2026-10-18/contextual/). Older installed 0.1.0 evidence remains historical; it cannot establish 0.2.0 acceptance. Tickets CX-03/CX-04/CX-05 retain their remaining real-browser, layout, accessibility and failure-path gates; Brevo/LinkedIn rich editor adapters are separate CX-06/CX-07 work.
 
 Technical references: [activeTab](https://developer.chrome.com/docs/extensions/develop/concepts/activeTab), [content scripts](https://developer.chrome.com/docs/extensions/develop/concepts/content-scripts), [session storage](https://developer.chrome.com/docs/extensions/reference/api/storage).
+
+## Double-check online (FB-10)
+
+After a review or an answer, the card can list public statements found in the selected field (prices, dates, events, places) under "Double-check online". Nothing is sent until the employee presses "Check with Tavily"; only the ticked, optionally edited text leaves the device. Averill re-checks each statement against the field text and its Tavily guards, then shows results labelled "Public check, not company approval". In the judge demo workspace without a local Tavily key the search goes through the capped judge server.

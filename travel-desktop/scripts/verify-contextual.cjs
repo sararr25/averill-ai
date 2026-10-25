@@ -15,7 +15,20 @@ BrowserConnect.prototype.start = async function () { connectPort = await origina
 const originalDialog = dialog.showMessageBox;
 dialog.showMessageBox = async (...args) => { const options = args.at(-1); assert.equal(options.title, 'Connect the Averill browser companion'); approvals++; return { response: 1 }; };
 const originalFetch = global.fetch;
-global.fetch = (url, options) => { assert.equal(new URL(url).hostname, '127.0.0.1', 'No provider request allowed'); return originalFetch(url, options); };
+// FB-10: mocked Tavily only. Placeholder keys keep Averill from reading any stored secret; nothing real is ever contacted.
+process.env.TAVILY_API_KEY = 'tvly-mock-not-a-real-key'; process.env.NEBIUS_API_KEY = 'mock-not-a-real-key';
+const tavilyCalls = [];
+global.fetch = (url, options) => {
+  const target = new URL(url);
+  if (target.hostname === 'api.tavily.com') {
+    const body = JSON.parse(options.body); tavilyCalls.push(body);
+    return Promise.resolve(new Response(JSON.stringify({ results: [
+      { title: 'Tivoli Christmas market 2026 | Visit Copenhagen', url: 'https://visit.example/christmas-market', content: 'The Tivoli Christmas market opens on 14 November 2026 and runs until 31 December.', score: 0.9 },
+      { title: 'Insecure page', url: 'http://visit.example/insecure', content: 'Dropped because it is not HTTPS.' },
+    ] }), { status: 200 }));
+  }
+  assert.equal(target.hostname, '127.0.0.1', 'No provider request allowed'); return originalFetch(url, options);
+};
 require('../main.js');
 const pause = ms => new Promise(resolve => setTimeout(resolve, ms)); const checks = [];
 const OUT = process.env.OUT || ''; if (OUT) fs.mkdirSync(OUT, { recursive: true });
@@ -82,6 +95,50 @@ app.whenReady().then(async () => { try {
   checks.push('FB-07 Ask by typing: Enter asks, Shift+Enter does not ask, a cited answer (title, version, exact quote) appears in the card as plain text; unmatched question says no approved source; credential question refused; host field untouched');
  }
 
+ // FB-10: Double-check online. Claims come from the draft, nothing is sent before the button, only ticked text leaves, results are plain text with a link.
+ {
+  const DRAFT10='The Tivoli Gardens Christmas market in Copenhagen opens on 14 November 2026. Flights from Copenhagen to Vienna start at €79.\nOur lowest prices guaranteed.';
+  const setDraft=text=>page(`(()=>{const d=document.getElementById('draft');Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype,'value').set.call(d,${JSON.stringify(text)});d.dispatchEvent(new Event('input',{bubbles:true}))})()`);
+  const tap=async selector=>{const at=await page(`(()=>{const e=testShadow.querySelector(${JSON.stringify(selector)});if(!e)throw new Error('Missing '+${JSON.stringify(selector)});e.scrollIntoView({block:'nearest'});const r=e.getBoundingClientRect(),x=r.x+Math.min(r.width/2,40),y=r.y+r.height/2;if(document.elementFromPoint(x,y)!==testShadow.host)throw new Error('Clipped or covered: '+${JSON.stringify(selector)});return {x:Math.round(x),y:Math.round(y)}})()`);editor.webContents.sendInputEvent({type:'mouseDown',button:'left',clickCount:1,...at});editor.webContents.sendInputEvent({type:'mouseUp',button:'left',clickCount:1,...at});await pause(80)};
+  const shot10=async name=>{if(SHOTS)fs.writeFileSync(path.join(SHOTS,`${name}${VAMO?'-'+VAMO:''}.png`),(await editor.webContents.capturePage()).toPNG())};
+  await setDraft(DRAFT10);await pause(200);await click('Ask Averill');await until("testShadow.querySelector('.check .claim')");
+  const offered=await page("(()=>{const c=testShadow.querySelector('.check');return {claims:[...c.querySelectorAll('textarea.claimtext')].map(t=>t.value),ticked:[...c.querySelectorAll('input[type=checkbox]')].map(i=>i.checked),button:[...c.querySelectorAll('button')].map(b=>[b.textContent,Math.round(b.getBoundingClientRect().height)]),text:c.textContent}})()");
+  assert.deepEqual(offered.claims,['The Tivoli Gardens Christmas market in Copenhagen opens on 14 November 2026.','Flights from Copenhagen to Vienna start at €79.']);
+  assert.deepEqual(offered.ticked,[true,true]);assert.deepEqual(offered.button[0],['Check with Tavily',32],'Secondary button is 32px');
+  assert(offered.text.includes('Double-check online')&&offered.text.includes('Nothing is sent until you press the button')&&offered.text.includes('Only the ticked text above leaves this device'));
+  assert.equal(tavilyCalls.length,0,'Nothing is sent before the employee presses Check with Tavily');
+  await shot10('public-check-claims');
+  const fit10=await page("(()=>{const r=testShadow.host.getBoundingClientRect(),c=testShadow.querySelector('.card').getBoundingClientRect(),f=testShadow.querySelector('.footer').getBoundingClientRect();return r.left>=0&&r.top>=0&&r.right<=innerWidth+1&&r.bottom<=innerHeight+1&&f.height>0&&f.bottom<=c.bottom+1})()");assert(fit10,'Card with claims fits the viewport');
+  // Untick the second statement, then edit the first by real typing (a shortened version of the draft text).
+  await tap('.check .claim:nth-of-type(2) input');assert.equal(await page("testShadow.querySelectorAll('.check .claim input')[1].checked"),false);assert((await page("testShadow.querySelector('.check .checkrow small').textContent")).startsWith('1 of 2'));
+  await tap('.check .claim:nth-of-type(1) textarea');await page("testShadow.querySelector('.check textarea.claimtext').select()");
+  const edited='Tivoli Gardens Christmas market in Copenhagen opens on 14 November 2026.';await editor.webContents.insertText(edited);await pause(60);
+  assert.equal(await page("testShadow.querySelector('.check textarea.claimtext').value"),edited);assert.equal(tavilyCalls.length,0,'Editing or unticking sends nothing');
+  const draftBefore10=await page("document.getElementById('draft').value");assert.equal(draftBefore10,DRAFT10,'The host field is untouched by the claim editor');
+  await tap('.check .checkrow button');await until("testShadow.querySelector('.results .verdict')");
+  assert.equal(tavilyCalls.length,1,'Exactly the ticked statement was searched');assert.equal(tavilyCalls[0].query,edited);assert(!JSON.stringify(tavilyCalls).includes('Vienna'),'The unticked statement never left the device');assert(!JSON.stringify(tavilyCalls).includes('lowest prices'));
+  const results=await page("(()=>{const r=testShadow.querySelector('.results');const a=[...r.querySelectorAll('a')];return {title:r.querySelector('h3').textContent,verdicts:[...r.querySelectorAll('.verdict')].map(v=>[v.className,v.querySelector('b').textContent]),links:a.map(x=>({text:x.textContent,href:x.href,target:x.target,rel:x.rel,h:Math.round(x.getBoundingClientRect().height)})),urls:[...r.querySelectorAll('.src small')].map(x=>x.textContent),snippets:[...r.querySelectorAll('.snip')].map(x=>x.textContent),unsafe:r.querySelectorAll('script,img,iframe,style,form').length,text:r.textContent,focus:testShadow.activeElement===r.querySelector('h3')}})()");
+  assert.equal(results.title,'Public check, not company approval');assert.deepEqual(results.verdicts,[['verdict unclear','Unclear']]);
+  assert.equal(results.links.length,1,'The non-HTTPS result is dropped; the HTTPS result renders as a link');assert.equal(results.links[0].href,'https://visit.example/christmas-market');assert.equal(results.links[0].text,'Tivoli Christmas market 2026 | Visit Copenhagen');assert.equal(results.links[0].target,'_blank');assert(results.links[0].rel.includes('noopener')&&results.links[0].rel.includes('noreferrer'));assert(results.links[0].h>=24,'Text link is at least 24px tall');
+  assert.deepEqual(results.urls,['https://visit.example/christmas-market']);assert(results.snippets[0].includes('opens on 14 November 2026'));assert.equal(results.unsafe,0,'Results are plain text');assert(!results.text.includes('insecure'));assert(results.focus,'Focus moves to the results heading');
+  assert.equal(await page("document.getElementById('draft').value"),DRAFT10,'Checking online never edits the host field');
+  await shot10('public-check-results');
+  const fit10b=await page("(()=>{const r=testShadow.host.getBoundingClientRect();return r.left>=0&&r.top>=0&&r.right<=innerWidth+1&&r.bottom<=innerHeight+1})()");assert(fit10b,'Card with results fits the viewport');
+  // Desktop: the check is visible in the activity log and in Current work.
+  await pause(400);
+  const snap10=await run('window.desktop.snapshot()');
+  assert.deepEqual(JSON.parse(JSON.stringify(snap10.onlineCheck.last.counts)),{supported:0,contradicted:0,unclear:1});assert.equal(snap10.onlineCheck.last.origin,'browser card');
+  const lines10=snap10.cloudActivity.mine.filter(row=>row.kind==='summary');assert.equal(lines10.length,1);assert.equal(lines10[0].label,'Checked online with Tavily: 1 claim');assert(!JSON.stringify(snap10.cloudActivity).includes('Tivoli'),'Activity log keeps no claim text');
+  const desktopText=await run("document.getElementById('online-checks-content').textContent");assert(desktopText.includes('Checked online with Tavily: 1 claim')&&desktopText.includes('from the browser card')&&desktopText.includes('0 supported, 0 contradicted, 1 unclear'),desktopText);
+  assert.equal(await run("document.getElementById('online-checks').hidden"),false);
+  // Typing in the host field invalidates the offer and the results.
+  await setDraft(DRAFT10+' Edited.');await pause(100);assert.equal(await page("Boolean(testShadow.querySelector('.check, .results'))"),false,'Editing the draft clears the offer and the results');
+  // Back to the field the following steps expect.
+  await setDraft(original);await pause(200);await click('Ask Averill');await until("testShadow.textContent.includes('Remove “lowest prices guaranteed”.')");
+  assert.equal(await page("Boolean(testShadow.querySelector('.check'))"),false,'A draft without public statements shows no double-check section');
+  checks.push('FB-10 Double-check online: claims from the draft shown with checkboxes and the exact text; nothing sent before the 32px Check with Tavily button; unticked text never leaves; edited text sent as typed; mocked Tavily result renders as plain text with an HTTPS link and "Public check, not company approval"; desktop activity line and Current work summary appear; draft untouched');
+ }
+
  // FB-06: the same simulator composer after edits, after the app replaces the field node, and as a role=textbox editor.
  if(FB06){
   assert(VAMO==='linkedin'||VAMO==='instagram','FB06 needs VAMO_PAGE=linkedin or instagram');
@@ -105,7 +162,7 @@ app.whenReady().then(async () => { try {
   await step('a field that never comes back ends the selection but not the connection',async()=>{
    await page("document.getElementById('fb06-box').remove()");await pause(3200);
    assert.equal(await page("testShadow.host.style.display"),'none');assert.equal((await run('window.desktop.snapshot()')).browserBridge.connected,true)});
-  console.log(checks.filter(c=>c.startsWith('FB-06')).join('\n'));console.log(`FB06 ${VAMO} PASS ${checks.filter(c=>c.startsWith('FB-06')).length}/4 steps; zero provider requests`);return;
+  console.log(checks.filter(c=>c.startsWith('FB-06')).join('\n'));console.log(`FB06 ${VAMO} PASS ${checks.filter(c=>c.startsWith('FB-06')).length}/4 steps; zero real provider requests`);return;
  }
  if(AB){
   const samples=[];
@@ -163,7 +220,7 @@ app.whenReady().then(async () => { try {
  checks.push('Logout revokes the connection; the page learns the signed_out reason from the ended bridge');
  const response = await global.fetch(`http://127.0.0.1:${connectPort}/connect`, { method: 'POST', headers: { Origin: extOrigin, 'Content-Type': 'application/json' }, body: JSON.stringify({ tabId: 9, pageOrigin }) }); assert.equal(response.status, 401);
  if (OUT) fs.writeFileSync(path.join(OUT, 'verification.json'), JSON.stringify({ checks, providerRequests: 0, limits: ['Synthetic transport and browser approval; '+(VAMO?'actual Vamo '+VAMO+' mock editor, not a real platform':'synthetic editor, not installed Chrome or real-platform acceptance'), 'Plain text controls only; rich editor writes remain unsupported'] }, null, 2));
- console.log(checks.join('\n')); console.log(`${checks.length} contextual checks passed; zero provider requests`);
+ console.log(checks.join('\n')); console.log(`${checks.length} contextual checks passed; zero real provider requests; ${tavilyCalls.length} mocked Tavily search`);
  } catch (error) { console.error(error.stack); process.exitCode = 1; }
  finally { dialog.showMessageBox = originalDialog; global.fetch = originalFetch; editor?.destroy(); pageServer?.close(); pageServer?.closeAllConnections(); app.quit(); fs.rmSync(profile, { recursive: true, force: true }); }
 });

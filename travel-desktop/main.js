@@ -78,6 +78,7 @@ const browserBridge = new BrowserBridge({
     if (payload.kind === 'proposal') return contextualReview.proposal(payload);
     if (payload.kind === 'open') return contextualReview.open(payload);
     if (payload.kind === 'ask') return contextualReview.ask(payload);
+    if (payload.kind === 'public-check') return contextualReview.publicCheck(payload);
     throw new Error('Unsupported contextual action');
   },
 });
@@ -89,6 +90,25 @@ function logCloudCall(entry) {
 nebiusClient.onCall(logCloudCall);
 tavilyClient.onCall(logCloudCall);
 const runtimeKeys = { nebius: process.env.NEBIUS_API_KEY || '', tavily: process.env.TAVILY_API_KEY || '' };
+// FB-10: how an online (Tavily) double-check would run now. A local key wins; the judge demo workspace falls back to the capped demo server.
+function onlineCheckState() {
+  const via = !signedIn() ? null : runtimeKeys.tavily ? 'local-key' : companyWorkspace.demoAccounts === true ? 'demo-server' : null;
+  return { available: Boolean(via), via, quota: via === 'demo-server' ? 'demo' : null, nemotron: Boolean(aiEnabled && runtimeKeys.nebius && signedIn() && privacy.allowed(companyWorkspace)) };
+}
+// The last online check, kept in memory only. It lists the public statements the employee confirmed and what came back.
+let lastPublicCheck = null;
+async function runPublicCheck(task, claims, origin) {
+  requireSession();
+  const personId = companyWorkspace.activePersonId;
+  const result = await publicCheck.checkOnline(companyWorkspace, task, claims, { tavilyKey: runtimeKeys.tavily, nebiusKey: aiEnabled ? runtimeKeys.nebius : '' });
+  if (personId !== companyWorkspace.activePersonId || !signedIn()) throw new Error('The signed-in person changed during the public check.');
+  const counts = { supported: 0, contradicted: 0, unclear: 0 };
+  for (const item of result.claims) counts[counts[item.verdict] === undefined ? 'unclear' : item.verdict]++;
+  lastPublicCheck = { personId, origin, at: new Date().toISOString(), via: result.via, counts, claims: result.claims.map(item => ({ claim: item.claim, verdict: item.verdict, results: (item.results || []).slice(0, 2).map(({ title, url }) => ({ title, url })) })) };
+  try { workspace.save(app.getPath('userData'), companyWorkspace); } catch (error) { console.error('Could not save the online check activity:', error.message); }
+  publish();
+  return result;
+}
 function reviewState() { return { signedIn: signedIn(), workspace: companyWorkspace, observed: externalObservation, epoch: externalEpoch, aiEnabled, key: runtimeKeys.nebius }; }
 // One company-question path for the desktop Ask and the in-page card: local unless the owner's AI policy and the session AI switch allow the model.
 function answerCompany(question, context = '') {
@@ -98,6 +118,8 @@ function answerCompany(question, context = '') {
 }
 const contextualReview = new ContextualReview({
   getState: reviewState,
+  online: onlineCheckState,
+  checkOnline: (claims, task) => runPublicCheck(task, claims, 'browser card'),
   answer: (question, context) => answerCompany(question, context),
   openSource: sourceId => { agentWindow.show(); agentWindow.focus(); agentWindow.webContents.send('agent:open-context', { sourceId }); },
 });
@@ -194,6 +216,7 @@ function snapshot() {
     externalObservation: signedIn() ? externalObservation : null,
     externalError: signedIn() ? externalError : '',
     services: { nebius: Boolean(runtimeKeys.nebius), tavily: Boolean(runtimeKeys.tavily) },
+    onlineCheck: signedIn() ? { ...onlineCheckState(), last: lastPublicCheck?.personId === companyWorkspace.activePersonId ? lastPublicCheck : null } : null,
     publicSite: signedIn() ? publicSite.snapshot(companyWorkspace) : null,
     cloudActivity: signedIn() ? { mine: cloudActivity.forPerson(companyWorkspace, companyWorkspace.activePersonId), totals: workspace.person(companyWorkspace)?.role === 'admin' ? cloudActivity.summary(companyWorkspace) : null } : null,
     shared: [...shared],
@@ -754,10 +777,7 @@ app.whenReady().then(async () => {
     fromAgent(event);
     if (!taskReview.tasks[task]) throw new Error('Choose a supported work type.');
     if (!Array.isArray(claims) || claims.some(claim => typeof claim !== 'string' || privacy.credentials(claim))) throw new Error('Remove credentials before public checking.');
-    const personId = companyWorkspace.activePersonId;
-    const result = await publicCheck.checkClaims(companyWorkspace, task, claims, { tavilyKey: runtimeKeys.tavily, nebiusKey: aiEnabled ? runtimeKeys.nebius : '' });
-    if (personId !== companyWorkspace.activePersonId || !signedIn()) throw new Error('The signed-in person changed during the public check.');
-    return result;
+    return runPublicCheck(task, claims, 'desktop');
   });
   ipcMain.handle('agent:link-check', async (event, task, urls) => {
     fromAgent(event);

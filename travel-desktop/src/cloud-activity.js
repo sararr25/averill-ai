@@ -1,6 +1,6 @@
 // Local, per-person record of Nebius/Tavily calls. Stores counts and purposes only, never payload text.
 const MAX = 200;
-const FIELDS = ['service', 'purpose', 'kind', 'model', 'ok', 'status', 'items', 'ms'];
+const FIELDS = ['service', 'purpose', 'kind', 'model', 'ok', 'status', 'items', 'ms', 'label', 'via'];
 
 function record(data, personId, entry, now = new Date()) {
   if (!data || !personId) return;
@@ -18,6 +18,7 @@ function forPerson(data, personId) { return [...(data?.cloudActivity?.[personId]
 function summary(data) {
   const totals = {};
   for (const list of Object.values(data?.cloudActivity || {})) for (const row of list) {
+    if (row.kind === 'summary') continue; // a one-line recap of calls that are already counted
     const item = totals[row.service] ||= { calls: 0, failed: 0 };
     item.calls += 1; if (!row.ok) item.failed += 1;
   }
