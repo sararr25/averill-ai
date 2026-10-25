@@ -32,7 +32,7 @@ export function LinkedInDemo() {
             <img className="li-company-logo" src={AVATAR} alt="Vamo logo"/>
             <h1>Vamo</h1>
             <p className="li-company-tagline">{VAMO_HEADLINE}</p>
-            <p className="li-company-meta">Travel Arrangements · Copenhagen, Capital Region of Denmark · 1,247 followers · 2–10 employees</p>
+            <p className="li-company-meta">Travel Arrangements · Copenhagen, Capital Region of Denmark · 1,247 followers · 2-10 employees</p>
             <div className="li-company-actions"><button className="li-follow" disabled title="Outside the local demo"><Plus size={16}/> Follow</button><button className="li-outline" disabled title="Outside the local demo">Visit website <ExternalLink size={14}/></button><button className="li-outline" disabled title="Outside the local demo">Message</button></div>
           </div>
           <nav className="li-company-tabs" aria-label="Company page sections">{tabs.map(tab => <button key={tab} className={tab === 'Posts' ? 'active' : ''} disabled={tab !== 'Posts'} title={tab === 'Posts' ? undefined : 'Outside the local demo'}>{tab}</button>)}</nav>
@@ -45,8 +45,8 @@ export function LinkedInDemo() {
       <aside className="li-right">
         <div className="li-card li-about">
           <h2>About</h2>
-          <p>Vamo plans trips for young travellers who’d rather collect stories than souvenirs. City breaks with open time built in, for people travelling solo, with a friend or with the whole group chat. Right now: Copenhagen, Vienna and Prague — each one walked and tested by the small crew that plans it.</p>
-          <dl><div><dt><Globe size={15}/> Website</dt><dd>vamo.example</dd></div><div><dt><Building2 size={15}/> Industry</dt><dd>Travel Arrangements</dd></div><div><dt><Users size={15}/> Company size</dt><dd>2–10 employees</dd></div><div><dt><MapPin size={15}/> Headquarters</dt><dd>Copenhagen, Denmark</dd></div><div><dt><Hash size={15}/> Specialties</dt><dd>Youth travel, city breaks, group trips, trip planning</dd></div></dl>
+          <p>Vamo plans trips for young travellers who’d rather collect stories than souvenirs. City breaks with open time built in, for people travelling solo, with a friend or with the whole group chat. Right now: Copenhagen, Vienna and Prague, each one walked and tested by the small crew that plans it.</p>
+          <dl><div><dt><Globe size={15}/> Website</dt><dd>vamo.example</dd></div><div><dt><Building2 size={15}/> Industry</dt><dd>Travel Arrangements</dd></div><div><dt><Users size={15}/> Company size</dt><dd>2-10 employees</dd></div><div><dt><MapPin size={15}/> Headquarters</dt><dd>Copenhagen, Denmark</dd></div><div><dt><Hash size={15}/> Specialties</dt><dd>Youth travel, city breaks, group trips, trip planning</dd></div></dl>
         </div>
         <div className="li-foot">About · Accessibility · Help Center<br/>Privacy &amp; Terms<br/><span>Demo Social Simulator © 2026</span></div>
       </aside>

@@ -17,7 +17,7 @@ const FOOTER = 'You are receiving this email because you subscribed to Vamo. Uns
 const cases = [
   { name: 'Brevo launch · subject', task: 'email', label: 'Subject line', text: brevo('vamo-brevo-winter-v2').subject,
     expect: [['forbidden-claim', 'current-brief.md', 'Do not claim "lowest prices guaranteed"']],
-    fixed: 'Winter Escapes 2027 — discover curated winter city breaks' },
+    fixed: 'Winter Escapes 2027: discover curated winter city breaks' },
   { name: 'Brevo launch · audience', task: 'email', label: 'Audience', kind: 'select', text: brevo('vamo-brevo-winter-v2').recipients,
     expect: [['field-requirement', 'current-brief.md', 'email | audience | "Travel subscribers — Denmark"']],
     fixed: 'Travel subscribers — Denmark' },
@@ -32,7 +32,7 @@ const cases = [
     fixed: brevo('vamo-brevo-vienna-teaser').body.replace('Lowest prices guaranteed on every Vienna break this winter.', 'Discover curated winter city breaks.') },
   { name: 'LinkedIn winter draft', task: 'linkedin', label: 'Post text', text: social('vamo-li-winter-draft').text,
     expect: [['forbidden-claim', 'current-brief.md', 'Do not claim "lowest prices guaranteed"'], ['missing-required-text', 'linkedin-campaign.md', 'Include “Explore the winter collection”']],
-    fixed: social('vamo-li-winter-draft').text.replace('Lowest prices guaranteed — book before the end of October.', 'Discover curated winter city breaks. Explore the winter collection.') },
+    fixed: social('vamo-li-winter-draft').text.replace('Lowest prices guaranteed. Book before the end of October.', 'Discover curated winter city breaks. Explore the winter collection.') },
   { name: 'Instagram paid Reel', task: 'instagram', label: 'Caption', text: social('vamo-ig-winter-reel-draft').text,
     expect: [['missing-required-text', 'brand-and-legal.md', 'For paid creator content, include "Paid partnership with Vamo"']],
     fixed: `Paid partnership with Vamo\n\n${social('vamo-ig-winter-reel-draft').text}` },
