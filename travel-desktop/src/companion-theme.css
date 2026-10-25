@@ -122,6 +122,18 @@
 .agent-body .operation-feedback[hidden],.agent-body #work-controls [hidden]{display:none!important}
 .agent-body .check-scope{background:var(--av-surface);border-color:var(--av-border)}
 
+.agent-body .browser-checklist{box-sizing:border-box;margin:0 0 var(--av-space-6);padding:var(--av-space-5);border:1px solid var(--av-border);border-radius:var(--av-radius-panel);background:var(--av-surface)}
+.agent-body .browser-checklist[hidden]{display:none}
+.agent-body .browser-checklist h3{font:var(--av-type-item);margin:0 0 var(--av-space-3)}
+.agent-body .connection-steps{list-style:none;margin:0;padding:0;display:grid;gap:var(--av-space-3)}
+.agent-body .connection-steps li{display:flex;align-items:flex-start;gap:var(--av-space-3)}
+.agent-body .connection-steps .step-mark{flex:none;display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;border:1px solid var(--av-control-border);color:var(--av-text-secondary);font:var(--av-type-label)}
+.agent-body .connection-steps li.done .step-mark{border-color:transparent;background:var(--av-accent);color:var(--av-on-accent)}
+.agent-body .connection-steps .step-text{display:flex;flex-direction:column;min-width:0}
+.agent-body .connection-steps strong{font:var(--av-type-label);color:var(--av-text);overflow-wrap:anywhere}
+.agent-body .connection-steps small{overflow-wrap:anywhere}
+.agent-body #browser-end{margin:var(--av-space-4) 0 0;color:var(--av-warning)}
+.agent-body #browser-end[hidden]{display:none}
 @media(max-width:640px){.agent-body .agent-tab>.section:first-child>.section-head h2,.agent-body .review-hero h2{font:var(--av-type-title);letter-spacing:-.02em}}
 @media(max-width:440px){.agent-body .agent-main{padding:0 var(--av-space-4) var(--av-space-4)}.agent-body .agent-nav{flex-wrap:wrap;padding:var(--av-space-1) var(--av-space-2);gap:0}.agent-body .agent-nav button,.agent-body .nav-more>summary{padding:0 var(--av-space-2);font-size:12px}.agent-body .agent-header,.agent-body .session-bar{padding-left:var(--av-space-4);padding-right:var(--av-space-4)}}
 @media(prefers-reduced-motion:reduce){.agent-body *{scroll-behavior:auto!important}.agent-body button:not(:disabled):active{transform:none}}

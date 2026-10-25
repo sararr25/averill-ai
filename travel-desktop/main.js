@@ -68,7 +68,8 @@ const browserBridge = new BrowserBridge({
     if (!result || result.fieldId !== externalObservation?.fieldId || result.revision !== externalObservation?.revision || result.contentHash !== externalObservation?.contentHash) contextualReview.invalidate();
     externalObservation = result; externalWatching = true; externalError = result ? '' : 'Editing selected field. Review updates after a pause.'; publish();
   },
-  onStop: () => { stopExternal(); publish(); },
+  onStop: reason => { stopExternal(true, reason); publish(); },
+  onState: () => publish(),
   onRequest: payload => {
     requireSession();
     if (browserBridge.personId !== companyWorkspace.activePersonId) throw new Error('Browser session changed');
@@ -95,7 +96,8 @@ const contextualReview = new ContextualReview({
 
 const browserConnect = new BrowserConnect({
   port: !app.isPackaged && process.env.AVERILL_CONNECT_PORT === '0' ? 0 : undefined,
-  getSession: () => signedIn() ? `${browserSessionEpoch}:${companyWorkspace.activePersonId}` : null,
+  getSession: () => browserSession(),
+  onChange: () => publish(),
   approve: async ({ origin, pageOrigin }) => {
     agentWindow.show(); agentWindow.focus();
     const result = await dialog.showMessageBox(agentWindow, { type: 'question', title: 'Connect the Averill browser companion', message: `Connect this browser companion to ${pageOrigin}?`, detail: `Extension: ${origin}\nOnly a field you choose will be shared locally. Use Stop sharing to end access. Approval lasts until sign-out or app restart. No sending or publication.`, buttons: ['Cancel', 'Connect'], defaultId: 0, cancelId: 0 });
@@ -103,7 +105,7 @@ const browserConnect = new BrowserConnect({
   },
   connect: async binding => {
     requireSession(); const personId = companyWorkspace.activePersonId, session = browserSessionEpoch;
-    stopExternal(); const pair = await browserBridge.start(personId, binding);
+    stopExternal(true, null); const pair = await browserBridge.start(personId, binding);
     if (!signedIn() || session !== browserSessionEpoch || personId !== companyWorkspace.activePersonId) { browserBridge.stop(); throw new Error('Account changed'); }
     publish(); return pair;
   },
@@ -133,13 +135,15 @@ async function saveSecret(service, value) {
   runtimeKeys[service] = key;
 }
 
+function browserSession() { return signedIn() ? `${browserSessionEpoch}:${companyWorkspace.activePersonId}` : null; }
 function signedIn() {
   return Boolean(companyWorkspace && (!companyWorkspace.authEnabled || authenticatedPersonId === companyWorkspace.activePersonId));
 }
 function requireSession() { if (!signedIn()) throw new Error('Sign in to your account first.'); }
-function stopExternal(clearSelection = true) {
+// reason names why an active browser connection ends (see browser-extension/end-reasons.js).
+function stopExternal(clearSelection = true, reason = 'stopped_by_user') {
   contextualReview.invalidate();
-  browserBridge.stop();
+  browserBridge.stop(browserBridge.server ? reason : null);
   externalEpoch += 1;
   if (externalWatchTimer) clearInterval(externalWatchTimer);
   externalWatchTimer = null;
@@ -158,7 +162,7 @@ function isOwnWindowSource(source) {
 }
 function clearSessionWork() {
   browserSessionEpoch++; browserConnect.revoke();
-  shared.clear(); aiEnabled = false; stopExternal();
+  shared.clear(); aiEnabled = false; stopExternal(true, 'signed_out');
   workState.clear();
   for (const window of workWindows.values()) if (!window.isDestroyed()) window.close();
   workWindows.clear();
@@ -174,7 +178,8 @@ function snapshot() {
     workspace: signedIn() ? workspace.publicSnapshot(companyWorkspace) : { configured: Boolean(companyWorkspace), company: companyWorkspace?.company },
     learning: learning.snapshot(signedIn() ? companyWorkspace : null),
     guide: signedIn() ? guide.snapshot(companyWorkspace) : null,
-    browserBridge: signedIn() ? browserBridge.status() : {ready:false,connected:false},
+    browserBridge: signedIn() ? browserBridge.status() : {ready:false,connected:false,paused:false,pageHost:'',lastEnd:null},
+    browserConnect: signedIn() ? browserConnect.status(browserSession()) : {approved:false,pending:false},
     browserConnectionError: signedIn() ? browserConnectionError : '',
     externalWindow: signedIn() ? selectedExternalWindow : null,
     externalWatching: signedIn() && externalWatching,
@@ -865,5 +870,5 @@ app.whenReady().then(async () => {
   app.on('activate', () => { if (BrowserWindow.getAllWindows().length === 0) app.quit(); });
 });
 
-app.on('before-quit', () => { browserConnect.stop(); browserBridge.stop(); });
+app.on('before-quit', () => { browserConnect.stop(); browserBridge.shutdown(); });
 app.on('window-all-closed', () => app.quit());

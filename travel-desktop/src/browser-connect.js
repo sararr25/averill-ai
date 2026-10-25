@@ -4,11 +4,13 @@ const CONNECT_PORT = 43147;
 
 // A loopback rendezvous, never a source/observation API. Trust lasts only for the signed-in session.
 class BrowserConnect {
-  constructor({ getSession, approve, connect, port = CONNECT_PORT }) {
-    this.getSession = getSession; this.approve = approve; this.connect = connect; this.port = port;
+  constructor({ getSession, approve, connect, onChange = () => {}, port = CONNECT_PORT }) {
+    this.getSession = getSession; this.approve = approve; this.connect = connect; this.onChange = onChange; this.port = port;
     this.trusted = new Map(); this.pending = false;
   }
   revoke() { this.trusted.clear(); }
+  // Desktop checklist step 1: an extension was approved for this signed-in session.
+  status(session) { return { approved: Boolean(session) && [...this.trusted.values()].includes(session), pending: this.pending }; }
   stop() { this.revoke(); this.server?.close(); this.server?.closeIdleConnections(); this.server = null; }
   async start() {
     this.server = http.createServer(async (request, response) => {
@@ -28,7 +30,7 @@ class BrowserConnect {
         const payload = JSON.parse(Buffer.concat(parts).toString());
         if (!Number.isSafeInteger(payload.tabId) || payload.tabId < 0 || !/^https?:\/\/[^/]+$/.test(payload.pageOrigin || '')) throw new Error('Invalid tab');
         // Lock before any approval await; there is at most one prompt/replacement in progress.
-        if (this.pending) throw new Error('Busy'); this.pending = true; held = true;
+        if (this.pending) throw new Error('Busy'); this.pending = true; held = true; this.onChange();
         if (this.trusted.get(origin) !== session) {
           const approved = await this.approve({ origin, pageOrigin: payload.pageOrigin });
           if (!approved || this.getSession() !== session) { response.writeHead(403); response.end('{"error":"Connection cancelled. No field was shared."}'); return; }
@@ -39,7 +41,7 @@ class BrowserConnect {
         if (this.getSession() !== session) throw new Error('Session changed');
         response.writeHead(200); response.end(JSON.stringify(pair));
       } catch { response.writeHead(400); response.end('{"error":"The connection changed. Connect the selected tab again."}'); }
-      finally { if (held) this.pending = false; }
+      finally { if (held) { this.pending = false; this.onChange(); } }
     });
     this.server.requestTimeout = 5000; this.server.headersTimeout = 5000;
     await new Promise((resolve, reject) => { this.server.once('error', reject); this.server.listen(this.port, '127.0.0.1', resolve); });

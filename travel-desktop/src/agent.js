@@ -91,6 +91,7 @@ function render() {
   renderLearning();
   renderHero();
   renderWorkStep();
+  renderBrowserChecklist();
   el('browser-guided-status').textContent = current.browserConnectionError || '';
   el('browser-guided-status').hidden = !current.browserConnectionError;
   el('browser-copy-pair').disabled = !current.browserBridge?.ready;
@@ -646,6 +647,21 @@ el('external-task-review').addEventListener('click',()=>checkWork(false));
 el('external-task').addEventListener('change',()=>{invalidateWorkReview();el('external-task-result').replaceChildren();renderHero();});
 el('review-start').addEventListener('click',()=>{if(el('review-start').dataset.target==='check'){checkWork(false);return;}if(el('review-start').dataset.target==='setup'){showTab('setup');return;}showTab('work');el('work-controls').querySelector('summary').focus();});
 let workStepIdentity;
+// FB-05: three live steps for the browser companion plus why the last connection ended.
+function renderBrowserChecklist(){
+ const bridge=current.browserBridge||{},connect=current.browserConnect||{};
+ const field=current.externalWindow?.adapter==='browser-dom'?current.externalObservation?.field||null:null;
+ const steps=[
+  ['extension',Boolean(connect.approved||bridge.connected),connect.pending?'Waiting for you to choose Connect in Averill.':connect.approved||bridge.connected?'Approved until you sign out or quit Averill.':'In Chrome, click the Averill icon, then Connect this tab.'],
+  ['tab',Boolean(bridge.connected),bridge.connected?(bridge.paused?'Paused while the tab is in the background. It resumes when you return.':'Stays on until you stop sharing, sign out, close the tab or open another site.'):'No tab is connected.'],
+  ['field',Boolean(bridge.connected&&current.externalWindow?.adapter==='browser-dom'),field?field.label:bridge.connected&&current.externalWindow?.adapter==='browser-dom'?'Selected. Waiting for you to pause typing.':'Click a draft field on the connected page.'],
+ ];
+ steps.forEach(([id,done,detail],index)=>{const item=el(`browser-step-${id}`);item.classList.toggle('done',done);item.querySelector('.step-mark').textContent=done?'✓':String(index+1);el(`browser-step-${id}-detail`).textContent=`${done?'Done. ':''}${detail}`;});
+ el('browser-step-tab').querySelector('strong').textContent=bridge.connected?`Tab connected (${bridge.pageHost})`:'Tab connected';
+ const end=!bridge.connected&&bridge.lastEnd?bridge.lastEnd.message:'';
+ el('browser-end').textContent=end?`Last connection ended. ${end}`:'';el('browser-end').hidden=!end;
+ el('browser-checklist').hidden=!current.auth?.signedIn;
+}
 function renderWorkStep(){
  const captured=Boolean(current.externalObservation),selected=Boolean(current.externalWindow),ready=Boolean(current.browserBridge?.ready);
  const identity=current.externalWindow?.id||null;

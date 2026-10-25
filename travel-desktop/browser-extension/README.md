@@ -1,6 +1,6 @@
 # Averill in-page browser companion
 
-Version 0.2.0. Opt-in Chrome Manifest V3 extension, distributed as source for the hackathon prototype. The content script shows Companion guidance beside one chosen top-frame draft field. It uses the desktop app's real local review engine, exact approved source passages and optional consented Nemotron review. A complete synthetic flow is verified; actual-platform acceptance is still open.
+Version 0.3.0. Opt-in Chrome Manifest V3 extension, distributed as source for the hackathon prototype. The content script shows Companion guidance beside one chosen top-frame draft field. It uses the desktop app's real local review engine, exact approved source passages and optional consented Nemotron review. A complete synthetic flow is verified; actual-platform acceptance is still open.
 
 ## Install or update
 
@@ -15,7 +15,19 @@ Installation is an employee action. Review the source and manifest, then use Chr
 5. A unique forbidden-phrase removal may offer **Apply change** for a plain textarea/text input. Confirm its preview. **Undo** restores the previous text only if nothing has changed since; otherwise the card offers explicit manual recovery. Rich contenteditable editors remain review-only until a dedicated adapter is validated. Arbitrary rewriting and new text insertion are not implemented.
 6. Editing immediately invalidates earlier advice. A 1.2-second pause, blur or selection sends the new selected field; periodic local reads detect editor-driven changes. Ask again to recheck. Stop in the page, popup, desktop or floating control revokes the current bridge. Dismiss only closes the card.
 
-After initial connection approval, an explicit reconnect within the same authenticated session needs no second desktop approval. Hiding/closing/navigating the shared tab stops the current field transport; reconnect from the desired tab. Sign-out/restart also revokes extension approval. Company source/policy changes invalidate cached advice at the next status exchange and are checked again on every Apply/open authorization.
+After initial connection approval, an explicit reconnect within the same authenticated session needs no second desktop approval.
+
+### Connection length (owner decision D1, 25 October 2026)
+
+A connection stays on for the whole signed-in Averill session:
+
+- Switching tabs, covering Chrome with Averill or leaving the tab idle **pauses** sharing. The page sends a paused heartbeat and nothing else; it resumes when the tab is visible again, with no new approval.
+- Reloading the same page, or moving inside the same site, keeps the connection. The extension worker re-injects the companion using the existing activeTab grant. If Chrome refuses, sharing ends and the page asks for a reconnect.
+- A failed local relay is retried three times (after 0.5 s and 1.5 s) before Averill counts as closed. A rejected token ends at once.
+- It ends only on: Stop (page, popup, desktop or floating control), sign-out, Averill quit or unreachable, closing the tab, moving the tab to another site, lost contact (no heartbeat for 2 minutes while visible, 30 minutes while paused), or a rejected token. The in-page card, popup and Current work checklist show which one, in plain words.
+- Limits: trust and the connection live in memory only. Quitting Averill, restarting Chrome or reloading the extension always ends it. Chrome only grants page access after a click on the toolbar icon, so **every reconnect starts there**: click the Averill icon, then **Connect this tab**. A tab Chrome freezes or discards for more than 30 minutes ends as lost contact.
+
+The toolbar badge shows **ON** on the connected tab. The popup reads the current state each time it opens: connected, not connected (with the last end reason), or waiting for approval in Averill. Company source/policy changes invalidate cached advice at the next status exchange and are checked again on every Apply/open authorization.
 
 If guided connection is unavailable, the popup explains how to open/sign in to Averill. **Advanced connection** retains legacy pairing JSON for diagnostics; it is no longer the normal route. A port conflict on 43147 can prevent guided connection without preventing the legacy fallback.
 
@@ -35,8 +47,8 @@ The plain-text adapter changes only a unique, exact server-authorized removal an
 
 ## Evidence
 
-- `npm test`: bridge authorization, rendezvous approval/reconnect/logout, selected-field source authority, stale model replies, exact patch applicability and prior regressions.
-- `npm run verify:contextual`: real Electron main process, loopback servers, review engine, actual background/content scripts and native plaintext control. Chrome permission/transport and the native approval response are simulated in an isolated profile. It verifies preview/Apply/exact Undo, revoked-source rejection, manual recovery after typing, recheck, explicit source deep link, Stop/reconnect/logout and zero provider requests. This is **not** installed Chrome, Brevo, LinkedIn or live Nemotron acceptance.
+- `npm test`: bridge authorization, liveness/pause/end reasons, the actual extension worker in a VM (retry, retry exhaustion, rejected token, same-site re-injection with sequence continuity, other site, tab close, popup status), rendezvous approval/reconnect/logout, selected-field source authority, stale model replies, exact patch applicability and prior regressions.
+- `npm run verify:contextual`: real Electron main process, loopback servers, review engine, actual background/content scripts and native plaintext control. Chrome permission/transport and the native approval response are simulated in an isolated profile. It verifies preview/Apply/exact Undo, the status pill and toolbar badge, hidden/visible pause and resume, same-origin reload re-injection without new approval, the ended card after Stop and sign-out, revoked-source rejection, manual recovery after typing, recheck, explicit source deep link, Stop/reconnect/logout and zero provider requests. This is **not** installed Chrome, Brevo, LinkedIn or live Nemotron acceptance.
 - `npm run verify:browser`: prior native pairing/typing/Stop/logout and real content-script code in a synthetic DOM; also verifies that clicking an excluded field clears the old selection without transmitting its value.
 - `npm run verify:ui-e2e`: regression for the existing desktop Review/Work flow.
 
