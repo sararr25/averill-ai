@@ -10,7 +10,7 @@ const root = fs.mkdtempSync(path.join(os.tmpdir(), 'averill-handover-'));
 const sources = path.resolve(__dirname, '../sources');
 const write = (name, text) => { const file = path.join(root, name); fs.writeFileSync(file, text); return file; };
 const v1 = write('v1.md', 'Field requirement: email | audience | "All subscribers".\nField requirement: email | date | "2026-10-08".\nDo not claim "best deal ever".\n');
-const v2 = write('v2.md', 'Field requirement: email | audience | "Travel subscribers — Denmark".\nField requirement: email | date | "2026-10-15".\nField requirement: email | time | "10:00".\nDo not claim "lowest prices guaranteed".\n');
+const v2 = write('v2.md', 'Field requirement: email | audience | "Travel subscribers, Denmark".\nField requirement: email | date | "2026-10-15".\nField requirement: email | time | "10:00".\nDo not claim "lowest prices guaranteed".\n');
 const people = [{ id: 'owner', role: 'admin', department: null }, { id: 'lead', role: 'lead', department: 'Marketing' }, { id: 'staff', role: 'employee', department: 'Marketing' }, { id: 'other', role: 'employee', department: 'Marketing' }];
 const base = { department: 'Marketing', scope: 'department', ownerId: 'owner', priority: 10, aiAllowed: true, confidentiality: 'internal' };
 const make = () => ({ privacy: { companyAI: true }, activePersonId: 'lead', people, sources: [
@@ -25,7 +25,7 @@ test('briefing lists changed, added and removed rules with quotes from both vers
   const audience = result.changes.find(change => change.kind === 'audience');
   assert.equal(audience.type, 'changed');
   assert.equal(audience.from, 'All subscribers');
-  assert.equal(audience.value, 'Travel subscribers — Denmark');
+  assert.equal(audience.value, 'Travel subscribers, Denmark');
   assert.ok(fs.readFileSync(v1, 'utf8').includes(audience.older.quote) && fs.readFileSync(v2, 'utf8').includes(audience.newer.quote));
   assert.ok(result.changes.some(change => change.type === 'stated' && change.kind === 'time'));
   assert.ok(result.changes.some(change => change.type === 'removed' && change.value === 'best deal ever'));
@@ -34,7 +34,7 @@ test('briefing lists changed, added and removed rules with quotes from both vers
 
 test('Nemotron briefing points are kept only when their quotes are exact', async () => {
   const fetcher = async url => url.endsWith('/models') ? { ok: true, json: async () => ({ data: [{ id: 'nvidia/nemotron-super' }] }) } : { ok: true, status: 200, json: async () => ({ choices: [{ message: { content: JSON.stringify({ points: [
-    { text: 'The audience is now Denmark only.', old_quote: '"All subscribers"', new_quote: '"Travel subscribers — Denmark"' },
+    { text: 'The audience is now Denmark only.', old_quote: '"All subscribers"', new_quote: '"Travel subscribers, Denmark"' },
     { text: 'Invented change.', old_quote: '', new_quote: 'This is not in either file.' },
   ] }) } }] }) };
   const result = await briefing.brief(make(), 'v1', { key: 'k', fetcher, useModel: true });

@@ -33,7 +33,7 @@ function renderLearning(){
   const step=data.steps[active.confirmed.length];lesson.append(node('p',`Step ${active.confirmed.length+1} of ${data.steps.length} · Confirmed by you, not automatically verified.`,'section-note'),node('h4',step.title),node('p',step.instruction));
   const help=node('details');help.append(node('summary','I need help with this step'),node('p',step.help));lesson.append(help,guideLink(data.guide));
   if(active.source){lesson.append(node('p',`${active.source.title} · v${active.source.version}${active.sourceAvailable?'':' · no longer available for practice'}`));if(active.sourceAvailable){const b=node('button','Read company context','source-link');b.type='button';b.addEventListener('click',()=>showSource(active.source.id,b));lesson.append(b);}}
-  const next=learningButton('I tried this step — continue','confirm',{sessionId:active.id,stepId:step.id});next.classList.add('agent-primary');lesson.append(next);
+  const next=learningButton('I tried this step, continue','confirm',{sessionId:active.id,stepId:step.id});next.classList.add('agent-primary');lesson.append(next);
  }
  panel.append(lesson);
  for(const session of data.sessions.filter(s=>s.exercise&&!s.finishedAt&&!s.excluded)){

@@ -5,7 +5,7 @@ Ticket JD-06. Every flaw planted in the simulator drafts, the approved Vamo sour
 | Draft (simulator) | Field | Planted flaw | Finding | Approved source and passage |
 | --- | --- | --- | --- | --- |
 | Brevo · Winter Escapes 2027 · launch draft | Subject line | "lowest prices guaranteed" | forbidden-claim | `current-brief.md` v2 — Do not claim "lowest prices guaranteed" or imply a price guarantee. |
-| Brevo · Winter Escapes 2027 · launch draft | Audience | Sent to "All travel subscribers" | field-requirement | `current-brief.md` v2 — Field requirement: email \| audience \| "Travel subscribers — Denmark". |
+| Brevo · Winter Escapes 2027 · launch draft | Audience | Sent to "All travel subscribers" | field-requirement | `current-brief.md` v2 — Field requirement: email \| audience \| "Travel subscribers, Denmark". |
 | Brevo · Winter Escapes 2027 · launch draft | Email content | "lowest prices guaranteed" | forbidden-claim | `current-brief.md` v2 (as above) |
 | Brevo · Winter Escapes 2027 · launch draft | Email content | Footer missing | missing-required-text | `brand-and-legal.md` v1 — Every marketing email must include this footer: "You are receiving this email because you subscribed to Vamo. Unsubscribe anytime." |
 | Brevo · Winter Escapes 2027 · last-call reminder | Email content | Footer missing | missing-required-text | `brand-and-legal.md` v1 (as above) |

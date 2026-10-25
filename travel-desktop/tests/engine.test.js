@@ -7,7 +7,7 @@ const { parseModelAnswer } = require('../src/assistant');
 test('email findings appear for an incoming draft and disappear after correction', () => {
   const incoming = { subject: 'Lowest prices guaranteed', body: 'Book now', audience: 'All subscribers', footer: false };
   assert.deepEqual(inspect('email', incoming).map((item) => item.id), ['unapproved-claim', 'wrong-audience', 'missing-footer']);
-  const fixed = { subject: 'Discover curated winter city breaks', body: 'Explore Vienna', audience: 'Travel subscribers — Denmark', footer: true };
+  const fixed = { subject: 'Discover curated winter city breaks', body: 'Explore Vienna', audience: 'Travel subscribers, Denmark', footer: true };
   assert.deepEqual(inspect('email', fixed), []);
 });
 

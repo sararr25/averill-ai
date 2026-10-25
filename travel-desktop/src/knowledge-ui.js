@@ -52,13 +52,13 @@ async function renderKnowledge(){
    if(file.kind==='uploaded')card.append(node('p','This file has been received. Confirm the onboarding proposal in Setup to save it as a source; approval is a separate step.'));
    const metadata=node('details',undefined,'knowledge-details');metadata.append(node('summary','Approval details'));
    if(file.kind==='saved'){
-    metadata.append(node('p',`Approved ${file.approvedAt?new Date(file.approvedAt).toLocaleString():'—'} · Approver ${file.approvedBy||'—'}${file.conflict?' · Conflict: excluded from answers':''}${file.supersedesId?' · Replaces an earlier source':''}${file.supersededBy?' · Replaced by a later source':''}`,'knowledge-meta'));
+    metadata.append(node('p',`Approved ${file.approvedAt?new Date(file.approvedAt).toLocaleString():'not recorded'} · Approver ${file.approvedBy||'not recorded'}${file.conflict?' · Conflict: excluded from answers':''}${file.supersedesId?' · Replaces an earlier source':''}${file.supersededBy?' · Replaced by a later source':''}`,'knowledge-meta'));
     if(file.latestDecision)metadata.append(node('p',`Latest decision: ${file.latestDecision.action} · ${file.latestDecision.reason} · ${new Date(file.latestDecision.at).toLocaleString()}`,'knowledge-decision'));
    }
    if(file.kind==='saved')technical.append(metadata);
    card.append(knowledgeExcerpt(file.excerpt,el('knowledge-search').value));
    const read=node('button','Read extracted text','secondary-button');read.type='button';read.dataset.focusKey=`library:${file.id}:read`;read.disabled=!file.readable;
-   const showFile=async(trigger)=>{read.disabled=true;try{const content=await(file.kind==='uploaded'?window.desktop.readOnboardingFile(file.id):window.desktop.readWorkspaceFile(file.id));activeSourceId=null;el('open-source').hidden=true;el('source-title').textContent=content.title;el('source-content').textContent=content.text||'No readable text.';openSourceDialog(trigger);}catch{}finally{read.disabled=!file.readable;}};read.addEventListener('click',()=>showFile(read));read.classList.replace('secondary-button','agent-primary');card.append(read,technical);
+   const showFile=async(trigger)=>{read.disabled=true;try{const content=await(file.kind==='uploaded'?window.desktop.readOnboardingFile(file.id):window.desktop.readWorkspaceFile(file.id));activeSourceId=null;el('open-source').hidden=true;el('source-title').textContent=content.title;el('source-content').textContent=content.text||'No readable text.';openSourceDialog(trigger);}catch{}finally{read.disabled=!file.readable;}};read.addEventListener('click',()=>showFile(read));card.append(read,technical);
    if(file.kind==='saved'){
     const open=node('button','Open original file','secondary-button');open.type='button';open.addEventListener('click',()=>window.desktop.openWorkspaceSource(file.id).catch(()=>{}));technical.append(open);
     if(file.status==='superseded'&&file.supersededBy)card.append(briefingButton(file));

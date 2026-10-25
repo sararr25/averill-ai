@@ -1,22 +1,7 @@
 /* B — Guided: action → captured work → source-backed result. */
 .agent-body{--control-border:var(--ds-color-control-border);--motion-ease:cubic-bezier(.22,1,.36,1);color-scheme:dark}
-.agent-body :is(input:not([type=checkbox]),select,textarea){box-sizing:border-box;max-width:100%;min-height:40px;padding:9px 11px;border:1px solid var(--control-border);border-radius:8px;background:var(--ds-color-window);color:var(--ds-color-text);font:400 14px/1.45 var(--ds-font-body)}
-.agent-body label{font-size:13px;line-height:1.5;color:var(--ds-color-text-secondary)}
-.agent-body :is(button,.source-link,summary){min-height:40px;box-sizing:border-box;cursor:pointer}
-.agent-body summary{transition:color 140ms var(--motion-ease)}
-.agent-body button{transition:transform 140ms var(--motion-ease),background-color 140ms,border-color 140ms,color 140ms}
-.agent-body button:not(:disabled):active{transform:translateY(1px);transition-duration:80ms}
-.agent-body button:disabled{cursor:not-allowed}
-.agent-body :is(button,summary,input,select,textarea):focus-visible{outline:2px solid var(--ds-color-focus);outline-offset:2px}
-.agent-body summary{display:flex;align-items:center;gap:10px;color:var(--ds-color-text);font:600 14px/1.45 var(--ds-font-body);padding:8px 0}
 .agent-body summary::before{content:'›';display:inline-block;color:var(--ds-color-verified);font-size:20px;transition:transform 140ms var(--motion-ease)}
 .agent-body details[open]>summary::before{transform:rotate(90deg)}
-.agent-body summary:hover{color:var(--ds-color-verified)}
-.agent-body .section-head{align-items:flex-start;flex-direction:column;gap:4px}
-.agent-body .section-head h2{margin-bottom:0}
-.agent-body .section-head span{font-size:12px}
-.agent-body .section-note,.agent-body .field-hint{font-size:13px;line-height:1.55}
-.agent-body .section-note{margin:12px 0}
 .agent-body :is(.browser-adapter,.native-adapter,.work-question,.knowledge-filter-options,.setup-group){border-top:1px solid var(--ds-color-border);padding:10px 0;margin:12px 0}
 .agent-body .browser-adapter p,.agent-body .native-adapter p{font-size:13px;line-height:1.55;color:var(--ds-color-text-secondary)}
 .agent-body .work-progress{display:flex;gap:12px;flex-wrap:wrap;color:var(--ds-color-text-muted);font-size:12px;margin:18px 0 10px}
@@ -26,25 +11,16 @@
 .agent-body .sharing-controls button{flex-shrink:0}
 .agent-body .context-form{margin:16px 0;padding-top:12px}
 .agent-body #external-task{display:block;width:100%;margin:8px 0 12px}
-.agent-body #review-start{margin:8px 0 20px}
 .agent-body .review-instructions{font-size:13px!important;line-height:1.65!important}
 .agent-body[data-area=review] .aperture-wrap{height:48px;background:none;filter:none!important}
 .agent-body[data-area=review] .aperture-mark{width:32px;height:32px;filter:none!important;animation:none!important}
 .agent-body[data-area=review] .hero-tagline,.agent-body[data-area=review] .hero-rule{display:none}
-.agent-body[data-area=review] .review-hero h2{font-size:28px;line-height:1.2}
-.agent-body .review-evidence{padding:14px;margin:12px 0;border-left:2px solid var(--ds-color-verified)}
-.agent-body .review-evidence p{margin:8px 0!important;font-size:14px!important;line-height:1.55!important}
-.agent-body .review-evidence small{display:block;font-size:12px;line-height:1.6;color:var(--ds-color-text-secondary)}
-.agent-body .knowledge-card{border-top:1px solid var(--ds-color-border);box-shadow:none}
-.agent-body .knowledge-details{margin-top:8px}
-.agent-body .learning-card h3{font-size:18px}
-.agent-body .session-bar button,.agent-body .review-context button,.agent-body .finding-navigation button,.agent-body .operation-feedback #operation-dismiss{min-height:40px}
 .agent-body .operation-feedback{height:60px;min-height:60px;flex-shrink:0}
 .agent-body .operation-feedback #operation-title:empty{display:none}
 .source-dialog{opacity:0;transform:translateY(8px);transition:opacity 140ms ease-in,transform 220ms var(--motion-ease),display 140ms allow-discrete,overlay 140ms allow-discrete}
 .source-dialog[open]{opacity:1;transform:translateY(0);transition-timing-function:var(--motion-ease)}
 @starting-style{.source-dialog[open]{opacity:0;transform:translateY(8px)}}
-@media(prefers-reduced-motion:reduce){.agent-body *, .agent-body *::before{transition:none!important;animation:none!important}.agent-body button:not(:disabled):active{transform:none}.source-dialog{transform:none;transition:none}}
+@media(prefers-reduced-motion:reduce){.agent-body *, .agent-body *::before{transition:none!important;animation:none!important}.source-dialog{transform:none;transition:none}}
 
 .agent-body #external-result strong,.agent-body #external-result small{display:block;line-height:1.6}.agent-body #external-result small{font-size:12px;margin-top:4px}.agent-body :is(.browser-adapter,.context-form) button{margin-right:6px;margin-bottom:6px}.agent-body .learning-week{border-top:1px solid var(--ds-color-border);margin-top:24px;padding-top:8px}
 /* Reserve routine feedback space; visibility removes it from keyboard/AX when idle. */
@@ -52,26 +28,17 @@
 .agent-body .operation-feedback{opacity:1;visibility:visible;transition:opacity 140ms ease-in,visibility 140ms allow-discrete}
 @starting-style{.agent-body .operation-feedback:not([hidden]){opacity:0}}
 @media(prefers-reduced-motion:reduce){.agent-body .operation-feedback{transition:none}}
-.agent-body .secondary-button{border-color:var(--ds-color-control-border)}
 
 /* Phase 1 UI/UX review (16 Oct): readable column, grouped tabs, live session bar, all-clear state, visible Nemotron toggle. */
-.agent-body .agent-tab.active{width:100%;max-width:760px;margin-inline:auto}
-.agent-body .agent-nav,.agent-body[data-area=review] .agent-nav{justify-content:flex-start;gap:4px}
-.agent-body .agent-nav button{padding:0 12px}
 .agent-body[data-area=review] .aperture-wrap,.agent-body[data-area=review].has-finding .aperture-wrap{height:40px;justify-items:start}
 .agent-body[data-area=review] .aperture-mark{width:28px;height:28px}
 .agent-body .review-context.is-live{gap:10px;padding:8px 8px 8px 12px;margin:0 0 20px;border:1px solid var(--ds-color-signal);border-radius:10px;font-size:12px;color:var(--ds-color-text)}
 .agent-body .review-context.is-live>span:nth-child(2){flex:1;min-width:0}
 .live-dot{width:8px;height:8px;border-radius:50%;background:var(--ds-color-signal);flex-shrink:0}
-.agent-body .review-context .stop-button{min-height:36px;padding:6px 14px;font-size:12px;font-weight:600;border:0;border-radius:8px;background:var(--ds-color-signal);color:#00171d}
-.agent-body .review-context .stop-button:focus-visible{outline:2px solid var(--ds-color-verified);outline-offset:2px}
 .review-clear #hero-title::before{content:"✓";display:inline-grid;place-items:center;width:1.1em;height:1.1em;margin-right:.35em;border-radius:50%;background:var(--ds-color-verified);color:#00171d;font-size:.7em;vertical-align:.12em}
 .check-scope{display:grid;gap:4px;margin:0 0 16px;padding:10px 12px;border-left:2px solid var(--ds-color-verified);color:var(--ds-color-text-secondary);font-size:13px;line-height:1.45}
 .agent-body .review-hero .check-scope p{margin:0}.check-scope strong{color:var(--ds-color-text);margin-right:4px}
 .ai-chip{display:inline-block;padding:2px 8px;border-radius:999px;border:1px solid var(--ds-color-verified);color:var(--ds-color-verified);font-size:11px;font-weight:600}
-.agent-body .ai-control .ai-toggle,.agent-body[data-area=review] .ai-control .ai-toggle{min-height:32px;padding:4px 12px;border:1px solid var(--ds-color-verified);border-radius:999px;font-size:12px;font-weight:600;color:var(--ds-color-verified)}
-.agent-body .ai-control .ai-toggle[aria-pressed=true]{background:var(--ds-color-verified);color:#00171d}
-.agent-body .ai-control .ai-toggle:disabled{opacity:.6;border-style:dashed}
 
 /* Phase 2 UI/UX review: primary vs secondary areas, Review start steps, answer states, Knowledge counts, quiet destructive actions. */
 .agent-body .agent-nav .nav-divider{width:1px;height:18px;align-self:center;margin:0 8px;background:var(--ds-color-border)}
@@ -85,9 +52,6 @@
 .answer-badge{display:inline-block;margin-bottom:8px;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:600}
 .learning-question[data-result=correct] .answer-badge{background:var(--ds-color-verified);color:#00171d}
 .learning-question[data-result=retry] .answer-badge{border:1px solid var(--ds-color-signal);color:var(--ds-color-signal)}
-.learning-delete,.danger-link{min-height:40px;padding:4px 0;border:0;background:none;color:var(--ds-color-signal);font-size:12px;font-weight:600;text-decoration:underline;text-underline-offset:3px}
-.learning-delete{display:block;margin-top:24px;padding-top:12px;border-top:1px solid var(--ds-color-border);width:100%;text-align:left}
-.learning-delete:focus-visible,.danger-link:focus-visible{outline:2px solid var(--ds-color-verified);outline-offset:2px}
 #knowledge-summary,.knowledge-summary{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
 .count-chip{padding:2px 9px;border-radius:999px;border:1px solid var(--ds-color-border-strong,#397084);color:var(--ds-color-text-secondary);font-size:11px}
 .count-chip.attention{border-color:var(--ds-color-signal);color:var(--ds-color-signal)}
@@ -95,33 +59,18 @@
 /* 17 Oct UI pass: calmer header, no floating aperture, clearer composer action, quieter section labels. */
 .agent-body #hero-title:focus{outline:none}
 .agent-body[data-area=review] .aperture-wrap{display:none}
-.agent-body .agent-header .brand-mark{display:grid;place-items:center;width:24px;height:24px;border:0;padding:0;margin-right:8px;color:var(--ds-color-signal)}
-.agent-body .agent-header{display:flex;align-items:center}.agent-body .agent-header .live-pill{margin-left:auto}
 .agent-body.has-live-review[data-area=review] .live-pill{visibility:hidden}
-.agent-body .session-bar .text-button{border:0;background:none;color:var(--ds-color-text-secondary);font-size:12px;font-weight:600;text-decoration:underline;text-underline-offset:3px;min-height:40px;padding:0 4px;margin-left:auto}
-.agent-body .session-bar .text-button:hover{color:var(--ds-color-text)}
-.agent-body .review-composer .composer-attach{width:auto;padding:0 12px;font-size:12px;font-weight:600;color:var(--ds-color-verified);white-space:nowrap}
-.agent-body .section-head span{font:600 10px/1.4 var(--ds-font-body);letter-spacing:.14em;text-transform:uppercase;color:var(--ds-color-text-muted)}
 /* Disabled controls must look unavailable; previously they kept full opacity. */
-.agent-body button:disabled,.agent-body button[aria-disabled=true]{opacity:.42;cursor:not-allowed;box-shadow:none}
-.agent-body .agent-primary:disabled{background:transparent;color:var(--ds-color-text-muted);border-color:var(--ds-color-border)}
-.agent-body .agent-tab.active:not([data-tab=review]){padding-top:12px}
 .agent-body .onboarding-section :is(div,p,section):empty{display:none}
 .agent-body .onboarding-section .field-hint{margin:8px 0 14px;font-size:12px;color:var(--ds-color-text-muted)}
-.agent-body .agent-header{justify-content:flex-start;gap:10px}
 .agent-body .agent-tab .check-scope p{margin:0}
-/* #11: the plain correction sentence leads each card. */
-.agent-body .review-evidence .finding-action{display:block;font-size:15px;line-height:1.4;margin-bottom:2px}
-/* #17: borderless dismiss with a 32px hit area; focus outline comes from the shared rule above. */
-.agent-body .operation-feedback #operation-dismiss{border:0;background:transparent;width:32px;height:32px;min-height:32px;padding:0;border-radius:6px;color:var(--ds-color-text-secondary);font-size:18px;line-height:1;align-self:center}
-.agent-body .operation-feedback #operation-dismiss:hover{background:var(--ds-color-panel);color:var(--ds-color-text)}
 /* #14: Work hides controls that don't apply yet; component display rules must not override [hidden]. */
 .agent-body [data-tab=work] [hidden]{display:none!important}
 /* In-app guide (guide-ui.js) */
+.agent-body .review-hero{position:relative}
 .agent-body .guide-help{width:28px;height:28px;min-height:28px;border-radius:50%;border:1px solid var(--ds-color-control-border);background:transparent;color:var(--ds-color-text-secondary);font:600 13px/1 var(--ds-font-body);padding:0;flex:none}
 .agent-body .guide-help:hover{color:var(--ds-color-text);border-color:var(--ds-color-text-secondary)}
 .agent-body .section-head .guide-help,.agent-body .review-hero>.guide-help{position:absolute;top:12px;right:12px}
-.agent-body .section-head,.agent-body .review-hero{position:relative}
 .agent-body .guide-help[data-guide="work"]{display:block;margin:0 0 6px auto}
 .agent-body .guide-target{outline:2px solid var(--ds-color-signal);outline-offset:-2px;border-radius:var(--ds-radius-sm)}
 .agent-body .guide-panel,.agent-body .guide-offer{position:fixed;z-index:60;left:16px;right:16px;bottom:16px;max-width:460px;margin:0 auto;background:var(--ds-color-panel);color:var(--ds-color-text);border:1px solid var(--ds-color-border);border-radius:var(--ds-radius-md);padding:16px;box-shadow:0 10px 30px #0006}

@@ -190,7 +190,7 @@ function renderFirstRun(){
   const steps=el('review-steps');if(steps.hidden)return;
   const approved=(current.workspace?.sources||[]).some(source=>source.status==='approved');
   const admin=current.workspace?.people?.find(person=>person.id===current.workspace.activePersonId)?.role==='admin';
-  const items=[...(approved?[]:[['Add',admin?'and approve company files in Setup':'— ask your admin to approve company files']]),['Share','one draft field or app window'],['Check','it against approved company rules'],['Fix','it in your own tool, then recheck']];
+  const items=[...(approved?[]:[['Add',admin?'and approve company files in Setup':'company files by asking your admin to approve them']]),['Share','one draft field or app window'],['Check','it against approved company rules'],['Fix','it in your own tool, then recheck']];
   const key=JSON.stringify(items);if(steps.dataset.key===key)return;steps.dataset.key=key;
   steps.replaceChildren(...items.map(([verb,rest])=>{const li=node('li');li.append(node('strong',verb),document.createTextNode(` ${rest}`));return li;}));
   el('review-start').textContent=approved||!admin?'Choose what to review':'Add company files';

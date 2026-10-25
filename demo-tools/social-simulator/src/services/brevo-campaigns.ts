@@ -6,7 +6,7 @@ const flawed = flawedDrafts as { brevo: BrevoCampaign[] };
 const STORAGE_KEY = 'demo-social-simulator:vamo-brevo-campaigns:v2';
 // Approved footer sentence (brand-and-legal.md). The preview shows the footer block only when the body carries it.
 export const BREVO_FOOTER = 'You are receiving this email because you subscribed to Vamo. Unsubscribe anytime.';
-const DENMARK = 'Travel subscribers — Denmark';
+const DENMARK = 'Travel subscribers, Denmark';
 type Layout = Pick<BrevoCampaign, 'intro' | 'sections' | 'cta' | 'signOff'>;
 // Builds the plain-text body from the structured layout so the editor and the rendered preview never disagree.
 function bodyOf({ intro, sections = [], cta, signOff }: Layout): string {

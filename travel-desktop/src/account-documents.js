@@ -14,7 +14,7 @@ function save(userData, data, entries) {
   if (!person?.credential) throw new Error('Account document requires an existing account.');
   const filename = `${entry.email.replace(/[^a-z0-9@._-]/gi, '_')}.md`;
   const target = path.join(root, filename);
-  const content = `# Averill — demo login\n\nCompany: ${data.company}\nName: ${person.name}\nProfile: ${profiles[person.profile]?.label || person.profile}\n\nEmail: ${entry.email}\nPassword: ${entry.password}\n\nThis account works in the local Averill workspace on this Mac.\nCreated: ${new Date().toISOString()}\n`;
+  const content = `# Averill demo login\n\nCompany: ${data.company}\nName: ${person.name}\nProfile: ${profiles[person.profile]?.label || person.profile}\n\nEmail: ${entry.email}\nPassword: ${entry.password}\n\nThis account works in the local Averill workspace on this Mac.\nCreated: ${new Date().toISOString()}\n`;
   const temporary = `${target}.tmp`;
   fs.writeFileSync(temporary, content, { mode: 0o600 });
   fs.renameSync(temporary, target);

@@ -44,13 +44,13 @@ const localFetch=global.fetch;global.fetch=(url,options)=>{assert.equal(new URL(
         win.setSize(width, height); win.webContents.setZoomFactor(zoom);
         for (const tab of ['todo','review','knowledge','learn']) {
           await run(`document.querySelector('[data-tab-button=${tab}]').click()`); await pause();
-          const layout = await run("({width:innerWidth,scroll:document.documentElement.scrollWidth,animations:document.getAnimations().filter(a=>a.playState==='running').length,unnamed:[...document.querySelectorAll('button')].filter(e=>e.getClientRects().length&&!e.textContent.trim()&&!e.getAttribute('aria-label')&&!e.title).length})");
+          const layout = await run("({width:innerWidth,scroll:document.documentElement.scrollWidth,animations:document.getAnimations().filter(a=>a.playState==='running').length,unnamed:[...document.querySelectorAll('button')].filter(e=>e.getClientRects().length&&!e.textContent.trim()&&!e.getAttribute('aria-label')&&!e.title).length,tooSmall:[...document.querySelectorAll('button,summary,select,input')].filter(e=>e.getClientRects().length&&getComputedStyle(e).visibility!=='hidden'&&!e.closest('details:not([open])>:not(summary)')).filter(e=>{const r=e.getBoundingClientRect();return e.type!=='checkbox'&&e.type!=='radio'&&(r.height<24||r.width<24)}).map(e=>(e.id||e.className||e.tagName)+':'+Math.round(e.getBoundingClientRect().width)+'x'+Math.round(e.getBoundingClientRect().height))})");
           assert(layout.scroll <= layout.width + 1, `${index}/${tab}/${width}/${zoom}: horizontal overflow ${JSON.stringify(layout)}`);
-          assert.equal(layout.unnamed, 0, `${tab}: unnamed visible control`); assert.equal(layout.animations, 0, 'Reduced motion');
+          assert.equal(layout.unnamed, 0, `${tab}: unnamed visible control`); assert.deepEqual(layout.tooSmall, [], `${tab}/${width}/${zoom}: WCAG 2.2 target size below 24px`); assert.equal(layout.animations, 0, 'Reduced motion');
           if (out && index === 0) fs.writeFileSync(path.join(out, `${tab}-${width}-zoom${zoom}.png`), (await win.webContents.capturePage()).toPNG());
         }
       }
-      checks.push(`Role ${index}: three destinations at 520/960px and 200% zoom; named buttons, no page overflow, reduced motion`);
+      checks.push(`Role ${index}: four destinations at 520/960px and 200% zoom; named buttons, 24px minimum targets, no page overflow, reduced motion`);
     }
     await run('window.desktop.logout()'); assert.equal(await run("document.querySelectorAll('.knowledge-card').length"), 0); checks.push('Logout clears library material');
     console.log(checks.join('\n')); console.log(`${checks.length} accessibility matrix checks passed; native VoiceOver not asserted`);

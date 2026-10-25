@@ -507,7 +507,7 @@ app.whenReady().then(async () => {
     if (workspace.person(companyWorkspace)?.role !== 'admin') throw new Error('Administrator access required.');
     if (onboardingBusy) throw new Error('An onboarding operation is already running.');
     const personId = companyWorkspace.activePersonId;
-    const selection = await dialog.showOpenDialog(agentWindow, { properties: ['openFile', 'multiSelections'], filters: [{ name: 'Company files — Excel, PDF, SVG and documents', extensions: [...onboarding.EXTENSIONS].map(e => e.slice(1)) }] });
+    const selection = await dialog.showOpenDialog(agentWindow, { properties: ['openFile', 'multiSelections'], filters: [{ name: 'Company files: Excel, PDF, SVG and documents', extensions: [...onboarding.EXTENSIONS].map(e => e.slice(1)) }] });
     fromAgent(event);
     if (personId !== companyWorkspace.activePersonId) throw new Error('Account changed. Upload the files again.');
     if(selection.canceled)return {...snapshot(),operationNotice:'Selection cancelled. No files added.'};
