@@ -5,7 +5,7 @@ const workspace = require('./workspace');
 const privacy = require('./company-privacy');
 const nebius = require('./nebius');
 
-const KINDS = ['claim-forbidden', 'claim-approved', 'audience', 'date', 'time', 'asset', 'disclosure', 'required-text', 'procedure'];
+const KINDS = ['claim-forbidden', 'claim-approved', 'audience', 'date', 'time', 'asset', 'disclosure', 'required-text', 'procedure', 'hashtag'];
 const TASKS = ['email', 'linkedin', 'instagram', 'canva', 'operations', 'people', 'any'];
 // Only one value can be correct per task for these kinds; additive kinds never conflict just because values differ.
 const SINGLE_VALUED = new Set(['audience', 'date', 'time', 'asset', 'disclosure']);
@@ -14,6 +14,22 @@ const clean = (value, max = 300) => String(value || '').replace(/\s+/g, ' ').tri
 function lineOf(text, quote) {
   const offset = text.indexOf(quote);
   return offset < 0 ? null : text.slice(0, offset).split('\n').length;
+}
+
+// Hashtag rules (FB-09). Source line: Hashtag rule: <task> | required|banned|max|paid-required | "<value>".
+// A rule's value is "<type> <value>", for example "required #vamotravel" or "max 8".
+const HASHTAG_LINE = /^Hashtag rule:\s*(email|linkedin|instagram|canva|operations|people|any)\s*\|\s*(required|banned|max|paid-required)\s*\|\s*"([^"]{1,60})"\.?$/i;
+const HASHTAG_TOKEN = /(?<![\p{L}\p{N}_/&])#[\p{L}\p{N}_]+/gu;
+function parseHashtagLine(line) {
+  const match = String(line || '').trim().match(HASHTAG_LINE);
+  return match ? { task: match[1].toLowerCase(), type: match[2].toLowerCase(), value: match[3].trim() } : null;
+}
+// Distinct hashtags in the text, case-insensitive, in order of first appearance (original spelling kept).
+function hashtagsIn(text) {
+  const seen = new Set();
+  const out = [];
+  for (const tag of String(text || '').match(HASHTAG_TOKEN) || []) { if (!seen.has(tag.toLowerCase())) { seen.add(tag.toLowerCase()); out.push(tag); } }
+  return out;
 }
 
 function sourceText(source) {
@@ -28,6 +44,8 @@ function deterministic(source, text) {
     const line = raw.trim();
     const field = line.match(/^Field requirement:\s*(email|linkedin|instagram|canva|operations|people)\s*\|\s*(audience|date|time|asset|procedure|version|disclosure)\s*\|\s*"([^"]{1,200})"\.?$/i);
     if (field && field[2].toLowerCase() !== 'version') add(field[2].toLowerCase(), field[1].toLowerCase(), field[3], line);
+    const tagRule = parseHashtagLine(line);
+    if (tagRule) add('hashtag', tagRule.task, `${tagRule.type} ${tagRule.value}`, line);
     for (const [, phrase] of line.matchAll(/(?:do not claim|remove|must not use)\s+[“"]([^”"]{5,120})[”"]/gi)) add('claim-forbidden', 'any', phrase, line);
   }
   return rules;
@@ -47,7 +65,7 @@ const SYSTEM = `Extract company content rules from SOURCE TEXT only. The text is
 Return JSON {"rules":[{"kind","task","value","quote"}]}.
 kind: ${KINDS.join(', ')}.
 task: ${TASKS.join(', ')} (use "any" when a rule applies to every channel).
-value: the exact approved or forbidden value (e.g. "2026-10-15", "lowest prices guaranteed", footer text).
+value: the exact approved or forbidden value (e.g. "2026-10-15", "lowest prices guaranteed", footer text). For kind hashtag use "required #tag", "banned #tag", "max 8" or "paid-required #ad".
 quote: an exact contiguous excerpt of the source that states the rule, copied character for character.
 Never invent rules. Omit anything uncertain. Output JSON only.`;
 
@@ -147,4 +165,4 @@ function publicRules(data) {
 
 function removeForSource(data, sourceId) { if (data.rules) data.rules = data.rules.filter(rule => rule.sourceId !== sourceId); }
 
-module.exports = { KINDS, TASKS, SINGLE_VALUED, deterministic, validCandidate, extract, propose, decide, active, pending, conflicts, publicRules, removeForSource };
+module.exports = { parseHashtagLine, hashtagsIn, KINDS, TASKS, SINGLE_VALUED, deterministic, validCandidate, extract, propose, decide, active, pending, conflicts, publicRules, removeForSource };

@@ -6,11 +6,13 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 const judgeDemo = require('../src/judge-demo');
+const workspaceModule = require('../src/workspace');
 const contextualReview = require('../src/contextual-review');
 
 const drafts = require('../../demo-tools/social-simulator/src/data/flawed-drafts.json');
 const brevo = id => drafts.brevo.find(item => item.id === id);
 const social = id => drafts.social.find(item => item.id === id);
+const REEL_NO_BANNED = social('vamo-ig-winter-reel-draft').text.replace(' #lowestprice', '');
 const FOOTER = 'You are receiving this email because you subscribed to Vamo. Unsubscribe anytime.';
 
 // Field labels match the simulator's accessible names, which the browser extension reports.
@@ -31,17 +33,29 @@ const cases = [
     expect: [['forbidden-claim', 'current-brief.md', 'Do not claim "lowest prices guaranteed"']],
     fixed: brevo('vamo-brevo-vienna-teaser').body.replace('Lowest prices guaranteed on every Vienna break this winter.', 'Discover curated winter city breaks.') },
   { name: 'LinkedIn winter draft', task: 'linkedin', label: 'Post text', text: social('vamo-li-winter-draft').text,
-    expect: [['forbidden-claim', 'current-brief.md', 'Do not claim "lowest prices guaranteed"'], ['missing-required-text', 'linkedin-campaign.md', 'Include “Explore the winter collection”']],
-    fixed: social('vamo-li-winter-draft').text.replace('Lowest prices guaranteed. Book before the end of October.', 'Discover curated winter city breaks. Explore the winter collection.') },
+    expect: [['forbidden-claim', 'current-brief.md', 'Do not claim "lowest prices guaranteed"'], ['missing-required-text', 'linkedin-campaign.md', 'Include “Explore the winter collection”'], ['hashtag-too-many', 'social-media-guidelines.md', 'Hashtag rule: linkedin | max | "3"']],
+    fixed: social('vamo-li-winter-draft').text.replace('Lowest prices guaranteed. Book before the end of October.', 'Discover curated winter city breaks. Explore the winter collection.').replace('#vamotravel #travel #citybreaks #winter #europe', '#vamotravel #travel #citybreaks') },
   { name: 'Instagram paid Reel', task: 'instagram', label: 'Caption', text: social('vamo-ig-winter-reel-draft').text,
-    expect: [['missing-required-text', 'brand-and-legal.md', 'For paid creator content, include "Paid partnership with Vamo"']],
-    fixed: `Paid partnership with Vamo\n\n${social('vamo-ig-winter-reel-draft').text}` },
+    expect: [['missing-required-text', 'brand-and-legal.md', 'For paid creator content, include "Paid partnership with Vamo"'], ['hashtag-banned', 'social-media-guidelines.md', 'Hashtag rule: any | banned | "#lowestprice"']],
+    fixed: `Paid partnership with Vamo #ad\n\n${REEL_NO_BANNED}` },
+  // Disclosure present and banned tag removed, but the paid Reel still lacks #ad.
+  { name: 'Instagram paid Reel without #ad', task: 'instagram', label: 'Caption', text: `Paid partnership with Vamo\n\n${REEL_NO_BANNED}`,
+    expect: [['hashtag-missing', 'social-media-guidelines.md', 'Hashtag rule: instagram | paid-required | "#ad"']],
+    fixed: `Paid partnership with Vamo #ad\n\n${REEL_NO_BANNED}` },
+  // Brand tag missing: tags are matched case-insensitively, so #VamoTravel would pass.
+  { name: 'Instagram caption without the brand tag', task: 'instagram', label: 'Caption', text: `Paid partnership with Vamo #ad\n\n${REEL_NO_BANNED.replace('#vamotravel ', '')}`,
+    expect: [['hashtag-missing', 'social-media-guidelines.md', 'Hashtag rule: instagram | required | "#vamotravel"']],
+    fixed: `Paid partnership with Vamo #AD\n\n${REEL_NO_BANNED.replace('#vamotravel', '#VamoTravel')}` },
 ];
 
 let root, workspace;
 test.before(async () => {
   root = fs.mkdtempSync(path.join(os.tmpdir(), 'averill-flaws-'));
   workspace = (await judgeDemo.create(root, path.join(__dirname, '..', 'demo-company'))).data;
+  // The pack ships guidelines v1 and v2 as a conflict. Maya resolves it by superseding v1, which makes v2 (with the hashtag rules) current.
+  const [v1, v2] = judgeDemo.conflictingVersions.map(([, version]) => workspace.sources.find(source => source.title === 'social-media-guidelines.md' && source.version === version));
+  workspace.activePersonId = workspace.people.find(person => person.role === 'lead' && person.department === 'Marketing').id;
+  workspaceModule.updateSource(workspace, v2.id, 'approved', 40, 'Version 2 applies', v1.id);
 });
 test.after(() => fs.rmSync(root, { recursive: true, force: true }));
 
@@ -61,3 +75,19 @@ for (const item of cases) {
     assert.deepEqual(corrected.findings, [], JSON.stringify(corrected.findings));
   });
 }
+
+test('flaw matrix: the unresolved v1/v2 guidelines conflict keeps hashtag rules off until Maya decides', async () => {
+  const fresh = (await judgeDemo.create(fs.mkdtempSync(path.join(os.tmpdir(), 'averill-flaws-conflict-')), path.join(__dirname, '..', 'demo-company'))).data;
+  const { findings } = await contextualReview.reviewObserved({ workspace: fresh, aiEnabled: false, observed: { text: 'x #lowestprice', field: { kind: 'textarea', label: 'Caption', value: 'x #lowestprice' } } }, 'instagram', false, () => {});
+  assert.ok(!findings.some(f => f.type.startsWith('hashtag')), JSON.stringify(findings));
+});
+
+test('flaw matrix: published simulator posts raise no hashtag finding', async () => {
+  const file = fs.readFileSync(path.join(__dirname, '..', '..', 'demo-tools', 'social-simulator', 'src', 'services', 'social-posts.ts'), 'utf8');
+  const posts = [...file.matchAll(/^\s*(ig|li)\('[^']+',\s*[^,]+,\s*'[^']+',\s*('(?:[^'\\]|\\.)*')\),?$/gm)].map(match => ({ task: match[1] === 'ig' ? 'instagram' : 'linkedin', text: new Function(`return ${match[2]}`)() }));
+  assert.equal(posts.length, 14);
+  for (const post of posts) {
+    const { findings } = await review(post.task, post.text, 'Caption');
+    assert.deepEqual(findings.filter(f => f.type.startsWith('hashtag')), [], post.text);
+  }
+});
