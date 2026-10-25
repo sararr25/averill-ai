@@ -77,6 +77,7 @@ const browserBridge = new BrowserBridge({
     if (payload.kind === 'review') return contextualReview.review(payload);
     if (payload.kind === 'proposal') return contextualReview.proposal(payload);
     if (payload.kind === 'open') return contextualReview.open(payload);
+    if (payload.kind === 'ask') return contextualReview.ask(payload);
     throw new Error('Unsupported contextual action');
   },
 });
@@ -89,8 +90,15 @@ nebiusClient.onCall(logCloudCall);
 tavilyClient.onCall(logCloudCall);
 const runtimeKeys = { nebius: process.env.NEBIUS_API_KEY || '', tavily: process.env.TAVILY_API_KEY || '' };
 function reviewState() { return { signedIn: signedIn(), workspace: companyWorkspace, observed: externalObservation, epoch: externalEpoch, aiEnabled, key: runtimeKeys.nebius }; }
+// One company-question path for the desktop Ask and the in-page card: local unless the owner's AI policy and the session AI switch allow the model.
+function answerCompany(question, context = '') {
+  if (!(aiEnabled && privacy.allowed(companyWorkspace))) return localWorkspaceAnswer(companyWorkspace, question);
+  return semanticIndex.search(app.getPath('userData'), companyWorkspace, question, { key: runtimeKeys.nebius }).catch(() => ({ results: [] }))
+    .then(found => answerWorkspace(companyWorkspace, question, runtimeKeys.nebius, undefined, found.results, context));
+}
 const contextualReview = new ContextualReview({
   getState: reviewState,
+  answer: (question, context) => answerCompany(question, context),
   openSource: sourceId => { agentWindow.show(); agentWindow.focus(); agentWindow.webContents.send('agent:open-context', { sourceId }); },
 });
 
@@ -658,9 +666,7 @@ app.whenReady().then(async () => {
     fromAgent(event);
     if(aiEnabled&&privacy.credentials(question))throw new Error('Remove credentials before using external AI.');
     if (companyWorkspace) {
-      if (!(aiEnabled && privacy.allowed(companyWorkspace))) return localWorkspaceAnswer(companyWorkspace, question);
-      return semanticIndex.search(app.getPath('userData'), companyWorkspace, question, { key: runtimeKeys.nebius }).catch(() => ({ results: [] }))
-        .then(found => answerWorkspace(companyWorkspace, question, runtimeKeys.nebius, undefined, found.results));
+      return answerCompany(question);
     }
     return aiEnabled && privacy.allowed(companyWorkspace) ? answerQuestion(question, runtimeKeys.nebius, companyWorkspace) : { ...localAnswer(String(question || '').slice(0, 1000)), mode: 'local' };
   });

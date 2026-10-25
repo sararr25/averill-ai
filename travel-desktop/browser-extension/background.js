@@ -123,9 +123,16 @@ async function relayContext(message, sender) {
   const { pair } = await load();
   if (!validPair(pair) || sender.tab?.id !== pair.tabId || sender.frameId !== 0 || sender.origin !== pair.pageOrigin) return { stopped: true, reason: endedFor(sender.tab?.id) };
   const payload = { kind: message.kind, task: message.task, fieldId: message.fieldId, revision: message.revision, reviewId: message.reviewId, findingId: message.findingId, useAI: message.useAI === true, consent: message.consent === true };
+  if (message.kind === 'ask') {
+    // Only the typed question and, if a field is selected, its id and revision. The bridge holds the field text.
+    const question = typeof message.question === 'string' ? message.question.slice(0, 500) : '';
+    if (!question.trim()) return { error: 'Type a question first.' };
+    Object.assign(payload, { question });
+  }
   try {
     const response = await fetch(pair.endpoint.replace('/observation', '/context'), { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Averill-Token': pair.token }, body: JSON.stringify({ ...payload, tabId: pair.tabId, pageOrigin: pair.pageOrigin }), signal: AbortSignal.timeout(45000) });
     if (state.pair?.token !== pair.token) return { stopped: true, reason: endedFor(pair.tabId) };
+    if (response.status === 400 && message.kind === 'ask') return { error: 'The question could not be answered. Check it and try again.' };
     if (response.status === 400) return { error: 'The draft or company guidance changed. Review this field again.' };
     if (!response.ok) return { error: 'The check could not finish. Try again.' };
     return await response.json();
@@ -144,7 +151,7 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
     task.then(reply, error => reply({ error: error.message }));
     return true;
   }
-  if (['review', 'proposal', 'open'].includes(message.kind)) { relayContext(message, sender).then(reply, () => reply({ error: 'Try a fresh review.' })); return true; }
+  if (['review', 'proposal', 'open', 'ask'].includes(message.kind)) { relayContext(message, sender).then(reply, () => reply({ error: 'Try a fresh review.' })); return true; }
   if (!['field', 'heartbeat', 'editing', 'stop'].includes(message.kind)) { reply({ error: 'Unsupported action.' }); return; }
   (message.kind === 'stop' ? relayEvent(message, sender) : enqueue(() => relayEvent(message, sender))).then(reply, () => reply({ stopped: true, reason: 'lost_contact' }));
   return true;

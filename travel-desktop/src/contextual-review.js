@@ -2,8 +2,12 @@ const crypto = require('node:crypto');
 const taskReview = require('./task-review');
 const reviewAgent = require('./review-agent');
 const rules = require('./rules');
+const fs = require('node:fs');
+const privacy = require('./company-privacy');
+const { approvedSources } = require('./workspace');
 
 const digest = value => crypto.createHash('sha256').update(JSON.stringify(value)).digest('hex');
+const ASK_MAX = 500, ASK_CONTEXT_MAX = 1500;
 function stale() { return new Error('The work, session or approved guidance changed. Review the selected field again.'); }
 
 // Both the desktop renderer and the browser capability call this orchestration.
@@ -41,8 +45,8 @@ function exactProposal(finding, observed) {
 }
 
 class ContextualReview {
-  constructor({ getState, openSource = () => {}, fetcher }) {
-    this.getState = getState; this.openSource = openSource; this.fetcher = fetcher;
+  constructor({ getState, openSource = () => {}, fetcher, answer = null }) {
+    this.getState = getState; this.openSource = openSource; this.fetcher = fetcher; this.answer = answer;
     this.generation = 0; this.last = null;
   }
   invalidate() { this.generation++; this.last = null; }
@@ -90,6 +94,43 @@ class ContextualReview {
     };
     this.last = { value, identity: expected, task, generation };
     return value;
+  }
+  // FB-07: a typed question from the in-page card. Same answer path as the desktop Ask, but the
+  // reply is rebuilt from validated citations only: approved, visible, not restricted, no credentials,
+  // and every quote must appear exactly in the stored source text.
+  async ask({ question, fieldId, revision }) {
+    const state = this.getState();
+    if (!state?.signedIn || !state.workspace || typeof this.answer !== 'function') throw stale();
+    const input = typeof question === 'string' ? question.trim() : '';
+    if (!input || input.length > ASK_MAX) throw new Error('Ask a question of 1 to 500 characters.');
+    if (privacy.credentials(input)) return { id: crypto.randomUUID(), state: 'refused', message: 'Take credentials out of the question. Averill does not process them.', text: '', citations: [], mode: 'local', usedField: false };
+    const personId = state.workspace.activePersonId, epoch = state.epoch;
+    // The selected field is context only while it is still the exact field and revision the card showed.
+    const observed = state.observed;
+    let context = '';
+    if (fieldId !== undefined && observed?.fieldId === fieldId && observed.revision === revision && observed.personId === personId && typeof observed.field?.value === 'string') {
+      const value = observed.field.value.slice(0, ASK_CONTEXT_MAX);
+      if (!privacy.credentials(value)) context = value;
+    }
+    const raw = await this.answer(input, context);
+    const now = this.getState();
+    if (!now?.signedIn || now.workspace?.activePersonId !== personId || now.epoch !== epoch) throw stale();
+    const allowed = new Map(approvedSources(now.workspace).filter(source => source.confidentiality !== 'restricted' && !source.containsCredentials).map(source => [source.id, source]));
+    const citations = [];
+    for (const item of (raw?.sources || []).slice(0, 5)) {
+      const source = allowed.get(item?.id);
+      if (!source || typeof item.quote !== 'string' || !item.quote || item.quote.length > 600 || !source.textPath) continue;
+      let text = ''; try { text = fs.readFileSync(source.textPath, 'utf8'); } catch { continue; }
+      if (!text.includes(item.quote)) continue;
+      citations.push({ id: source.id, title: String(source.title).slice(0, 160), version: String(source.version || ''), quote: item.quote });
+    }
+    const stripped = (raw?.sources || []).length > citations.length;
+    if (!citations.length) return { id: crypto.randomUUID(), state: 'no-source', message: 'No approved source answers this.', text: '', citations: [], mode: 'local', usedField: Boolean(context) };
+    // If any cited source was removed, the original prose may quote it. Rebuild from what survived.
+    const model = !stripped && raw.mode === 'model' && typeof raw.text === 'string';
+    // A local answer is only an extract, so the citation carries the quote and the prose does not repeat it.
+    const text = model ? raw.text.slice(0, 1500) : `Closest approved wording, from ${citations[0].title}. This is an extract, not an inferred answer.`;
+    return { id: crypto.randomUUID(), state: 'answered', text, citations, mode: model ? 'model' : 'local', usedField: Boolean(context) };
   }
   proposal({ reviewId, findingId }) {
     const last = this.current(reviewId);

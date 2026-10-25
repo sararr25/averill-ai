@@ -53,6 +53,35 @@ app.whenReady().then(async () => { try {
  holdReviewReply=true;await click('Ask Averill');await until("testShadow.textContent.includes('Checking your draft.')");await click('×');await pause(350);assert(await page("Boolean(testShadow.querySelector('.chip'))"));checks.push('Dismissed pending review stays dismissed when its reply arrives');holdReviewReply=false;await click('Ask Averill');await click('Ask Averill');await until("testShadow.textContent.includes('Remove “lowest prices guaranteed”.')");
  assert(await page("testShadow.textContent.includes('Approved · Version 2')")); assert(!(await page('testShadow.textContent')).includes(storage.pair.token)); checks.push('Ask shows the actual local cited finding in-page; no desktop navigation or token exposure');
 
+ // FB-07: type a question in the card; real pointer click, real typing, Enter submits, Shift+Enter adds a line.
+ {
+  const ask=async question=>{
+   const at=await page("(()=>{const t=testShadow.querySelector('textarea#averill-ask');t.scrollIntoView({block:'nearest'});const r=t.getBoundingClientRect(),x=r.x+r.width/2,y=r.y+r.height/2;if(document.elementFromPoint(x,y)!==testShadow.host)throw new Error('Question box is clipped or covered');return {x:Math.round(x),y:Math.round(y)}})()");
+   editor.webContents.sendInputEvent({type:'mouseDown',button:'left',clickCount:1,...at});editor.webContents.sendInputEvent({type:'mouseUp',button:'left',clickCount:1,...at});await pause(60);
+   await page("(()=>{const t=testShadow.querySelector('textarea#averill-ask');t.value=''})()");
+   assert.equal(await page("testShadow.activeElement?.id"),'averill-ask');
+   await editor.webContents.insertText(question);return question;
+  };
+  const press=(keyCode,modifiers=[])=>{editor.webContents.sendInputEvent({type:'keyDown',keyCode,modifiers});editor.webContents.sendInputEvent({type:'keyUp',keyCode,modifiers})};
+  const draftBefore=await page("document.getElementById('draft').value"),ob=(await run('window.desktop.snapshot()')).externalObservation;
+  await ask('Can we say lowest prices guaranteed?');
+  assert.equal(await page("(()=>{const t=testShadow.querySelector('textarea#averill-ask'),e=new KeyboardEvent('keydown',{key:'Enter',shiftKey:true,bubbles:true,composed:true,cancelable:true});t.dispatchEvent(e);return e.defaultPrevented||!testShadow.querySelector('.out').hidden})()"),false,'Shift+Enter is left to the textarea and does not ask');
+  press('Return');
+  await until("testShadow.querySelector('.out .cite')");
+  const shown=await page("(()=>{const out=testShadow.querySelector('.out');return {text:out.textContent,cites:[...out.querySelectorAll('.cite')].map(c=>({title:c.querySelector('b').textContent,small:c.querySelector('small').textContent,quote:c.querySelector('.quote').textContent})),html:out.querySelectorAll('script,img,a').length}})()");
+  assert.equal(shown.cites[0].quote,'Do not claim "lowest prices guaranteed".');assert.equal(shown.cites[0].small,'Approved · Version 2');assert(shown.cites[0].title.length>0);assert.equal(shown.html,0,'Answer is plain text');
+  assert.equal(await page("document.getElementById('draft').value"),draftBefore,'Asking never edits the host field');
+  assert(!(await page('testShadow.textContent')).includes(storage.pair.token));
+  if(SHOTS)fs.writeFileSync(path.join(SHOTS,`ask-answer${VAMO?'-'+VAMO:''}.png`),(await editor.webContents.capturePage()).toPNG());
+  const fit=await page("(()=>{const r=testShadow.host.getBoundingClientRect(),c=testShadow.querySelector('.card').getBoundingClientRect(),a=testShadow.querySelector('.ask').getBoundingClientRect(),f=testShadow.querySelector('.footer').getBoundingClientRect(),b=testShadow.querySelector('#averill-ask').parentElement.querySelector('button').getBoundingClientRect();return {inView:r.left>=0&&r.top>=0&&r.right<=innerWidth+1&&r.bottom<=innerHeight+1,askBtnH:b.height,footerVisible:f.bottom<=c.bottom+1&&f.height>0,askAboveFooter:a.bottom<=f.top+1}})()");
+  assert(fit.inView&&fit.footerVisible&&fit.askAboveFooter,'Card with answer fits the viewport: '+JSON.stringify(fit));assert.equal(Math.round(fit.askBtnH),32,'Ask button is the 32px secondary size');
+  await ask('Can we offer free chocolate on every flight?');press('Return');await until("testShadow.querySelector('.out')&&testShadow.querySelector('.out').textContent.includes('No approved source answers this.')");
+  if(SHOTS)fs.writeFileSync(path.join(SHOTS,`ask-no-source${VAMO?'-'+VAMO:''}.png`),(await editor.webContents.capturePage()).toPNG());
+  await ask('Log in with password: hunter2hunter2');press('Return');await until("testShadow.querySelector('.out .error')");assert((await page("testShadow.querySelector('.out .error').textContent")).includes('credentials out of the question'));
+  assert.equal(approvals,1);
+  checks.push('FB-07 Ask by typing: Enter asks, Shift+Enter does not ask, a cited answer (title, version, exact quote) appears in the card as plain text; unmatched question says no approved source; credential question refused; host field untouched');
+ }
+
  // FB-06: the same simulator composer after edits, after the app replaces the field node, and as a role=textbox editor.
  if(FB06){
   assert(VAMO==='linkedin'||VAMO==='instagram','FB06 needs VAMO_PAGE=linkedin or instagram');
