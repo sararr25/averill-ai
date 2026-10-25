@@ -16,6 +16,8 @@ This spike answers ticket FB-13 in FEEDBACK_SPEC_2026-10-25.md. It ran in the ow
 - Owner step still open: create the template link (Share, Share link, choose "Template link", copy). Canva Help says this works on free accounts. The agent did not do this step, because it publishes a link. After that, test it once with a second Canva account (acceptance item still open).
 - Evidence: review-evidence-2026-10-25/canva-starting-post-editor.jpg
 
+- Update, 26 October 2026: the texts were moved inside Vamo's 108 px safe margin (FB-14 rule): "vamo" at 120, 120; headline at 120, 900, 840 px wide, font size 150; body line at 120, 1270. Saved with the owner's approval. Before this change the post itself failed the safe-area check.
+
 ## Spike findings
 
 | Question | Result | Evidence |
