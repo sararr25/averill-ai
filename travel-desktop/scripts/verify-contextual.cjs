@@ -2,7 +2,7 @@
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const fs = require('node:fs'), path = require('node:path'), http = require('node:http'), vm = require('node:vm'), assert = require('node:assert/strict');
 const AB=process.env.AB_VARIANT||'';assert(['','expanded','compact'].includes(AB));
-const VAMO=process.env.VAMO_PAGE||'';assert(['','brevo','linkedin','instagram'].includes(VAMO));
+const VAMO=process.env.VAMO_PAGE||'';const FB06=process.env.FB06==='1';assert(['','brevo','linkedin','instagram'].includes(VAMO));
 const APP = path.resolve(__dirname, '..'), profile = fs.mkdtempSync('/tmp/averill-contextual-ui-');
 const workspace = require('../src/workspace'), { BrowserConnect } = require('../src/browser-connect');
 const file = path.join(profile, 'brand.md'); fs.writeFileSync(file, 'Do not claim "lowest prices guaranteed".'+(AB?'\nDo not claim "free flights".\nDo not claim "book today".':''));
@@ -52,6 +52,32 @@ app.whenReady().then(async () => { try {
  await page("[...testShadow.querySelectorAll('button')].find(b=>b.textContent==='Ask Averill').focus()");
  holdReviewReply=true;await click('Ask Averill');await until("testShadow.textContent.includes('Checking your draft.')");await click('×');await pause(350);assert(await page("Boolean(testShadow.querySelector('.chip'))"));checks.push('Dismissed pending review stays dismissed when its reply arrives');holdReviewReply=false;await click('Ask Averill');await click('Ask Averill');await until("testShadow.textContent.includes('Remove “lowest prices guaranteed”.')");
  assert(await page("testShadow.textContent.includes('Approved · Version 2')")); assert(!(await page('testShadow.textContent')).includes(storage.pair.token)); checks.push('Ask shows the actual local cited finding in-page; no desktop navigation or token exposure');
+
+ // FB-06: the same simulator composer after edits, after the app replaces the field node, and as a role=textbox editor.
+ if(FB06){
+  assert(VAMO==='linkedin'||VAMO==='instagram','FB06 needs VAMO_PAGE=linkedin or instagram');
+  const step=async(name,fn)=>{try{await fn();checks.push('FB-06 '+VAMO+': '+name)}catch(error){error.message='FB-06 step failed: '+name+': '+error.message;throw error}};
+  const shot=async name=>{if(SHOTS)fs.writeFileSync(path.join(SHOTS,`${VAMO}-${name}.png`),(await editor.webContents.capturePage()).toPNG())};
+  const finding="testShadow.textContent.includes('Remove “lowest prices guaranteed”.')";
+  await step('edit the draft, the finding still arrives',async()=>{await page("(()=>{const d=document.getElementById('draft');Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype,'value').set.call(d,d.value+' Extra line.');d.dispatchEvent(new Event('input',{bubbles:true}))})()");await pause(200);await click('Ask Averill');await until(finding)});
+  await shot('card-after-edit');
+  await step('the app replaces the field node, the selection is found again and the finding arrives',async()=>{
+   await page("(()=>{const old=document.getElementById('draft'),n=document.createElement('textarea');for(const a of old.attributes)n.setAttribute(a.name,a.value);n.value=old.value;old.replaceWith(n)})()");
+   await until("testShadow.host.style.display==='block'&&!testShadow.textContent.includes('Remove')");
+   assert.equal(await page("document.querySelector('textarea')===document.getElementById('draft')&&document.getElementById('draft').isConnected"),true);
+   await click('Ask Averill');await until(finding);assert.equal((await run('window.desktop.snapshot()')).browserBridge.connected,true);assert.equal(approvals,1)});
+  await shot('card-after-rerender');
+  await step('a role=textbox plaintext-only editor can be shared and reviewed',async()=>{
+   await page("(()=>{const d=document.createElement('div');d.id='fb06-box';d.setAttribute('role','textbox');d.setAttribute('contenteditable','plaintext-only');d.setAttribute('aria-label','Write a caption...');d.style.cssText='position:relative;margin:8px;min-height:60px;border:1px solid #888;background:#fff;color:#000';d.textContent='Our lowest prices guaranteed.';(document.querySelector('[role=dialog]')||document.body).append(d)})()");
+   const box=await page("(()=>{const r=document.getElementById('fb06-box').getBoundingClientRect();return {x:Math.round(r.x+20),y:Math.round(r.y+20)}})()");
+   editor.webContents.sendInputEvent({type:'mouseDown',button:'left',clickCount:1,...box});editor.webContents.sendInputEvent({type:'mouseUp',button:'left',clickCount:1,...box});await pause(250);
+   await click('Ask Averill');await until(finding)});
+  await shot('card-role-textbox');
+  await step('a field that never comes back ends the selection but not the connection',async()=>{
+   await page("document.getElementById('fb06-box').remove()");await pause(3200);
+   assert.equal(await page("testShadow.host.style.display"),'none');assert.equal((await run('window.desktop.snapshot()')).browserBridge.connected,true)});
+  console.log(checks.filter(c=>c.startsWith('FB-06')).join('\n'));console.log(`FB06 ${VAMO} PASS ${checks.filter(c=>c.startsWith('FB-06')).length}/4 steps; zero provider requests`);return;
+ }
  if(AB){
   const samples=[];
   for(let i=0;i<23;i++){

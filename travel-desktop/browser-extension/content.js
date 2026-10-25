@@ -1,6 +1,7 @@
 (() => {
  if(window.__averillStop)window.__averillStop();
- let selected=null,timer=null,heartbeat=null,alive=true,composing=false,sequence=0,generation=0,result=null,reviewValue='',expanded=false,uiState='ready',error='',undo=null,mutationPending=false;
+ let selected=null,selectedSig=null,refinding=null,timer=null,heartbeat=null,alive=true,composing=false,sequence=0,generation=0,result=null,reviewValue='',expanded=false,uiState='ready',error='',undo=null,mutationPending=false;
+ const FS=globalThis.AverillFieldSelect;if(!FS)throw new Error('Averill field-select.js was not loaded.');
  const identities=new WeakMap(),abort=new AbortController();
  const host=document.createElement('div');host.setAttribute('data-averill-companion','');host.tabIndex=0;host.setAttribute('aria-label','Averill review controls');
  host.style.cssText='position:fixed;z-index:2147483646;display:none;pointer-events:auto;margin:0;padding:0;border:0;background:transparent;inset:auto;width:360px;max-width:calc(100vw - 24px);';
@@ -18,17 +19,17 @@
  function button(label,action,cls='text'){const b=node('button',label,cls);b.type='button';b.addEventListener('click',action);return b;}
  function describe(element){
   if(!element||!element.isConnected||element.getClientRects().length===0)return null;
-  const kind=element.matches('select')?'select':element.isContentEditable?'contenteditable':element.tagName==='TEXTAREA'?'textarea':element.type;
+  const kind=element.matches('select')?'select':FS.isEditableText(element)&&!element.matches('input,textarea')?'contenteditable':element.tagName==='TEXTAREA'?'textarea':element.type;
   if(!['text','textarea','contenteditable','select','date','time','checkbox'].includes(kind))return null;
-  const label=element.getAttribute('aria-label')||element.labels?.[0]?.innerText||element.getAttribute('placeholder')||'Selected draft field';
-  if(/password|token|secret|card|payment|recipient|e-?mail address|phone|personal|personnel/i.test([label,element.name,element.id,element.autocomplete].join(' ')))return null;
+  const label=FS.labelOf(element);
+  if(FS.isSensitive([label,element.name,element.id,element.autocomplete]))return null;
   const value=kind==='contenteditable'?element.innerText:kind==='checkbox'?String(element.checked):element.value;
   if(String(value||'').length>6000)return null;
   let identity=identities.get(element);if(!identity){identity={id:`field_${Date.now().toString(36)}_${++sequence}`,revision:0,value:String(value||'')};identities.set(element,identity)}
   if(identity.value!==String(value||'')){identity.revision++;identity.value=String(value||'')}
   return {id:identity.id,revision:identity.revision,kind,label:label.slice(0,100),value:String(value||'')};
  }
- function teardown(){if(!alive)return false;alive=false;clearTimeout(timer);clearInterval(heartbeat);abort.abort();selected=null;result=null;undo=null;return true}
+ function teardown(){if(!alive)return false;alive=false;clearTimeout(timer);clearTimeout(refinding?.timer);refinding=null;selectedSig=null;observer.disconnect();clearInterval(heartbeat);abort.abort();selected=null;result=null;undo=null;return true}
  function remove(){teardown();chrome.runtime.onMessage.removeListener?.(onMessage);root.replaceChildren();host.remove()}
  // Sharing ended: keep a short card that says why and how to reconnect, instead of disappearing.
  function stop(reason){if(!teardown())return;showEnded(reason)}
@@ -51,7 +52,7 @@
   card.append(head,main);box.replaceChildren(card);status.textContent=`Sharing ended. ${message}`;
  }
  function invalidate(message=''){generation++;result=null;uiState='ready';error=message;expanded=false;render()}
- async function commit(reason){const request=generation;timer=null;if(!alive||composing||document.visibilityState!=='visible')return;const field=describe(selected);const value=await send(field?{kind:'field',field,reason}:{kind:'editing'});if(request===generation&&result&&Object.hasOwn(value,'reviewId')&&value.reviewId!==result.id)invalidate('The draft or approved guidance changed. Check again.');return field}
+ async function commit(reason){const request=generation;timer=null;if(!alive||composing||document.visibilityState!=='visible')return;if(reason==='pause'&&selected?.isConnected)selectedSig=sign(selected);const field=describe(selected);const value=await send(field?{kind:'field',field,reason}:{kind:'editing'});if(request===generation&&result&&Object.hasOwn(value,'reviewId')&&value.reviewId!==result.id)invalidate('The draft or approved guidance changed. Check again.');return field}
  function position(){if(!selected||!selected.isConnected)return;const container=selected.closest('[role=dialog],dialog[open]')||document.documentElement;if(host.parentElement!==container)container.append(host);host.style.right='';host.style.bottom='';const r=selected.getBoundingClientRect(),width=Math.min(expanded?420:360,innerWidth-24);host.style.width=width+'px';const height=host.getBoundingClientRect().height;let left,top;
   if(r.right+width+24<=innerWidth){left=r.right+12;top=Math.max(12,Math.min(r.top,innerHeight-height-12))}
   else if(r.left-width-12>=12){left=r.left-width-12;top=Math.max(12,Math.min(r.top,innerHeight-height-12))}
@@ -101,7 +102,23 @@
   status.textContent=main.querySelector('h2')?.textContent||error;
   if(focused){const controls=[...box.querySelectorAll('button,select,summary')];const next=controls.find(e=>(e.getAttribute('aria-label')||e.textContent)===focusLabel)||main.querySelector('.primary')||main.querySelector('h2');if(next){if(next.tagName==='H2')next.tabIndex=-1;next.focus({preventScroll:true})}}
  }
- function chooseField(event){if(!event.isTrusted||event.composedPath().includes(host))return;const candidate=event.target.closest('textarea,input,select,[contenteditable="true"],[contenteditable=""]');if(candidate&&!describe(candidate)){generation++;selected=null;result=null;undo=null;send({kind:'editing'});host.style.cssText+='display:block;left:auto;top:auto;right:12px;bottom:12px;';box.replaceChildren();const card=node('section',undefined,'card'),main=node('div',undefined,'main');main.append(node('h2','This field cannot be shared.'),node('p','Choose a supported draft text field. Sensitive fields and oversized content are excluded.'),button('Dismiss',()=>{host.style.display='none'},'secondary'),button('Stop sharing',async()=>{await send({kind:'stop'});stop('stopped_by_user')}));card.append(main);box.append(card);return}if(describe(candidate)){if(candidate!==selected){selected=candidate;undo=null;invalidate()}clearTimeout(timer);commit('selection');render()}}
+  const visible=element=>Boolean(describe(element));
+  function sign(element){return FS.signature(element,document,visible)}
+  function cancelRefind(){clearTimeout(refinding?.timer);refinding=null}
+  // An editor that re-renders its field ends the old node, not the selection: look for the same field
+  // (tag, role, name, label, stable id, position) for a few seconds, then give the selection up.
+  function lose(){
+   if(!selected||selected.isConnected||refinding)return;const signature=selectedSig;generation++;selected=null;result=null;undo=null;host.style.display='none';send({kind:'editing'});
+   if(!signature)return;refinding={signature,step:0,timer:null};tryRefind();
+  }
+  function tryRefind(){
+   if(!alive||!refinding)return;const state=refinding,found=FS.refind(state.signature,document,visible);
+   if(found){refinding=null;selected=found;selectedSig=sign(found);undo=null;invalidate();commit('selection');render();return}
+   const delays=[100,300,800,2000];if(state.step>=delays.length){refinding=null;return}
+   state.timer=setTimeout(tryRefind,delays[state.step++]);
+  }
+  const observer=new MutationObserver(()=>{if(selected&&!selected.isConnected)lose()});observer.observe(document.documentElement,{childList:true,subtree:true});
+ function chooseField(event){if(!event.isTrusted||event.composedPath().includes(host))return;const candidate=FS.fieldFromEvent(event);if(candidate&&!describe(candidate)){generation++;selected=null;selectedSig=null;cancelRefind();result=null;undo=null;send({kind:'editing'});host.style.cssText+='display:block;left:auto;top:auto;right:12px;bottom:12px;';box.replaceChildren();const card=node('section',undefined,'card'),main=node('div',undefined,'main');main.append(node('h2','This field cannot be shared.'),node('p','Choose a supported draft text field. Sensitive fields and oversized content are excluded.'),button('Dismiss',()=>{host.style.display='none'},'secondary'),button('Stop sharing',async()=>{await send({kind:'stop'});stop('stopped_by_user')}));card.append(main);box.append(card);return}if(describe(candidate)){cancelRefind();if(candidate!==selected){selected=candidate;undo=null;invalidate()}selectedSig=sign(candidate);clearTimeout(timer);commit('selection');render()}}
  document.addEventListener('click',chooseField,{signal:abort.signal,capture:true});
  document.addEventListener('focusin',event=>{if(event.target!==selected)chooseField(event)},{signal:abort.signal,capture:true});
  document.addEventListener('input',event=>{if(event.target!==selected)return;clearTimeout(timer);describe(selected);if(mutationPending){send({kind:'editing'});return}invalidate();if(undo){uiState='undo-conflict';render()}send({kind:'editing'});timer=setTimeout(()=>commit('pause'),1200)},{signal:abort.signal});
@@ -121,6 +138,6 @@
  }},{signal:abort.signal,capture:true});
  heartbeat=setInterval(()=>{if(document.visibilityState!=='visible'){send({kind:'heartbeat',paused:true});return}
   // An editor that re-renders its field ends the selection, not the connection.
-  if(selected&&!selected.isConnected){generation++;selected=null;result=null;undo=null;host.style.display='none';send({kind:'editing'});return}{const request=generation;send({kind:'heartbeat'}).then(value=>{if(request===generation&&result&&Object.hasOwn(value,'reviewId')&&value.reviewId!==result.id)invalidate('The draft or company guidance changed. Check again.')});if(selected&&!timer&&!composing)commit('read')}},4000);
+  if(selected&&!selected.isConnected){lose();return}{const request=generation;send({kind:'heartbeat'}).then(value=>{if(request===generation&&result&&Object.hasOwn(value,'reviewId')&&value.reviewId!==result.id)invalidate('The draft or company guidance changed. Check again.')});if(selected&&!timer&&!composing)commit('read')}},4000);
  send(document.visibilityState==='visible'?{kind:'heartbeat'}:{kind:'heartbeat',paused:true});
 })();

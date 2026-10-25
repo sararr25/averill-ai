@@ -50,7 +50,7 @@ test('connect sets the ON badge and the popup reads connected state; stop clears
   assert.deepEqual(await w.send({ kind: 'status' }), { state: 'not-connected', host: 'draft.example', page: true });
   assert.deepEqual(await w.send({ kind: 'connect-tab' }), { connected: true });
   assert.deepEqual(w.badges.at(-1), { tabId: 4, text: 'ON' });
-  assert.deepEqual(w.injections[0].files, ['end-reasons.js', 'editor-adapter.js', 'content.js']);
+  assert.deepEqual(w.injections[0].files, ['end-reasons.js', 'editor-adapter.js', 'field-select.js', 'content.js']);
   assert.deepEqual(await w.send({ kind: 'status' }), { state: 'connected', host: 'draft.example' });
   assert.deepEqual(await w.send({ kind: 'stop-pair' }), { stopped: true });
   assert.deepEqual(w.badges.at(-1), { tabId: 4, text: '' });

@@ -38,7 +38,7 @@ app.whenReady().then(async()=>{try{
  const page=new BrowserWindow({width:700,height:500,show:false,webPreferences:{contextIsolation:true}});
  await page.loadURL('data:text/html,'+encodeURIComponent('<label>Body<textarea id="body">Draft</textarea></label><label>Password<input type="password" id="password"></label>'));
  await page.webContents.executeJavaScript("window.messages=[];window.reply={};window.testShadow=null;const attach=Element.prototype.attachShadow;Element.prototype.attachShadow=function(o){return window.testShadow=attach.call(this,o)};window.chrome={runtime:{sendMessage:async item=>{window.messages.push(item);return window.reply;},onMessage:{addListener:()=>{}}}};void 0;");
- for(const file of ['end-reasons.js','content.js'])await page.webContents.executeJavaScript(fs.readFileSync(path.join(__dirname,'../browser-extension',file),'utf8'));
+ for(const file of ['end-reasons.js','field-select.js','content.js'])await page.webContents.executeJavaScript(fs.readFileSync(path.join(__dirname,'../browser-extension',file),'utf8'));
  const box=await page.webContents.executeJavaScript("(()=>{const r=document.getElementById('body').getBoundingClientRect();return {x:Math.round(r.x+10),y:Math.round(r.y+10)}})()");
  page.webContents.sendInputEvent({type:'mouseDown',button:'left',clickCount:1,...box});page.webContents.sendInputEvent({type:'mouseUp',button:'left',clickCount:1,...box});await pause(80);
  assert.ok(await page.webContents.executeJavaScript("messages.some(x=>x.kind==='field'&&x.reason==='selection')"));

@@ -1,7 +1,7 @@
 importScripts('end-reasons.js');
 const { isReason } = globalThis.AverillEndReasons;
 const CONNECT_ENDPOINT = 'http://127.0.0.1:43147/connect';
-const CONTENT_FILES = ['end-reasons.js', 'editor-adapter.js', 'content.js'];
+const CONTENT_FILES = ['end-reasons.js', 'editor-adapter.js', 'field-select.js', 'content.js'];
 // Session-long connection (owner decision D1): 3 tries with backoff before Averill counts as closed.
 const RETRY_DELAYS_MS = [500, 1500];
 const RELAY_TIMEOUT_MS = 4000;
