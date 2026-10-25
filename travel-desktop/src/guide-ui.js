@@ -45,12 +45,12 @@ const GUIDE_STEPS = {
     ],
     lead: [
       { target: '#knowledge-summary', title: 'One item to review', body: 'Emma proposed her practice note to Marketing. It is not used until you approve it.' },
-      { target: '#knowledge-review-queue', title: 'Source approval requests', body: 'Open the proposal, read it, then approve or reject it.' },
+      { target: '#knowledge-review-queue', title: 'Source approval requests', body: 'Also listed under To do. Open the proposal, read it, then approve or reject it.' },
       { target: '#knowledge-conflicts', title: 'Show conflicts', body: 'Two versions of social-media-guidelines.md are both approved. Averill uses neither until you decide.' },
     ],
     admin: [
       { target: '#knowledge-department', title: 'Every department', body: 'As owner you see Marketing, Operations and People documents. Filter by department here.' },
-      { target: '#knowledge-review-queue', title: 'Approval requests', body: 'Proposals waiting for a decision across the company.' },
+      { target: '#knowledge-review-queue', title: 'Approval requests', body: 'Also listed under To do. Proposals waiting for a decision across the company.' },
       { target: '#rules-panel', title: 'Company rules', body: 'Every rule Averill checks, with the document and version it comes from.' },
     ],
   },

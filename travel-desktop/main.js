@@ -12,6 +12,7 @@ const accounts = require('./src/accounts');
 const accountDocuments = require('./src/account-documents');
 const judgeDemo = require('./src/judge-demo');
 const guide = require('./src/guide');
+const todo = require('./src/todo');
 const judgeServer = require('./src/judge-server');
 const onboarding = require('./src/onboarding');
 const privacy = require('./src/company-privacy');
@@ -164,6 +165,7 @@ function clearSessionWork() {
   if (companionWindow && !companionWindow.isDestroyed()) companionWindow.hide();
 }
 function snapshot() {
+  const findings = workKinds.flatMap((kind) => shared.has(kind) ? inspect(kind, workState.get(kind) || {}).map((item) => ({ ...item, kind })) : []);
   return {
     auth: { enabled: Boolean(companyWorkspace?.authEnabled), demo: Boolean(companyWorkspace?.demoAccounts), signedIn: signedIn(), accounts: accounts.publicAccounts(companyWorkspace), person: signedIn() ? accounts.publicAccounts(companyWorkspace).find(p => p.id === companyWorkspace.activePersonId) || null : null },
     privacy: {companyAI:privacy.allowed(companyWorkspace)},
@@ -184,7 +186,8 @@ function snapshot() {
     shared: [...shared],
     open: [...workWindows.keys()],
     aiEnabled,
-    findings: workKinds.flatMap((kind) => shared.has(kind) ? inspect(kind, workState.get(kind) || {}).map((item) => ({ ...item, kind })) : []),
+    findings,
+    todo: signedIn() ? todo.list(companyWorkspace, findings) : null,
   };
 }
 
@@ -337,6 +340,12 @@ app.whenReady().then(async () => {
     fromAgent(event, true);
     if (!signedIn()) throw new Error('Sign in first.');
     guide.update(companyWorkspace, action, screen);
+    return persistWorkspace();
+  });
+  ipcMain.handle('todo:done', (event, taskId) => {
+    fromAgent(event);
+    if (typeof taskId !== 'string') throw new Error('Invalid task');
+    workspace.completeTask(companyWorkspace, taskId);
     return persistWorkspace();
   });
   ipcMain.handle('learning:action', (event, action, payload = {}) => {

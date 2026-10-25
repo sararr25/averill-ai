@@ -171,7 +171,7 @@ function renderSession(){
     button.append(node('strong',`Continue as ${person.name}`),node('span',`${person.jobTitle}${person.department?` · ${person.department}`:''}`));
     button.addEventListener('click',async()=>{
      for(const control of list.querySelectorAll('button'))control.disabled=true;el('login-feedback').textContent='Signing in…';
-     try{current=await window.desktop.demoLogin(person.id);el('login-feedback').textContent='';render();showTab(preferredArea());}
+     try{current=await window.desktop.demoLogin(person.id);el('login-feedback').textContent='';render();showTab(landingArea());}
      catch(error){el('login-feedback').textContent=error.message;}
      finally{for(const control of list.querySelectorAll('button'))control.disabled=false;}
     });

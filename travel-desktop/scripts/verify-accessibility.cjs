@@ -42,7 +42,7 @@ const localFetch=global.fetch;global.fetch=(url,options)=>{assert.equal(new URL(
       checks.push(`Authenticated ${people[index].role}/${people[index].department || 'company'}: private source visibility and approval queue scope`);
       for (const [width, height, zoom] of [[960,820,1],[520,850,1],[960,820,2]]) {
         win.setSize(width, height); win.webContents.setZoomFactor(zoom);
-        for (const tab of ['review','knowledge','learn']) {
+        for (const tab of ['todo','review','knowledge','learn']) {
           await run(`document.querySelector('[data-tab-button=${tab}]').click()`); await pause();
           const layout = await run("({width:innerWidth,scroll:document.documentElement.scrollWidth,animations:document.getAnimations().filter(a=>a.playState==='running').length,unnamed:[...document.querySelectorAll('button')].filter(e=>e.getClientRects().length&&!e.textContent.trim()&&!e.getAttribute('aria-label')&&!e.title).length})");
           assert(layout.scroll <= layout.width + 1, `${index}/${tab}/${width}/${zoom}: horizontal overflow ${JSON.stringify(layout)}`);

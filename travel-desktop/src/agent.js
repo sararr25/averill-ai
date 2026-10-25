@@ -22,13 +22,16 @@ let lastObservationHash = null;
 
 const el = (id) => document.getElementById(id);
 const DEMO_NO_AI = 'AI review of library files is not available in this demo. Share a draft field or app window and choose Check approved rules: it checks the approved rules locally and can also ask NVIDIA Nemotron.';
-const areas=new Set(['review','work','learn','research','knowledge','setup']);
+const areas=new Set(['todo','review','work','learn','research','knowledge','setup']);
 function preferredArea(){
   if(!current.workspace?.configured||current.onboarding&&!current.onboarding.applied)return 'setup';
   const id=current.auth?.person?.id;
   const saved=id?localStorage.getItem(`averill:last-area:${id}`):null;
-  return areas.has(saved)?saved:'review';
+  return areas.has(saved)?saved:'todo';
 }
+
+// After login the first stop is To do, except while the company still has to finish setup.
+function landingArea(){return !current.workspace?.configured||current.onboarding&&!current.onboarding.applied?'setup':'todo';}
 
 function showTab(name) {
   if(!areas.has(name))return;
@@ -71,12 +74,14 @@ function render() {
     lastExternalText = ''; lastExternalWindowId = null; lastObservationHash = null;
     el('context-question').value = ''; el('context-result').replaceChildren(); el('external-result').replaceChildren(); el('external-task-result').replaceChildren();
     if (typeof renderGuide === 'function') renderGuide();
+    renderTodo();
     return;
   }
   if(externalReview&&externalReview.identity!==workIdentity())invalidateWorkReview();
   const authority = JSON.stringify([current.workspace?.activePersonId, current.workspace?.sources, current.privacy]);
   if (authority !== lastWorkAuthority) { lastWorkAuthority = authority; el('external-task-result').replaceChildren(); el('context-result').replaceChildren(); }
   renderWorkspace();
+  renderTodo();
   renderKnowledge();
   renderRules();
   if (typeof renderGuide === 'function') renderGuide();
@@ -315,7 +320,7 @@ function renderWorkspace() {
     judgeButton.type = 'button';
     judgeButton.addEventListener('click', async () => {
       judgeButton.disabled = true;
-      try { current = await window.desktop.startJudgeDemo(); render(); }
+      try { current = await window.desktop.startJudgeDemo(); render(); showTab(landingArea()); }
       catch (error) { el('workspace-feedback').textContent = error.message; }
       finally { judgeButton.disabled = false; }
     });
@@ -706,7 +711,7 @@ el('open-source').addEventListener('click', () => { if (activeSourceId) window.d
 el('login-account').addEventListener('change', () => { el('login-email').value = el('login-account').value; el('login-password').value = ''; el('login-password').focus(); });
 el('login-form').addEventListener('submit', async (event) => {
   event.preventDefault(); const submit = el('login-form').querySelector('button'); submit.disabled = true; el('login-feedback').textContent = 'Signing in…';
-  try { current = await window.desktop.login(el('login-email').value, el('login-password').value); el('login-password').value = ''; el('login-feedback').textContent = ''; render(); showTab(preferredArea()); }
+  try { current = await window.desktop.login(el('login-email').value, el('login-password').value); el('login-password').value = ''; el('login-feedback').textContent = ''; render(); showTab(landingArea()); }
   catch (error) { el('login-feedback').textContent = error.message; }
   finally { submit.disabled = false; }
 });

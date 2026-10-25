@@ -6,6 +6,7 @@ const path = require('node:path');
 const workspace = require('../src/workspace');
 const accounts = require('../src/accounts');
 const judgeDemo = require('../src/judge-demo');
+const todo = require('../src/todo');
 
 const pack = path.join(__dirname, '..', 'demo-company');
 
@@ -86,5 +87,30 @@ test('judge demo gives each role real work: Emma a pending note, Maya a review q
       assert.equal(workspace.approvedSources(data).filter(source => source.department === department).length, judgeDemo.otherSources[department].length);
     }
     assert.ok(judgeDemo.roster.every(member => !accounts.publicAccounts(data).some(account => account.name === member.name)));
+  } finally { fs.rmSync(root, { recursive: true, force: true }); }
+});
+
+test('judge demo seeds at least two open tasks for each of Emma, Maya and Alex, visible only to them', async () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'averill-judge-'));
+  try {
+    const { data } = await judgeDemo.create(root, pack);
+    const byName = name => data.people.find(person => person.name === name);
+    const titles = {};
+    for (const name of ['Emma Larsen', 'Maya Jensen', 'Alex Holm']) {
+      workspace.switchPerson(data, byName(name).id);
+      const { tasks } = todo.list(data);
+      assert.ok(tasks.length >= 2, `${name} has ${tasks.length} tasks`);
+      assert.ok(tasks.every(task => /^\d{4}-\d{2}-\d{2}$/.test(task.dueDate) && task.origin && task.action));
+      titles[name] = tasks.map(task => task.title);
+    }
+    assert.equal(new Set(Object.values(titles).flat()).size, judgeDemo.taskSeeds.length);
+    assert.ok(titles['Emma Larsen'].includes('Finish the Instagram Reel caption'));
+    assert.ok(titles['Alex Holm'].includes('Check the Vamo website against the new brief'));
+    assert.equal(workspace.load(root).tasks.length, judgeDemo.taskSeeds.length);
+    // Maya also needs to review Emma's proposed note; Emma does not.
+    workspace.switchPerson(data, byName('Maya Jensen').id);
+    assert.equal(todo.list(data).review.length, 1);
+    workspace.switchPerson(data, byName('Emma Larsen').id);
+    assert.equal(todo.list(data).review.length, 0);
   } finally { fs.rmSync(root, { recursive: true, force: true }); }
 });
