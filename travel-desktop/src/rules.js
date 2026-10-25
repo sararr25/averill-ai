@@ -67,6 +67,19 @@ function parseImageLine(line) {
   return rule;
 }
 
+// Design rules (FB-14). Source line: Design rule: <task> | contrast-normal|contrast-large|safe-margin | "<number>".
+// contrast-* is a minimum WCAG contrast ratio (1 to 21); safe-margin is the minimum distance in pixels between any text box and
+// every edge of a 1080 pixel wide design (scaled for other widths).
+const DESIGN_LINE = /^Design rule:\s*(email|linkedin|instagram|canva|operations|people|any)\s*\|\s*(contrast-normal|contrast-large|safe-margin)\s*\|\s*"(\d{1,3}(?:\.\d{1,2})?)"\.?$/i;
+function parseDesignLine(line) {
+  const match = String(line || '').trim().match(DESIGN_LINE);
+  if (!match) return null;
+  const rule = { task: match[1].toLowerCase(), type: match[2].toLowerCase(), value: match[3], number: Number(match[3]) };
+  if (rule.type.startsWith('contrast-') && !(rule.number >= 1 && rule.number <= 21)) return null;
+  if (rule.type === 'safe-margin' && !(Number.isInteger(rule.number) && rule.number <= 540)) return null;
+  return rule;
+}
+
 function sourceText(source) {
   try { return source.textPath ? fs.readFileSync(source.textPath, 'utf8') : ''; } catch { return ''; }
 }
@@ -200,4 +213,4 @@ function publicRules(data) {
 
 function removeForSource(data, sourceId) { if (data.rules) data.rules = data.rules.filter(rule => rule.sourceId !== sourceId); }
 
-module.exports = { parseHashtagLine, hashtagsIn, parseImageLine, parseAspect, aspectFits, KINDS, TASKS, SINGLE_VALUED, deterministic, validCandidate, extract, propose, decide, active, pending, conflicts, publicRules, removeForSource };
+module.exports = { parseHashtagLine, hashtagsIn, parseImageLine, parseDesignLine, parseAspect, aspectFits, KINDS, TASKS, SINGLE_VALUED, deterministic, validCandidate, extract, propose, decide, active, pending, conflicts, publicRules, removeForSource };

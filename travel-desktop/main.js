@@ -80,6 +80,7 @@ const browserBridge = new BrowserBridge({
     if (payload.kind === 'ask') return contextualReview.ask(payload);
     if (payload.kind === 'public-check') return contextualReview.publicCheck(payload);
     if (payload.kind === 'image-check') return contextualReview.imageCheck(payload);
+    if (payload.kind === 'design-check') return contextualReview.designCheck(payload);
     throw new Error('Unsupported contextual action');
   },
 });
@@ -193,7 +194,7 @@ function isOwnWindowSource(source) {
 }
 function clearSessionWork() {
   browserSessionEpoch++; browserConnect.revoke();
-  shared.clear(); aiEnabled = false; stopExternal(true, 'signed_out');
+  shared.clear(); aiEnabled = false; stopExternal(true, 'signed_out'); contextualReview.clearDesign();
   workState.clear();
   for (const window of workWindows.values()) if (!window.isDestroyed()) window.close();
   workWindows.clear();
@@ -217,6 +218,7 @@ function snapshot() {
     externalObservation: signedIn() ? externalObservation : null,
     externalError: signedIn() ? externalError : '',
     services: { nebius: Boolean(runtimeKeys.nebius), tavily: Boolean(runtimeKeys.tavily) },
+    designCheck: signedIn() ? contextualReview.designStatus(companyWorkspace.activePersonId) : null,
     onlineCheck: signedIn() ? { ...onlineCheckState(), last: lastPublicCheck?.personId === companyWorkspace.activePersonId ? lastPublicCheck : null } : null,
     publicSite: signedIn() ? publicSite.snapshot(companyWorkspace) : null,
     cloudActivity: signedIn() ? { mine: cloudActivity.forPerson(companyWorkspace, companyWorkspace.activePersonId), totals: workspace.person(companyWorkspace)?.role === 'admin' ? cloudActivity.summary(companyWorkspace) : null } : null,

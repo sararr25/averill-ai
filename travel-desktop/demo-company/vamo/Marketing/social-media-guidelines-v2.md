@@ -27,3 +27,10 @@ Image rule: instagram | aspect | "4:5 to 1.91:1, 9:16".
 Image rule: linkedin | aspect | "1.91:1, 1:1, 4:5".
 Image rule: instagram | min-width | "1080".
 Image rule: any | alt-text | "required".
+
+## Design
+Text on a Vamo design must be easy to read and must stay clear of the edges. Normal text needs a contrast ratio of at least 4.5:1 against the background behind it. Large text, meaning 24 px or more on a 1080 pixel wide post or 18.66 px or more in bold, needs at least 3:1. These are the WCAG 2.2 level AA values. Keep every text box at least 10% of the width away from every edge, which is 108 px on a 1080 pixel wide post. This matches the margin guide Canva shows on an Instagram post. It is Vamo's own rule, not a value that Instagram publishes. Wording on a design follows the same claim rules as the caption.
+
+Design rule: instagram | contrast-normal | "4.5".
+Design rule: instagram | contrast-large | "3".
+Design rule: instagram | safe-margin | "108".

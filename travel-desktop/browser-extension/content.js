@@ -59,7 +59,7 @@
   if(identity.value!==String(value||'')){identity.revision++;identity.value=String(value||'')}
   return {id:identity.id,revision:identity.revision,kind,label:label.slice(0,100),value:String(value||'')};
  }
- function teardown(){if(!alive)return false;alive=false;clearTimeout(timer);clearTimeout(refinding?.timer);refinding=null;selectedSig=null;observer.disconnect();clearInterval(heartbeat);abort.abort();selected=null;result=null;undo=null;return true}
+ function teardown(){if(!alive)return false;alive=false;designTeardown();clearTimeout(timer);clearTimeout(refinding?.timer);refinding=null;selectedSig=null;observer.disconnect();clearInterval(heartbeat);abort.abort();selected=null;result=null;undo=null;return true}
  function remove(){teardown();chrome.runtime.onMessage.removeListener?.(onMessage);root.replaceChildren();host.remove()}
  // Sharing ended: keep a short card that says why and how to reconnect, instead of disappearing.
  function stop(reason){if(!teardown())return;showEnded(reason)}
@@ -320,5 +320,88 @@
  heartbeat=setInterval(()=>{if(document.visibilityState!=='visible'){send({kind:'heartbeat',paused:true});return}
   // An editor that re-renders its field ends the selection, not the connection.
   if(selected&&!selected.isConnected){lose();return}{const request=generation;send({kind:'heartbeat'}).then(value=>{if(request===generation&&result&&Object.hasOwn(value,'reviewId')&&value.reviewId!==result.id)invalidate('The draft or company guidance changed. Check again.')});if(selected&&!timer&&!composing)commit('read')}},4000);
+ // FB-14: Canva design check. Off by default. When "Watch my design" is on, the design is read in this page after an edit
+ // pause (1 s, at most once every 2 s, only while connected and visible) by canva-design.js; only texts and numbers go to Averill.
+ // A finding shows a blocking card until the next check is clean or the employee presses "Export anyway". Averill never edits,
+ // exports or shares the design and never touches Canva's own controls.
+ const DESIGN=globalThis.AverillCanvaDesign;let design=null;
+ const DESIGN_CSS='.dcard{max-height:calc(100vh - 84px)}.dcard.block{border:2px solid #ffb8bf}.dcard.block h2{color:#ffb8bf}.dlabel{margin-left:auto;font-size:13px;font-weight:600;color:#b8b2c6}.watch{display:flex;align-items:center;gap:10px;min-height:32px;margin:0 0 12px;font-weight:600;font-size:14px;cursor:pointer}.watch input{flex:none;width:24px;height:24px;margin:0;accent-color:#d6ef91;cursor:pointer}.watch input:focus-visible{outline:3px solid #d6ef91;outline-offset:2px}.dlist{list-style:none;margin:0 0 12px;padding:0}.dfind{background:#35313f;border-radius:12px;padding:12px;margin:0 0 8px}.dfind b{display:block;font-size:13px;font-weight:600;color:#f3f1f8;overflow-wrap:anywhere}.dfind p{font-size:13px;color:#f3f1f8;margin:6px 0 0}.dfind p.measure{color:#ffc794;font-weight:600}.dfind .source{background:#2b2835;margin:8px 0 0}.dfind .source summary{min-height:24px}.dnote{font-size:12px;color:#b8b2c6;margin:8px 0 0;line-height:1.5}';
+ function designTeardown(){if(!design)return;clearTimeout(design.timer);design.observer.disconnect();design.abort.abort();design.host.remove();design=null}
+ function findingSignature(value){return value.findings.map(f=>`${f.type}|${f.element}|${f.text}`).sort().join('\n')}
+ function designPanel(){
+  const dhost=document.createElement('div');dhost.setAttribute('data-averill-design','');dhost.setAttribute('aria-label','Averill design check');
+  dhost.style.cssText='position:fixed;z-index:2147483646;display:block;right:12px;top:72px;left:auto;bottom:auto;width:340px;max-width:calc(100vw - 24px);margin:0;padding:0;border:0;background:transparent;';
+  const droot=dhost.attachShadow({mode:'closed'}),dstyle=style.cloneNode(true);dstyle.textContent+=DESIGN_CSS;droot.append(dstyle);
+  const dbox=node('div'),dstatus=node('div');dstatus.setAttribute('role','status');dstatus.setAttribute('aria-live','polite');dstatus.setAttribute('aria-atomic','true');dstatus.style.cssText='position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);';droot.append(dbox,dstatus);
+  document.documentElement.append(dhost);
+  // Keys typed in the card are Averill's: Canva's shortcuts must not see them.
+  for(const type of ['keydown','keyup','keypress'])dhost.addEventListener(type,e=>e.stopPropagation());
+  design={host:dhost,root:droot,box:dbox,status:dstatus,on:false,state:'off',result:null,reason:'',error:'',override:null,timer:null,lastRun:0,busy:false,pending:false,lastSent:'',checkedAt:null,cache:new WeakMap(),abort:new AbortController(),observer:new MutationObserver(()=>{if(design?.on)scheduleDesign()})};
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&design?.on)scheduleDesign()},{signal:design.abort.signal});
+  renderDesign();
+ }
+ function scheduleDesign(){const d=design;if(!d?.on||!alive)return;clearTimeout(d.timer);d.timer=setTimeout(()=>runDesign(false),Math.max(1000,d.lastRun+2000-Date.now()))}
+ function setWatch(on){const d=design;if(!d)return;d.on=on;clearTimeout(d.timer);d.result=null;d.override=null;d.lastSent='';d.error='';d.reason='';
+  if(on){d.observer.observe(document.body,{subtree:true,childList:true,attributes:true,characterData:true});d.state='checking';renderDesign();runDesign(true)}
+  else{d.observer.disconnect();d.state='off';renderDesign()}}
+ async function runDesign(force){
+  const d=design;if(!d||!d.on||!alive||document.visibilityState!=='visible')return;
+  if(d.busy){d.pending=true;return}
+  d.busy=true;d.lastRun=Date.now();
+  const read=DESIGN.read(document,{imageCache:d.cache});
+  if(read.state!=='ok'){d.busy=false;d.result=null;d.lastSent='';d.override=null;d.state='unreadable';d.reason=read.reason;renderDesign();if(d.pending){d.pending=false;scheduleDesign()}return}
+  const payload={design:read.design,elements:read.elements},sig=JSON.stringify(payload);
+  if(!force&&sig===d.lastSent&&d.result){d.busy=false;if(d.pending){d.pending=false;scheduleDesign()}return}
+  if(!d.result&&d.state!=='checking'){d.state='checking';renderDesign()}
+  const value=await send({kind:'design-check',...payload});
+  if(design!==d||!d.on||!alive)return;
+  d.busy=false;
+  if(value.stopped)return;
+  if(value.error){d.state='error';d.error=String(value.error).slice(0,300);d.result=null;d.lastSent=''}
+  else if(['findings','clean','insufficient-evidence'].includes(value.state)&&Array.isArray(value.findings)){
+   d.result=value;d.lastSent=sig;d.checkedAt=new Date();d.error='';
+   if(value.state==='findings')d.state=d.override&&d.override.signature===findingSignature(value)?'overridden':'blocking';
+   else{d.override=null;d.state=value.state==='clean'?'clean':'insufficient'}
+  }else{d.state='error';d.error='The design check could not finish. Try again.';d.result=null;d.lastSent=''}
+  renderDesign();
+  if(d.pending){d.pending=false;scheduleDesign()}
+ }
+ async function exportAnyway(){
+  const d=design;if(!d?.result||d.state!=='blocking')return;const checked=d.result;
+  const value=await send({kind:'design-check',action:'override',checkId:checked.id});
+  if(design!==d||d.result!==checked)return;
+  if(value.state==='override-recorded'){d.override={signature:findingSignature(checked),at:value.at};d.state='overridden';d.error=''}
+  else d.error=String(value.error||'Averill could not record this. Check the design again.').slice(0,300);
+  renderDesign();
+ }
+ function renderDesign(){
+  const d=design;if(!d||!alive)return;
+  const focused=d.root.activeElement,focusLabel=focused?.getAttribute('aria-label')||focused?.textContent;
+  const card=node('section',undefined,d.state==='blocking'?'card dcard block':'card dcard');card.setAttribute('aria-label','Averill design check');
+  const head=node('div',undefined,'head'),mark=node('img');mark.src=asset('assets/mark.svg');mark.alt='';head.append(mark,node('span','Averill','brand'),node('span','Design check','dlabel'));
+  const main=node('div',undefined,'main');
+  const watch=node('label',undefined,'watch'),toggle=node('input');toggle.type='checkbox';toggle.checked=d.on;toggle.setAttribute('aria-label','Watch my design');toggle.addEventListener('change',()=>setWatch(toggle.checked));watch.append(toggle,node('span','Watch my design'));main.append(watch);
+  const result=d.result,count=result?.findings?.length||0,plural=count===1?'':'s';
+  const notes=()=>{for(const note of (result?.notes||[]).slice(0,4))main.append(node('p',String(note).slice(0,240),'dnote'))};
+  if(!d.on)main.append(node('p','When this is on, Averill reads the texts, colors and positions of this design after you pause editing, and checks contrast, the safe area and approved wording. Only text and numbers go to Averill on this device. Averill never edits, exports or shares your design.','hint'));
+  else if(d.state==='checking')main.append(node('h2','Checking your design.'),node('p','Reading the texts, colors and positions on this page.','hint'));
+  else if(d.state==='unreadable')main.append(node('h2','Averill cannot read this design'),node('p',String(d.reason).slice(0,300)),node('p','Nothing was checked. Check contrast and margins yourself before you export. Canva may have changed its page, or the design uses something Averill does not read yet.','hint'));
+  else if(d.state==='error')main.append(node('h2','The design check could not finish.'),node('p',d.error,'error'),button('Check again',()=>runDesign(true),'secondary'));
+  else if(d.state==='clean'){const n=result.elementCount;main.append(node('h2','No design problems found.'),node('p',`Checked ${n} text${n===1?'':'s'} for ${(result.checked||[]).join(', ')}. Last check ${d.checkedAt.toLocaleTimeString()}. Averill keeps watching while you edit.`,'hint'));notes()}
+  else if(d.state==='insufficient'){main.append(node('h2','No approved design rules yet.'),node('p','There are not enough approved design rules to check this design. Ask your lead to approve them. Nothing was changed.'));notes()}
+  else if(d.state==='blocking'||d.state==='overridden'){
+   if(d.state==='blocking')main.append(node('h2','Fix before you export'),node('p',`Averill found ${count} problem${plural} in this design. Averill cannot stop Canva’s export, so fix ${count===1?'it':'them'} first.`));
+   else main.append(node('h2','Export anyway recorded.'),node('p',`You chose to export with ${count} known problem${plural}. Averill recorded this for this session only. The problem${plural} ${count===1?'is':'are'} still in the design.`,'hint'));
+   const list=node('ol',undefined,'dlist');
+   for(const f of result.findings.slice(0,12)){const item=node('li',undefined,'dfind');item.append(node('b',`“${String(f.text).slice(0,120)}”`),node('p',String(f.problem).slice(0,300)));if(f.measured)item.append(node('p',String(f.measured).slice(0,200),'measure'));if(f.source)item.append(source(f));list.append(item)}
+   main.append(list);if(d.state==='blocking')main.append(button('Export anyway',exportAnyway,'secondary'));notes();
+  }
+  if(d.error&&d.state!=='error')main.append(node('p',d.error,'error'));
+  const footer=node('div',undefined,'footer');footer.append(button('Stop sharing',async()=>{await send({kind:'stop'});stop('stopped_by_user')}));
+  card.append(head,main,footer);d.box.replaceChildren(card);
+  const heading=main.querySelector('h2')?.textContent;d.status.textContent=d.state==='blocking'?`Fix before you export. ${count} problem${plural}.`:heading||'';
+  if(focused){const next=[...d.box.querySelectorAll('button,input,summary')].find(e=>(e.getAttribute('aria-label')||e.textContent)===focusLabel);next?.focus({preventScroll:true})}
+ }
+ if(detected==='canva'&&DESIGN)designPanel();
  send(document.visibilityState==='visible'?{kind:'heartbeat'}:{kind:'heartbeat',paused:true});
 })();

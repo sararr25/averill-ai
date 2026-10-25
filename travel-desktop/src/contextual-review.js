@@ -9,6 +9,7 @@ const publicClaims = require('./public-claims');
 const { internalTexts } = require('./public-check');
 const { approvedSources } = require('./workspace');
 const imageCheck = require('./image-check');
+const designCheck = require('./design-check');
 
 const digest = value => crypto.createHash('sha256').update(JSON.stringify(value)).digest('hex');
 const ASK_MAX = 500, ASK_CONTEXT_MAX = 1500;
@@ -59,6 +60,7 @@ class ContextualReview {
     this.getState = getState; this.openSource = openSource; this.fetcher = fetcher; this.answer = answer;
     this.checkOnline = checkOnline; this.online = online;
     this.generation = 0; this.last = null; this.offered = null;
+    this.clearDesign();
   }
   invalidate() { this.generation++; this.last = null; this.offered = null; }
   // FB-10: public statements the employee may double-check online. They are exact pieces of the selected field, which the
@@ -127,6 +129,31 @@ class ContextualReview {
     if (!now?.signedIn || now.workspace?.activePersonId !== personId || now.epoch !== epoch || now.observed?.fieldId !== fieldId || now.observed.revision !== revision) throw stale();
     return { ...result, fieldId, revision };
   }
+  // FB-14: a Canva design check from the in-page card. Only texts and numbers arrive (validated again here); the page must be
+  // canva.com. The result is not bound to a selected field: it describes the whole open design at the time of the check.
+  designCheck(payload) {
+    const state = this.getState();
+    if (!state?.signedIn || !state.workspace) throw stale();
+    if (!/^https:\/\/([a-z0-9-]+\.)*canva\.com$/.test(String(payload?.pageOrigin || ''))) throw new Error('Design checks run on canva.com only.');
+    const personId = state.workspace.activePersonId;
+    if (payload.action === 'override') {
+      // "Export anyway": recorded for this signed-in session only, for the last check this person ran, if it had findings.
+      const last = this.lastDesign;
+      if (!last || last.id !== payload.checkId || last.personId !== personId || last.epoch !== state.epoch || !last.findingCount) throw stale();
+      const entry = { checkId: last.id, at: new Date().toISOString(), findingCount: last.findingCount, types: last.types, personId };
+      this.designOverrides.push(entry);
+      return { state: 'override-recorded', checkId: entry.checkId, at: entry.at };
+    }
+    const result = designCheck.evaluate({ workspace: state.workspace, payload: { design: payload.design, elements: payload.elements } });
+    this.lastDesign = { id: result.id, personId, epoch: state.epoch, at: new Date().toISOString(), findingCount: result.findings.length, elementCount: result.elementCount, types: [...new Set(result.findings.map(f => f.type))] };
+    return result;
+  }
+  designStatus(personId) {
+    const mine = entry => entry && entry.personId === personId;
+    const last = mine(this.lastDesign) ? this.lastDesign : null;
+    return { last: last && { at: last.at, findingCount: last.findingCount, elementCount: last.elementCount, types: last.types }, overrides: this.designOverrides.filter(mine).map(({ at, findingCount, types }) => ({ at, findingCount, types })) };
+  }
+  clearDesign() { this.lastDesign = null; this.designOverrides = []; }
   validate(expected, task, generation) {
     if (generation !== this.generation || identity(this.getState(), task) !== expected) throw stale();
   }

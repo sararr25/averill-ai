@@ -28,6 +28,7 @@
     "verify:rehearsal": "node scripts/verify-rehearsal.cjs",
     "verify:contextual": "electron scripts/verify-contextual.cjs",
     "verify:canva-adapter": "electron scripts/verify-canva-adapter.cjs",
+    "verify:canva-design": "electron scripts/verify-canva-design.cjs",
     "verify:accessibility": "electron scripts/verify-accessibility.cjs",
     "verify:guide": "electron scripts/verify-guide.cjs",
     "verify:demo-ai": "electron scripts/verify-demo-ai.cjs"

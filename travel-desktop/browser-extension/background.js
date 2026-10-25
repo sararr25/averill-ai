@@ -1,7 +1,12 @@
-importScripts('end-reasons.js');
+importScripts('end-reasons.js', 'canva-design.js');
 const { isReason } = globalThis.AverillEndReasons;
+const CanvaDesign = globalThis.AverillCanvaDesign;
 const CONNECT_ENDPOINT = 'http://127.0.0.1:43147/connect';
 const CONTENT_FILES = ['end-reasons.js', 'editor-adapter.js', 'field-select.js', 'content.js'];
+// FB-14: the Canva design reader is injected before content.js on canva.com only. No new permission: same activeTab grant.
+const CANVA_HOST = /(^|\.)canva\.com$/;
+function isCanva(url) { try { const target = new URL(url); return target.protocol === 'https:' && CANVA_HOST.test(target.hostname); } catch { return false; } }
+function contentFiles(url) { return isCanva(url) ? [...CONTENT_FILES.slice(0, -1), 'canva-design.js', 'content.js'] : CONTENT_FILES; }
 // Session-long connection (owner decision D1): 3 tries with backoff before Averill counts as closed.
 const RETRY_DELAYS_MS = [500, 1500];
 const RELAY_TIMEOUT_MS = 4000;
@@ -50,7 +55,7 @@ async function endPair(reason, { notifyBridge = false, notifyPage = true } = {})
 }
 function endedFor(tabId) { return state?.ended?.tabId === tabId ? state.ended.reason : 'lost_contact'; }
 
-async function inject(tabId) { await chrome.scripting.executeScript({ target: { tabId }, files: CONTENT_FILES }); }
+async function inject(tabId, url) { await chrome.scripting.executeScript({ target: { tabId }, files: contentFiles(url) }); }
 async function contentAlive(tabId) {
   try { return (await chrome.tabs.sendMessage(tabId, { kind: 'ping' }))?.alive === true; } catch { return false; }
 }
@@ -75,7 +80,7 @@ async function connectTab(message) {
   if (!validPair(pair)) throw new Error('Start a fresh connection from Averill.');
   s.pair = { endpoint: pair.endpoint, token: pair.token, tabId: tab.id, pageOrigin, sequence: 0 }; s.ended = null;
   await persist();
-  try { await inject(tab.id); }
+  try { await inject(tab.id, tab.url); }
   catch {
     await endPair('lost_contact', { notifyBridge: true, notifyPage: false });
     throw new Error('This page does not allow the companion. Choose a supported draft page.');
@@ -170,6 +175,31 @@ async function relayContext(message, sender) {
   }
 }
 
+// FB-14: a Canva design check. Only texts and numbers, validated here before anything is sent: at most 30 texts of up to
+// 500 characters, bounded numbers, no unknown keys, no image data. "Export anyway" sends only the id of the last check.
+async function relayDesign(message, sender) {
+  const { pair } = await load();
+  if (!validPair(pair) || sender.tab?.id !== pair.tabId || sender.frameId !== 0 || sender.origin !== pair.pageOrigin) return { stopped: true, reason: endedFor(sender.tab?.id) };
+  if (!isCanva(pair.pageOrigin)) return { error: 'Design checks work on canva.com only.' };
+  let payload;
+  if (message.action === 'override') {
+    if (!CanvaDesign.validCheckId(message.checkId)) return { error: 'Check the design again first.' };
+    payload = { kind: 'design-check', action: 'override', checkId: message.checkId };
+  } else {
+    try { payload = { kind: 'design-check', ...CanvaDesign.validate({ design: message.design, elements: message.elements }) }; }
+    catch (error) { return { error: `Averill cannot read this design. ${error.message}` }; }
+  }
+  try {
+    const response = await fetch(pair.endpoint.replace('/observation', '/context'), { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Averill-Token': pair.token }, body: JSON.stringify({ ...payload, tabId: pair.tabId, pageOrigin: pair.pageOrigin }), signal: AbortSignal.timeout(20000) });
+    if (state.pair?.token !== pair.token) return { stopped: true, reason: endedFor(pair.tabId) };
+    if (response.status === 400) return { error: message.action === 'override' ? 'The design or session changed. Check the design again.' : 'Averill could not check this design. Try again after your next edit.' };
+    if (!response.ok) return { error: 'The design check could not finish. Try again.' };
+    return await response.json();
+  } catch {
+    return { error: 'The design check could not finish. Try again.' };
+  }
+}
+
 chrome.runtime.onMessage.addListener((message, sender, reply) => {
   if (['connect-tab', 'pair-tab', 'stop-pair', 'status'].includes(message.kind)) {
     if (sender.tab || sender.id !== chrome.runtime.id) { reply({ error: 'Extension control required.' }); return; }
@@ -179,6 +209,7 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
     task.then(reply, error => reply({ error: error.message }));
     return true;
   }
+  if (message.kind === 'design-check') { relayDesign(message, sender).then(reply, () => reply({ error: 'The design check could not finish. Try again.' })); return true; }
   if (['review', 'proposal', 'open', 'ask', 'public-check', 'image-check'].includes(message.kind)) { relayContext(message, sender).then(reply, () => reply({ error: 'Try a fresh review.' })); return true; }
   if (!['field', 'heartbeat', 'editing', 'stop'].includes(message.kind)) { reply({ error: 'Unsupported action.' }); return; }
   (message.kind === 'stop' ? relayEvent(message, sender) : enqueue(() => relayEvent(message, sender))).then(reply, () => reply({ stopped: true, reason: 'lost_contact' }));
@@ -193,7 +224,7 @@ async function reattach(tabId, tab) {
   let origin = null; try { origin = new URL(tab?.url).origin; } catch {}
   if (origin !== pair.pageOrigin) { await endPair('other_site', { notifyBridge: true, notifyPage: false }); return; }
   if (!await contentAlive(tabId)) {
-    try { await inject(tabId); }
+    try { await inject(tabId, tab.url); }
     catch { await endPair('lost_contact', { notifyBridge: true, notifyPage: false }); return; }
   }
   await setBadge(tabId, true);
