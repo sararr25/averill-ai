@@ -131,3 +131,29 @@ test('closing the shared tab ends with tab_closed', async () => {
   assert.equal(w.storage.ended.reason, 'tab_closed');
   assert.equal(w.requests.find(r => r.body.kind === 'stop').body.endReason, 'tab_closed');
 });
+
+// FB-08: the image check is the only request that may be large, and only the validated image fields leave the worker.
+const PNG_URL = 'data:image/png;base64,' + Buffer.concat([Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]), Buffer.alloc(64)]).toString('base64');
+test('image-check is whitelisted, sends only sizes, alt text and PNG data, and marks the request kind', async () => {
+  const w = worker({ respond: () => new Response(JSON.stringify({ state: 'no-conflict', findings: [], images: [], notes: [] }), { status: 200 }) });
+  await w.send({ kind: 'connect-tab' });
+  const value = await w.fromPage({ kind: 'image-check', task: 'instagram', fieldId: 'field_1', revision: 2, token: 'LEAK', images: [{ width: 1080, height: 1350, alt: 'A bridge', dataUrl: PNG_URL, src: 'https://leak.example/a.png', text: 'LEAK' }, { width: 640, height: 480 }] });
+  assert.equal(value.state, 'no-conflict');
+  const sent = w.requests.at(-1);
+  assert.match(sent.url, /\/context$/); assert.equal(sent.headers['X-Averill-Kind'], 'image-check');
+  assert.deepEqual(sent.body.images, [{ width: 1080, height: 1350, alt: 'A bridge', dataUrl: PNG_URL }, { width: 640, height: 480, alt: '', unreadable: true }]);
+  assert(!JSON.stringify(sent.body).includes('LEAK'));
+  const other = await w.fromPage({ kind: 'ask', question: 'q' });
+  assert.equal(w.requests.at(-1).headers['X-Averill-Kind'], undefined, 'other requests keep the small-request path');
+});
+test('image-check rejects too many images, non-PNG data, and bodies above 6 MB before anything is sent', async () => {
+  const w = worker({ respond: ok });
+  await w.send({ kind: 'connect-tab' });
+  const before = w.requests.length, image = { width: 100, height: 100, alt: 'x', dataUrl: PNG_URL };
+  assert.match((await w.fromPage({ kind: 'image-check', task: 'instagram', fieldId: 'f', revision: 0, images: Array(5).fill(image) })).error, /up to 4 images/);
+  assert.match((await w.fromPage({ kind: 'image-check', task: 'instagram', fieldId: 'f', revision: 0, images: [{ ...image, dataUrl: 'data:text/html;base64,AAAA' }] })).error, /up to 4 images/);
+  assert.match((await w.fromPage({ kind: 'image-check', task: 'instagram', fieldId: 'f', revision: 0, images: [{ ...image, alt: 'a'.repeat(301) }] })).error, /up to 4 images/);
+  const huge = 'data:image/png;base64,' + 'A'.repeat(1.6 * 1024 * 1024);
+  assert.match((await w.fromPage({ kind: 'image-check', task: 'instagram', fieldId: 'f', revision: 0, images: Array(4).fill({ ...image, dataUrl: huge }) })).error, /too large to check \(limit 6 MB\)/);
+  assert.equal(w.requests.length, before, 'nothing was relayed');
+});

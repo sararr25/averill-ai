@@ -8,6 +8,7 @@ const tavily = require('./tavily');
 const publicClaims = require('./public-claims');
 const { internalTexts } = require('./public-check');
 const { approvedSources } = require('./workspace');
+const imageCheck = require('./image-check');
 
 const digest = value => crypto.createHash('sha256').update(JSON.stringify(value)).digest('hex');
 const ASK_MAX = 500, ASK_CONTEXT_MAX = 1500;
@@ -52,7 +53,9 @@ function exactProposal(finding, observed) {
 
 class ContextualReview {
   // checkOnline(claims, task) runs the public check (Tavily). online() says whether it is available and how it is routed.
-  constructor({ getState, openSource = () => {}, fetcher, answer = null, checkOnline = null, online = () => ({ available: false }) }) {
+  // ocr(filePath) reads the text of one temporary image file; tempDir is where those files live (FB-08, local only).
+  constructor({ getState, openSource = () => {}, fetcher, answer = null, checkOnline = null, online = () => ({ available: false }), ocr = undefined, tempDir = undefined }) {
+    this.ocr = ocr; this.tempDir = tempDir;
     this.getState = getState; this.openSource = openSource; this.fetcher = fetcher; this.answer = answer;
     this.checkOnline = checkOnline; this.online = online;
     this.generation = 0; this.last = null; this.offered = null;
@@ -108,6 +111,21 @@ class ContextualReview {
     const now = this.getState();
     if (!now?.signedIn || now.workspace?.activePersonId !== personId || now.epoch !== epoch) throw stale();
     return shapeChecked(raw);
+  }
+  // FB-08: the images the employee asked the card to check. Pixels are read on this device and never leave it; the reply
+  // carries findings and short per-image facts only. Bound to the same field revision as the review.
+  async imageCheck({ task, fieldId, revision, images }) {
+    const state = this.getState();
+    if (!state?.signedIn || !state.workspace) throw stale();
+    const observed = state.observed;
+    if (!observed?.fieldId || observed.fieldId !== fieldId || observed.revision !== revision || observed.personId !== state.workspace.activePersonId) throw stale();
+    if (!taskReview.tasks[task]) throw new Error('Choose a supported work type.');
+    const list = imageCheck.validate(images);
+    const personId = state.workspace.activePersonId, epoch = state.epoch;
+    const result = await imageCheck.run({ workspace: state.workspace, task, images: list, ocr: this.ocr, tempDir: this.tempDir });
+    const now = this.getState();
+    if (!now?.signedIn || now.workspace?.activePersonId !== personId || now.epoch !== epoch || now.observed?.fieldId !== fieldId || now.observed.revision !== revision) throw stale();
+    return { ...result, fieldId, revision };
   }
   validate(expected, task, generation) {
     if (generation !== this.generation || identity(this.getState(), task) !== expected) throw stale();

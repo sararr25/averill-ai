@@ -91,3 +91,45 @@ test('flaw matrix: published simulator posts raise no hashtag finding', async ()
     assert.deepEqual(findings.filter(f => f.type.startsWith('hashtag')), [], post.text);
   }
 });
+
+// FB-08: the planted image flaw. The Instagram Reel draft uses a copy of the Reel artwork with "Lowest prices guaranteed"
+// printed on it. The check runs the same engine on the text read from the image; the corrected image is the original artwork.
+const imageCheck = require('../src/image-check');
+const WINTER = path.join(__dirname, '..', '..', 'demo-tools', 'social-simulator', 'public', 'vamo', 'winter');
+const svgSize = file => { const head = fs.readFileSync(file, 'utf8').match(/<svg[^>]*>/)[0]; return { width: Number(head.match(/\bwidth="(\d+)"/)[1]), height: Number(head.match(/\bheight="(\d+)"/)[1]) }; };
+// Stand-in for OCR that is the same on every machine: the words drawn as <text> in the artwork.
+const svgWords = async file => fs.readFileSync(file, 'utf8').match(/<text[^>]*>[^<]*<\/text>/g).map(t => t.replace(/<[^>]+>/g, '')).join('\n');
+const PNG_HEAD = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+const imageReview = (task, name, ocr, alt = 'Selected post preview') => {
+  const png = 'data:image/png;base64,' + Buffer.concat([PNG_HEAD, Buffer.from(name)]).toString('base64');
+  return imageCheck.run({ workspace, task, images: imageCheck.validate([{ ...svgSize(path.join(WINTER, name)), alt, dataUrl: png }]), ocr: async () => ocr(path.join(WINTER, name)) });
+};
+
+test('flaw matrix: the Instagram Reel draft uses the planted image and the image check catches "lowest prices guaranteed" with its citation', async () => {
+  assert.equal(social('vamo-ig-winter-reel-draft').imageUrl, '/vamo/winter/winter-reel-vertical-price.svg');
+  const { findings } = await imageReview('instagram', 'winter-reel-vertical-price.svg', svgWords);
+  assert.deepEqual(findings.map(f => f.type), ['forbidden-claim'], JSON.stringify(findings));
+  assert.equal(findings[0].source.title, 'current-brief.md');
+  assert(findings[0].source.quote.includes('Do not claim "lowest prices guaranteed"'));
+  assert.equal(findings[0].observedExcerpt, 'Lowest prices guaranteed');
+  assert.equal(findings[0].imageIndex, 1);
+  const corrected = await imageReview('instagram', 'winter-reel-vertical.svg', svgWords);
+  assert.deepEqual(corrected.findings, [], JSON.stringify(corrected.findings));
+});
+
+test('flaw matrix: the LinkedIn draft image meets the approved image rules', async () => {
+  assert.equal(social('vamo-li-winter-draft').imageUrl, '/vamo/winter/winter-linkedin-landscape.svg');
+  const { findings } = await imageReview('linkedin', 'winter-linkedin-landscape.svg', svgWords);
+  assert.deepEqual(findings, [], JSON.stringify(findings));
+  const noAlt = await imageReview('linkedin', 'winter-linkedin-landscape.svg', svgWords, '');
+  assert.deepEqual(noAlt.findings.map(f => f.type), ['image-alt-missing']);
+});
+
+// The real macOS reader on the real artwork. Skipped where the helper cannot run (not macOS or not built).
+const OCR_BINARY = path.join(__dirname, '..', 'scripts', 'extract-text-macos-arm64');
+test('flaw matrix: the macOS OCR helper reads the planted phrase out of the real artwork', { skip: process.platform !== 'darwin' || !fs.existsSync(OCR_BINARY) ? 'macOS OCR helper not available' : false }, async () => {
+  const flawed = await imageReview('instagram', 'winter-reel-vertical-price.svg', file => imageCheck.defaultOcr(file));
+  assert.deepEqual(flawed.findings.map(f => f.type), ['forbidden-claim'], JSON.stringify(flawed));
+  const corrected = await imageReview('instagram', 'winter-reel-vertical.svg', file => imageCheck.defaultOcr(file));
+  assert.deepEqual(corrected.findings, [], JSON.stringify(corrected));
+});

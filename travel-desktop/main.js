@@ -79,6 +79,7 @@ const browserBridge = new BrowserBridge({
     if (payload.kind === 'open') return contextualReview.open(payload);
     if (payload.kind === 'ask') return contextualReview.ask(payload);
     if (payload.kind === 'public-check') return contextualReview.publicCheck(payload);
+    if (payload.kind === 'image-check') return contextualReview.imageCheck(payload);
     throw new Error('Unsupported contextual action');
   },
 });

@@ -1,6 +1,6 @@
 (() => {
  if(window.__averillStop)window.__averillStop();
- let selected=null,selectedSig=null,refinding=null,timer=null,heartbeat=null,alive=true,composing=false,sequence=0,generation=0,result=null,claimSet=null,reviewValue='',expanded=false,uiState='ready',error='',undo=null,mutationPending=false;
+ let selected=null,selectedSig=null,refinding=null,timer=null,heartbeat=null,alive=true,composing=false,sequence=0,generation=0,result=null,claimSet=null,imageSet=null,reviewValue='',expanded=false,uiState='ready',error='',undo=null,mutationPending=false;
  const FS=globalThis.AverillFieldSelect;if(!FS)throw new Error('Averill field-select.js was not loaded.');
  const identities=new WeakMap(),abort=new AbortController();
  const host=document.createElement('div');host.setAttribute('data-averill-companion','');host.tabIndex=0;host.setAttribute('aria-label','Averill review controls');
@@ -9,7 +9,7 @@
  const asset=file=>chrome.runtime.getURL?chrome.runtime.getURL(file):'';
  const style=document.createElement('style');style.textContent=`
  @font-face{font-family:AverillJakarta;src:url('${asset('assets/plus-jakarta-sans.ttf')}');font-weight:200 800;font-display:swap}
- :host{all:initial;color-scheme:dark}*{box-sizing:border-box}.card{font:14px/1.6 AverillJakarta,system-ui,sans-serif;color:#f3f1f8;background:#2b2835;border:1px solid #57505f;border-radius:22px;box-shadow:0 16px 50px #100f192b;max-height:calc(100vh - 24px);display:flex;flex-direction:column;overflow:hidden;text-align:left}.head{display:flex;align-items:center;gap:8px;padding:14px 12px 0 20px;flex:none}.head img{width:24px;height:24px}.brand{font-size:20px;letter-spacing:-.045em;font-weight:600}.pill{margin-left:auto;display:inline-flex;align-items:center;gap:6px;font:600 11px/16px AverillJakarta,system-ui,sans-serif;color:#d6ef91;background:#363e2d;border-radius:999px;padding:3px 10px;white-space:nowrap}.pill::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor}.pill.off{color:#ffc794;background:#44362e}.hint{font-size:13px}.main{padding:18px 20px;overflow:auto;min-height:0}.footer{padding:0 20px 14px;flex:none}h2{font-size:24px;line-height:1.3;letter-spacing:-.035em;font-weight:600;margin:0 0 12px}p{font-size:14px;color:#b8b2c6;margin:0 0 14px;line-height:1.6}.tag{font-size:11px;color:#b8b2c6;margin-bottom:9px}.observed{background:#44362e;color:#ffc794;border-radius:9px;padding:12px;font-size:13px;white-space:pre-wrap;overflow-wrap:anywhere;margin:12px 0}.primary{display:block;background:#d6ef91;color:#242a1b;border:0;border-radius:12px;padding:0 16px;font:600 13px/20px AverillJakarta,system-ui,sans-serif;min-height:36px;width:100%;text-align:center}.more .primary{display:inline-block;width:auto}.secondary{background:transparent;border:1px solid #8e879b;color:#f3f1f8;border-radius:12px;padding:0 12px;min-height:32px;font:600 13px/20px AverillJakarta,system-ui,sans-serif}.primary+.text,.primary+.secondary{margin-top:8px}.text{border:0;background:transparent;color:#b8b2c6;padding:0;text-decoration:underline;text-underline-offset:3px;min-height:24px;font:600 13px/20px AverillJakarta,system-ui,sans-serif}.text+.text{display:table;margin-top:8px}.close{border:0;background:transparent;color:#b8b2c6;font-size:20px;line-height:1;min-width:32px;min-height:32px;border-radius:12px}.row{display:flex;gap:15px;justify-content:space-between;align-items:center}.source{background:#35313f;border-radius:12px;padding:12px;font-size:13px;color:#f3f1f8;margin-bottom:4px}.source summary{cursor:pointer}.source small{display:block;font-size:12px;color:#b8b2c6}.quote{margin-top:12px;border-top:1px solid #484351;padding-top:12px;white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px;max-height:130px;overflow:auto}.diff{border:1px solid #484351;border-radius:12px;overflow:hidden;margin:12px 0}.diff div{padding:12px;white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px}.before{background:#44362e;color:#ffc794}.after{background:#363e2d;color:#d6ef91}.diff small{display:block;font-size:11px;margin-bottom:5px}.notice{color:#d6ef91}.error{color:#ffb8bf}.more{border-top:1px solid #484351;margin-top:14px;padding-top:14px}button,select{font:inherit;cursor:pointer}button:disabled{opacity:.6;cursor:default}button:focus-visible,summary:focus-visible,select:focus-visible{outline:3px solid #d6ef91;outline-offset:3px}select{width:100%;padding:10px;background:#35313f;color:#f3f1f8;border:1px solid #8e879b;border-radius:10px;margin-bottom:12px}.ask{border-top:1px solid #484351;padding:14px 20px;flex:none}.ask label{display:block;font-size:12px;font-weight:600;color:#b8b2c6;margin-bottom:6px}.ask textarea{display:block;width:100%;min-height:56px;resize:none;background:#35313f;color:#f3f1f8;border:1px solid #8e879b;border-radius:12px;padding:8px 12px;font:13px/1.5 AverillJakarta,system-ui,sans-serif}.ask textarea:focus-visible{outline:3px solid #d6ef91;outline-offset:2px}.askrow{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:8px}.askrow small{font-size:12px;color:#b8b2c6;line-height:1.4}.out{margin-top:12px;max-height:200px;overflow:auto}.out p{font-size:13px;margin:0 0 8px}.cite{background:#35313f;border-radius:12px;padding:12px;font-size:13px;margin-bottom:8px}.cite b{display:block;font-weight:600}.cite small{display:block;font-size:12px;color:#b8b2c6}.cite .quote{margin-top:8px;padding-top:8px;max-height:96px}.check{border-top:1px solid #484351;margin-top:14px;padding-top:14px}.check h3,.results h3{font-size:14px;line-height:1.4;font-weight:600;margin:0 0 6px;color:#f3f1f8}.check .hint,.results .hint{font-size:13px;color:#b8b2c6;margin:0 0 10px;line-height:1.5}.claim{display:flex;gap:8px;align-items:flex-start;margin-bottom:8px}.claim input{flex:none;width:24px;height:24px;margin:4px 0 0;accent-color:#d6ef91;cursor:pointer}.claim textarea{flex:1;min-width:0;display:block;min-height:52px;resize:none;background:#35313f;color:#f3f1f8;border:1px solid #8e879b;border-radius:12px;padding:6px 10px;font:13px/1.5 AverillJakarta,system-ui,sans-serif}.claim.off textarea{opacity:.6}.claim input:focus-visible,.claim textarea:focus-visible{outline:3px solid #d6ef91;outline-offset:2px}.checkrow{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:4px}.checkrow small{font-size:12px;color:#b8b2c6;line-height:1.4}.checknote{font-size:12px;color:#b8b2c6;margin:8px 0 0;line-height:1.5}.results{margin-top:14px}.verdict{border-left:3px solid #8e879b;background:#35313f;border-radius:0 12px 12px 0;padding:10px 12px;margin-bottom:8px;font-size:13px}.verdict.supported{border-color:#d6ef91}.verdict.contradicted{border-color:#ffb8bf}.verdict b{display:block;font-weight:600}.verdict.supported b{color:#d6ef91}.verdict.contradicted b{color:#ffb8bf}.verdict p{font-size:13px;margin:4px 0 0;overflow-wrap:anywhere}.src{margin-top:8px;border-top:1px solid #484351;padding-top:8px}.src a{display:inline-block;min-height:24px;color:#f3f1f8;font-weight:600;text-decoration:underline;text-underline-offset:3px;overflow-wrap:anywhere}.src a:focus-visible{outline:3px solid #d6ef91;outline-offset:2px}.src small{display:block;font-size:12px;color:#b8b2c6;overflow-wrap:anywhere}.src .snip{font-size:12px;margin-top:4px;overflow-wrap:anywhere}.chip{border:1px solid #57505f;background:#2b2835;color:#f3f1f8;border-radius:12px;min-height:36px;padding:0 16px;font:600 13px AverillJakarta,system-ui,sans-serif;box-shadow:0 4px 18px #100f1920}button{transition:background-color 140ms cubic-bezier(.16,1,.3,1)}button:hover{filter:brightness(1.06)}@media(prefers-reduced-motion:reduce){button{transition:none}}
+ :host{all:initial;color-scheme:dark}*{box-sizing:border-box}.card{font:14px/1.6 AverillJakarta,system-ui,sans-serif;color:#f3f1f8;background:#2b2835;border:1px solid #57505f;border-radius:22px;box-shadow:0 16px 50px #100f192b;max-height:calc(100vh - 24px);display:flex;flex-direction:column;overflow:hidden;text-align:left}.head{display:flex;align-items:center;gap:8px;padding:14px 12px 10px 20px;flex:none;position:relative;z-index:1;background:#2b2835;border-bottom:1px solid #484351}.head img{width:24px;height:24px}.brand{font-size:20px;letter-spacing:-.045em;font-weight:600}.pill{margin-left:auto;display:inline-flex;align-items:center;gap:6px;font:600 11px/16px AverillJakarta,system-ui,sans-serif;color:#d6ef91;background:#363e2d;border-radius:999px;padding:3px 10px;white-space:nowrap}.pill::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor}.pill.off{color:#ffc794;background:#44362e}.hint{font-size:13px}.main{padding:16px 20px 18px;overflow:auto;min-height:0}.footer{padding:0 20px 14px;flex:none}h2{font-size:24px;line-height:1.3;letter-spacing:-.035em;font-weight:600;margin:0 0 12px}p{font-size:14px;color:#b8b2c6;margin:0 0 14px;line-height:1.6}.tag{font-size:11px;color:#b8b2c6;margin-bottom:9px}.observed{background:#44362e;color:#ffc794;border-radius:9px;padding:12px;font-size:13px;white-space:pre-wrap;overflow-wrap:anywhere;margin:12px 0}.primary{display:block;background:#d6ef91;color:#242a1b;border:0;border-radius:12px;padding:0 16px;font:600 13px/20px AverillJakarta,system-ui,sans-serif;min-height:36px;width:100%;text-align:center}.more .primary{display:inline-block;width:auto}.secondary{background:transparent;border:1px solid #8e879b;color:#f3f1f8;border-radius:12px;padding:0 12px;min-height:32px;font:600 13px/20px AverillJakarta,system-ui,sans-serif}.primary+.text,.primary+.secondary{margin-top:8px}.text{border:0;background:transparent;color:#b8b2c6;padding:0;text-decoration:underline;text-underline-offset:3px;min-height:24px;font:600 13px/20px AverillJakarta,system-ui,sans-serif}.text+.text{display:table;margin-top:8px}.close{border:0;background:transparent;color:#b8b2c6;font-size:20px;line-height:1;min-width:32px;min-height:32px;border-radius:12px}.row{display:flex;gap:15px;justify-content:space-between;align-items:center}.source{background:#35313f;border-radius:12px;padding:12px;font-size:13px;color:#f3f1f8;margin-bottom:4px}.source summary{cursor:pointer}.source small{display:block;font-size:12px;color:#b8b2c6}.quote{margin-top:12px;border-top:1px solid #484351;padding-top:12px;white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px;max-height:130px;overflow:auto}.diff{border:1px solid #484351;border-radius:12px;overflow:hidden;margin:12px 0}.diff div{padding:12px;white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px}.before{background:#44362e;color:#ffc794}.after{background:#363e2d;color:#d6ef91}.diff small{display:block;font-size:11px;margin-bottom:5px}.notice{color:#d6ef91}.error{color:#ffb8bf}.more{border-top:1px solid #484351;margin-top:14px;padding-top:14px}button,select{font:inherit;cursor:pointer}button:disabled{opacity:.6;cursor:default}button:focus-visible,summary:focus-visible,select:focus-visible{outline:3px solid #d6ef91;outline-offset:3px}select{width:100%;padding:10px;background:#35313f;color:#f3f1f8;border:1px solid #8e879b;border-radius:10px;margin-bottom:12px}.ask{border-top:1px solid #484351;padding:14px 20px;flex:none}.ask label{display:block;font-size:12px;font-weight:600;color:#b8b2c6;margin-bottom:6px}.ask textarea{display:block;width:100%;min-height:56px;resize:none;background:#35313f;color:#f3f1f8;border:1px solid #8e879b;border-radius:12px;padding:8px 12px;font:13px/1.5 AverillJakarta,system-ui,sans-serif}.ask textarea:focus-visible{outline:3px solid #d6ef91;outline-offset:2px}.askrow{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:8px}.askrow small{font-size:12px;color:#b8b2c6;line-height:1.4}.out{margin-top:12px;max-height:200px;overflow:auto}.out p{font-size:13px;margin:0 0 8px}.cite{background:#35313f;border-radius:12px;padding:12px;font-size:13px;margin-bottom:8px}.cite b{display:block;font-weight:600}.cite small{display:block;font-size:12px;color:#b8b2c6}.cite .quote{margin-top:8px;padding-top:8px;max-height:96px}.check{border-top:1px solid #484351;margin-top:14px;padding-top:14px}.check h3,.results h3{font-size:14px;line-height:1.4;font-weight:600;margin:0 0 6px;color:#f3f1f8}.check .hint,.results .hint{font-size:13px;color:#b8b2c6;margin:0 0 10px;line-height:1.5}.claim{display:flex;gap:8px;align-items:flex-start;margin-bottom:8px}.claim input{flex:none;width:24px;height:24px;margin:4px 0 0;accent-color:#d6ef91;cursor:pointer}.claim textarea{flex:1;min-width:0;display:block;min-height:52px;resize:none;background:#35313f;color:#f3f1f8;border:1px solid #8e879b;border-radius:12px;padding:6px 10px;font:13px/1.5 AverillJakarta,system-ui,sans-serif}.claim.off textarea{opacity:.6}.claim input:focus-visible,.claim textarea:focus-visible{outline:3px solid #d6ef91;outline-offset:2px}.checkrow{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:4px}.checkrow small{font-size:12px;color:#b8b2c6;line-height:1.4}.checknote{font-size:12px;color:#b8b2c6;margin:8px 0 0;line-height:1.5}.results{margin-top:14px}.verdict{border-left:3px solid #8e879b;background:#35313f;border-radius:0 12px 12px 0;padding:10px 12px;margin-bottom:8px;font-size:13px}.verdict.supported{border-color:#d6ef91}.verdict.contradicted{border-color:#ffb8bf}.verdict b{display:block;font-weight:600}.verdict.supported b{color:#d6ef91}.verdict.contradicted b{color:#ffb8bf}.verdict p{font-size:13px;margin:4px 0 0;overflow-wrap:anywhere}.src{margin-top:8px;border-top:1px solid #484351;padding-top:8px}.src a{display:inline-block;min-height:24px;color:#f3f1f8;font-weight:600;text-decoration:underline;text-underline-offset:3px;overflow-wrap:anywhere}.src a:focus-visible{outline:3px solid #d6ef91;outline-offset:2px}.src small{display:block;font-size:12px;color:#b8b2c6;overflow-wrap:anywhere}.src .snip{font-size:12px;margin-top:4px;overflow-wrap:anywhere}.chip{border:1px solid #57505f;background:#2b2835;color:#f3f1f8;border-radius:12px;min-height:36px;padding:0 16px;font:600 13px AverillJakarta,system-ui,sans-serif;box-shadow:0 4px 18px #100f1920}h3{scroll-margin-top:16px}.images{border-top:1px solid #484351;margin-top:14px;padding-top:14px}.images h3{font-size:14px;line-height:1.4;font-weight:600;margin:0 0 6px;color:#f3f1f8}.images .hint{font-size:13px;color:#b8b2c6;margin:0 0 10px;line-height:1.5}.images .source summary{min-height:24px}.images>.imgitem{margin-top:14px}.imgitem{margin-bottom:10px;font-size:13px;overflow-wrap:anywhere}.imgitem p{font-size:13px;color:#f3f1f8;margin:0 0 6px}.imgitem p.checknote{color:#b8b2c6;font-size:12px}.imgfacts{margin:8px 0 0;padding:0;list-style:none}.imgfacts li{font-size:12px;color:#b8b2c6;line-height:1.5;margin:0 0 2px;overflow-wrap:anywhere}button{transition:background-color 140ms cubic-bezier(.16,1,.3,1)}button:hover{filter:brightness(1.06)}@media(prefers-reduced-motion:reduce){button{transition:none}}
  `;root.append(style);const box=document.createElement('div');root.append(box);
  const status=node('div');status.setAttribute('role','status');status.setAttribute('aria-live','polite');status.setAttribute('aria-atomic','true');status.style.cssText='position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);';root.append(status);
  // FB-07: one persistent question box, moved into whichever card is showing. Plain text only.
@@ -81,7 +81,7 @@
   const main=node('div',undefined,'main');main.append(node('h2','Sharing ended.'),node('p',message),node('p',reasons.RECONNECT,'hint'),button('Close',remove,'secondary'));
   card.append(head,main);box.replaceChildren(card);status.textContent=`Sharing ended. ${message}`;
  }
- function invalidate(message=''){generation++;result=null;claimSet=null;uiState='ready';error=message;expanded=false;render()}
+ function invalidate(message=''){generation++;result=null;claimSet=null;imageSet=null;uiState='ready';error=message;expanded=false;render()}
  async function commit(reason){const request=generation;timer=null;if(!alive||composing||document.visibilityState!=='visible')return;if(reason==='pause'&&selected?.isConnected)selectedSig=sign(selected);const field=describe(selected);const value=await send(field?{kind:'field',field,reason}:{kind:'editing'});if(request===generation&&result&&Object.hasOwn(value,'reviewId')&&value.reviewId!==result.id)invalidate('The draft or approved guidance changed. Check again.');return field}
  function position(){if(!selected||!selected.isConnected)return;const container=selected.closest('[role=dialog],dialog[open]')||document.documentElement;if(host.parentElement!==container)container.append(host);host.style.right='';host.style.bottom='';const r=selected.getBoundingClientRect(),width=Math.min(expanded?420:360,innerWidth-24);host.style.width=width+'px';const height=host.getBoundingClientRect().height;let left,top;
   if(r.right+width+24<=innerWidth){left=r.right+12;top=Math.max(12,Math.min(r.top,innerHeight-height-12))}
@@ -163,6 +163,98 @@
   if(set.outcome)section.append(checkResults(set.outcome));
   return section;
  }
+ // FB-08: "Check images too". Nothing is collected before the employee presses the button; pixels are read in a canvas here and go
+ // only to Averill on this device. A page image the browser will not let us read sends no pixels at all.
+ const IMAGE_MAX=4,IMAGE_SIDES=[1600,1200,900,600],IMAGE_URL_BUDGET=1.4*1024*1024,IMAGE_MIN_RENDERED=64,IMAGE_TASKS=['instagram','linkedin'];
+ const COMPOSER='[role=dialog],dialog,form,[class*="compose" i],[class*="composer" i],[class*="share-box" i]';
+ function imageCandidates(box){
+  const found=[];
+  for(const el of box.querySelectorAll('img')){
+   if(found.length>=IMAGE_MAX)break;const r=el.getBoundingClientRect();
+   if(el.complete&&el.naturalWidth>0&&el.naturalHeight>0&&r.width>=IMAGE_MIN_RENDERED&&r.height>=IMAGE_MIN_RENDERED)found.push({kind:'img',el});
+  }
+  let seen=0;
+  for(const el of box.querySelectorAll('*')){
+   if(found.length>=IMAGE_MAX||++seen>600)break;if(el.tagName==='IMG')continue;
+   const bg=getComputedStyle(el).backgroundImage,match=/^url\((["']?)(.+)\1\)$/.exec(bg||'');
+   if(!match)continue;const r=el.getBoundingClientRect();
+   if(r.width>=IMAGE_MIN_RENDERED&&r.height>=IMAGE_MIN_RENDERED)found.push({kind:'bg',el,url:match[2]});
+  }
+  return found;
+ }
+ // The post editor around the shared field: its dialog, form or composer, never the whole page.
+ function composerOf(field){
+  const modal=field.closest('[role=dialog],dialog');if(modal)return modal;
+  for(let node=field.parentElement,steps=0;node&&node!==document.body&&node!==document.documentElement&&steps<12;node=node.parentElement,steps++){
+   if(node.matches(COMPOSER)&&imageCandidates(node).length)return node;
+  }
+  for(let node=field.parentElement,steps=0;node&&node!==document.body&&node!==document.documentElement&&steps<6;node=node.parentElement,steps++)if(imageCandidates(node).length)return node;
+  return null;
+ }
+ function loadImage(url,cors){return new Promise((resolve,reject)=>{const img=new Image();if(cors)img.crossOrigin='anonymous';img.onload=()=>resolve(img);img.onerror=()=>reject(new Error('load'));img.src=url})}
+ // Downscaled PNG, long side at most 1600 pixels (smaller if the file would be too big). Throws if the canvas is tainted.
+ function pngOf(source,width,height){
+  for(const side of IMAGE_SIDES){
+   const scale=Math.min(1,side/Math.max(width,height)),canvas=document.createElement('canvas');
+   canvas.width=Math.max(1,Math.round(width*scale));canvas.height=Math.max(1,Math.round(height*scale));
+   const ctx=canvas.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.drawImage(source,0,0,canvas.width,canvas.height);
+   const url=canvas.toDataURL('image/png');if(url.length<=IMAGE_URL_BUDGET)return url;
+  }
+  return null;
+ }
+ async function readImage(candidate){
+  if(candidate.kind==='img'){
+   const el=candidate.el,out={width:el.naturalWidth,height:el.naturalHeight,alt:(el.getAttribute('alt')||'').trim().slice(0,300)};
+   try{const url=pngOf(el,out.width,out.height);if(url)out.dataUrl=url}catch{}
+   return out;
+  }
+  const label=(candidate.el.getAttribute('aria-label')||'').trim().slice(0,300);
+  try{
+   const plain=await loadImage(candidate.url,false),out={width:plain.naturalWidth,height:plain.naturalHeight,alt:candidate.el.getAttribute('role')==='img'?label:''};
+   if(!out.width||!out.height)return null;
+   try{const url=pngOf(await loadImage(candidate.url,true),out.width,out.height);if(url)out.dataUrl=url}catch{}
+   return out;
+  }catch{return null}
+ }
+ async function collectImages(field){
+  const box=composerOf(field);if(!box)return [];
+  const images=[];for(const candidate of imageCandidates(box).slice(0,IMAGE_MAX)){const image=await readImage(candidate);if(image)images.push(image)}
+  return images;
+ }
+ async function runImageCheck(set){
+  if(set.busy||!alive||imageSet!==set)return;
+  set.busy=true;set.outcome=null;set.message='';render();status.textContent='Checking the images on this device.';
+  const field=selected?await commit('selection'):null;
+  if(!alive||imageSet!==set)return;
+  if(!field||field.id!==set.fieldId||field.revision!==set.revision){set.busy=false;set.message='The draft changed. Check the images again.';render();return}
+  let images;try{images=await collectImages(selected)}catch{set.busy=false;set.message='The images on this page could not be collected.';render();return}
+  const value=await send({kind:'image-check',task:set.task,fieldId:set.fieldId,revision:set.revision,images});
+  if(!alive||imageSet!==set)return;
+  set.busy=false;set.focusResults=true;
+  if(value.error)set.message=String(value.error).slice(0,300);else if(['findings','no-conflict','insufficient-evidence'].includes(value.state)&&Array.isArray(value.findings))set.outcome=value;else set.message='The image check could not finish. Try again.';
+  render();status.textContent=set.outcome?(set.outcome.findings.length?`${set.outcome.findings.length} image suggestion${set.outcome.findings.length===1?'':'s'}.`:'No image conflicts found.'):set.message;
+ }
+ function imageResults(out){
+  const wrap=node('div',undefined,'imgitem'),title=node('h3',out.findings.length?`${out.findings.length} image suggestion${out.findings.length===1?'':'s'}`:out.state==='insufficient-evidence'?'No approved image guidance yet':'No image conflicts found');title.tabIndex=-1;wrap.append(title);
+  for(const f of out.findings.slice(0,12)){const item=node('div',undefined,'imgitem');item.append(node('p',String(f.suggestion||'').slice(0,400)));if(f.source)item.append(source(f));wrap.append(item)}
+  const facts=node('ul',undefined,'imgfacts');
+  for(const image of (out.images||[]).slice(0,IMAGE_MAX))facts.append(node('li',`Image ${image.index}: ${image.width} by ${image.height} pixels, ${image.altPresent?'alt text present':'no alt text'}, ${String(image.reading||'').slice(0,40)}.`));
+  for(const note of (out.notes||[]).slice(0,8))facts.append(node('li',String(note).slice(0,240)));
+  if(facts.children.length)wrap.append(facts);
+  wrap.append(node('p',`Checked${out.scope?.checked?.length?': '+out.scope.checked.join(', '):''}. Only the images inside this post editor were looked at. Pictures and any text read from them stayed on this device.`,'checknote'));
+  return wrap;
+ }
+ function imageSection(){
+  const field=selected?describe(selected):null;
+  if(!field||!IMAGE_TASKS.includes(task)||CLAIM_BLOCKED.includes(uiState))return null;
+  if(!imageSet||imageSet.fieldId!==field.id||imageSet.revision!==field.revision||imageSet.task!==task)imageSet={fieldId:field.id,revision:field.revision,task,busy:false,outcome:null,message:'',focusResults:false};
+  const set=imageSet,section=node('section',undefined,'images');section.setAttribute('aria-label','Images');
+  section.append(node('h3','Images'),node('p','Check the images attached to this post: size, alt text and any text printed on them. This happens on this device only. Nothing is collected until you press the button.','hint'));
+  const go=button(set.busy?'Checking images':'Check images too',()=>runImageCheck(set),'secondary');go.disabled=set.busy;section.append(go);
+  if(set.message)section.append(node('p',set.message,'error'));
+  if(set.outcome)section.append(imageResults(set.outcome));
+  return section;
+ }
  function source(finding){const details=node('details',undefined,'source'),summary=node('summary',finding.source.title);summary.append(node('small',`Approved · Version ${finding.source.version}`));details.append(summary,node('div',finding.source.quote,'quote'));return details}
  function render(proposal){if(!alive||!selected)return;const focused=root.activeElement;const focusLabel=focused?.getAttribute('aria-label')||focused?.textContent;host.style.display='block';box.replaceChildren();
   if(uiState==='dismissed'){box.append(button('Ask Averill',()=>{uiState='ready';render()},'chip'));position();return}
@@ -183,13 +275,13 @@
   else if(result?.state==='no-conflict')main.append(node('h2','No conflicts found.'),node('p','No conflict was found in the selected text against the approved rules checked. Other fields and visual layout were not reviewed.'),button('Recheck selected text',()=>ask(false),'primary'));
   else if(result?.state==='insufficient-evidence')main.append(node('h2','No approved source yet.'),node('p','There is not enough approved, visible guidance to check this text. Your draft has not changed.'),button('Try again',()=>ask(false),'primary'));
   else{main.append(node('h2',uiState==='error'?'The check could not finish.':'Help, right where you work.'),node('p','Check this selected field against approved company guidance.'));if(task)main.append(button(uiState==='error'?'Try again':'Ask Averill',()=>ask(false),'primary'))}
-  if(task){const check=checkSection();if(check)main.append(check)}
+  if(task){const check=checkSection();if(check)main.append(check);const pictures=imageSection();if(pictures)main.append(pictures)}
   if(task&&uiState!=='checking'&&uiState!=='consent'&&uiState!=='preview'&&uiState!=='applying'&&uiState!=='undoing'&&uiState!=='applied')main.append(button('Use Nemotron for this review',()=>ask(true)));
   const footer=node('div',undefined,'footer');footer.append(button('Stop sharing',async()=>{await send({kind:'stop'});stop('stopped_by_user')}));card.append(head,main,askSection(),footer);box.append(card);position();if(focused===askInput){askInput.focus({preventScroll:true})}
   status.textContent=main.querySelector('h2')?.textContent||error;
-  const resultsFocus=Boolean(claimSet?.focusResults);if(claimSet)claimSet.focusResults=false;
+  const resultsFocus=Boolean(claimSet?.focusResults||imageSet?.focusResults);if(claimSet)claimSet.focusResults=false;if(imageSet)imageSet.focusResults=false;
   if(focused&&focused!==askInput&&!resultsFocus){const controls=[...box.querySelectorAll('button,select,summary,a[href],input')];const next=controls.find(e=>(e.getAttribute('aria-label')||e.textContent)===focusLabel)||main.querySelector('.primary')||main.querySelector('h2');if(next){if(next.tagName==='H2')next.tabIndex=-1;next.focus({preventScroll:true})}}
-  if(resultsFocus){const heading=box.querySelector('.results h3')||box.querySelector('.check .error');if(heading){heading.tabIndex=-1;heading.focus()}}
+  if(resultsFocus){const heading=box.querySelector('.results h3')||box.querySelector('.imgitem h3')||box.querySelector('.check .error')||box.querySelector('.images .error');if(heading){heading.tabIndex=-1;heading.focus()}}
  }
   const visible=element=>Boolean(describe(element));
   function sign(element){return FS.signature(element,document,visible)}

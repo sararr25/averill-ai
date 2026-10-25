@@ -6,6 +6,8 @@ const CONTENT_FILES = ['end-reasons.js', 'editor-adapter.js', 'field-select.js',
 const RETRY_DELAYS_MS = [500, 1500];
 const RELAY_TIMEOUT_MS = 4000;
 const MAX_CLAIMS = 5, MAX_CLAIM_LENGTH = 300;
+// FB-08: the only request allowed to be large. Averill rejects more than 6 MB of body, so the worker refuses first.
+const MAX_IMAGES = 4, MAX_IMAGE_BODY_BYTES = 6 * 1024 * 1024, MAX_ALT_LENGTH = 300, PNG_DATA_URL = /^data:image\/png;base64,[A-Za-z0-9+/]+={0,2}$/;
 let queue = Promise.resolve();
 function enqueue(task) { const run = queue.then(task); queue = run.catch(() => {}); return run; }
 function validPair(pair) { return /^http:\/\/127\.0\.0\.1:\d+\/observation$/.test(pair?.endpoint || '') && /^[a-f0-9]{64}$/.test(pair?.token || ''); }
@@ -137,10 +139,27 @@ async function relayContext(message, sender) {
     if (!list.length || list.length > MAX_CLAIMS || list.some(claim => typeof claim !== 'string' || !claim.trim() || claim.length > MAX_CLAIM_LENGTH)) return { error: `Choose 1 to ${MAX_CLAIMS} statements of up to ${MAX_CLAIM_LENGTH} characters.` };
     Object.assign(payload, { claims: list.map(claim => claim.trim()) });
   }
+  if (message.kind === 'image-check') {
+    // FB-08: sizes, alt text and downscaled PNGs of the images in the shared field's post editor, collected only after the
+    // employee pressed "Check images too". Everything is validated here; the pixels go to Averill on this device and nowhere else.
+    const list = Array.isArray(message.images) ? message.images : null;
+    const valid = list && list.length <= MAX_IMAGES && list.every(image => image && Number.isSafeInteger(image.width) && Number.isSafeInteger(image.height) && image.width > 0 && image.height > 0
+      && (image.alt === undefined || (typeof image.alt === 'string' && image.alt.length <= MAX_ALT_LENGTH)) && (image.dataUrl === undefined || (typeof image.dataUrl === 'string' && PNG_DATA_URL.test(image.dataUrl))));
+    if (!valid) return { error: `Averill can check up to ${MAX_IMAGES} images. Check the images again.` };
+    Object.assign(payload, { images: list.map(image => ({ width: image.width, height: image.height, alt: image.alt || '', ...(image.dataUrl ? { dataUrl: image.dataUrl } : { unreadable: true }) })) });
+  }
   try {
-    const response = await fetch(pair.endpoint.replace('/observation', '/context'), { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Averill-Token': pair.token }, body: JSON.stringify({ ...payload, tabId: pair.tabId, pageOrigin: pair.pageOrigin }), signal: AbortSignal.timeout(message.kind === 'public-check' ? 120000 : 45000) });
+    const headers = { 'Content-Type': 'application/json', 'X-Averill-Token': pair.token };
+    const body = JSON.stringify({ ...payload, tabId: pair.tabId, pageOrigin: pair.pageOrigin });
+    if (message.kind === 'image-check') {
+      if (body.length > MAX_IMAGE_BODY_BYTES) return { error: 'The images are too large to check (limit 6 MB). Use smaller images.' };
+      headers['X-Averill-Kind'] = 'image-check';
+    }
+    const response = await fetch(pair.endpoint.replace('/observation', '/context'), { method: 'POST', headers, body, signal: AbortSignal.timeout(message.kind === 'public-check' ? 120000 : message.kind === 'image-check' ? 90000 : 45000) });
     if (state.pair?.token !== pair.token) return { stopped: true, reason: endedFor(pair.tabId) };
     if (response.status === 400 && message.kind === 'ask') return { error: 'The question could not be answered. Check it and try again.' };
+    if (response.status === 413) return { error: 'The images are too large to check (limit 6 MB). Use smaller images.' };
+    if (response.status === 400 && message.kind === 'image-check') return { error: 'The images or the draft changed. Check the images again.' };
     if (response.status === 400 && message.kind === 'public-check') return { error: 'The draft changed. Check the statements again.' };
     if (response.status === 400) return { error: 'The draft or company guidance changed. Review this field again.' };
     if (!response.ok) return { error: 'The check could not finish. Try again.' };
@@ -160,7 +179,7 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
     task.then(reply, error => reply({ error: error.message }));
     return true;
   }
-  if (['review', 'proposal', 'open', 'ask', 'public-check'].includes(message.kind)) { relayContext(message, sender).then(reply, () => reply({ error: 'Try a fresh review.' })); return true; }
+  if (['review', 'proposal', 'open', 'ask', 'public-check', 'image-check'].includes(message.kind)) { relayContext(message, sender).then(reply, () => reply({ error: 'Try a fresh review.' })); return true; }
   if (!['field', 'heartbeat', 'editing', 'stop'].includes(message.kind)) { reply({ error: 'Unsupported action.' }); return; }
   (message.kind === 'stop' ? relayEvent(message, sender) : enqueue(() => relayEvent(message, sender))).then(reply, () => reply({ stopped: true, reason: 'lost_contact' }));
   return true;

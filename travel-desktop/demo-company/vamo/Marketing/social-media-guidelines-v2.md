@@ -17,3 +17,13 @@ Hashtag rule: any | banned | "#cheapestflights".
 Hashtag rule: any | banned | "#lowestprice".
 Hashtag rule: any | banned | "#bestprice".
 Hashtag rule: instagram | paid-required | "#ad".
+
+## Images
+Every Instagram and LinkedIn post carries an image. Instagram feed images use a ratio from 4:5 to 1.91:1, which includes 1:1, and Reels and Stories use 9:16. LinkedIn images use 1.91:1, 1:1 or 4:5. Instagram images are at least 1080 pixels wide. Every image has alt text that describes it. Text printed on an image follows the same claim rules as the caption, so an image must not say "lowest prices guaranteed" either.
+
+Image rule: instagram | required | "image".
+Image rule: linkedin | required | "image".
+Image rule: instagram | aspect | "4:5 to 1.91:1, 9:16".
+Image rule: linkedin | aspect | "1.91:1, 1:1, 4:5".
+Image rule: instagram | min-width | "1080".
+Image rule: any | alt-text | "required".

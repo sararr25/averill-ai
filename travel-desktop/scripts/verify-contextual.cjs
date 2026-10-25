@@ -1,14 +1,14 @@
 // Actual main process, bridge, review engine, background and content script; synthetic browser transport/approval only.
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
-const fs = require('node:fs'), path = require('node:path'), http = require('node:http'), vm = require('node:vm'), assert = require('node:assert/strict');
+const os = require('node:os'), fs = require('node:fs'), path = require('node:path'), http = require('node:http'), vm = require('node:vm'), assert = require('node:assert/strict');
 const AB=process.env.AB_VARIANT||'';assert(['','expanded','compact'].includes(AB));
-const VAMO=process.env.VAMO_PAGE||'';const FB06=process.env.FB06==='1';assert(['','brevo','linkedin','instagram'].includes(VAMO));
+const VAMO=process.env.VAMO_PAGE||'';const FB06=process.env.FB06==='1';const FB08=process.env.FB08==='1';assert(['','brevo','linkedin','instagram'].includes(VAMO));
 const APP = path.resolve(__dirname, '..'), profile = fs.mkdtempSync('/tmp/averill-contextual-ui-');
 const workspace = require('../src/workspace'), { BrowserConnect } = require('../src/browser-connect');
-const file = path.join(profile, 'brand.md'); fs.writeFileSync(file, 'Do not claim "lowest prices guaranteed".'+(AB?'\nDo not claim "free flights".\nDo not claim "book today".':''));
+const file = path.join(profile, 'brand.md'); fs.writeFileSync(file, 'Do not claim "lowest prices guaranteed".'+(FB08?'\nImage rule: instagram | required | "image".\nImage rule: instagram | aspect | "4:5 to 1.91:1, 9:16".\nImage rule: instagram | min-width | "1080".\nImage rule: linkedin | aspect | "1.91:1, 1:1, 4:5".\nImage rule: any | alt-text | "required".':'')+(AB?'\nDo not claim "free flights".\nDo not claim "book today".':''));
 const data = workspace.create(profile, 'Synthetic contextual test', 'Owner'), source = workspace.importFile(profile, data, file, { department: 'Marketing', version: '2' }); workspace.updateSource(data, source.id, 'approved'); workspace.save(profile, data);
 app.setPath('userData', profile); process.env.AVERILL_CONNECT_PORT = '0';
-let connectPort, approvals = 0, editor, pageServer, backgroundListener, updatedListener, holdReviewReply = false; const storage = {}, badges = [];
+const imageCalls = []; let connectPort, approvals = 0, editor, pageServer, backgroundListener, updatedListener, holdReviewReply = false; const storage = {}, badges = [];
 const SHOTS = process.env.SHOTS || ''; if (SHOTS) fs.mkdirSync(SHOTS, { recursive: true });
 const originalStart = BrowserConnect.prototype.start;
 BrowserConnect.prototype.start = async function () { connectPort = await originalStart.call(this); return connectPort; };
@@ -46,12 +46,12 @@ app.whenReady().then(async () => { try {
  const worker = vm.createContext({ chrome, URL, AbortSignal, setTimeout, fetch: (url, options) => global.fetch(url, { ...options, headers: { ...options.headers, Origin: extOrigin } }) }); worker.globalThis = worker;
  worker.importScripts = (...files) => { for (const name of files) vm.runInContext(fs.readFileSync(path.join(APP, 'browser-extension', name), 'utf8'), worker); };
  vm.runInContext(fs.readFileSync(path.join(APP, 'browser-extension/background.js'), 'utf8').replace('http://127.0.0.1:43147/connect', `http://127.0.0.1:${connectPort}/connect`), worker);
- const relay = (payload, sender = { id: chrome.runtime.id, tab: { id: 9 }, frameId: 0, origin: pageOrigin }) => new Promise(resolve => backgroundListener(payload, sender, value => { if (payload.kind === 'review' && holdReviewReply) setTimeout(() => resolve(value), 250); else resolve(value); }));
+ const relay = (payload, sender = { id: chrome.runtime.id, tab: { id: 9 }, frameId: 0, origin: pageOrigin }) => new Promise(resolve => backgroundListener(payload, sender, value => { if (payload.kind === 'image-check') imageCalls.push({ payload: JSON.parse(JSON.stringify(payload)), value: JSON.parse(JSON.stringify(value)) }); if (payload.kind === 'review' && holdReviewReply) setTimeout(() => resolve(value), 250); else resolve(value); }));
  const preload = path.join(profile, 'test-preload.cjs'); fs.writeFileSync(preload, "const {contextBridge,ipcRenderer}=require('electron');contextBridge.exposeInMainWorld('testExtension',{send:p=>ipcRenderer.invoke('test-extension',p),onMessage:f=>ipcRenderer.on('test-extension-message',(_,p)=>f(p))});");
  editor = new BrowserWindow({ width: 1200, height: 900, show: false, webPreferences: { preload, contextIsolation: true, sandbox: true } });
  ipcMain.handle('test-extension', (event, payload) => { assert.equal(event.sender, editor.webContents); return relay(payload); });
  await editor.loadURL(pageOrigin + (VAMO?'/'+VAMO:'/draft')); const page = async s => {try{return await editor.webContents.executeJavaScript(s)}catch(error){console.error('Page operation:',s.slice(0,180));throw error}};
- if(VAMO){await pause(500);if(VAMO==='linkedin')await page("document.querySelector('.li-start').click()");else if(VAMO==='instagram'){await page("[...document.querySelectorAll('button')].find(b=>b.textContent==='Create post').click()");await page("const input=document.querySelector('input[type=file]'),dt=new DataTransfer();dt.items.add(new File(['<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\"><rect width=\"100\" height=\"100\" fill=\"teal\"/></svg>'],'synthetic.svg',{type:'image/svg+xml'}));input.files=dt.files;input.dispatchEvent(new Event('change',{bubbles:true}));");await pause(200);}else{await page("document.querySelector('.br-campaign-main').click()");await pause(100);await page("[...document.querySelectorAll('button')].find(b=>/Edit design|Start designing/.test(b.textContent)).click()");}await pause(200);await page("const draft=document.querySelector('textarea');draft.id='draft';Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype,'value').set.call(draft,'  Hello 🌍\\nOur lowest prices guaranteed.\\nKeep https://example.test  ');draft.dispatchEvent(new Event('input',{bubbles:true}));");checks.push('Actual Vamo '+VAMO+' React editor opened, synthetic draft only; no send/save');}
+ if(VAMO){await pause(500);if(VAMO==='linkedin')await page("document.querySelector('.li-start').click()");else if(VAMO==='instagram'&&FB08){await page("document.querySelector('.ig-draft').click()");await pause(300)}else if(VAMO==='instagram'){await page("[...document.querySelectorAll('button')].find(b=>b.textContent==='Create post').click()");await page("const input=document.querySelector('input[type=file]'),dt=new DataTransfer();dt.items.add(new File(['<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\"><rect width=\"100\" height=\"100\" fill=\"teal\"/></svg>'],'synthetic.svg',{type:'image/svg+xml'}));input.files=dt.files;input.dispatchEvent(new Event('change',{bubbles:true}));");await pause(200);}else{await page("document.querySelector('.br-campaign-main').click()");await pause(100);await page("[...document.querySelectorAll('button')].find(b=>/Edit design|Start designing/.test(b.textContent)).click()");}await pause(200);await page("const draft=document.querySelector('textarea');draft.id='draft';Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype,'value').set.call(draft,'  Hello 🌍\\nOur lowest prices guaranteed.\\nKeep https://example.test  ');draft.dispatchEvent(new Event('input',{bubbles:true}));");checks.push('Actual Vamo '+VAMO+' React editor opened, synthetic draft only; no send/save');}
  if(AB)await page("const d=document.getElementById('draft');Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype,'value').set.call(d,d.value+' Free flights: book today.');d.dispatchEvent(new Event('input',{bubbles:true}));");
  const shim = () => page(`window.testShadow=null;const originalShadow=Element.prototype.attachShadow;Element.prototype.attachShadow=function(o){const r=originalShadow.call(this,o);window.testShadow=r;return r};window.chrome={runtime:{getURL:p=>${JSON.stringify(pageOrigin + '/')}+p,sendMessage:p=>window.testExtension.send(p),onMessage:{addListener:f=>window.testExtension.onMessage(f)}}};void 0;`);
  await shim();
@@ -139,6 +139,79 @@ app.whenReady().then(async () => { try {
   checks.push('FB-10 Double-check online: claims from the draft shown with checkboxes and the exact text; nothing sent before the 32px Check with Tavily button; unticked text never leaves; edited text sent as typed; mocked Tavily result renders as plain text with an HTTPS link and "Public check, not company approval"; desktop activity line and Current work summary appear; draft untouched');
  }
 
+
+ // FB-08: "Check images too". Real Chromium canvas, real pointer clicks, real macOS OCR helper on the planted image; mocked nothing but the transport.
+ if(FB08){
+  assert(VAMO==='instagram','FB08 needs VAMO_PAGE=instagram (the planted image is on the Instagram Reel draft)');
+  const step=async(name,fn)=>{try{await fn();checks.push('FB-08 '+VAMO+': '+name)}catch(error){error.message='FB-08 step failed: '+name+': '+error.message;throw error}};
+  const shot=async(name,rect)=>{if(SHOTS)fs.writeFileSync(path.join(SHOTS,`${VAMO}-${name}.png`),(await editor.webContents.capturePage(rect)).toPNG())};
+  const leftovers=()=>fs.readdirSync(os.tmpdir()).filter(name=>name.startsWith('averill-image-')).sort();
+  const tempBefore=leftovers();
+  // A second origin without CORS headers: its image can be shown but never read into a canvas.
+  const foreign=http.createServer((req,res)=>{res.setHeader('Content-Type','image/svg+xml');res.end('<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350"><rect width="1080" height="1350" fill="#3a6b7a"/></svg>')});
+  await new Promise(r=>foreign.listen(0,'127.0.0.1',r));
+  try{
+  await page("window.__pngReads=0;const original=HTMLCanvasElement.prototype.toDataURL;HTMLCanvasElement.prototype.toDataURL=function(...a){window.__pngReads++;return original.apply(this,a)};void 0");
+  await page(`(()=>{const i=document.createElement('img');i.id='foreign-img';i.alt='Partner photo';i.src='http://127.0.0.1:${foreign.address().port}/partner.svg';i.style.cssText='display:block;width:120px;height:150px';document.querySelector('[role=dialog]').append(i)})()`);
+  await until("document.getElementById('foreign-img').complete&&document.getElementById('foreign-img').naturalWidth>0");
+  await until("testShadow.textContent.includes('Remove “lowest prices guaranteed”.')");
+  await step('nothing is collected before the click: no canvas read, no image request, section is off by default',async()=>{
+   assert.equal(await page('window.__pngReads'),0);assert.equal(imageCalls.length,0);
+   const section=await page("(()=>{const s=testShadow.querySelector('.images');return s&&{text:s.textContent,button:[...s.querySelectorAll('button')].map(b=>[b.textContent,Math.round(b.getBoundingClientRect().height),b.disabled,b.className])}})()");
+   assert(section,'Images section is shown');assert(section.text.includes('Nothing is collected until you press the button'));
+   assert.deepEqual(section.button,[['Check images too',32,false,'secondary']]);
+  });
+  const before=await page("document.getElementById('draft').value");
+  await click('Check images too');await until("testShadow.querySelector('.images .imgitem h3')");
+  const results=await page("(()=>{const s=testShadow.querySelector('.images');return {text:s.textContent,items:[...s.querySelectorAll('.imgitem .imgitem p')].map(p=>p.textContent),sources:[...s.querySelectorAll('details.source')].map(d=>({title:d.querySelector('summary').firstChild.textContent,quote:d.querySelector('.quote').textContent,summaryH:Math.round(d.querySelector('summary').getBoundingClientRect().height)})),pills:s.querySelectorAll('.pill').length,unsafe:s.querySelectorAll('script,img,a,svg').length,links:[...s.querySelectorAll('button,summary')].map(e=>Math.round(e.getBoundingClientRect().height))}})()");
+  await step('Check images too reads the composer images; the planted claim is found by the real OCR helper and cites its approved line',async()=>{
+   assert.equal(imageCalls.length,1);assert(await page('window.__pngReads')>0);
+   assert(results.items.some(t=>/^Image 1 shows “Lowest prices guaranteed”/.test(t)),JSON.stringify(results.items));
+   const claim=results.sources.find(x=>x.quote.includes('Do not claim "lowest prices guaranteed"'));assert(claim,JSON.stringify(results.sources));assert.equal(claim.title,'brand.md');
+   assert(results.sources.every(x=>x.summaryH>=24),'citation links are at least 24px tall');assert.equal(results.pills,0,'no pills');assert.equal(results.unsafe,0,'plain text only');
+   assert.equal(await page("document.getElementById('draft').value"),before,'the check never edits the field');
+  });
+  await step('a cross-origin image sends no pixels and the card says it could not be read on this page',async()=>{
+   const sent=imageCalls[0].payload;assert.equal(sent.images.length,2);
+   assert(sent.images[0].dataUrl.startsWith('data:image/png;base64,'));assert.equal(sent.images[1].dataUrl,undefined);assert.equal(sent.images[1].alt,'Partner photo');
+   assert(results.text.includes('Image 2 could not be read on this page'),results.text);
+  });
+  await step('the downscaled PNG has a long side of at most 1600 pixels; the reply carries no image data',async()=>{
+   const png=Buffer.from(imageCalls[0].payload.images[0].dataUrl.split(',')[1],'base64'),w=png.readUInt32BE(16),h=png.readUInt32BE(20);
+   assert.equal(Math.max(w,h),1600,`${w}x${h}`);assert.equal(imageCalls[0].payload.images[0].width,1080);assert.equal(imageCalls[0].payload.images[0].height,1920);
+   const reply=JSON.stringify(imageCalls[0].value);assert(!reply.includes('base64')&&!reply.includes('dataUrl')&&reply.length<6000,reply.length);
+   assert(!JSON.stringify((await run('window.desktop.snapshot()'))).includes('base64'),'no image data in the desktop snapshot');
+   assert.deepEqual(leftovers(),tempBefore,'every temporary image file was deleted');
+  });
+  await page("(()=>{const m=testShadow.querySelector('.main');m.scrollTop=m.scrollHeight})()");await pause(120);await shot('images-section-planted');
+  await step('after the image is replaced by the original artwork the same check is clean',async()=>{
+   await page("document.querySelector('[role=dialog] img[alt=\"Selected post preview\"]').src='/vamo/winter/winter-reel-vertical.svg'");await pause(300);
+   await click('Check images too');await until("testShadow.querySelector('.images .imgitem h3')?.textContent==='No image conflicts found'");
+   assert.equal(imageCalls.length,2);assert.equal(imageCalls[1].value.findings.length,0);assert.deepEqual(leftovers(),tempBefore);
+   assert((await page("testShadow.querySelector('.images').textContent")).includes('Image 2 could not be read on this page'));
+  });
+  await page("(()=>{const m=testShadow.querySelector('.main');m.scrollTop=m.scrollHeight})()");await pause(120);await shot('images-section-clean');
+  await step('editing the draft clears the image results',async()=>{
+   await page("(()=>{const d=document.getElementById('draft');Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype,'value').set.call(d,d.value+' More.');d.dispatchEvent(new Event('input',{bubbles:true}))})()");await pause(150);
+   assert.equal(await page("Boolean(testShadow.querySelector('.images .imgitem'))"),false);
+  });
+  // Card header fix: with the card scrolled, no section title may sit under the header. "Before" re-applies the old header rules.
+  await step('scrolled card: section titles never slide under the header',async()=>{
+   await click('Ask Averill');await until("testShadow.textContent.includes('Remove “lowest prices guaranteed”.')");await click('Check images too');await until("testShadow.querySelector('.images .imgitem h3')");
+   editor.setSize(1200,520);await pause(300);await page("window.dispatchEvent(new Event('resize'))");await pause(200);
+   const geometry=()=>page("(()=>{const m=testShadow.querySelector('.main'),h=testShadow.querySelector('.head'),t=testShadow.querySelector('.images h3');m.scrollTop=m.scrollHeight;const hb=h.getBoundingClientRect().bottom,mt=m.getBoundingClientRect().top,tt=t.getBoundingClientRect().top;m.scrollTop=Math.max(0,m.scrollTop-40);const sc=m.scrollHeight>m.clientHeight;const titles=[...m.querySelectorAll('h2,h3')].filter(e=>{const r=e.getBoundingClientRect();return r.bottom>hb&&r.top<hb});return {scrolls:sc,headBottom:hb,mainTop:mt,opaque:getComputedStyle(h).backgroundColor,separator:getComputedStyle(h).borderBottomWidth,straddling:titles.map(e=>e.textContent)}})()");
+   await page("(()=>{const m=testShadow.querySelector('.main');m.scrollTop=m.scrollHeight})()");
+   const after=await geometry();assert(after.scrolls,'the card scrolls at this height');assert(after.mainTop>=after.headBottom-0.5,JSON.stringify(after));assert.equal(after.separator,'1px');assert.deepEqual(after.straddling,[]);
+   await page("(()=>{const m=testShadow.querySelector('.main');m.scrollTop=m.scrollHeight-60})()");await pause(120);
+   await shot('card-scrolled-header-after');
+   await page("(()=>{const s=document.createElement('style');s.id='old-head';s.textContent='.head{padding-bottom:0!important;border-bottom:0!important}.main{padding-top:18px!important}';testShadow.append(s);const m=testShadow.querySelector('.main');m.scrollTop=m.scrollHeight-60})()");await pause(120);
+   await shot('card-scrolled-header-before-old-css');
+   await page("testShadow.getElementById('old-head').remove()");
+  });
+  editor.setSize(1200,900);
+  }finally{foreign.close();foreign.closeAllConnections()}
+  console.log(checks.filter(c=>c.startsWith('FB-08')).join('\n'));console.log(`FB08 ${VAMO} PASS ${checks.filter(c=>c.startsWith('FB-08')).length}/6 steps; zero real provider requests; real macOS OCR helper`);return;
+ }
  // FB-06: the same simulator composer after edits, after the app replaces the field node, and as a role=textbox editor.
  if(FB06){
   assert(VAMO==='linkedin'||VAMO==='instagram','FB06 needs VAMO_PAGE=linkedin or instagram');

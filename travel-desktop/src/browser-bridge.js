@@ -19,6 +19,9 @@ function fieldName(pageOrigin, label) {
 const LIVENESS_MS = 2 * 60 * 1000;
 const PAUSED_LIVENESS_MS = 30 * 60 * 1000;
 const TOMBSTONE_MS = 10 * 60 * 1000;
+// Requests are small (24 KB) except an image check (FB-08), which carries downscaled PNGs and may be 6 MB. The raised limit
+// applies only when the extension declares that kind in a header and the body then proves to be that kind.
+const BODY_LIMIT = 24000, IMAGE_BODY_LIMIT = 6 * 1024 * 1024;
 const EXTENSION_END_REASONS = ['stopped_by_user', 'tab_closed', 'other_site', 'lost_contact'];
 
 class BrowserBridge {
@@ -79,16 +82,25 @@ class BrowserBridge {
       response.setHeader('Cache-Control', 'no-store');
       if (request.method === 'OPTIONS') {
         response.setHeader('Access-Control-Allow-Methods', 'POST');
-        response.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-Averill-Token');
+        response.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-Averill-Token, X-Averill-Kind');
         response.writeHead(204); response.end(); return;
       }
       const supplied = String(request.headers['x-averill-token'] || '');
       if (request.method !== 'POST' || (this.token !== token && !ended) || !/^[a-f0-9]{64}$/.test(supplied) || supplied.length !== token.length || !crypto.timingSafeEqual(Buffer.from(supplied), Buffer.from(token))) { response.writeHead(403); response.end(); return; }
       if (ended) { request.resume(); response.setHeader('Content-Type', 'application/json'); response.writeHead(410); response.end(JSON.stringify({ ended })); return; }
       try {
+        const imageCheck = request.url === '/context' && request.headers['x-averill-kind'] === 'image-check';
+        const limit = imageCheck ? IMAGE_BODY_LIMIT : BODY_LIMIT;
+        if (imageCheck && Number(request.headers['content-length']) > limit) {
+          // Read and drop the body (bounded) so the sender sees a clean 413 instead of a reset connection.
+          let dropped = 0;
+          for await (const chunk of request) { dropped += chunk.length; if (dropped > 4 * limit) { request.destroy(); return; } }
+          response.writeHead(413); response.end('{}'); return;
+        }
         let bytes = 0, chunks = [];
-        for await (const chunk of request) { bytes += chunk.length; if (bytes > 24000) throw new Error('Too large'); chunks.push(chunk); }
+        for await (const chunk of request) { bytes += chunk.length; if (bytes > limit) throw new Error('Too large'); chunks.push(chunk); }
         const payload = JSON.parse(Buffer.concat(chunks).toString());
+        if (imageCheck && payload.kind !== 'image-check') throw new Error('Wrong request kind');
         if (this.token !== token) throw new Error('Sharing stopped');
         if (!Number.isSafeInteger(payload.tabId) || payload.tabId < 0 || !/^https?:\/\/[^/]+$/.test(payload.pageOrigin || '')) throw new Error('Invalid tab');
         const binding = `${payload.tabId}:${payload.pageOrigin}`;

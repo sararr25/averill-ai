@@ -32,6 +32,41 @@ function hashtagsIn(text) {
   return out;
 }
 
+// Image rules (FB-08). Source line: Image rule: <task> | required|aspect|min-width|alt-text | "<value>".
+// required "image"; alt-text "required"; min-width "1080"; aspect "4:5 to 1.91:1, 9:16" (width:height, a range or single ratios).
+const IMAGE_LINE = /^Image rule:\s*(email|linkedin|instagram|canva|operations|people|any)\s*\|\s*(required|aspect|min-width|alt-text)\s*\|\s*"([^"]{1,80})"\.?$/i;
+const RATIO = /^(\d+(?:\.\d+)?):(\d+(?:\.\d+)?)$/;
+const ASPECT_TOLERANCE = 0.02;
+function ratioOf(text) {
+  const match = String(text).trim().match(RATIO);
+  if (!match || !(Number(match[1]) > 0) || !(Number(match[2]) > 0)) return null;
+  return Number(match[1]) / Number(match[2]);
+}
+// "4:5 to 1.91:1, 9:16" -> [{ min: 0.8, max: 1.91 }, { min: 0.5625, max: 0.5625 }]; null when any part is not a ratio.
+function parseAspect(value) {
+  const ranges = [];
+  for (const part of String(value).split(',')) {
+    const [low, high, ...extra] = part.split(/\s+to\s+/i);
+    const min = ratioOf(low), max = high === undefined ? min : ratioOf(high);
+    if (extra.length || min === null || max === null || min > max) return null;
+    ranges.push({ min, max });
+  }
+  return ranges.length ? ranges : null;
+}
+function aspectFits(ratio, ranges) {
+  return ranges.some(({ min, max }) => ratio >= min * (1 - ASPECT_TOLERANCE) && ratio <= max * (1 + ASPECT_TOLERANCE));
+}
+function parseImageLine(line) {
+  const match = String(line || '').trim().match(IMAGE_LINE);
+  if (!match) return null;
+  const rule = { task: match[1].toLowerCase(), type: match[2].toLowerCase(), value: match[3].trim() };
+  if (rule.type === 'required' && rule.value.toLowerCase() !== 'image') return null;
+  if (rule.type === 'alt-text' && rule.value.toLowerCase() !== 'required') return null;
+  if (rule.type === 'min-width') { if (!/^\d{2,5}$/.test(rule.value)) return null; rule.pixels = Number(rule.value); }
+  if (rule.type === 'aspect') { rule.ranges = parseAspect(rule.value); if (!rule.ranges) return null; }
+  return rule;
+}
+
 function sourceText(source) {
   try { return source.textPath ? fs.readFileSync(source.textPath, 'utf8') : ''; } catch { return ''; }
 }
@@ -165,4 +200,4 @@ function publicRules(data) {
 
 function removeForSource(data, sourceId) { if (data.rules) data.rules = data.rules.filter(rule => rule.sourceId !== sourceId); }
 
-module.exports = { parseHashtagLine, hashtagsIn, KINDS, TASKS, SINGLE_VALUED, deterministic, validCandidate, extract, propose, decide, active, pending, conflicts, publicRules, removeForSource };
+module.exports = { parseHashtagLine, hashtagsIn, parseImageLine, parseAspect, aspectFits, KINDS, TASKS, SINGLE_VALUED, deterministic, validCandidate, extract, propose, decide, active, pending, conflicts, publicRules, removeForSource };
