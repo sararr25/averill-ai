@@ -1,6 +1,10 @@
 # Feedback round, 25 to 26 October 2026
 
-**State:** branch `feat/feedback-blocks-a-d`, newest commit `a70e4e5`. Nothing pushed. No release built. Spec: `docs/FEEDBACK_SPEC_2026-10-25.md`. Canva spike: `docs/CANVA_SPIKE_2026-10-25.md`.
+**State (26 October):** branch `feat/feedback-blocks-a-d` pushed; pull request [#55](https://github.com/sararr25/averill-ai/pull/55) open against `main`, not merged. Release ZIP built locally only (not published). Spec: `docs/FEEDBACK_SPEC_2026-10-25.md` (FB-01 to FB-15, decisions D1 to D4). Canva spike: `docs/CANVA_SPIKE_2026-10-25.md`. Screenshots: `docs/review-evidence-2026-10-25/`.
+
+**How it was built:** each ticket by a subagent (Sonnet for normal coding, Opus for the connection, UI and Canva work, Haiku for docs), then rechecked in this session (tests rerun, screenshots looked at) before one commit per ticket. Owner decisions: D1 connection for the whole session, D2 real Canva (simulator mock rejected), D3 local photo checks, D4 Averill only warns on real sites.
+
+**Cleanup done 26 October:** removed 737 `averill-*` test folders from `/tmp` and the user temp folder (1.3 GB, recreated by the verify scripts when they run), the merged local branch `docs/feedback-spec-2026-10-25`, and the local copy of the replaced 24 October ZIP. The older sibling folder `../demo-social-simulator` (an out-of-date copy of `demo-tools/social-simulator`) was left in place; delete it only on the owner's word.
 
 ## What exists now
 - Simulator (`demo-tools/social-simulator`): the Brevo preview looks like a real email (inbox header, logo, hero, sections, button, footer with address, Unsubscribe). All posts and drafts have images and realistic hashtags. Not deployed: averill-demo-sim.vercel.app still serves the old version until the branch is merged and deployed (owner decision).
