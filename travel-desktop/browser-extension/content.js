@@ -354,8 +354,9 @@
   if(!force&&sig===d.lastSent&&d.result){d.busy=false;if(d.pending){d.pending=false;scheduleDesign()}return}
   if(!d.result&&d.state!=='checking'){d.state='checking';renderDesign()}
   const value=await send({kind:'design-check',...payload});
-  if(design!==d||!d.on||!alive)return;
+  if(design!==d||!alive)return;
   d.busy=false;
+  if(!d.on){d.pending=false;return}
   if(value.stopped)return;
   if(value.error){d.state='error';d.error=String(value.error).slice(0,300);d.result=null;d.lastSent=''}
   else if(['findings','clean','insufficient-evidence'].includes(value.state)&&Array.isArray(value.findings)){

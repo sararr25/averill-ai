@@ -107,3 +107,16 @@ test('every end reason has its own plain-English message without dashes', () => 
   assert.match(endReasons.RECONNECT, /click the Averill icon in the Chrome toolbar/);
   assert.throws(() => endReasons.message('expired'), /Unknown browser connection end reason/);
 });
+
+test('the bridge applies the extension sensitive-field policy: post composers named "personal" pass, personal data does not', async t => {
+  const received = [];
+  const bridge = new BrowserBridge({ onObservation: item => received.push(item), onStop: () => {} });
+  t.after(() => bridge.shutdown());
+  const pair = await bridge.start('person', { origin: extension, tabId: 4, pageOrigin: 'https://draft.example' });
+  const post = client(pair);
+  const field = label => ({ kind: 'field', reason: 'pause', field: { kind: 'textarea', label, value: 'Draft text' } });
+  for (const label of ['Personal update', 'Share a personal story', 'My personal brand']) assert.equal((await post(field(label))).status, 200, label);
+  assert.equal(received.filter(Boolean).length, 3);
+  for (const label of ['Personal email', 'Personal details', 'Personal phone number']) assert.equal((await post(field(label))).status, 400, label);
+  assert.equal(received.filter(Boolean).length, 3);
+});

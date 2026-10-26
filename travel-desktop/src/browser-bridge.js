@@ -128,7 +128,8 @@ class BrowserBridge {
           const field = payload.field;
           if (!field || !['text', 'textarea', 'contenteditable', 'select', 'date', 'time', 'checkbox'].includes(field.kind) || typeof field.value !== 'string' || field.value.length > 6000 || !['pause', 'blur', 'selection', 'read'].includes(payload.reason)) throw new Error('Invalid field');
           const label = String(field.label || 'Selected field').slice(0, 100);
-          if (/password|token|secret|card|payment|recipient|e-?mail address|phone|personal|personnel/i.test(label)) throw new Error('Sensitive field');
+          // Same policy as browser-extension/field-select.js: "personal" only counts when it names personal data.
+          if (/password|token|secret|card|payment|recipient|e-?mail address|phone|personal[\s_-]*(e-?mail|data|details|information|info|id|number|phone|address)|personnel/i.test(label)) throw new Error('Sensitive field');
           const result = observation({ personId, windowId: `browser:${payload.tabId}`, windowName: fieldName(payload.pageOrigin, label), method: 'browser-dom', text: field.value });
           // Only one employee-selected field is represented; never infer the rest of a draft.
           result.field = { label, kind: field.kind, value: result.sensitiveRedacted ? result.text : field.value };

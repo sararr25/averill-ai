@@ -23,7 +23,8 @@ BrowserConnect.prototype.start = async function () { connectPort = await origina
 const originalDialog = dialog.showMessageBox;
 dialog.showMessageBox = async (...args) => { assert.equal(args.at(-1).title, 'Connect the Averill browser companion'); approvals++; return { response: 1 }; };
 const originalFetch = global.fetch;
-global.fetch = (url, options) => { assert.equal(new URL(url).hostname, '127.0.0.1', 'No provider request allowed'); return originalFetch(url, options); };
+let designDelay = 0, designInFlight = 0; // Holds design-check requests back so a check can be in flight when the watch is turned off.
+global.fetch = async (url, options) => { assert.equal(new URL(url).hostname, '127.0.0.1', 'No provider request allowed'); if (designDelay && String(options?.body || '').includes('"design-check"')) { designInFlight++; await new Promise(resolve => setTimeout(resolve, designDelay)); designInFlight--; } return originalFetch(url, options); };
 require('../main.js');
 const pause = ms => new Promise(resolve => setTimeout(resolve, ms)); const checks = [];
 const PAGE = 'https://www.canva.com/qa';
@@ -153,6 +154,15 @@ app.whenReady().then(async () => { try {
     assert.equal((await findings())[0].lines[1], 'contrast 1.76:1, needs 4.5:1');
     await shot('fb14-block-contrast-zoom100');
     await setBodyColor(NEAR_BLACK); await until(clean, 'clean at 100%');
+  });
+  await step('Turning the watch off while a check is in flight does not leave it stuck; turning it back on checks again', async () => {
+    designDelay = 2000; await setBodyColor(PISTACHIO);
+    for (let i = 0; i < 80 && !designInFlight; i++) await pause(50);
+    assert.equal(designInFlight, 1, 'a design check is in flight');
+    await tap({ css: 'input[type=checkbox]' }); await pause(2500); designDelay = 0;
+    await tap({ css: 'input[type=checkbox]' });
+    await until(blocking, 'blocking card after the watch is turned back on');
+    await setBodyColor(NEAR_BLACK); await until(clean, 'clean again');
   });
   await step('Stop sharing ends the watch; a later design check is refused by the worker', async () => {
     await tap({ css: 'button', label: 'Stop sharing' });

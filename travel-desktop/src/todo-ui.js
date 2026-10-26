@@ -49,7 +49,7 @@ function todoGroup(title, empty, items, note) {
 }
 function renderTodo() {
   const host = el('todo-content'), badge = el('todo-badge'), list = current.auth?.signedIn ? current.todo : null;
-  if (!list) { host.replaceChildren(); badge.hidden = true; return; }
+  if (!list) { host.replaceChildren(); delete host.dataset.key; badge.hidden = true; return; }
   badge.textContent = String(list.count); badge.hidden = list.count === 0;
   document.querySelector('[data-tab-button=todo]').setAttribute('aria-label', list.count ? `To do, ${list.count} open` : 'To do');
   const key = JSON.stringify(list);
