@@ -1,7 +1,7 @@
 const { sourceFor } = require('./campaign');
 
 const approved = {
-  audience: 'Travel subscribers — Denmark',
+  audience: 'Travel subscribers, Denmark',
   emailFooter: 'You are receiving this email because you subscribed to Vamo. Unsubscribe anytime.',
   reelAsset: 'winter-reel-vertical.svg',
   reelDate: '2026-10-17',

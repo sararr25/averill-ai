@@ -1,0 +1,90 @@
+// Canva design check (FB-14). The browser card reads the open Canva design in the page (browser-extension/canva-design.js)
+// and sends only texts and numbers: each text, its design box, font size and weight, its colors and the averaged darkest and
+// lightest 10% of the background under it. No image or pixel reaches this module. It checks, against approved source lines:
+// (a) WCAG AA contrast, (b) that every text box sits inside Vamo's safe area, (c) the approved copy rules (forbidden claims).
+// Averill only warns: it never edits, exports or shares the design.
+const crypto = require('node:crypto');
+const canva = require('../browser-extension/canva-design');
+const taskReview = require('./task-review');
+const rules = require('./rules');
+
+// The Canva sizes the reader accepts are all Instagram posts, so design rules are looked up for the instagram work type.
+const FORMAT = 'instagram';
+// Large text in WCAG is at least 18 pt (24 CSS px), or 14 pt (18.66 CSS px) when bold. Averill maps that onto a design by
+// counting one design pixel of a 1080 pixel wide post as one CSS pixel (a narrower or wider design is scaled to 1080 first).
+// This is Averill's documented simplification: WCAG defines the size at viewing size, which a social post does not fix.
+const BASE_WIDTH = 1080, LARGE_PX = 24, LARGE_BOLD_PX = 18.66, BOLD_WEIGHT = 700;
+const EDGE_TOLERANCE = 0.5;
+const clip = (value, max) => String(value ?? '').slice(0, max);
+const floor2 = value => (Math.floor(value * 100) / 100).toFixed(2);
+
+function isLarge(element, design) {
+  const size = element.fontSize * BASE_WIDTH / design.width;
+  return size >= LARGE_PX || (element.fontWeight >= BOLD_WEIGHT && size >= LARGE_BOLD_PX);
+}
+
+// Distances from each edge of the design to the text box, in design pixels. A box exactly on the safe line is inside.
+function safeZone(box, design, margin) {
+  const need = margin * design.width / BASE_WIDTH;
+  const gaps = { left: box.x, top: box.y, right: design.width - (box.x + box.width), bottom: design.height - (box.y + box.height) };
+  const worst = Object.entries(gaps).filter(([, gap]) => gap < need - EDGE_TOLERANCE).sort((a, b) => a[1] - b[1])[0];
+  return { need, gaps, inside: !worst, edge: worst ? worst[0] : null, gap: worst ? worst[1] : null };
+}
+
+// Approved design lines for this format, each with the exact line to cite.
+function designRules(sources) {
+  const found = [];
+  for (const { source, text } of sources) {
+    for (const raw of text.split(/\r?\n/)) {
+      const line = raw.trim();
+      const rule = rules.parseDesignLine(line);
+      if (rule && (rule.task === FORMAT || rule.task === 'any')) found.push({ ...rule, source, quote: line });
+    }
+  }
+  return found;
+}
+const citation = entry => ({ id: entry.source.id, title: clip(entry.source.title, 160), version: String(entry.source.version || ''), quote: entry.quote });
+
+function evaluate({ workspace, payload }) {
+  const { design, elements } = canva.validate(payload);
+  const eligible = taskReview.currentSources(workspace, FORMAT).filter(entry => entry.source.confidentiality !== 'restricted' && !entry.source.containsCredentials);
+  const byId = new Map(eligible.map(entry => [entry.source.id, entry]));
+  const found = designRules(eligible);
+  const first = type => found.find(rule => rule.type === type) || null;
+  const normal = first('contrast-normal'), large = first('contrast-large'), margin = first('safe-margin');
+  const findings = [], notes = [];
+  const add = (type, index, element, problem, measured, entry) => findings.push({ id: crypto.randomUUID(), type, element: index + 1, text: clip(element.text.replace(/\s+/g, ' ').trim(), 120), problem: clip(problem, 300), measured: clip(measured, 200), source: citation(entry) });
+
+  elements.forEach((element, index) => {
+    if (normal) {
+      const big = isLarge(element, design);
+      // Without an approved large-text line, large text is held to the normal (stricter) line.
+      const rule = big && large ? large : normal;
+      const measuredRatio = canva.worstContrast(element.colors, element.background);
+      if (measuredRatio < rule.number) add('contrast', index, element, 'This text is hard to read on its background.', `contrast ${floor2(measuredRatio)}:1, needs ${rule.value}:1${big && large ? ' for large text' : ''}`, rule);
+    }
+    if (margin) {
+      const zone = safeZone(element.box, design, margin.number);
+      if (!zone.inside) {
+        const gap = Math.round(zone.gap), need = Math.round(zone.need);
+        const measured = gap < 0 ? `${-gap} px past the ${zone.edge} edge, needs at least ${need} px from every edge` : `${gap} px from the ${zone.edge} edge, needs at least ${need} px from every edge`;
+        add('safe-zone', index, element, 'This text sits outside the safe area.', measured, margin);
+      }
+    }
+    // The same engine as captions, limited to claims: hashtags and caption-only requirements do not apply to a design.
+    for (const f of taskReview.localReview(workspace, FORMAT, element.text, null).findings.filter(item => item.type === 'forbidden-claim')) {
+      const entry = byId.get(f.source?.id);
+      if (!entry || typeof f.source.quote !== 'string' || !f.source.quote || !entry.text.includes(f.source.quote) || !element.text.includes(f.observedExcerpt)) continue;
+      add('forbidden-claim', index, element, `Remove “${f.observedExcerpt}”. The approved rules don’t allow it.`, '', { source: entry.source, quote: f.source.quote });
+    }
+  });
+  // Say what was not checked, so a missing rule is never read as a clean result.
+  if (!normal) notes.push('No approved contrast rule applies, so contrast was not checked.');
+  else if (!large) notes.push('No approved large-text contrast rule applies, so large text was held to the normal contrast rule.');
+  if (!margin) notes.push('No approved safe-margin rule applies, so the safe area was not checked.');
+  const checked = [normal && 'contrast', margin && 'safe area', byId.size && 'approved wording'].filter(Boolean);
+  const state = findings.length ? 'findings' : normal && margin ? 'clean' : 'insufficient-evidence';
+  return { id: crypto.randomUUID(), state, findings: findings.slice(0, 30), checked, notes, elementCount: elements.length, design: { width: design.width, height: design.height } };
+}
+
+module.exports = { FORMAT, BASE_WIDTH, LARGE_PX, LARGE_BOLD_PX, isLarge, safeZone, designRules, evaluate };

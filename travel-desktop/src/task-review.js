@@ -25,6 +25,26 @@ function visibleMatch(observed, phrase) {
 
 const FIELD_LABELS = { audience: /audience|segment/i, date: /date/i, time: /time/i, asset: /asset|creative|file/i, disclosure: /disclosure|partnership/i };
 
+const CAPTION_LABEL = /body|message|caption|post copy|post text|email content/i;
+const PAID_TEXT = /paid partnership|sponsored/i;
+
+// Hashtag check (FB-09) for one rule: type is required, banned, max or paid-required. Returns a finding or null.
+function hashtagFinding(type, value, observed, observedField, source, quote, confidence, extra = {}) {
+  if (observedField && !CAPTION_LABEL.test(observedField.label)) return null;
+  const tags = rules.hashtagsIn(observed);
+  const has = tag => tags.some(entry => entry.toLowerCase() === tag.toLowerCase());
+  const make = (kind, observedExcerpt, suggestion) => ({ type: kind, observedExcerpt, suggestion, source: citation(source, quote), confidence, ...extra });
+  if (type === 'required' && !has(value)) return make('hashtag-missing', '', `Add the required hashtag ${value}.`);
+  if (type === 'paid-required' && PAID_TEXT.test(observed) && !has(value)) return make('hashtag-missing', '', `A paid post must also carry ${value}. Add it next to the paid partnership disclosure.`);
+  if (type === 'banned' && has(value)) return make('hashtag-banned', tags.find(entry => entry.toLowerCase() === value.toLowerCase()), `Remove ${value}. The approved hashtag rules don’t allow it.`);
+  const limit = Number(value);
+  if (type === 'max' && Number.isInteger(limit) && tags.length > limit) return make('hashtag-too-many', tags[limit], `Use at most ${limit} hashtags. This draft has ${tags.length}, so remove ${tags.length - limit}.`);
+  return null;
+}
+function addHashtagFinding(findings, found) {
+  if (found && !findings.some(f => f.type === found.type && f.source.id === found.source.id && f.source.quote === found.source.quote)) findings.push(found);
+}
+
 // Approved, model-extracted rules (AV-13). Hand-written source lines above stay authoritative and are not duplicated.
 function applyApprovedRules(data, task, observed, observedField, sources, findings, unchecked) {
   const current = new Map(sources.map(item => [item.source.id, item.source]));
@@ -37,6 +57,9 @@ function applyApprovedRules(data, task, observed, observedField, sources, findin
     } else if (FIELD_LABELS[rule.kind]) {
       if (!observedField || !FIELD_LABELS[rule.kind].test(observedField.label)) unchecked.add(rule.kind);
       else if (observedField.value.trim().toLowerCase() !== rule.value.toLowerCase() && !findings.some(f => f.type === 'field-requirement')) findings.push({ type: 'field-requirement', observedExcerpt: observedField.value, suggestion: `The approved ${rule.kind} is “${rule.value}”. Check and update this selected field yourself.`, source: citation(source, rule.quote), confidence: 'approved-rule', ruleId: rule.id });
+    } else if (rule.kind === 'hashtag') {
+      const [type, ...rest] = String(rule.value).split(' ');
+      addHashtagFinding(findings, hashtagFinding(type, rest.join(' '), observed, observedField, source, rule.quote, 'approved-rule', { ruleId: rule.id }));
     } else if (rule.kind === 'required-text' && (!observedField || /body|message|caption|post copy|post text|email content/i.test(observedField.label)) && !visibleMatch(observed, rule.value) && !findings.some(f => f.type === 'missing-required-text' && f.source.id === source.id)) {
       findings.push({ type: 'missing-required-text', observedExcerpt: '', suggestion: `Add the required text: “${rule.value}”`, source: citation(source, rule.quote), confidence: 'approved-rule', ruleId: rule.id });
     }
@@ -60,6 +83,8 @@ function localReview(data, task, observedText, observedField = null) {
         if (!observedField || !labels[fieldName.toLowerCase()].test(observedField.label)) unchecked.add(fieldName.toLowerCase());
         else if (observedField.value.trim().toLowerCase() !== expected.trim().toLowerCase()) findings.push({type:'field-requirement', observedExcerpt:observedField.value, suggestion:`The approved ${fieldName} is “${expected}”. Check and update this selected field yourself.`, source:citation(source,rule),confidence:'selected-field-rule'});
       }
+      const tagRule = rules.parseHashtagLine(rule);
+      if (tagRule && (tagRule.task === task || tagRule.task === 'any')) addHashtagFinding(findings, hashtagFinding(tagRule.type, tagRule.value, observed, observedField, source, rule, 'exact-rule'));
       const banned = [...rule.matchAll(/(?:do not claim|remove|must not use)\s+[“"]([^”"]{5,120})[”"]/gi)];
       for (const [, phrase] of banned) {
         const excerpt = visibleMatch(observed, phrase);

@@ -63,4 +63,28 @@ async function review(data, task, observedText, observedField = null, { fetcher 
   return { ...local, mode: 'model', provider: PROVIDER, model: body.model, steps, findings, status: findings.length ? 'These parts of your draft don’t match the approved rules.' : local.status };
 }
 
-module.exports = { review, validated, ENDPOINT, HOST };
+const SEARCH_LIMIT = 'Daily online check limit reached. Try again tomorrow.';
+
+// Demo workspace only: a transport for src/tavily.js that sends one public search to the owner's capped judge server
+// (POST /api/search). The server holds the Tavily key and counts one unit per search for this app install.
+// Callers must run the tavily.js outbound() guards first; this function only carries the request.
+function searchTransport(data, { fetcher = globalThis.fetch, endpoint = ENDPOINT } = {}) {
+  if (!data?.demoAccounts) throw new Error('The demo search server is only available in the judge demo workspace.');
+  const client = clientId(data);
+  return async (path, body) => {
+    if (path !== '/search') throw new Error('The demo search server only supports web search.');
+    let response, reply;
+    try {
+      response = await fetcher(`${endpoint}/api/search`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Averill-Client': client },
+        body: JSON.stringify({ kind: 'search', query: body.query }), signal: AbortSignal.timeout(30000),
+      });
+      reply = await response.json().catch(() => ({}));
+    } catch { throw Object.assign(new Error('The demo search server could not be reached.'), { expose: true }); }
+    if (response.status === 429) throw Object.assign(new Error(SEARCH_LIMIT), { limit: true, status: 429, expose: true });
+    if (!response.ok) throw Object.assign(new Error(`The demo search server is unavailable (${response.status}).`), { status: response.status, expose: true });
+    return reply.result || {};
+  };
+}
+
+module.exports = { review, validated, searchTransport, ENDPOINT, HOST, SEARCH_LIMIT };

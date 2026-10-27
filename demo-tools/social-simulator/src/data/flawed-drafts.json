@@ -7,11 +7,17 @@
       "senderName": "Vamo",
       "senderEmail": "hello@vamo.example",
       "recipients": "All travel subscribers",
-      "subject": "Winter Escapes 2027 — lowest prices guaranteed",
+      "subject": "Winter Escapes 2027: lowest prices guaranteed",
       "previewText": "Copenhagen, Vienna and Prague, through our eyes.",
       "body": "Our lowest prices guaranteed. Explore Copenhagen, Vienna and Prague this winter.",
       "createdAt": "2026-09-28T08:00:00Z",
-      "updatedAt": "2026-10-04T08:00:00Z"
+      "updatedAt": "2026-10-04T08:00:00Z",
+      "imageUrl": "/vamo/winter/winter-email-hero.svg",
+      "headline": "Winter Escapes 2027",
+      "cta": {
+        "label": "Explore the winter collection",
+        "url": "https://vamo.example/winter"
+      }
     },
     {
       "id": "vamo-brevo-winter-reminder",
@@ -20,13 +26,34 @@
       "status": "Draft",
       "senderName": "Maya from Vamo",
       "senderEmail": "hello@vamo.example",
-      "recipients": "Travel subscribers — Denmark",
+      "recipients": "Travel subscribers, Denmark",
       "subject": "Still thinking about a winter city break? ❄️",
-      "previewText": "Copenhagen, Vienna and Prague — the winter collection is open.",
-      "body": "Hey traveller,\n\nQuick one: the Winter Escapes 2027 collection went live last week, and a lot of you asked which city to pick.\n\nCopenhagen if you want harbour walks and a bakery on every corner.\nVienna if you want slow mornings and long café afternoons.\nPrague if you want side streets and a bridge at sunrise.\n\nDiscover curated winter city breaks — and tell us which one you are leaning towards. Just hit reply.\n\nMaya\nVamo, Copenhagen",
+      "previewText": "Copenhagen, Vienna and Prague: the winter collection is open.",
+      "body": "Hey traveller,\n\nQuick one: the Winter Escapes 2027 collection went live last week, and a lot of you asked which city to pick.\n\nCopenhagen if you want harbour walks and a bakery on every corner.\nVienna if you want slow mornings and long café afternoons.\nPrague if you want side streets and a bridge at sunrise.\n\nDiscover curated winter city breaks, and tell us which one you are leaning towards. Just hit reply.\n\nMaya\nVamo, Copenhagen",
       "imageUrl": "/vamo/winter/winter-email-hero.svg",
       "createdAt": "2026-10-16T09:10:00Z",
-      "updatedAt": "2026-10-20T15:05:00Z"
+      "updatedAt": "2026-10-20T15:05:00Z",
+      "headline": "Which winter city is yours?",
+      "intro": "Hey traveller,\n\nQuick one: the Winter Escapes 2027 collection went live last week, and a lot of you asked which city to pick.",
+      "sections": [
+        {
+          "heading": "Copenhagen",
+          "body": "Pick it if you want harbour walks and a bakery on every corner."
+        },
+        {
+          "heading": "Vienna",
+          "body": "Pick it if you want slow mornings and long café afternoons."
+        },
+        {
+          "heading": "Prague",
+          "body": "Pick it if you want side streets and a bridge at sunrise."
+        }
+      ],
+      "cta": {
+        "label": "Explore the winter collection",
+        "url": "https://vamo.example/winter"
+      },
+      "signOff": "Discover curated winter city breaks, and tell us which one you are leaning towards. Just hit reply.\n\nMaya\nVamo, Copenhagen"
     },
     {
       "id": "vamo-brevo-vienna-teaser",
@@ -35,13 +62,34 @@
       "status": "Draft",
       "senderName": "Vamo",
       "senderEmail": "hello@vamo.example",
-      "recipients": "Travel subscribers — Denmark",
+      "recipients": "Travel subscribers, Denmark",
       "subject": "Vienna in December, without the rush ☕️",
       "previewText": "Three slow days, one café at a time.",
       "body": "Hey traveller,\n\nOur Vienna winter break is built around one idea: never rush a café.\n\nDay one: Christmas markets at dusk, then dinner at a long shared table.\nDay two: one museum, the Ring by tram, and an evening at a concert hall standing area.\nDay three: a slow breakfast before the train home.\n\nLowest prices guaranteed on every Vienna break this winter.\n\nThe Vamo crew\n\nYou are receiving this email because you subscribed to Vamo. Unsubscribe anytime.",
       "imageUrl": "/vamo/vienna.jpg",
       "createdAt": "2026-10-18T11:00:00Z",
-      "updatedAt": "2026-10-21T09:40:00Z"
+      "updatedAt": "2026-10-21T09:40:00Z",
+      "headline": "Vienna in December",
+      "intro": "Hey traveller,\n\nOur Vienna winter break is built around one idea: never rush a café.",
+      "sections": [
+        {
+          "heading": "Day one",
+          "body": "Christmas markets at dusk, then dinner at a long shared table."
+        },
+        {
+          "heading": "Day two",
+          "body": "One museum, the Ring by tram, and an evening at a concert hall standing area."
+        },
+        {
+          "heading": "Day three",
+          "body": "A slow breakfast before the train home."
+        }
+      ],
+      "cta": {
+        "label": "See the Vienna winter break",
+        "url": "https://vamo.example/winter/vienna"
+      },
+      "signOff": "Lowest prices guaranteed on every Vienna break this winter.\n\nThe Vamo crew"
     }
   ],
   "social": [
@@ -56,7 +104,7 @@
       "imageUrl": "/vamo/winter/winter-linkedin-landscape.svg",
       "createdAt": "2026-10-14T13:20:00Z",
       "draftNote": "Organic company post · planned 16 Oct, 09:00",
-      "text": "Winter Escapes 2027 is here ❄️\n\nThree cities, planned by the people who walk them: harbour mornings in Copenhagen, slow cafés in Vienna and early bridges in Prague.\n\nLowest prices guaranteed — book before the end of October.\n\n#travel #citybreaks #winter"
+      "text": "Winter Escapes 2027 is here ❄️\n\nThree cities, planned by the people who walk them: harbour mornings in Copenhagen, slow cafés in Vienna and early bridges in Prague.\n\nLowest prices guaranteed. Book before the end of October.\n\n#vamotravel #travel #citybreaks #winter #europe"
     },
     {
       "id": "vamo-ig-winter-reel-draft",
@@ -65,11 +113,11 @@
       "authorAvatar": "/vamo/avatar.svg",
       "status": "draft",
       "scheduledFor": "2026-10-17T16:00:00Z",
-      "imageUrl": "/vamo/winter/winter-reel-vertical.svg",
+      "imageUrl": "/vamo/winter/winter-reel-vertical-price.svg",
       "paidPartner": "Creator: @ida.on.tour",
       "createdAt": "2026-10-15T10:00:00Z",
       "draftNote": "Paid creator Reel · planned 17 Oct, 18:00",
-      "text": "three cities, one winter ❄️ copenhagen → vienna → prague with @ida.on.tour\n\nharbour mornings, café afternoons, a bridge at sunrise. discover curated winter city breaks ✳\n\n#vamotravel #winterescapes #citybreak"
+      "text": "three cities, one winter ❄️ copenhagen → vienna → prague with @ida.on.tour\n\nharbour mornings, café afternoons, a bridge at sunrise. discover curated winter city breaks ✳\n\n#vamotravel #winterescapes #citybreak #lowestprice"
     }
   ]
 }

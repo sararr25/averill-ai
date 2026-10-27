@@ -1,11 +1,17 @@
 const crypto = require('node:crypto');
 const workspace = require('./workspace');
 const guide = { title: 'Canva: group, layer and align elements', url: 'https://www.canva.com/help/layer-group-align/', checkedAt: '2026-09-26' };
+const canvaExercise = require('./canva-exercise');
+// Canva layout essentials, done inside Canva (owner decisions Q3/Q4, 27 October 2026). "auto" steps tick themselves when the
+// browser card's design reading shows them (src/canva-exercise.js); "confirm" steps cannot be read from the page and are
+// confirmed once, at the end of the page, by the employee.
 const steps = [
- {id:'select',title:'Select the elements',instruction:'Select one element. Hold Shift while selecting another to make a multiple selection.',help:'Start with two elements already on your page. If an element cannot be selected, stop and check the editor rather than guessing.',question:'You want to select a second element without losing the first. What do you do?',options:['Hold Shift while selecting it','Open the download menu','Delete the first element'],correct:0,explanation:'Shift adds an element to the selection. Practise this with two elements on your page.'},
- {id:'position',title:'Find Position',instruction:'With your elements selected, find Position in the editor toolbar. If it is hidden, check the toolbar’s additional options.',help:'The available options depend on your selection. One element uses the page as its reference; multiple elements can align with each other.',question:'Which control contains alignment and layer options?',options:['Download','Position','Comments'],correct:1,explanation:'Position provides alignment and layer controls. Available choices depend on the selection.'},
- {id:'align',title:'Practise alignment',instruction:'Use an alignment option suitable for the selected elements. Look at the result and decide whether it matches your intended layout.',help:'Try aligning two elements, then undo if the result is not what you intended. Averill cannot confirm their geometry from OCR.',question:'Why can alignment options change when you select more than one element?',options:['The reference can change from the page to the selected elements','Alignment always changes the font','Multiple elements cannot be aligned'],correct:0,explanation:'A single element can align to the page; multiple selected elements can align with one another.'},
- {id:'group',title:'Group and practise moving together',instruction:'Keep the intended elements selected and group them using Command+G on Mac or Ctrl+G on Windows. Move the group and check the result yourself.',help:'Grouping keeps a set of elements together for operations such as moving. Some element types have restrictions; consult the guide if grouping is unavailable.',question:'Which shortcut groups selected elements on a Mac?',options:['Command+P','Command+G','Command+S'],correct:1,explanation:'Command+G groups the selected elements on a Mac. Use Ctrl+G on Windows.'}
+ {id:'hierarchy',check:'auto',title:'Add a headline and a supporting line',instruction:'In an Instagram post design, add two texts: a short headline and one supporting line.',help:'Use Text › Add a heading, then Add a little bit of body text. Any two texts on the page count.',question:'Why does a post need a headline and a separate supporting line?',options:['So the main message is read first and the detail second','So Canva can export it','So the file is smaller'],correct:0,explanation:'Two clear levels tell the reader what to read first.'},
+ {id:'size',check:'auto',title:'Make the headline clearly bigger',instruction:'Set the headline at least one and a half times the size of the supporting line.',help:'Select the headline and raise its font size in the top toolbar until it clearly leads.',question:'The supporting line is 40 px. What is the smallest headline size for this lesson?',options:['44 px','60 px','40 px'],correct:1,explanation:'One and a half times 40 px is 60 px: a size difference the eye notices at once.'},
+ {id:'align',check:'auto',title:'Align the two texts',instruction:'Select both texts with Shift, open Position and align their left edges or their centres.',help:'With two elements selected, Position aligns them to each other instead of to the page.',question:'You select two texts and open Position. What do the alignment options use as their reference?',options:['The selected elements','The page border only','The last exported file'],correct:0,explanation:'With more than one element selected, alignment lines them up with each other.'},
+ {id:'margin',check:'auto',title:'Keep text away from the edges',instruction:'Leave at least 60 pixels between every text and the edge of a 1080 pixel post.',help:'Drag the texts inward until Canva\'s spacing guides show room on every side.',question:'Why keep text away from the edge of a social post?',options:['Apps crop and overlay the edges, so text there can be hidden','It makes the export faster','Canva requires it'],correct:0,explanation:'Platforms place buttons and crops near the edges; a margin keeps the message visible.'},
+ {id:'contrast',check:'auto',title:'Make every text easy to read',instruction:'Choose text and background colours with enough contrast: 4.5 to 1 for normal text, 3 to 1 for large text.',help:'Pale text on a pale photo is the usual problem. Darken the text, or add a solid shape behind it.',question:'Which change usually fixes low contrast on a photo?',options:['Put a solid shape behind the text','Make the text thinner','Lower the export quality'],correct:0,explanation:'A solid shape gives the text a predictable background with enough contrast.'},
+ {id:'group',check:'confirm',title:'Group the headline and supporting line',instruction:'Keep both texts selected and press Command+G (Ctrl+G on Windows). Move the group and check that it stays together.',help:'Averill cannot see groups in the page, so you confirm this step yourself at the end.',question:'Which shortcut groups selected elements on a Mac?',options:['Command+P','Command+G','Command+S'],correct:1,explanation:'Command+G groups the selection so it moves as one.'},
 ];
 const projects={
  composition:{title:'Improve a composition',tool:'Canva',demoSource:null,steps:['Choose two related elements and describe the alignment problem.','Use Position or grouping to change the layout; inspect the result in Canva.','Record what improved and what you would still check before export.']},
@@ -25,7 +31,7 @@ function start(data, sourceId, now=new Date()) {
  const ownerId=owner(data);const store=state(data);const active=store.sessions.find(s=>s.ownerId===ownerId&&!s.finishedAt&&!s.excluded);
  if(active)return active;
  const source=sourceId ? usableSources(data).find(s=>s.id===sourceId):null;if(sourceId&&!source)throw new Error('Choose a visible, approved source without a conflict');
- const session={id:crypto.randomUUID(),ownerId,title:'Canva layout essentials',createdAt:new Date(now).toISOString(),confirmed:[],excluded:false,source:source?{id:source.id,title:source.title,version:source.version,sha256:source.sha256}:null};store.sessions.push(session);return session;
+ const session={id:crypto.randomUUID(),ownerId,title:'Canva layout essentials',lesson:'canva',checks:{},live:null,createdAt:new Date(now).toISOString(),confirmed:[],excluded:false,source:source?{id:source.id,title:source.title,version:source.version,sha256:source.sha256}:null};store.sessions.push(session);return session;
 }
 function record(data,payload,now=new Date()) {
  const ownerId=owner(data);if(!['LinkedIn','Newsletter','Canva'].includes(payload.tool))throw new Error('Choose a supported work activity');
@@ -62,7 +68,25 @@ function confirmProject(data,id,note,now=new Date()){
  if(session.project.notes.length===session.project.steps.length){session.note=session.project.notes.join(' · ');session.finishedAt=new Date(now).toISOString();}
  return session;
 }
-function confirm(data,id,stepId,now=new Date()) {const s=sessionFor(data,id);if(s.excluded||s.finishedAt)throw new Error('This session is no longer active');const next=steps[s.confirmed.length];if(!next||next.id!==stepId)throw new Error('Confirm the current step first');s.confirmed.push({id:stepId,at:new Date(now).toISOString(),week:weekKey(now),kind:'employee-confirmed'});if(s.confirmed.length===steps.length)s.finishedAt=new Date(now).toISOString();}
+function activeLesson(data){return state(data).sessions.find(s=>s.ownerId===owner(data)&&!s.finishedAt&&!s.excluded&&!s.exercise&&!s.project&&s.title==='Canva layout essentials')||null;}
+// A design reading from the Canva card: tick the steps it shows. A ticked step stays ticked; "now" says what the design shows today.
+function checkDesign(data,reading,now=new Date()){
+ const session=activeLesson(data);if(!session)return null;
+ const result=canvaExercise.evaluate(reading);session.checks||={};
+ for(const id of canvaExercise.AUTO_STEPS)if(result[id]&&!session.checks[id])session.checks[id]=new Date(now).toISOString();
+ session.live={at:new Date(now).toISOString(),result};
+ return {sessionId:session.id,title:session.title,steps:steps.map(step=>({id:step.id,title:step.title,check:step.check,done:step.check==='auto'&&Boolean(session.checks[step.id]),now:step.check==='auto'?Boolean(result[step.id]):null}))};
+}
+// One confirmation for the whole page: Averill-checked steps are recorded as such, the rest as confirmed by the employee.
+// Without Canva (selfConfirmAll), every step is the employee's own confirmation and is labelled that way.
+function finish(data,id,{selfConfirmAll=false}={},now=new Date()){
+ const s=sessionFor(data,id);if(s.excluded||s.finishedAt)throw new Error('This session is no longer active');
+ const checks=s.checks||{};const missing=steps.filter(step=>step.check==='auto'&&!checks[step.id]);
+ if(missing.length&&!selfConfirmAll)throw new Error(`Averill has not seen these steps in your Canva design yet: ${missing.map(step=>step.title).join('; ')}.`);
+ const at=new Date(now).toISOString(),done=new Set(s.confirmed.map(c=>c.id));
+ for(const step of steps)if(!done.has(step.id))s.confirmed.push({id:step.id,at,week:weekKey(now),kind:step.check==='auto'&&checks[step.id]?'checked-by-averill':'employee-confirmed'});
+ s.finishedAt=at;return s;
+}
 function exclude(data,id){sessionFor(data,id).excluded=true;}
 function deleteHistory(data){const id=owner(data),store=state(data);store.sessions=store.sessions.filter(session=>session.ownerId!==id);store.quizzes=store.quizzes.filter(quiz=>quiz.ownerId!==id);}
 function eligible(data,now) {return state(data).sessions.filter(s=>s.ownerId===owner(data)&&!s.excluded&&s.confirmed.some(c=>c.week===weekKey(now)));}
@@ -95,4 +119,4 @@ function snapshot(data,now=new Date()) {
  const quiz=[...store.quizzes].reverse().find(q=>q.ownerId===id&&q.week===weekKey(now));
  return {configured:true,week:weekKey(now),guide,steps:steps.map(({question,options,correct,explanation,...s})=>s),projects:Object.entries(projects).map(([id,item])=>({id,title:item.title,tool:item.tool})),sessions,quiz:quiz?{...quiz,outdated:quiz.fingerprint!==fingerprint(data,now),questions:quiz.questions.map(({correct,explanation,...q})=>({...q,available:validQuestion(data,q,now)}))}:null};
 }
-module.exports={start,record,startFinding,completeFinding,startProject,confirmProject,confirm,exclude,deleteHistory,beginQuiz,answer,snapshot,weekKey};
+module.exports={start,record,startFinding,completeFinding,startProject,confirmProject,checkDesign,finish,exclude,deleteHistory,beginQuiz,answer,snapshot,weekKey};

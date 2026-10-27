@@ -98,3 +98,20 @@ test('conflicts only for single-valued kinds; additive rules from different sour
   assert.ok(!found.some(item => item.kind === 'claim-forbidden'));
   assert.ok(localReview(data, 'email', 'best in the world').findings.some(item => item.type === 'forbidden-claim'), 'sources are not excluded by a candidate conflict');
 });
+
+test('hashtag rules: parsed from explicit lines, matched case-insensitively, and each finding cites its exact line', () => {
+  const tags = write('tags.md', 'Hashtags.\nHashtag rule: instagram | required | "#nordlys".\nHashtag rule: instagram | max | "2".\nHashtag rule: any | banned | "#cheapest".\nHashtag rule: instagram | paid-required | "#ad".\n');
+  const data = { ...fresh(), sources: [source('tags', tags)] };
+  assert.deepEqual(rules.parseHashtagLine('Hashtag rule: any | banned | "#cheapest".'), { task: 'any', type: 'banned', value: '#cheapest' });
+  assert.equal(rules.parseHashtagLine('Hashtag rule: tiktok | max | "3".'), null);
+  assert.deepEqual(rules.hashtagsIn('a #Nordlys b #nordlys c#x https://x.test/#anchor #ad'), ['#Nordlys', '#ad']);
+  assert.equal(rules.active(data).filter(rule => rule.kind === 'hashtag').length, 4);
+  const types = text => localReview(data, 'instagram', text).findings.map(f => `${f.type}:${f.source.quote}`);
+  assert.deepEqual(types('Trip #NORDLYS #hike'), []);
+  assert.deepEqual(types('Trip #hike'), ['hashtag-missing:Hashtag rule: instagram | required | "#nordlys".']);
+  assert.deepEqual(types('Trip #nordlys #Cheapest'), ['hashtag-banned:Hashtag rule: any | banned | "#cheapest".']);
+  assert.deepEqual(types('Trip #nordlys #a #b'), ['hashtag-too-many:Hashtag rule: instagram | max | "2".']);
+  assert.deepEqual(types('Paid partnership #nordlys'), ['hashtag-missing:Hashtag rule: instagram | paid-required | "#ad".']);
+  assert.deepEqual(localReview(data, 'linkedin', 'Trip #hike').findings, [], 'instagram rules do not apply to LinkedIn');
+  assert.deepEqual(localReview(data, 'instagram', 'Trip #hike', { kind: 'select', label: 'Audience', value: 'x' }).findings, [], 'only caption fields are checked');
+});

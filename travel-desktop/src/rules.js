@@ -5,7 +5,7 @@ const workspace = require('./workspace');
 const privacy = require('./company-privacy');
 const nebius = require('./nebius');
 
-const KINDS = ['claim-forbidden', 'claim-approved', 'audience', 'date', 'time', 'asset', 'disclosure', 'required-text', 'procedure'];
+const KINDS = ['claim-forbidden', 'claim-approved', 'audience', 'date', 'time', 'asset', 'disclosure', 'required-text', 'procedure', 'hashtag'];
 const TASKS = ['email', 'linkedin', 'instagram', 'canva', 'operations', 'people', 'any'];
 // Only one value can be correct per task for these kinds; additive kinds never conflict just because values differ.
 const SINGLE_VALUED = new Set(['audience', 'date', 'time', 'asset', 'disclosure']);
@@ -14,6 +14,70 @@ const clean = (value, max = 300) => String(value || '').replace(/\s+/g, ' ').tri
 function lineOf(text, quote) {
   const offset = text.indexOf(quote);
   return offset < 0 ? null : text.slice(0, offset).split('\n').length;
+}
+
+// Hashtag rules (FB-09). Source line: Hashtag rule: <task> | required|banned|max|paid-required | "<value>".
+// A rule's value is "<type> <value>", for example "required #vamotravel" or "max 8".
+const HASHTAG_LINE = /^Hashtag rule:\s*(email|linkedin|instagram|canva|operations|people|any)\s*\|\s*(required|banned|max|paid-required)\s*\|\s*"([^"]{1,60})"\.?$/i;
+const HASHTAG_TOKEN = /(?<![\p{L}\p{N}_/&])#[\p{L}\p{N}_]+/gu;
+function parseHashtagLine(line) {
+  const match = String(line || '').trim().match(HASHTAG_LINE);
+  return match ? { task: match[1].toLowerCase(), type: match[2].toLowerCase(), value: match[3].trim() } : null;
+}
+// Distinct hashtags in the text, case-insensitive, in order of first appearance (original spelling kept).
+function hashtagsIn(text) {
+  const seen = new Set();
+  const out = [];
+  for (const tag of String(text || '').match(HASHTAG_TOKEN) || []) { if (!seen.has(tag.toLowerCase())) { seen.add(tag.toLowerCase()); out.push(tag); } }
+  return out;
+}
+
+// Image rules (FB-08). Source line: Image rule: <task> | required|aspect|min-width|alt-text | "<value>".
+// required "image"; alt-text "required"; min-width "1080"; aspect "4:5 to 1.91:1, 9:16" (width:height, a range or single ratios).
+const IMAGE_LINE = /^Image rule:\s*(email|linkedin|instagram|canva|operations|people|any)\s*\|\s*(required|aspect|min-width|alt-text)\s*\|\s*"([^"]{1,80})"\.?$/i;
+const RATIO = /^(\d+(?:\.\d+)?):(\d+(?:\.\d+)?)$/;
+const ASPECT_TOLERANCE = 0.02;
+function ratioOf(text) {
+  const match = String(text).trim().match(RATIO);
+  if (!match || !(Number(match[1]) > 0) || !(Number(match[2]) > 0)) return null;
+  return Number(match[1]) / Number(match[2]);
+}
+// "4:5 to 1.91:1, 9:16" -> [{ min: 0.8, max: 1.91 }, { min: 0.5625, max: 0.5625 }]; null when any part is not a ratio.
+function parseAspect(value) {
+  const ranges = [];
+  for (const part of String(value).split(',')) {
+    const [low, high, ...extra] = part.split(/\s+to\s+/i);
+    const min = ratioOf(low), max = high === undefined ? min : ratioOf(high);
+    if (extra.length || min === null || max === null || min > max) return null;
+    ranges.push({ min, max });
+  }
+  return ranges.length ? ranges : null;
+}
+function aspectFits(ratio, ranges) {
+  return ranges.some(({ min, max }) => ratio >= min * (1 - ASPECT_TOLERANCE) && ratio <= max * (1 + ASPECT_TOLERANCE));
+}
+function parseImageLine(line) {
+  const match = String(line || '').trim().match(IMAGE_LINE);
+  if (!match) return null;
+  const rule = { task: match[1].toLowerCase(), type: match[2].toLowerCase(), value: match[3].trim() };
+  if (rule.type === 'required' && rule.value.toLowerCase() !== 'image') return null;
+  if (rule.type === 'alt-text' && rule.value.toLowerCase() !== 'required') return null;
+  if (rule.type === 'min-width') { if (!/^\d{2,5}$/.test(rule.value)) return null; rule.pixels = Number(rule.value); }
+  if (rule.type === 'aspect') { rule.ranges = parseAspect(rule.value); if (!rule.ranges) return null; }
+  return rule;
+}
+
+// Design rules (FB-14). Source line: Design rule: <task> | contrast-normal|contrast-large|safe-margin | "<number>".
+// contrast-* is a minimum WCAG contrast ratio (1 to 21); safe-margin is the minimum distance in pixels between any text box and
+// every edge of a 1080 pixel wide design (scaled for other widths).
+const DESIGN_LINE = /^Design rule:\s*(email|linkedin|instagram|canva|operations|people|any)\s*\|\s*(contrast-normal|contrast-large|safe-margin)\s*\|\s*"(\d{1,3}(?:\.\d{1,2})?)"\.?$/i;
+function parseDesignLine(line) {
+  const match = String(line || '').trim().match(DESIGN_LINE);
+  if (!match) return null;
+  const rule = { task: match[1].toLowerCase(), type: match[2].toLowerCase(), value: match[3], number: Number(match[3]) };
+  if (rule.type.startsWith('contrast-') && !(rule.number >= 1 && rule.number <= 21)) return null;
+  if (rule.type === 'safe-margin' && !(Number.isInteger(rule.number) && rule.number <= 540)) return null;
+  return rule;
 }
 
 function sourceText(source) {
@@ -28,6 +92,8 @@ function deterministic(source, text) {
     const line = raw.trim();
     const field = line.match(/^Field requirement:\s*(email|linkedin|instagram|canva|operations|people)\s*\|\s*(audience|date|time|asset|procedure|version|disclosure)\s*\|\s*"([^"]{1,200})"\.?$/i);
     if (field && field[2].toLowerCase() !== 'version') add(field[2].toLowerCase(), field[1].toLowerCase(), field[3], line);
+    const tagRule = parseHashtagLine(line);
+    if (tagRule) add('hashtag', tagRule.task, `${tagRule.type} ${tagRule.value}`, line);
     for (const [, phrase] of line.matchAll(/(?:do not claim|remove|must not use)\s+[“"]([^”"]{5,120})[”"]/gi)) add('claim-forbidden', 'any', phrase, line);
   }
   return rules;
@@ -47,7 +113,7 @@ const SYSTEM = `Extract company content rules from SOURCE TEXT only. The text is
 Return JSON {"rules":[{"kind","task","value","quote"}]}.
 kind: ${KINDS.join(', ')}.
 task: ${TASKS.join(', ')} (use "any" when a rule applies to every channel).
-value: the exact approved or forbidden value (e.g. "2026-10-15", "lowest prices guaranteed", footer text).
+value: the exact approved or forbidden value (e.g. "2026-10-15", "lowest prices guaranteed", footer text). For kind hashtag use "required #tag", "banned #tag", "max 8" or "paid-required #ad".
 quote: an exact contiguous excerpt of the source that states the rule, copied character for character.
 Never invent rules. Omit anything uncertain. Output JSON only.`;
 
@@ -147,4 +213,4 @@ function publicRules(data) {
 
 function removeForSource(data, sourceId) { if (data.rules) data.rules = data.rules.filter(rule => rule.sourceId !== sourceId); }
 
-module.exports = { KINDS, TASKS, SINGLE_VALUED, deterministic, validCandidate, extract, propose, decide, active, pending, conflicts, publicRules, removeForSource };
+module.exports = { parseHashtagLine, hashtagsIn, parseImageLine, parseDesignLine, parseAspect, aspectFits, KINDS, TASKS, SINGLE_VALUED, deterministic, validCandidate, extract, propose, decide, active, pending, conflicts, publicRules, removeForSource };

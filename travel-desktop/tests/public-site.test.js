@@ -7,7 +7,7 @@ const site = require('../src/public-site');
 
 const root = fs.mkdtempSync(path.join(os.tmpdir(), 'averill-site-'));
 const brief = path.join(root, 'brief.md');
-fs.writeFileSync(brief, 'Remove "lowest prices guaranteed" from every channel.\nField requirement: email | audience | "Travel subscribers — Denmark".\n');
+fs.writeFileSync(brief, 'Remove "lowest prices guaranteed" from every channel.\nField requirement: email | audience | "Travel subscribers, Denmark".\n');
 const resolver = async () => [{ address: '93.184.216.34', family: 4 }];
 const make = role => ({ privacy: { companyAI: true }, activePersonId: 'p', people: [{ id: 'p', role, department: 'Marketing' }],
   sources: [{ id: 'brief', title: 'Brief', department: 'Marketing', scope: 'department', status: 'approved', version: '2', ownerId: 'p', priority: 10, textPath: brief, aiAllowed: true, confidentiality: 'internal' }] });

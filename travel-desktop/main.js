@@ -12,6 +12,7 @@ const accounts = require('./src/accounts');
 const accountDocuments = require('./src/account-documents');
 const judgeDemo = require('./src/judge-demo');
 const guide = require('./src/guide');
+const todo = require('./src/todo');
 const judgeServer = require('./src/judge-server');
 const onboarding = require('./src/onboarding');
 const privacy = require('./src/company-privacy');
@@ -67,7 +68,8 @@ const browserBridge = new BrowserBridge({
     if (!result || result.fieldId !== externalObservation?.fieldId || result.revision !== externalObservation?.revision || result.contentHash !== externalObservation?.contentHash) contextualReview.invalidate();
     externalObservation = result; externalWatching = true; externalError = result ? '' : 'Editing selected field. Review updates after a pause.'; publish();
   },
-  onStop: () => { stopExternal(); publish(); },
+  onStop: reason => { stopExternal(true, reason); publish(); },
+  onState: () => publish(),
   onRequest: payload => {
     requireSession();
     if (browserBridge.personId !== companyWorkspace.activePersonId) throw new Error('Browser session changed');
@@ -75,6 +77,17 @@ const browserBridge = new BrowserBridge({
     if (payload.kind === 'review') return contextualReview.review(payload);
     if (payload.kind === 'proposal') return contextualReview.proposal(payload);
     if (payload.kind === 'open') return contextualReview.open(payload);
+    if (payload.kind === 'ask') return contextualReview.ask(payload);
+    if (payload.kind === 'public-check') return contextualReview.publicCheck(payload);
+    if (payload.kind === 'image-check') return contextualReview.imageCheck(payload);
+    if (payload.kind === 'design-check') {
+      const result = contextualReview.designCheck(payload);
+      if (payload.action === 'override') return result;
+      // D1: the same reading ticks the steps of an open Canva lesson. Only step titles and ticks go back to the card.
+      const exercise = learning.checkDesign(companyWorkspace, require('./browser-extension/canva-design').validate({ design: payload.design, elements: payload.elements }));
+      if (exercise) { workspace.save(app.getPath('userData'), companyWorkspace); publish(); }
+      return exercise ? { ...result, exercise } : result;
+    }
     throw new Error('Unsupported contextual action');
   },
 });
@@ -86,15 +99,56 @@ function logCloudCall(entry) {
 nebiusClient.onCall(logCloudCall);
 tavilyClient.onCall(logCloudCall);
 const runtimeKeys = { nebius: process.env.NEBIUS_API_KEY || '', tavily: process.env.TAVILY_API_KEY || '' };
+// FB-10: how an online (Tavily) double-check would run now. A local key wins; the judge demo workspace falls back to the capped demo server.
+function onlineCheckState() {
+  const via = !signedIn() ? null : runtimeKeys.tavily ? 'local-key' : companyWorkspace.demoAccounts === true ? 'demo-server' : null;
+  return { available: Boolean(via), via, quota: via === 'demo-server' ? 'demo' : null, nemotron: Boolean(aiEnabled && runtimeKeys.nebius && signedIn() && privacy.allowed(companyWorkspace)) };
+}
+// The last online check, kept in memory only. It lists the public statements the employee confirmed and what came back.
+let lastPublicCheck = null;
+async function runPublicCheck(task, claims, origin) {
+  requireSession();
+  const personId = companyWorkspace.activePersonId;
+  const result = await publicCheck.checkOnline(companyWorkspace, task, claims, { tavilyKey: runtimeKeys.tavily, nebiusKey: aiEnabled ? runtimeKeys.nebius : '' });
+  if (personId !== companyWorkspace.activePersonId || !signedIn()) throw new Error('The signed-in person changed during the public check.');
+  const counts = { supported: 0, contradicted: 0, unclear: 0 };
+  for (const item of result.claims) counts[counts[item.verdict] === undefined ? 'unclear' : item.verdict]++;
+  lastPublicCheck = { personId, origin, at: new Date().toISOString(), via: result.via, counts, claims: result.claims.map(item => ({ claim: item.claim, verdict: item.verdict, results: (item.results || []).slice(0, 2).map(({ title, url }) => ({ title, url })) })) };
+  try { workspace.save(app.getPath('userData'), companyWorkspace); } catch (error) { console.error('Could not save the online check activity:', error.message); }
+  publish();
+  return result;
+}
 function reviewState() { return { signedIn: signedIn(), workspace: companyWorkspace, observed: externalObservation, epoch: externalEpoch, aiEnabled, key: runtimeKeys.nebius }; }
+// One company-question path for the desktop Ask and the in-page card: local unless the owner's AI policy and the session AI switch allow the model.
+function answerCompany(question, context = '') {
+  if (!(aiEnabled && privacy.allowed(companyWorkspace))) return localWorkspaceAnswer(companyWorkspace, question);
+  return semanticIndex.search(app.getPath('userData'), companyWorkspace, question, { key: runtimeKeys.nebius }).catch(() => ({ results: [] }))
+    .then(found => answerWorkspace(companyWorkspace, question, runtimeKeys.nebius, undefined, found.results, context));
+}
 const contextualReview = new ContextualReview({
   getState: reviewState,
+  online: onlineCheckState,
+  checkOnline: (claims, task) => runPublicCheck(task, claims, 'browser card'),
+  answer: (question, context) => answerCompany(question, context),
   openSource: sourceId => { agentWindow.show(); agentWindow.focus(); agentWindow.webContents.send('agent:open-context', { sourceId }); },
 });
 
+// When the Averill extension last announced itself on this Mac. Only a timestamp: no tab, page or person.
+const extensionSeenFile = path.join(app.getPath('userData'), 'extension-seen.json');
+function readExtensionSeen() {
+  try { const at = JSON.parse(fs.readFileSync(extensionSeenFile, 'utf8')).at; return Number.isSafeInteger(at) ? at : null; }
+  catch (error) { if (error.code !== 'ENOENT') console.error('Ignoring unreadable extension-seen.json:', error.message); return null; }
+}
+let extensionSeenWritten = 0;
+function openInChrome(url) {
+  return new Promise((resolve, reject) => require('node:child_process').execFile('open', ['-a', 'Google Chrome', ...(url ? [url] : [])], error => error ? reject(new Error('Google Chrome was not found on this Mac. Install Chrome, then try again.')) : resolve()));
+}
 const browserConnect = new BrowserConnect({
   port: !app.isPackaged && process.env.AVERILL_CONNECT_PORT === '0' ? 0 : undefined,
-  getSession: () => signedIn() ? `${browserSessionEpoch}:${companyWorkspace.activePersonId}` : null,
+  getSession: () => browserSession(),
+  onChange: () => publish(),
+  seenAt: readExtensionSeen(),
+  onSeen: at => { if (at - extensionSeenWritten < 60000) return; extensionSeenWritten = at; fs.writeFileSync(extensionSeenFile, JSON.stringify({ at })); },
   approve: async ({ origin, pageOrigin }) => {
     agentWindow.show(); agentWindow.focus();
     const result = await dialog.showMessageBox(agentWindow, { type: 'question', title: 'Connect the Averill browser companion', message: `Connect this browser companion to ${pageOrigin}?`, detail: `Extension: ${origin}\nOnly a field you choose will be shared locally. Use Stop sharing to end access. Approval lasts until sign-out or app restart. No sending or publication.`, buttons: ['Cancel', 'Connect'], defaultId: 0, cancelId: 0 });
@@ -102,7 +156,7 @@ const browserConnect = new BrowserConnect({
   },
   connect: async binding => {
     requireSession(); const personId = companyWorkspace.activePersonId, session = browserSessionEpoch;
-    stopExternal(); const pair = await browserBridge.start(personId, binding);
+    stopExternal(true, null); const pair = await browserBridge.start(personId, binding);
     if (!signedIn() || session !== browserSessionEpoch || personId !== companyWorkspace.activePersonId) { browserBridge.stop(); throw new Error('Account changed'); }
     publish(); return pair;
   },
@@ -132,13 +186,15 @@ async function saveSecret(service, value) {
   runtimeKeys[service] = key;
 }
 
+function browserSession() { return signedIn() ? `${browserSessionEpoch}:${companyWorkspace.activePersonId}` : null; }
 function signedIn() {
   return Boolean(companyWorkspace && (!companyWorkspace.authEnabled || authenticatedPersonId === companyWorkspace.activePersonId));
 }
 function requireSession() { if (!signedIn()) throw new Error('Sign in to your account first.'); }
-function stopExternal(clearSelection = true) {
+// reason names why an active browser connection ends (see browser-extension/end-reasons.js).
+function stopExternal(clearSelection = true, reason = 'stopped_by_user') {
   contextualReview.invalidate();
-  browserBridge.stop();
+  browserBridge.stop(browserBridge.server ? reason : null);
   externalEpoch += 1;
   if (externalWatchTimer) clearInterval(externalWatchTimer);
   externalWatchTimer = null;
@@ -157,13 +213,14 @@ function isOwnWindowSource(source) {
 }
 function clearSessionWork() {
   browserSessionEpoch++; browserConnect.revoke();
-  shared.clear(); aiEnabled = false; stopExternal();
+  shared.clear(); aiEnabled = false; stopExternal(true, 'signed_out'); contextualReview.clearDesign();
   workState.clear();
   for (const window of workWindows.values()) if (!window.isDestroyed()) window.close();
   workWindows.clear();
   if (companionWindow && !companionWindow.isDestroyed()) companionWindow.hide();
 }
 function snapshot() {
+  const findings = workKinds.flatMap((kind) => shared.has(kind) ? inspect(kind, workState.get(kind) || {}).map((item) => ({ ...item, kind })) : []);
   return {
     auth: { enabled: Boolean(companyWorkspace?.authEnabled), demo: Boolean(companyWorkspace?.demoAccounts), signedIn: signedIn(), accounts: accounts.publicAccounts(companyWorkspace), person: signedIn() ? accounts.publicAccounts(companyWorkspace).find(p => p.id === companyWorkspace.activePersonId) || null : null },
     privacy: {companyAI:privacy.allowed(companyWorkspace)},
@@ -172,19 +229,23 @@ function snapshot() {
     workspace: signedIn() ? workspace.publicSnapshot(companyWorkspace) : { configured: Boolean(companyWorkspace), company: companyWorkspace?.company },
     learning: learning.snapshot(signedIn() ? companyWorkspace : null),
     guide: signedIn() ? guide.snapshot(companyWorkspace) : null,
-    browserBridge: signedIn() ? browserBridge.status() : {ready:false,connected:false},
+    browserBridge: signedIn() ? browserBridge.status() : {ready:false,connected:false,paused:false,pageHost:'',lastEnd:null},
+    browserConnect: signedIn() ? browserConnect.status(browserSession()) : {approved:false,pending:false},
     browserConnectionError: signedIn() ? browserConnectionError : '',
     externalWindow: signedIn() ? selectedExternalWindow : null,
     externalWatching: signedIn() && externalWatching,
     externalObservation: signedIn() ? externalObservation : null,
     externalError: signedIn() ? externalError : '',
     services: { nebius: Boolean(runtimeKeys.nebius), tavily: Boolean(runtimeKeys.tavily) },
+    designCheck: signedIn() ? contextualReview.designStatus(companyWorkspace.activePersonId) : null,
+    onlineCheck: signedIn() ? { ...onlineCheckState(), last: lastPublicCheck?.personId === companyWorkspace.activePersonId ? lastPublicCheck : null } : null,
     publicSite: signedIn() ? publicSite.snapshot(companyWorkspace) : null,
     cloudActivity: signedIn() ? { mine: cloudActivity.forPerson(companyWorkspace, companyWorkspace.activePersonId), totals: workspace.person(companyWorkspace)?.role === 'admin' ? cloudActivity.summary(companyWorkspace) : null } : null,
     shared: [...shared],
     open: [...workWindows.keys()],
     aiEnabled,
-    findings: workKinds.flatMap((kind) => shared.has(kind) ? inspect(kind, workState.get(kind) || {}).map((item) => ({ ...item, kind })) : []),
+    findings,
+    todo: signedIn() ? todo.list(companyWorkspace, findings) : null,
   };
 }
 
@@ -339,6 +400,12 @@ app.whenReady().then(async () => {
     guide.update(companyWorkspace, action, screen);
     return persistWorkspace();
   });
+  ipcMain.handle('todo:done', (event, taskId) => {
+    fromAgent(event);
+    if (typeof taskId !== 'string') throw new Error('Invalid task');
+    workspace.completeTask(companyWorkspace, taskId);
+    return persistWorkspace();
+  });
   ipcMain.handle('learning:action', (event, action, payload = {}) => {
     fromAgent(event);
     if (!companyWorkspace) throw new Error('Create a workspace first');
@@ -360,7 +427,7 @@ app.whenReady().then(async () => {
     }
     else if(action==='project-start')learning.startProject(companyWorkspace,payload.projectId,payload.sourceId);
     else if(action==='project-confirm')learning.confirmProject(companyWorkspace,payload.sessionId,payload.note);
-    else if (action === 'confirm') learning.confirm(companyWorkspace, payload.sessionId, payload.stepId);
+    else if (action === 'finish') learning.finish(companyWorkspace, payload.sessionId, { selfConfirmAll: payload.selfConfirmAll === true });
     else if (action === 'exclude') learning.exclude(companyWorkspace, payload.sessionId);
     else if (action === 'delete-history') { learning.deleteHistory(companyWorkspace); ruleExercises.deleteMine(companyWorkspace); guide.clearMine(companyWorkspace); }
     else if (action === 'quiz') learning.beginQuiz(companyWorkspace);
@@ -498,7 +565,7 @@ app.whenReady().then(async () => {
     if (workspace.person(companyWorkspace)?.role !== 'admin') throw new Error('Administrator access required.');
     if (onboardingBusy) throw new Error('An onboarding operation is already running.');
     const personId = companyWorkspace.activePersonId;
-    const selection = await dialog.showOpenDialog(agentWindow, { properties: ['openFile', 'multiSelections'], filters: [{ name: 'Company files — Excel, PDF, SVG and documents', extensions: [...onboarding.EXTENSIONS].map(e => e.slice(1)) }] });
+    const selection = await dialog.showOpenDialog(agentWindow, { properties: ['openFile', 'multiSelections'], filters: [{ name: 'Company files: Excel, PDF, SVG and documents', extensions: [...onboarding.EXTENSIONS].map(e => e.slice(1)) }] });
     fromAgent(event);
     if (personId !== companyWorkspace.activePersonId) throw new Error('Account changed. Upload the files again.');
     if(selection.canceled)return {...snapshot(),operationNotice:'Selection cancelled. No files added.'};
@@ -644,9 +711,7 @@ app.whenReady().then(async () => {
     fromAgent(event);
     if(aiEnabled&&privacy.credentials(question))throw new Error('Remove credentials before using external AI.');
     if (companyWorkspace) {
-      if (!(aiEnabled && privacy.allowed(companyWorkspace))) return localWorkspaceAnswer(companyWorkspace, question);
-      return semanticIndex.search(app.getPath('userData'), companyWorkspace, question, { key: runtimeKeys.nebius }).catch(() => ({ results: [] }))
-        .then(found => answerWorkspace(companyWorkspace, question, runtimeKeys.nebius, undefined, found.results));
+      return answerCompany(question);
     }
     return aiEnabled && privacy.allowed(companyWorkspace) ? answerQuestion(question, runtimeKeys.nebius, companyWorkspace) : { ...localAnswer(String(question || '').slice(0, 1000)), mode: 'local' };
   });
@@ -734,10 +799,7 @@ app.whenReady().then(async () => {
     fromAgent(event);
     if (!taskReview.tasks[task]) throw new Error('Choose a supported work type.');
     if (!Array.isArray(claims) || claims.some(claim => typeof claim !== 'string' || privacy.credentials(claim))) throw new Error('Remove credentials before public checking.');
-    const personId = companyWorkspace.activePersonId;
-    const result = await publicCheck.checkClaims(companyWorkspace, task, claims, { tavilyKey: runtimeKeys.tavily, nebiusKey: aiEnabled ? runtimeKeys.nebius : '' });
-    if (personId !== companyWorkspace.activePersonId || !signedIn()) throw new Error('The signed-in person changed during the public check.');
-    return result;
+    return runPublicCheck(task, claims, 'desktop');
   });
   ipcMain.handle('agent:link-check', async (event, task, urls) => {
     fromAgent(event);
@@ -817,6 +879,14 @@ app.whenReady().then(async () => {
     if (!externalWatchTimer) externalWatchTimer = setInterval(watchExternalTick, 6000);
     watchExternalTick(); publish(); return snapshot();
   });
+  // Guided install (owner decision Q5): open Chrome's extensions page and show the folder to load. Never installs anything itself.
+  ipcMain.handle('agent:extension-install', async event => {
+    fromAgent(event);
+    await openInChrome('chrome://extensions');
+    shell.showItemInFolder(path.join(__dirname, 'browser-extension', 'manifest.json'));
+    return true;
+  });
+  ipcMain.handle('agent:open-chrome', async event => { fromAgent(event); await openInChrome(); return true; });
   ipcMain.handle('agent:open-web', async (event, url) => {
     fromAgent(event);
     try {
@@ -856,5 +926,5 @@ app.whenReady().then(async () => {
   app.on('activate', () => { if (BrowserWindow.getAllWindows().length === 0) app.quit(); });
 });
 
-app.on('before-quit', () => { browserConnect.stop(); browserBridge.stop(); });
+app.on('before-quit', () => { browserConnect.stop(); browserBridge.shutdown(); });
 app.on('window-all-closed', () => app.quit());

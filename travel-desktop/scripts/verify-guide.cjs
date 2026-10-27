@@ -28,6 +28,7 @@ app.whenReady().then(async()=>{try{
  await run("[...document.querySelectorAll('#guide-offer button')].find(b=>b.textContent==='Skip').click()");await pause(800);
  step('Skip hides the offer and is remembered',await run("!document.getElementById('guide-offer')&&current.guide.offered===true"));
  await signOut();await signIn('Emma');step('Emma keeps her progress after switching people',await run("current.guide.done.length===5"));
+ await signOut();await signIn('Emma');step('To do is rebuilt when the same person signs out and back in',await run("document.getElementById('todo-content').querySelectorAll('section').length===2"));
  await run("window.confirm=()=>true;document.querySelector('[data-tab-button=learn]').click()");await pause(400);
  await run("[...document.querySelectorAll('button')].find(b=>b.textContent==='Delete my local learning history').click()");await pause(1000);
  step('Deleting her local learning history clears her guide progress',await run("current.guide.offered===false&&current.guide.done.length===0"));

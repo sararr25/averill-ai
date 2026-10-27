@@ -28,6 +28,18 @@ const roster = [
   { name: 'Lina Sørensen', role: 'lead', department: 'People' },
   { name: 'Freja Nielsen', role: 'employee', department: 'People' },
 ];
+// Seed tasks per sign-in: [email, title, origin, days until due, screen the To do button opens].
+const campaign = 'Winter Escapes 2027';
+const taskSeeds = [
+  ['emma@vamo.example', 'Finish the Instagram Reel caption', `${campaign}, assigned by Maya`, 2, 'review'],
+  ['emma@vamo.example', 'Check the LinkedIn post against the approved brief', `${campaign}, assigned by Maya`, 4, 'review'],
+  ['emma@vamo.example', 'Practise the paid partnership disclosure rule', 'Weekly learning', 6, 'learn'],
+  ['maya@vamo.example', 'Decide which social media guidelines version applies', 'Version conflict in Marketing sources', 1, 'setup'],
+  ['maya@vamo.example', 'Approve the launch email before it is scheduled', `${campaign}, email campaign`, 3, 'review'],
+  ['alex@vamo.example', 'Check the Vamo website against the new brief', `${campaign}, website`, 5, 'setup'],
+  ['alex@vamo.example', 'Review who has access to the campaign files', 'Team access', 7, 'setup'],
+];
+const dueIn = (days) => { const date = new Date(); date.setDate(date.getDate() + days); return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`; };
 const privateNote = path.join('Proposals', 'marketing-personal-note-v1.md');
 const team = [
   { name: 'Maya Jensen', role: 'lead', department: 'Marketing', email: 'maya@vamo.example', profile: 'marketing_manager' },
@@ -49,12 +61,14 @@ async function create(userData, packRoot) {
   const ownerPassword = accounts.temporaryPassword();
   await accounts.configure(data, owner.id, 'alex@vamo.example', ownerPassword, 'owner');
   credentials.push({ email: 'alex@vamo.example', password: ownerPassword });
+  const byEmail = { 'alex@vamo.example': owner };
   let emma = null;
   for (const member of team) {
     const added = workspace.addPerson(data, member.name, member.role, member.department);
     const password = accounts.temporaryPassword();
     await accounts.configure(data, added.id, member.email, password, member.profile);
     credentials.push({ email: member.email, password });
+    byEmail[member.email] = added;
     if (member.email.startsWith('emma@')) emma = added;
   }
   for (const [file, version, priority] of marketingSources) {
@@ -72,6 +86,7 @@ async function create(userData, packRoot) {
       workspace.updateSource(data, source.id, 'approved', priority, 'Pre-approved for the judge demo');
     }
   }
+  for (const [email, title, origin, days, area] of taskSeeds) workspace.addTask(data, { title, assigneeId: byEmail[email].id, dueDate: dueIn(days), origin, link: { area } });
   accountDocuments.save(userData, data, credentials);
   workspace.switchPerson(data, emma.id);
   // Emma's own note: imported privately, then proposed, so it waits for Maya's review.
@@ -81,4 +96,4 @@ async function create(userData, packRoot) {
   return { data, personId: emma.id };
 }
 
-module.exports = { create, marketingSources, conflictingVersions, otherSources, roster, team };
+module.exports = { create, taskSeeds, marketingSources, conflictingVersions, otherSources, roster, team };

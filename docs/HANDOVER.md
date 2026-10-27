@@ -1,3 +1,57 @@
+# Feedback round, 25 to 26 October 2026
+
+**State (26 October):** branch `feat/feedback-blocks-a-d` pushed; pull request [#55](https://github.com/sararr25/averill-ai/pull/55) open against `main`, not merged. Release ZIP built locally only (not published). Spec: `docs/FEEDBACK_SPEC_2026-10-25.md` (FB-01 to FB-15, decisions D1 to D4). Canva spike: `docs/CANVA_SPIKE_2026-10-25.md`. Screenshots: `docs/review-evidence-2026-10-25/`.
+
+**How it was built:** each ticket by a subagent (Sonnet for normal coding, Opus for the connection, UI and Canva work, Haiku for docs), then rechecked in this session (tests rerun, screenshots looked at) before one commit per ticket. Owner decisions: D1 connection for the whole session, D2 real Canva (simulator mock rejected), D3 local photo checks, D4 Averill only warns on real sites.
+
+**Cleanup done 26 October:** removed 737 `averill-*` test folders from `/tmp` and the user temp folder (1.3 GB, recreated by the verify scripts when they run), the merged local branch `docs/feedback-spec-2026-10-25`, and the local copy of the replaced 24 October ZIP. The older sibling folder `../demo-social-simulator` (an out-of-date copy of `demo-tools/social-simulator`) was left in place; delete it only on the owner's word.
+
+## What exists now
+- Simulator (`demo-tools/social-simulator`): the Brevo preview looks like a real email (inbox header, logo, hero, sections, button, footer with address, Unsubscribe). All posts and drafts have images and realistic hashtags. Not deployed: averill-demo-sim.vercel.app still serves the old version until the branch is merged and deployed (owner decision).
+- Desktop: new first tab **To do** (Needs your review and Your tasks, with a count badge). Judges land there after Try the demo. Demo tasks: Emma 3, Maya 2, Alex 2 (Winter Escapes 2027).
+- UI: smaller buttons (primary 36 px, others 32 px and 28 px), a clearer type scale, one primary button per section.
+- Extension v0.3.0 (reload needed): stays connected for the whole signed-in session (tab switch, Averill covering Chrome, idle, same-site reload). It ends on Stop, sign-out, quitting Averill, closing the tab, or moving to another site. Toolbar badge ON. Popup shows the state (Not connected with 4 steps, Waiting for approval in Averill, Connected to host, last end reason). Card shows a "Connected to Averill" pill and, when it ends, the reason and how to reconnect. Desktop Current work shows a 3-step Browser connection checklist.
+- LinkedIn and Instagram composer fields are found reliably (role=textbox, plain text only, field re-found after re-render).
+- Card: "Ask about this draft or company rules" box (Enter to ask), with cited answers from approved sources. Example: "Can we say lowest prices guaranteed?" cites the brand rule.
+- Card: "Double-check online" after a review or question. Public statements (dates, prices, events) are ticked, then "Check with Tavily". Nothing is sent before the click. Results appear under "Public check, not company approval". In the demo it goes through the judge server (10 searches a day per client). Verdict is Unclear unless Nemotron is on. Desktop shows "Checked online with Tavily: N claims".
+- Card: "Images" section with "Check images too": size, aspect ratio, alt text, and text printed in the image (macOS OCR, local). Planted: the Instagram paid Reel image shows "Lowest prices guaranteed".
+- Hashtag rules (social-media-guidelines v2): #vamotravel required; Instagram max 8, LinkedIn max 3; banned #cheapestflights, #lowestprice, #bestprice; paid Reel needs #ad. Planted: LinkedIn draft has 5 hashtags; Reel draft has #lowestprice. These findings appear only after Maya supersedes guidelines v1.
+- Canva (real canva.com): card "Design check" with "Watch my design" (off by default). Blocks with "Fix before you export" for contrast below 4.5:1 (3:1 for large text), text closer than 108 px to any edge (Vamo rule, same as the Canva margin guide), and forbidden phrases. "Export anyway" records an override. Averill never edits or exports. Starting design DAHZAkgeHzA "Vamo Copenhagen before 8 Instagram post", 1080x1440, texts inside margins (saved 26 October).
+- Existing workspaces must re-import social-media-guidelines-v2 to get the hashtag, image and design rules. A fresh Try the demo gets them.
+
+## Verified
+All of this is synthetic: fixtures, synthetic pages, and mocked Nebius, Tavily and judge-server calls.
+- npm test 207/207.
+- Flaw matrix 14/14 (one run with real macOS OCR).
+- verify:contextual 20/20 for default, instagram, linkedin and brevo.
+- FB06: 10/10 LinkedIn and 10/10 Instagram.
+- verify:browser PASS; verify:canva-adapter PASS.
+- verify:canva-design 12/12 (on a synthetic page rebuilt from the captured Canva structure, not on canva.com).
+- verify:accessibility 9/9; verify:ui-e2e 23/23; verify:guide 27/27.
+- Simulator npm test 33/33 and build OK.
+
+- FB-15 run, 26 October: all checks above repeated, plus verify:feedback, intake, rehearsal and demo-ai (outage mode) PASS. verify:cloud-ui first failed: its synthetic review result was not bound to a review, so the new re-render after a public check cleared it; the test now binds it like the app does and passes. verify:contextual (default) failed once at the source dialog and passed on rerun (intermittent, also seen 21 October).
+- Packaged app: `npm run package:release` built `travel-desktop/dist/Averill-macOS-arm64.zip` (SHA-256 `9c4072081dc26121e70d94759c4469e09e8241d5fdd5eadf31b9c428a5e54349`, not published; the 24 October ZIP was replaced locally). Integrity check PASS. Driven over the DevTools port with temporary profiles: first run, Try the demo lands on To do, the three demo logins, and the synthetic QA owner login all pass. The bundled extension is 0.3.0 with the new files. Restart persistence, native approval and installed Chrome were not run.
+
+## Not verified
+- Installed Chrome with the real extension (v0.3.0).
+- Real canva.com live check.
+- Live Tavily, Nebius and judge-server calls (all mocked).
+- verify:external, verify:native-window and verify:task-review were not verified, because they need Screen Recording permission.
+
+## Open
+Owner decisions:
+- Confirm or revert the AGENTS.md exception added for FB-10. The card may show public statements that are exact pieces of the field text; only the ticked text is sent.
+- Confirm that in-card questions use Nemotron when the session AI switch and company policy allow it, without a per-question confirmation. The README says so; the card does not.
+- Push, merge and deploy: the simulator and judge server deploy from main. Owner's word only.
+- Release ZIP: owner's word only.
+
+TODOs:
+- Create the Canva template link (Share > Share link > Template link) and test it with a second account. Until then, test-averill.md has a marked placeholder for it. Do not invent a URL.
+- Merge and deploy so averill-demo-sim and averill-judge-ai serve the new version.
+- Run the packaged app checks in FB-15.
+- Existing workspaces must re-import social-media-guidelines-v2.
+
 # Judge demo upgrade — implemented, 24 October 2026
 
 **State:** JD-01 … JD-11 done on branch `fix/judge-demo-c-block` (pushed up to `d5a3743`; `b15de32` JD-11 and the JD-13 commit are local only). JD-12 done by the owner. JD-13: guide updated and verified; **no release published** — waits for the owner.
@@ -348,7 +402,9 @@ The owner first requested preparation steps 2 and 3, then a stop. Those were del
 
 - `travel-desktop/main.js`, `preload.js`: windows, sender checks, sharing, services, workspace and learning IPC.
 - `travel-desktop/src/learning.js`, `learning-ui.js`, `tests/learning.test.js`: Learn state/UI/tests.
-- `travel-desktop/src/agent.*`, `agent-theme.css`, `agent-controls.css`: assistant and tabs.
+- `travel-desktop/src/agent.*`, `app.css`: assistant and tabs. Since 27 October 2026 `app.css` is the app's only stylesheet (the old agent-controls, agent-theme, ui-refinements, guided-ui, companion-theme and todo rules merged in load order); colours come from `design-system/companion/tokens.css`, light by default and dark when macOS is dark. `scripts/verify-phase-b.cjs` checks contrast and text size in both themes.
+- Current work (27 October 2026, phase C): a "Working on now" card names the connected draft, picks the check type from the site (Canva, Brevo, LinkedIn, Instagram), and has Check now, Ask about this and Disconnect; corrections follow, then Recent work (name, check type, time and correction titles per person in this Mac's localStorage). Pairing recovery and app window capture moved to Workspace settings › Connection tools. The extension posts a bodyless `/hello` to 127.0.0.1:43147 when its worker starts; Averill stores only the timestamp in `extension-seen.json` and shows Install (opens chrome://extensions and reveals the folder; nothing is installed automatically) or Connect (brings Chrome forward; never claims a connection). Verified by `scripts/verify-phase-c.cjs` with a simulated extension, not with real Chrome.
+- Learn (27 October 2026, phase D1): the Canva layout lesson runs inside Canva. `src/canva-exercise.js` reads the same FB-14 design reading and ticks five steps by itself (two texts, headline 1.5x bigger, aligned edges, 60 px margin at 1080 px, readable contrast); ticks stay once seen. Grouping cannot be read and is confirmed once with "Finish lesson", which stays disabled until the five steps are seen. "I cannot connect Canva" finishes with every step recorded as employee-confirmed. The browser card lists the lesson steps under the design check. Verified with `npm test` (211/211) and `verify-canva-design` (15/15) on the synthetic Canva page only, not on real canva.com. D2 (Brevo) and D3 (LinkedIn/Instagram) are not started.
 - `travel-desktop/src/work.*`, `work-theme.css`: supplied campaign editors.
 - `travel-desktop/src/workspace.js`, `workspace-answer.js`: local sources, roles, approval and company answers.
 - `travel-desktop/src/engine.js`, `assistant.js`, `campaign.js`: campaign rules/local answers/Nebius.

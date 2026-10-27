@@ -4,6 +4,8 @@ const nebius = require('./nebius');
 const privacy = require('./company-privacy');
 const tavily = require('./tavily');
 const rules = require('./rules');
+const judgeServer = require('./judge-server');
+const cloudActivity = require('./cloud-activity');
 const { currentSources } = require('./task-review');
 
 const VERDICTS = ['supported', 'contradicted', 'unclear'];
@@ -28,19 +30,36 @@ async function judge(data, claim, search, key, fetcher) {
   return { verdict: parsed.verdict, url: result.url, title: result.title, snippet, explanation: String(parsed.explanation || '').slice(0, 300), model: reply.model };
 }
 
-async function checkClaims(data, task, claims, { tavilyKey, nebiusKey, fetcher } = {}) {
+async function checkClaims(data, task, claims, { tavilyKey, nebiusKey, fetcher, transport } = {}) {
   const list = (Array.isArray(claims) ? claims : []).map(claim => String(claim || '').trim()).filter(Boolean).slice(0, 5);
   if (!list.length) throw new Error('Choose at least one public statement to check.');
   const internal = internalTexts(data, task);
   const useModel = privacy.allowed(data) && Boolean(nebiusKey);
   const out = [];
   for (const claim of list) {
-    const search = await tavily.search(claim, { key: tavilyKey, purpose: 'public-check', depth: 'advanced', answer: !useModel, maxResults: 5, internalTexts: internal, fetcher });
+    const search = await tavily.search(claim, { key: tavilyKey, purpose: 'public-check', depth: 'advanced', answer: !useModel, maxResults: 5, internalTexts: internal, fetcher, transport });
     let verdict = { verdict: 'unclear', explanation: search.answer ? `Tavily summary: ${search.answer}` : 'Review the public results yourself.' };
     if (useModel && search.results.length) { try { verdict = await judge(data, claim, search, nebiusKey, fetcher); } catch { /* keep the unjudged results */ } }
-    out.push({ claim, ...verdict, results: search.results.slice(0, 3).map(({ title, url }) => ({ title, url })) });
+    out.push({ claim, ...verdict, results: search.results.slice(0, 3).map(({ title, url, content }) => ({ title, url, snippet: String(content || '').replace(/\s+/g, ' ').trim().slice(0, 240), content })) });
   }
   return { checkedAt: new Date().toISOString(), method: useModel ? 'Tavily search, judged by NVIDIA Nemotron' : 'Tavily search', claims: out };
+}
+
+// Search through the owner's local Tavily key, or in the judge demo workspace without one through the capped judge server.
+// Each finished check adds one line to the person's cloud activity log: counts only, never the claim text.
+function route(data, tavilyKey) {
+  if (tavilyKey) return { via: 'local-key', tavilyKey };
+  if (data?.demoAccounts === true) return { via: 'demo-server' };
+  throw Object.assign(new Error('Online checks need a Tavily key. Ask an administrator to add one in Workspace settings.'), { expose: true });
+}
+
+async function checkOnline(data, task, claims, { tavilyKey, nebiusKey, fetcher, endpoint, personId = data?.activePersonId, now = new Date() } = {}) {
+  const way = route(data, tavilyKey);
+  const transport = way.via === 'demo-server' ? judgeServer.searchTransport(data, { fetcher, endpoint }) : undefined;
+  const result = await checkClaims(data, task, claims, { tavilyKey: way.tavilyKey, nebiusKey, fetcher, transport });
+  const count = result.claims.length;
+  cloudActivity.record(data, personId, { service: 'tavily', purpose: 'public-check', kind: 'summary', ok: true, items: count, via: way.via, label: `Checked online with Tavily: ${count} claim${count === 1 ? '' : 's'}` }, now);
+  return { ...result, via: way.via };
 }
 
 function links(text) {
@@ -72,4 +91,4 @@ async function checkLinks(data, task, observedText, urls, { tavilyKey, fetcher, 
   });
 }
 
-module.exports = { checkClaims, checkLinks, links };
+module.exports = { checkClaims, checkOnline, route, checkLinks, links, internalTexts };

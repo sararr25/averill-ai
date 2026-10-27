@@ -43,15 +43,29 @@ async function post(path, key, body, purpose, fetcher, timeout = 30000) {
   const started = Date.now();
   const response = await fetcher(`${API}${path}`, { method: 'POST', headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' }, body: JSON.stringify(body), signal: AbortSignal.timeout(timeout) });
   notify({ service: 'tavily', purpose, kind: path.slice(1), ok: response.ok, status: response.status, ms: Date.now() - started });
-  if (!response.ok) throw new Error(`Tavily ${path.slice(1)} failed (${response.status})`);
+  if (!response.ok) throw Object.assign(new Error(`Tavily ${path.slice(1)} failed (${response.status})`), { status: response.status });
   return response.json();
 }
 
-async function search(query, { key = process.env.TAVILY_API_KEY, purpose = 'search', depth = 'basic', answer = false, maxResults = 5, includeDomains, internalTexts, fetcher = globalThis.fetch } = {}) {
+// A transport replaces the direct Tavily request, for example the capped judge demo server. Callers still pass the
+// outbound() guard first, and the call is reported to the same listeners as a direct request.
+async function viaTransport(transport, path, body, purpose) {
+  const started = Date.now();
+  try {
+    const result = await transport(path, body);
+    notify({ service: 'tavily', purpose, kind: path.slice(1), ok: true, status: 200, ms: Date.now() - started });
+    return result;
+  } catch (error) {
+    notify({ service: 'tavily', purpose, kind: path.slice(1), ok: false, status: error.status, ms: Date.now() - started });
+    throw error;
+  }
+}
+
+async function search(query, { key = process.env.TAVILY_API_KEY, purpose = 'search', depth = 'basic', answer = false, maxResults = 5, includeDomains, internalTexts, transport, fetcher = globalThis.fetch } = {}) {
   const input = outbound(query, { max: 300, internalTexts });
   const body = { query: input, search_depth: depth === 'advanced' ? 'advanced' : 'basic', max_results: Math.min(10, Math.max(1, maxResults)), include_answer: answer, include_raw_content: false, include_images: false };
   if (includeDomains?.length) body.include_domains = includeDomains.slice(0, 10);
-  const result = await post('/search', key, body, purpose, fetcher, 20000);
+  const result = transport ? await viaTransport(transport, '/search', body, purpose) : await post('/search', key, body, purpose, fetcher, 20000);
   const results = (result.results || []).filter(item => /^https:\/\//.test(item.url || '')).slice(0, body.max_results).map(cleanResult);
   return { query: input, answer: answer && results.length ? clip(result.answer, 2000) : '', results };
 }

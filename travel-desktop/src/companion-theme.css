@@ -2,29 +2,142 @@
 @import url('../design-system/companion/tokens.css');
 @font-face{font-family:'Plus Jakarta Sans';src:url('../browser-extension/assets/plus-jakarta-sans.ttf') format('truetype');font-weight:200 800;font-display:swap}
 :root{--ds-font-body:var(--av-font);--ds-font-display:var(--av-font);--ds-font-mono:var(--av-font);--ds-color-canvas:var(--av-canvas);--ds-color-window:var(--av-canvas);--ds-color-panel:var(--av-surface);--ds-color-panel-hover:var(--av-surface-hover);--ds-color-text:var(--av-text);--ds-color-text-secondary:var(--av-text-secondary);--ds-color-text-muted:var(--av-text-secondary);--ds-color-border:var(--av-border);--ds-color-control-border:var(--av-control-border);--ds-color-signal:var(--av-warning);--ds-color-signal-hover:var(--av-accent-hover);--ds-color-verified:var(--av-accent);--ds-color-verified-soft:var(--av-text);--ds-color-focus:var(--av-focus)}
-.agent-body{font-size:14px;line-height:1.6;background:var(--av-canvas)}
-.agent-body .agent-header,.agent-body[data-area=review] .agent-header{display:flex;height:76px;padding:16px 24px;border-bottom:0}
-.agent-body .agent-header .brand-mark{width:32px;height:32px;margin-right:4px}
+
+/* FB-12: this file is the single home for desktop chrome, type scale, controls, fields and cards.
+   Earlier stylesheets keep layout for their own components only; do not restyle these controls there. */
+
+/* Chrome */
+.agent-body{font:var(--av-type-body);background:var(--av-canvas)}
+.agent-body .agent-header,.agent-body[data-area=review] .agent-header{display:flex;align-items:center;justify-content:flex-start;gap:var(--av-space-3);height:auto;min-height:64px;padding:var(--av-space-4) var(--av-space-6);border-bottom:0}
+.agent-body .agent-header .brand-mark{display:grid;place-items:center;width:32px;height:32px;margin:0;padding:0;border:0}
 .agent-body .agent-header .eyebrow{font-size:9px;letter-spacing:.12em}
-.agent-body .agent-header h1{font-size:21px;line-height:1.25}
-.agent-body .agent-nav,.agent-body[data-area=review] .agent-nav{height:auto;min-height:52px;gap:2px;padding:4px 16px;align-items:center;position:relative;z-index:5;border-bottom:1px solid var(--av-border)}
-.agent-body .agent-nav button{min-height:44px;padding:8px 10px;border:0;border-radius:12px;font-size:12px;white-space:nowrap}
-.agent-body .agent-nav button.active{background:var(--av-accent-soft);color:var(--av-accent)}
-.nav-more{margin-left:auto;position:relative}.agent-body .nav-more>summary{min-height:44px;display:flex;align-items:center;cursor:pointer;padding:8px 10px;border-radius:12px;font-size:12px;box-sizing:border-box}.nav-more>div{position:absolute;right:0;top:100%;width:210px;padding:8px;border:1px solid var(--av-control-border);border-radius:18px;background:var(--av-surface);box-shadow:0 12px 28px #18151e66}.agent-body .nav-more button{display:block;width:100%;text-align:left}
-.agent-body .agent-main{padding:0 24px 24px}.agent-body .agent-tab.active,.agent-body .agent-tab.active[data-tab=review]{padding:24px 0;max-width:880px;width:100%;margin:auto;display:block;box-sizing:border-box}
-.agent-body .review-feed{overflow:visible;display:block;flex:none;padding:0}.agent-body .review-hero{padding:0 0 24px;flex:none;overflow:visible}.agent-body .aperture-wrap,.agent-body .hero-tagline,.agent-body .hero-rule{display:none}
-.agent-body .review-hero h2{font-size:32px;line-height:1.25;letter-spacing:-.035em;max-width:650px}.agent-body .review-hero p{font-size:14px;line-height:1.6}.agent-body #review-work-result{max-height:none;overflow:visible}
-.agent-body .review-evidence{background:var(--av-surface);border:1px solid var(--av-border);border-radius:18px;padding:20px;margin:16px 0}.agent-body .review-evidence .finding-action{color:var(--av-text);font-size:17px}.agent-body .review-evidence small{color:var(--av-text-secondary)}
-.agent-body .agent-primary{background:var(--av-accent);color:var(--av-on-accent);border:1px solid transparent;border-radius:12px;min-height:44px;padding:10px 16px;font-weight:650}.agent-body .agent-primary:hover{background:var(--av-accent-hover);color:var(--av-on-accent)}
-.agent-body .secondary-button,.agent-body input,.agent-body select,.agent-body textarea{border-color:var(--av-control-border);border-radius:12px;min-height:44px}.agent-body input,.agent-body select,.agent-body textarea{background:var(--av-surface);color:var(--av-text)}
-.agent-body button:focus-visible,.agent-body summary:focus-visible,.agent-body input:focus-visible,.agent-body select:focus-visible,.agent-body textarea:focus-visible{outline:2px solid var(--av-focus);outline-offset:3px}
-.agent-body .work-controls,.agent-body .review-chat{border-top:1px solid var(--av-border);margin-top:12px}.agent-body .work-controls>summary,.agent-body .review-chat>summary{padding:16px 0;min-height:44px;box-sizing:border-box;cursor:pointer;color:var(--av-text-secondary);font-size:14px;font-weight:600}.agent-body #work-controls-content{padding:8px 0 24px}.agent-body .review-conversation{margin-top:12px}.agent-body .review-composer{position:static;background:transparent;padding:16px 0;border:0}.agent-body .review-composer .ask-form{background:var(--av-surface);border-color:var(--av-control-border)}
-.agent-body .operation-feedback[hidden],.agent-body #work-controls [hidden]{display:none!important}.agent-body .session-bar{padding:4px 24px;background:var(--av-surface);border-color:var(--av-border)}
+.agent-body .agent-header h1{font:600 21px/28px var(--av-font);margin:0}
+.agent-body .agent-header .live-pill{margin-left:auto}
+.agent-body .session-bar{min-height:40px;padding:var(--av-space-1) var(--av-space-6);gap:var(--av-space-2);flex-wrap:nowrap;background:var(--av-surface);border-color:var(--av-border);font:var(--av-type-meta)}
+.agent-body .agent-nav,.agent-body[data-area=review] .agent-nav{display:flex;height:auto;min-height:48px;gap:var(--av-space-1);padding:var(--av-space-2) var(--av-space-6);align-items:center;justify-content:flex-start;position:relative;z-index:5;border-bottom:1px solid var(--av-border)}
+.agent-body .agent-main{padding:0 var(--av-space-6) var(--av-space-6)}
+.agent-body .agent-tab.active,.agent-body .agent-tab.active[data-tab=review]{padding:var(--av-space-6) 0 var(--av-space-8);max-width:880px;width:100%;margin:auto;display:block;box-sizing:border-box}
+
+/* Type scale: page title 32/40 (24/31 in narrow windows), section 18/26, item 16/24, body 14/22, label 13/20, meta 12/18. */
+.agent-body .agent-tab>.section:first-child>.section-head h2,.agent-body .review-hero h2{font:var(--av-type-page);letter-spacing:-.03em;margin:0;max-width:650px}
+.agent-body .section-head h2,.agent-body :is(.onboarding-section,.account-management) h3,.agent-body [data-current-learning] h3,.agent-body .learning-card>h3{font:var(--av-type-section);letter-spacing:-.01em;margin:0}
+.agent-body :is(.onboarding-section,.account-management) h3{margin:var(--av-space-6) 0 var(--av-space-2)}
+.agent-body :is(.knowledge-card,.todo-item) h3,.agent-body .learning-card h4,.agent-body .review-evidence .finding-action{font:var(--av-type-item);letter-spacing:0;margin:0 0 var(--av-space-1)}
+.agent-body .review-hero p,.agent-body .section-note{font:var(--av-type-body)}
+.agent-body .section-note{color:var(--av-text-secondary);margin:var(--av-space-2) 0 var(--av-space-4)}
+.agent-body .section-head{display:flex;flex-direction:column;align-items:flex-start;gap:var(--av-space-1);margin-bottom:var(--av-space-2);position:relative}
+.agent-body .section-head span{font:var(--av-type-meta);letter-spacing:0;text-transform:none;color:var(--av-text-secondary)}
+.agent-body :is(.field-hint,.knowledge-meta,.knowledge-decision),.agent-body small{font:var(--av-type-meta);color:var(--av-text-secondary)}
+.agent-body .field-hint{margin:var(--av-space-2) 0}
+.agent-body .knowledge-meta{margin:0}
+.agent-body label{font:var(--av-type-body);color:var(--av-text-secondary)}
+.agent-body label:has(>:is(input:not([type=checkbox]):not([type=radio]),select,textarea)),.agent-body label[for]{display:block;font:var(--av-type-label);color:var(--av-text);margin:var(--av-space-4) 0 0}
+.agent-body summary{display:flex;align-items:center;gap:var(--av-space-2);min-height:var(--av-control-default);padding:var(--av-space-2) 0;box-sizing:border-box;cursor:pointer;font:600 14px/22px var(--av-font);color:var(--av-text);transition:color var(--av-duration-feedback) var(--av-ease)}
+.agent-body summary:hover{color:var(--av-accent)}
+.agent-body :is(.work-controls,.review-chat,.learning-secondary,.knowledge-details,.library-governance)>summary,.agent-body #knowledge-review-queue>summary{color:var(--av-text-secondary)}
+
+/* Fields: label above, one height, one radius. */
+.agent-body :is(input:not([type=checkbox]):not([type=radio]),select,textarea){box-sizing:border-box;max-width:100%;min-height:36px;padding:var(--av-space-2) var(--av-space-3);border:1px solid var(--av-control-border);border-radius:var(--av-radius-control);background:var(--av-surface);color:var(--av-text);font:400 14px/20px var(--av-font)}
+.agent-body label>:is(input:not([type=checkbox]):not([type=radio]),select,textarea){display:block;width:100%;margin-top:var(--av-space-2)}
+.agent-body .ask-form input:not([type=checkbox]):not([type=radio]){min-height:0;border:0;background:transparent;padding:0}
+.agent-body .knowledge-filters{gap:var(--av-space-4)}
+.agent-body .knowledge-filters label{margin:0}
+.agent-body .knowledge-filters .check-row{align-self:end;min-height:36px;padding:var(--av-space-2) var(--av-space-3)}
+.agent-body #knowledge-filter{margin:var(--av-space-2) 0 0}
+.agent-body #web-form{margin-top:var(--av-space-3);border-top:1px solid var(--av-control-border);border-radius:var(--av-radius-control)}
+
+/* Buttons: primary 36px (one per section), default 32px, small 28px for item and toolbar actions, text links >= 24px. No full-width buttons. */
+.agent-body button{box-sizing:border-box;cursor:pointer;font-family:var(--av-font);transition:transform var(--av-duration-feedback) var(--av-ease),background-color var(--av-duration-feedback),border-color var(--av-duration-feedback),color var(--av-duration-feedback)}
+.agent-body button:not(:disabled):active{transform:translateY(1px);transition-duration:80ms}
+.agent-body :is(.agent-primary,.secondary-button,.primary-button),.agent-body .operation-feedback button:not(#operation-dismiss){display:inline-flex;align-items:center;justify-content:center;gap:var(--av-space-2);width:auto;min-height:var(--av-control-default);padding:0 var(--av-space-3);border:1px solid var(--av-control-border);border-radius:var(--av-radius-control);background:transparent;color:var(--av-text);font:var(--av-type-label);text-align:center}
+.agent-body .secondary-button:hover,.agent-body .operation-feedback button:not(#operation-dismiss):hover{background:var(--av-surface-hover);border-color:var(--av-text-secondary)}
+.agent-body :is(.agent-primary,.primary-button){min-height:var(--av-control-primary);padding:0 var(--av-space-4);border-color:transparent;background:var(--av-accent);color:var(--av-on-accent)}
+.agent-body :is(.agent-primary,.primary-button):hover{background:var(--av-accent-hover);color:var(--av-on-accent)}
+.agent-body :is(.finding-actions,.knowledge-card,.workspace-source,.account-row,.review-context,.finding-navigation,.operation-feedback,.external-controls,.ai-control) .secondary-button,.agent-body .review-context button,.agent-body .finding-navigation button,.agent-body .operation-feedback button:not(#operation-dismiss){min-height:var(--av-control-small);padding:0 var(--av-space-3)}
+.agent-body :is(.text-button,.danger-link,.learning-delete){display:inline-flex;align-items:center;width:auto;min-height:var(--av-target-min);padding:0 var(--av-space-1);border:0;background:none;color:var(--av-text-secondary);font:var(--av-type-label);text-decoration:underline;text-underline-offset:3px;white-space:nowrap}
+.agent-body .text-button:hover{color:var(--av-text)}
+.agent-body :is(.danger-link,.learning-delete){color:var(--av-warning)}
+.agent-body .learning-delete{display:flex;margin:var(--av-space-6) 0 0;padding:0}
+.agent-body .session-bar .text-button{margin-left:auto}
+.agent-body :is(.source-link,.approved-action){min-height:var(--av-target-min)}
+.agent-body .approved-action{gap:var(--av-space-2);padding:var(--av-space-1) 0;margin-top:var(--av-space-2);font:600 14px/22px var(--av-font)}
+/* Display rules above must never reveal a control the app hid. */
+.agent-body :is(button,summary)[hidden]{display:none!important}
+.agent-body button:disabled,.agent-body button[aria-disabled=true]{opacity:.42;cursor:not-allowed;box-shadow:none}
+.agent-body :is(.agent-primary,.primary-button):disabled{background:transparent;color:var(--av-text-secondary);border-color:var(--av-border)}
+.agent-body :is(form,.workspace-form,.context-form,.learning-card)>:is(button,.agent-primary,.secondary-button){justify-self:start;align-self:start}
+.agent-body :is(.icon-button,#operation-dismiss){display:inline-grid;place-items:center;width:var(--av-control-default);height:var(--av-control-default);min-width:var(--av-control-default);min-height:var(--av-control-default);padding:0;border:0;border-radius:var(--av-radius-control);background:transparent;color:var(--av-text-secondary);font-size:18px;line-height:1;align-self:center}
+.agent-body :is(.icon-button,#operation-dismiss):hover{background:var(--av-surface-hover);color:var(--av-text)}
+.agent-body .review-context .stop-button{min-height:var(--av-control-small);padding:0 var(--av-space-3);border:0;border-radius:var(--av-radius-control);background:var(--av-warning);color:var(--av-on-accent);font:var(--av-type-label)}
+.agent-body .ai-control{flex-wrap:wrap}
+.agent-body .ai-control button{white-space:nowrap}
+.agent-body .ai-control .ai-toggle{min-height:var(--av-control-small);padding:0 var(--av-space-3);border:1px solid var(--av-accent);border-radius:var(--av-radius-pill);background:transparent;color:var(--av-accent);font:var(--av-type-meta);font-weight:600}
+.agent-body .ai-control .ai-toggle[aria-pressed=true]{background:var(--av-accent);color:var(--av-on-accent)}
+.agent-body .ai-control .ai-toggle:disabled{opacity:.6;border-style:dashed}
+.agent-body .ask-form button[type=submit]{display:grid;place-items:center;width:var(--av-control-primary);height:var(--av-control-primary);min-height:0;padding:0;border:0;border-radius:50%;background:var(--av-accent);color:var(--av-on-accent)}
+.agent-body .review-composer .ask-form .composer-attach{display:inline-flex;align-items:center;width:auto;min-width:0;height:var(--av-control-default);padding:0 var(--av-space-3);margin-right:var(--av-space-1);border:0;border-radius:var(--av-radius-control);background:none;color:var(--av-accent);font:var(--av-type-label);white-space:nowrap}
+/* One spacing rule for every control inside a card: an 8px gap on the right and above, so inline buttons, links and selects never touch. */
+.agent-body :is(.knowledge-card,.learning-card,.knowledge-approval) :is(button,select):not(summary *){margin:var(--av-space-2) var(--av-space-2) 0 0}
+.agent-body :is(.finding-actions,.context-actions,.external-controls,.workspace-actions,.outbound-actions,.guide-actions){display:flex;flex-wrap:wrap;align-items:center;gap:var(--av-space-2)}
+.agent-body .finding-actions{margin-top:var(--av-space-3)}
+
+/* Navigation */
+.agent-body .agent-nav button,.agent-body .nav-more>summary{display:inline-flex;align-items:center;min-height:var(--av-control-default);min-width:0;padding:0 var(--av-space-3);border:0;border-radius:var(--av-radius-control);background:transparent;color:var(--av-text-secondary);font:500 13px/20px var(--av-font);white-space:nowrap}
+.agent-body .agent-nav button:hover,.agent-body .nav-more>summary:hover{color:var(--av-text);background:var(--av-surface-hover)}
+.agent-body .agent-nav button.active{background:var(--av-accent-soft);color:var(--av-accent);font-weight:600}
+.nav-more{margin-left:auto;position:relative}
+.nav-more>div{position:absolute;right:0;top:100%;width:210px;padding:var(--av-space-2);border:1px solid var(--av-control-border);border-radius:var(--av-radius-panel);background:var(--av-surface);box-shadow:0 12px 28px #18151e66}
+.agent-body .nav-more>div button{display:flex;width:100%;text-align:left}
+
+/* Focus: one visible ring for every control. */
+.agent-body :is(button,summary,input,select,textarea,.source-link):focus-visible{outline:2px solid var(--av-focus);outline-offset:3px}
+
+/* Cards and sections: 20px padding, 12px between cards, 32px between sections. */
+.agent-body .section{margin:0 0 var(--av-space-8)}
+.agent-body #work-controls-content>.section{margin-bottom:0}
+.agent-body :is(.knowledge-card,.learning-card,.review-evidence){box-sizing:border-box;margin:var(--av-space-3) 0;padding:var(--av-space-5);border:1px solid var(--av-border);border-radius:var(--av-radius-panel);background:var(--av-surface);color:var(--av-text);box-shadow:none}
+.agent-body :is(.knowledge-card,.learning-card,.review-evidence)>:first-child{margin-top:0}
+.agent-body :is(.knowledge-card,.learning-card,.review-evidence)>:last-child{margin-bottom:0}
+.agent-body .knowledge-card p{margin:var(--av-space-2) 0}
+.agent-body [data-current-learning]{margin:var(--av-space-4) 0 var(--av-space-6)}
+.agent-body details.learning-card{padding:var(--av-space-1) var(--av-space-5)}
+.agent-body details.learning-card[open]{padding-bottom:var(--av-space-5)}
+.agent-body .learning-card p{font:var(--av-type-body);color:var(--av-text-secondary);margin:var(--av-space-2) 0}
+.agent-body .learning-card :is(select,textarea){width:100%;margin:var(--av-space-2) 0}
+.agent-body .learning-card :is(.agent-primary,.secondary-button){margin:var(--av-space-2) var(--av-space-2) 0 0}
+.agent-body .review-evidence{border-left:2px solid var(--av-accent)}
+.agent-body .review-evidence p{margin:var(--av-space-2) 0;font:var(--av-type-body)}
+.agent-body .review-evidence small{display:block;font:var(--av-type-meta);color:var(--av-text-secondary)}
+.agent-body .knowledge-details{margin-top:var(--av-space-4);border-top:1px solid var(--av-border);padding-top:var(--av-space-2)}
+.agent-body .knowledge-details .danger-link{margin-top:var(--av-space-4)}
+.agent-body #knowledge-review-queue[hidden]{display:none!important}
+.agent-body #knowledge-review-queue{border-top:1px solid var(--av-control-border);margin-top:var(--av-space-8)}
+.agent-body .knowledge-card .knowledge-preview{max-height:110px;overflow:auto}
+.agent-body .learning-secondary{border-top:1px solid var(--av-border);margin-top:var(--av-space-4)}
+
+/* Current work */
+.agent-body .review-feed{overflow:visible;display:block;flex:none;padding:0}.agent-body .review-hero{padding:0 0 var(--av-space-6);flex:none;overflow:visible}.agent-body .aperture-wrap,.agent-body .hero-tagline,.agent-body .hero-rule{display:none}
+.agent-body .review-hero p{color:var(--av-text-secondary);margin:var(--av-space-3) 0 var(--av-space-5)}.agent-body #review-work-result{max-height:none;overflow:visible}
+.agent-body #review-start{margin:0}
+.agent-body .work-controls,.agent-body .review-chat{border-top:1px solid var(--av-border);margin-top:var(--av-space-3)}.agent-body .work-controls>summary,.agent-body .review-chat>summary{padding:var(--av-space-4) 0}.agent-body #work-controls-content{padding:var(--av-space-2) 0 var(--av-space-6)}.agent-body .review-conversation{margin-top:var(--av-space-3)}.agent-body .review-composer{position:static;background:transparent;padding:var(--av-space-4) 0;border:0}.agent-body .review-composer .ask-form{background:var(--av-surface);border-color:var(--av-control-border)}
+.agent-body .operation-feedback[hidden],.agent-body #work-controls [hidden]{display:none!important}
 .agent-body .check-scope{background:var(--av-surface);border-color:var(--av-border)}
-@media(max-width:440px){.agent-body .agent-main{padding:0 16px 16px}.agent-body .agent-nav{padding:4px 8px;gap:0}.agent-body .agent-nav button,.agent-body .nav-more>summary{padding:8px 7px;font-size:11px}.agent-body .review-hero h2{font-size:26px}.agent-body .agent-header{padding:16px}}
-@media(prefers-reduced-motion:reduce){.agent-body *{scroll-behavior:auto!important}}
 
-.agent-body .knowledge-card{background:var(--av-surface);border:1px solid var(--av-border);border-radius:18px;padding:20px;margin:16px 0}.agent-body .knowledge-card h3{font-size:19px;line-height:1.4;margin:0 0 8px}.agent-body .knowledge-details{margin-top:16px;border-top:1px solid var(--av-border);padding-top:8px}.agent-body .knowledge-details>summary,.agent-body .library-governance>summary,.agent-body #knowledge-review-queue>summary{cursor:pointer;min-height:44px;padding:10px 0;color:var(--av-text-secondary);box-sizing:border-box}.agent-body #knowledge-review-queue[hidden]{display:none!important}.agent-body #knowledge-review-queue{border-top:1px solid var(--av-control-border);margin-top:32px}.agent-body .knowledge-card .knowledge-preview{max-height:110px;overflow:auto}.agent-body .knowledge-details .danger-link{margin-top:24px;padding-top:16px;border-top:1px solid var(--av-border)}
-@media(max-width:440px){.agent-body .agent-nav{flex-wrap:wrap}}
-
-.agent-body .learning-secondary{border-top:1px solid var(--av-border);margin-top:16px}.agent-body .learning-secondary>summary{min-height:44px;padding:12px 0;box-sizing:border-box;cursor:pointer;color:var(--av-text-secondary)}.agent-body [data-current-learning]{background:var(--av-surface);border:1px solid var(--av-border);border-radius:18px;padding:20px;margin:16px 0 24px}.agent-body [data-current-learning] h3{font-size:21px;line-height:1.4}.agent-body [data-current-learning] h4{font-size:19px;line-height:1.5}
+.agent-body .browser-checklist{box-sizing:border-box;margin:0 0 var(--av-space-6);padding:var(--av-space-5);border:1px solid var(--av-border);border-radius:var(--av-radius-panel);background:var(--av-surface)}
+.agent-body .browser-checklist[hidden]{display:none}
+.agent-body .browser-checklist h3{font:var(--av-type-item);margin:0 0 var(--av-space-3)}
+.agent-body .connection-steps{list-style:none;margin:0;padding:0;display:grid;gap:var(--av-space-3)}
+.agent-body .connection-steps li{display:flex;align-items:flex-start;gap:var(--av-space-3)}
+.agent-body .connection-steps .step-mark{flex:none;display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;border:1px solid var(--av-control-border);color:var(--av-text-secondary);font:var(--av-type-label)}
+.agent-body .connection-steps li.done .step-mark{border-color:transparent;background:var(--av-accent);color:var(--av-on-accent)}
+.agent-body .connection-steps .step-text{display:flex;flex-direction:column;min-width:0}
+.agent-body .connection-steps strong{font:var(--av-type-label);color:var(--av-text);overflow-wrap:anywhere}
+.agent-body .connection-steps small{overflow-wrap:anywhere}
+.agent-body .online-checks h4{font:var(--av-type-label);margin:var(--av-space-4) 0 var(--av-space-2);color:var(--av-text-secondary)}
+.agent-body .online-check-list{list-style:none;margin:var(--av-space-2) 0 0;padding:0;display:grid;gap:var(--av-space-2);overflow-wrap:anywhere}
+.agent-body .online-check-list .source-link{min-height:24px}
+.agent-body #browser-end{margin:var(--av-space-4) 0 0;color:var(--av-warning)}
+.agent-body #browser-end[hidden]{display:none}
+@media(max-width:640px){.agent-body .agent-tab>.section:first-child>.section-head h2,.agent-body .review-hero h2{font:var(--av-type-title);letter-spacing:-.02em}}
+@media(max-width:440px){.agent-body .agent-main{padding:0 var(--av-space-4) var(--av-space-4)}.agent-body .agent-nav{flex-wrap:wrap;padding:var(--av-space-1) var(--av-space-2);gap:0}.agent-body .agent-nav button,.agent-body .nav-more>summary{padding:0 var(--av-space-2);font-size:12px}.agent-body .agent-header,.agent-body .session-bar{padding-left:var(--av-space-4);padding-right:var(--av-space-4)}}
+@media(prefers-reduced-motion:reduce){.agent-body *{scroll-behavior:auto!important}.agent-body button:not(:disabled):active{transform:none}}

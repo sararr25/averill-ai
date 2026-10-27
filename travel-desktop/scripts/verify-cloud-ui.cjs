@@ -115,7 +115,8 @@ app.whenReady().then(async () => {
     // Review result with agent steps and a public check.
     await run("showTab('review')"); await pause(200);
     const synthetic = { mode: 'agent', provider: 'Nebius Token Factory', model: 'nvidia/nemotron-3-super-120b-a12b', findings: [], uncheckedFields: [], status: 'No exact rule conflict found.', steps: [{ label: 'Checked approved rules locally' }, { label: 'Read 12 approved rules for this work type' }, { label: 'Nemotron proposed 0 findings · 0 passed exact-quote validation' }], publicClaims: ['Copenhagen Christmas markets open on 14 November.'] };
-    await run(`(()=>{const out=el('review-work-result')||el('external-task-result');drawTaskReview(out,${JSON.stringify(synthetic)});out.querySelector('.agent-steps').open=true;})()`); await pause(200);
+    // Bind the result to a review like the app does, so the re-render after the public check (activity log) keeps it.
+    await run(`(()=>{const out=el('review-work-result')||el('external-task-result');const result=${JSON.stringify(synthetic)};if(out.id==='review-work-result'){externalReview={identity:workIdentity(),result};render();}else drawTaskReview(out,result);out.querySelector('.agent-steps').open=true;})()`); await pause(200);
     const target = await run("el('review-work-result')?'review-work-result':'external-task-result'");
     assert.ok(await run(`el('${target}').textContent.includes('How Averill checked this')`));
     assert.ok(await run(`el('${target}').textContent.includes('PUBLIC CHECK')`));

@@ -97,7 +97,7 @@ async function renderRules() {
     for (const conflict of data.conflicts) {
       const card = node('article', undefined, 'knowledge-card rule-card'); card.dataset.state = 'conflict';
       card.append(node('strong', `${ruleKindLabels[conflict.kind] || 'Claim'} · ${conflict.task}`, 'knowledge-state'));
-      for (const rule of conflict.rules) card.append(node('blockquote', `${rule.value} — ${rule.sourceTitle} v${rule.sourceVersion}${rule.line ? `, line ${rule.line}` : ''}`, 'rule-quote'));
+      for (const rule of conflict.rules) card.append(node('blockquote', `${rule.value} (${rule.sourceTitle} v${rule.sourceVersion}${rule.line ? `, line ${rule.line}` : ''})`, 'rule-quote'));
       card.append(node('p', 'Neither source is excluded automatically. Resolve it by approving the right source version or rejecting one rule.', 'knowledge-meta'));
       section.append(card);
     }
@@ -112,7 +112,7 @@ async function renderRules() {
   if (freshness?.dependencies.length) {
     const fresh = node('div', undefined, 'rules-freshness');
     fresh.append(node('h3', `Public rule checks · ${freshness.dependencies.length}${freshness.queue.length ? ` · ${freshness.queue.length} may be outdated` : ''}`));
-    for (const entry of freshness.queue) fresh.append(node('p', `May be outdated: ${entry.sourceTitle} — “${entry.value}”. Review the source; its approval has not changed.`, 'knowledge-meta'));
+    for (const entry of freshness.queue) fresh.append(node('p', `May be outdated: ${entry.sourceTitle}, “${entry.value}”. Review the source; its approval has not changed.`, 'knowledge-meta'));
     if (me.role === 'admin') {
       const run = node('button', 'Check against public sources now', 'secondary-button'); run.type = 'button'; run.disabled = !current.services?.tavily;
       run.addEventListener('click', async () => {

@@ -11,7 +11,7 @@ const profiles = {
 function email(value) { return String(value || '').trim().toLowerCase(); }
 function validEmail(value) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email(value)) && email(value).length <= 254; }
 function validatePassword(value) {
- if (typeof value !== 'string' || value.length < 10 || value.length > 128) throw new Error('Use a password of 10–128 characters.');
+ if (typeof value !== 'string' || value.length < 10 || value.length > 128) throw new Error('Use a password of 10 to 128 characters.');
 }
 async function credential(password) {
  validatePassword(password);

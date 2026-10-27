@@ -36,11 +36,11 @@ The canonical versioned copy is `averill-ai/demo-tools/social-simulator/`. The p
 
 The unused Tailwind build dependency was removed after an npm advisory. Its unchanged static CSS reset is retained with the MIT license in src/vendor/; all platform styling uses local CSS.
 
-## Acceptance update — 12 October 2026
+## Acceptance update, 12 October 2026
 
 Real Chrome testing of the canonical copy on a separate loopback origin passed Instagram image/caption save, reload and reopened details; LinkedIn image/text save/reload and unsaved-composer cancellation; Brevo audience/subject/body/image persistence, desktop/mobile previews, cancelled design edits, empty-date rejection and native-entered Copenhagen scheduling/reload. This supersedes the historical image-persistence gate above. These are local simulations, not production platform or fresh installed-extension acceptance. See [the short checklist](../../docs/TESTING_CHECKLIST_2026-10-12.md) and [ticket #4](https://github.com/sararr25/averill-ai/issues/4).
 
-## Seeded Vamo content — aligned with the Vamo website, 17 October 2026
+## Seeded Vamo content, aligned with the Vamo website, 17 October 2026
 
 The Vamo website (`../../travel-site/`) is the base identity; the social pages follow it. The profile picture (`public/vamo/avatar.svg`) is the site's italic VAMO wordmark with the fuchsia asterisk on cream. Post graphics in `public/vamo/posts/` reuse the site's own elements: people-first photography, story-card captions in slanted DM Sans, Fraunces headlines, torn coral stickers ("COLLECT PEOPLE NOT THINGS"), the fuchsia stroke, the mint manifesto block, coral journal cards and the coral ticker. The voice is young and social (solo travellers, friends, hostels, carry-on only), never luxury, and reuses site lines such as "Take the long way to a good story", "Go for the place. Stay for the people." and "Coffee first. Plans later."
 

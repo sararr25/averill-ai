@@ -1,0 +1,478 @@
+{
+ "_note": "Structure of the real Canva editor page (Instagram Post 3:4, design DAHZAkgeHzA) captured 25 Oct 2026 at 40% zoom from canva.com. Classes, URLs and image sources removed; only tag, inline style subset (s), text (x) and children (c) kept. Two layers: positioned visual wrappers (translate = design px) and a separate unpositioned text layer with font sizes. The 864x1224 div at 108,108 is Canva's page margin guide.",
+ "tree": {
+  "t": "div",
+  "s": {
+   "width": "432.75px",
+   "height": "577px"
+  },
+  "c": [
+   {
+    "t": "div",
+    "s": {
+     "width": "1080px",
+     "height": "1440px",
+     "transform": "scale(0.400694)"
+    },
+    "c": [
+     {
+      "t": "div",
+      "c": [
+       {
+        "t": "div",
+        "s": {
+         "width": "1080px",
+         "height": "1440px"
+        },
+        "c": [
+         {
+          "t": "div",
+          "c": [
+           {
+            "t": "div",
+            "c": [
+             {
+              "t": "div",
+              "c": [
+               {
+                "t": "div",
+                "c": [
+                 {
+                  "t": "div",
+                  "c": [
+                   {
+                    "t": "div",
+                    "s": {
+                     "width": "1080px",
+                     "height": "1440px",
+                     "transform": "translate(0px, 0px) rotate(0deg)"
+                    },
+                    "c": [
+                     {
+                      "t": "img"
+                     }
+                    ]
+                   }
+                  ]
+                 }
+                ]
+               }
+              ]
+             }
+            ]
+           }
+          ]
+         },
+         {
+          "t": "div",
+          "s": {
+           "width": "864px",
+           "height": "1224px",
+           "position": "absolute",
+           "left": "108px",
+           "top": "108px"
+          }
+         },
+         {
+          "t": "div",
+          "s": {
+           "width": "1080px",
+           "height": "882.099px",
+           "transform": "translate(0px, 0px)"
+          },
+          "c": [
+           {
+            "t": "div",
+            "c": [
+             {
+              "t": "div",
+              "c": [
+               {
+                "t": "div",
+                "c": [
+                 {
+                  "t": "div",
+                  "c": [
+                   {
+                    "t": "div",
+                    "c": [
+                     {
+                      "t": "div",
+                      "s": {
+                       "width": "1080px",
+                       "height": "882.099px",
+                       "transform": "translate(0px, 0px) rotate(0deg)"
+                      },
+                      "c": [
+                       {
+                        "t": "img"
+                       }
+                      ]
+                     }
+                    ]
+                   }
+                  ]
+                 }
+                ]
+               }
+              ]
+             },
+             {
+              "t": "div",
+              "s": {
+               "width": "1080px",
+               "height": "882.099px",
+               "transform": "scale(1)",
+               "position": "absolute",
+               "left": "0px",
+               "top": "0px"
+              }
+             }
+            ]
+           }
+          ]
+         },
+         {
+          "t": "div",
+          "s": {
+           "width": "1080px",
+           "height": "576.796px",
+           "transform": "translate(0px, 863.204px)"
+          },
+          "c": [
+           {
+            "t": "div",
+            "c": [
+             {
+              "t": "div",
+              "c": [
+               {
+                "t": "div",
+                "c": [
+                 {
+                  "t": "div",
+                  "c": [
+                   {
+                    "t": "div",
+                    "c": [
+                     {
+                      "t": "div",
+                      "s": {
+                       "width": "1080px",
+                       "height": "576.796px",
+                       "transform": "translate(0px, 0px) rotate(0deg)"
+                      },
+                      "c": [
+                       {
+                        "t": "img"
+                       }
+                      ]
+                     }
+                    ]
+                   }
+                  ]
+                 }
+                ]
+               }
+              ]
+             },
+             {
+              "t": "div",
+              "s": {
+               "width": "1080px",
+               "height": "576.796px",
+               "transform": "scale(1)",
+               "position": "absolute",
+               "left": "0px",
+               "top": "0px"
+              }
+             }
+            ]
+           }
+          ]
+         },
+         {
+          "t": "div",
+          "c": [
+           {
+            "t": "div",
+            "s": {
+             "width": "117.373px",
+             "height": "53.4285px",
+             "transform": "translate(32.0489px, 16.875px)",
+             "opacity": "0.899902"
+            },
+            "c": [
+             {
+              "t": "div",
+              "s": {
+               "width": "83.4651px",
+               "height": "37.9936px",
+               "transform": "scale(1.40625, 1.40625)"
+              },
+              "c": [
+               {
+                "t": "div",
+                "s": {
+                 "transform": "translate(0px, -0.0032175px)"
+                },
+                "c": [
+                 {
+                  "t": "div",
+                  "c": [
+                   {
+                    "t": "div",
+                    "c": [
+                     {
+                      "t": "div",
+                      "c": [
+                       {
+                        "t": "p",
+                        "s": {
+                         "color": "rgb(16, 15, 13)",
+                         "line-height": "38px"
+                        },
+                        "c": [
+                         {
+                          "t": "span",
+                          "s": {
+                           "color": "rgb(16, 15, 13)",
+                           "font-size": "1em"
+                          },
+                          "x": "vamo"
+                         }
+                        ]
+                       }
+                      ]
+                     }
+                    ]
+                   }
+                  ]
+                 }
+                ]
+               }
+              ]
+             }
+            ]
+           }
+          ]
+         },
+         {
+          "t": "div",
+          "c": [
+           {
+            "t": "div",
+            "s": {
+             "width": "875.836px",
+             "height": "354.722px",
+             "transform": "translate(64.0151px, 891.786px)"
+            },
+            "c": [
+             {
+              "t": "div",
+              "s": {
+               "width": "622.817px",
+               "height": "252.247px",
+               "transform": "scale(1.40625, 1.40625)"
+              },
+              "c": [
+               {
+                "t": "div",
+                "s": {
+                 "transform": "translate(0px, 16.1234px)"
+                },
+                "c": [
+                 {
+                  "t": "div",
+                  "c": [
+                   {
+                    "t": "div",
+                    "c": [
+                     {
+                      "t": "div",
+                      "c": [
+                       {
+                        "t": "p",
+                        "s": {
+                         "color": "rgb(16, 15, 13)",
+                         "line-height": "110px"
+                        },
+                        "c": [
+                         {
+                          "t": "span",
+                          "s": {
+                           "color": "rgb(16, 15, 13)",
+                           "font-size": "1em"
+                          },
+                          "c": [
+                           {
+                            "t": "br"
+                           }
+                          ]
+                         }
+                        ]
+                       }
+                      ]
+                     }
+                    ]
+                   }
+                  ]
+                 }
+                ]
+               }
+              ]
+             }
+            ]
+           }
+          ]
+         },
+         {
+          "t": "div",
+          "c": [
+           {
+            "t": "div",
+            "s": {
+             "width": "763.083px",
+             "height": "37.9622px",
+             "transform": "translate(71.4707px, 1276.17px)"
+            },
+            "c": [
+             {
+              "t": "div",
+              "s": {
+               "width": "542.637px",
+               "height": "26.9954px",
+               "transform": "scale(1.40625, 1.40625)"
+              },
+              "c": [
+               {
+                "t": "div",
+                "s": {
+                 "transform": "translate(0px, -0.0023141px)"
+                },
+                "c": [
+                 {
+                  "t": "div",
+                  "c": [
+                   {
+                    "t": "div",
+                    "c": [
+                     {
+                      "t": "div",
+                      "c": [
+                       {
+                        "t": "p",
+                        "s": {
+                         "color": "rgb(16, 15, 13)",
+                         "line-height": "27px"
+                        },
+                        "c": [
+                         {
+                          "t": "span",
+                          "s": {
+                           "color": "rgb(16, 15, 13)",
+                           "font-size": "1em"
+                          },
+                          "x": "finish this line: what makes the city good before 8?"
+                         }
+                        ]
+                       }
+                      ]
+                     }
+                    ]
+                   }
+                  ]
+                 }
+                ]
+               }
+              ]
+             }
+            ]
+           }
+          ]
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "t": "div",
+      "c": [
+       {
+        "t": "div",
+        "c": [
+         {
+          "t": "div"
+         },
+         {
+          "t": "div"
+         },
+         {
+          "t": "div",
+          "c": [
+           {
+            "t": "p",
+            "s": {
+             "font-size": "32.175px"
+            },
+            "c": [
+             {
+              "t": "span",
+              "s": {
+               "color": "rgb(16, 15, 13)"
+              },
+              "x": "vamo"
+             }
+            ]
+           }
+          ]
+         },
+         {
+          "t": "div",
+          "c": [
+           {
+            "t": "p",
+            "s": {
+             "font-size": "119.295px"
+            },
+            "c": [
+             {
+              "t": "span",
+              "s": {
+               "color": "rgb(16, 15, 13)"
+              },
+              "x": "copenhagen before 8"
+             }
+            ]
+           }
+          ]
+         },
+         {
+          "t": "div",
+          "c": [
+           {
+            "t": "p",
+            "s": {
+             "font-size": "23.1412px"
+            },
+            "c": [
+             {
+              "t": "span",
+              "s": {
+               "color": "rgb(16, 15, 13)"
+              },
+              "x": "finish this line: what makes the city good before 8?"
+             }
+            ]
+           }
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ }
+}

@@ -163,7 +163,7 @@ function renderSession(){
   el('login-company').textContent=current.workspace?.company||'Your company';
   const demo=Boolean(current.auth.demo);
   el('login-form').hidden=demo;el('login-demo').hidden=!demo;
-  el('login-intro').textContent=demo?'Fictional demo company. Choose who you want to be — no password needed.':'Sign in to your workspace and personal learning.';
+  el('login-intro').textContent=demo?'Fictional demo company. Choose who you want to be. No password needed.':'Sign in to your workspace and personal learning.';
   if(demo){
    const list=el('login-demo');list.replaceChildren();
    for(const person of current.auth.accounts.filter(person=>!person.disabled)){
@@ -171,7 +171,7 @@ function renderSession(){
     button.append(node('strong',`Continue as ${person.name}`),node('span',`${person.jobTitle}${person.department?` · ${person.department}`:''}`));
     button.addEventListener('click',async()=>{
      for(const control of list.querySelectorAll('button'))control.disabled=true;el('login-feedback').textContent='Signing in…';
-     try{current=await window.desktop.demoLogin(person.id);el('login-feedback').textContent='';render();showTab(preferredArea());}
+     try{current=await window.desktop.demoLogin(person.id);el('login-feedback').textContent='';render();showTab(landingArea());}
      catch(error){el('login-feedback').textContent=error.message;}
      finally{for(const control of list.querySelectorAll('button'))control.disabled=false;}
     });

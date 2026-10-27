@@ -179,6 +179,28 @@ function resolveClarification(data,requestId,reply,sourceId){
  item.reply=text;item.status='answered';item.resolvedBy=active.id;item.resolvedAt=new Date().toISOString();return item;
 }
 
+// Tasks: minimal assigned work, saved in the workspace file. Only the assignee sees or completes a task.
+// No IPC creates tasks yet; the judge demo seeds them. link.area is the screen the To do button opens.
+const taskAreas = ['review', 'knowledge', 'learn', 'setup'];
+function addTask(data, { title, assigneeId, dueDate = null, origin, link = null }) {
+  const text = clean(title, 200), from = clean(origin, 120);
+  if (!text || !from) throw new Error('Task title and origin are required');
+  if (!data.people.some((entry) => entry.id === assigneeId)) throw new Error('Unknown assignee');
+  if (dueDate !== null && !/^\d{4}-\d{2}-\d{2}$/.test(dueDate)) throw new Error('Due date must be YYYY-MM-DD');
+  if (link !== null && !taskAreas.includes(link.area)) throw new Error('Unknown task destination');
+  const task = { id: id(), title: text, assigneeId, dueDate, origin: from, link: link ? { area: link.area } : null, status: 'open', createdAt: new Date().toISOString(), doneAt: null };
+  (data.tasks ||= []).push(task);
+  return task;
+}
+function completeTask(data, taskId) {
+  const task = (data.tasks || []).find((entry) => entry.id === taskId);
+  if (!task || task.assigneeId !== data.activePersonId) throw new Error('This task is not assigned to you');
+  if (task.status === 'done') throw new Error('This task is already done');
+  task.status = 'done';
+  task.doneAt = new Date().toISOString();
+  return task;
+}
+
 function visibleSources(data) {
   const active = person(data);
   if (!active) return [];
@@ -209,4 +231,4 @@ function publicSnapshot(data) {
   return { configured: true, company: data.company, departments: data.departments, people: data.people.map(({ credential, onboardingEvidence, ...entry }) => entry), activePersonId: data.activePersonId, conflicts: conflicts(data).filter((group) => group.every((id) => visibleIds.has(id))), sources: visible.map(({ storedPath, textPath, decisions, ...source }) => ({...source,latestDecision:source.ownerId===active.id||active.role==='admin'||active.role==='lead'&&active.department===source.department?decisions?.at(-1)||null:null})),clarifications:visibleClarifications(data) };
 }
 
-module.exports = { load, save, create, person, addPerson, switchPerson, importFile, importFolder, updateSource, proposeSource, removeSource, visibleSources, visibleClarifications, requestClarification, resolveClarification, approvedSources, conflicts, publicSnapshot, extractText };
+module.exports = { load, save, create, person, canManage, addTask, completeTask, addPerson, switchPerson, importFile, importFolder, updateSource, proposeSource, removeSource, visibleSources, visibleClarifications, requestClarification, resolveClarification, approvedSources, conflicts, publicSnapshot, extractText };
