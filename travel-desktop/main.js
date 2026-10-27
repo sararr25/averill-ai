@@ -126,10 +126,22 @@ const contextualReview = new ContextualReview({
   openSource: sourceId => { agentWindow.show(); agentWindow.focus(); agentWindow.webContents.send('agent:open-context', { sourceId }); },
 });
 
+// When the Averill extension last announced itself on this Mac. Only a timestamp: no tab, page or person.
+const extensionSeenFile = path.join(app.getPath('userData'), 'extension-seen.json');
+function readExtensionSeen() {
+  try { const at = JSON.parse(fs.readFileSync(extensionSeenFile, 'utf8')).at; return Number.isSafeInteger(at) ? at : null; }
+  catch (error) { if (error.code !== 'ENOENT') console.error('Ignoring unreadable extension-seen.json:', error.message); return null; }
+}
+let extensionSeenWritten = 0;
+function openInChrome(url) {
+  return new Promise((resolve, reject) => require('node:child_process').execFile('open', ['-a', 'Google Chrome', ...(url ? [url] : [])], error => error ? reject(new Error('Google Chrome was not found on this Mac. Install Chrome, then try again.')) : resolve()));
+}
 const browserConnect = new BrowserConnect({
   port: !app.isPackaged && process.env.AVERILL_CONNECT_PORT === '0' ? 0 : undefined,
   getSession: () => browserSession(),
   onChange: () => publish(),
+  seenAt: readExtensionSeen(),
+  onSeen: at => { if (at - extensionSeenWritten < 60000) return; extensionSeenWritten = at; fs.writeFileSync(extensionSeenFile, JSON.stringify({ at })); },
   approve: async ({ origin, pageOrigin }) => {
     agentWindow.show(); agentWindow.focus();
     const result = await dialog.showMessageBox(agentWindow, { type: 'question', title: 'Connect the Averill browser companion', message: `Connect this browser companion to ${pageOrigin}?`, detail: `Extension: ${origin}\nOnly a field you choose will be shared locally. Use Stop sharing to end access. Approval lasts until sign-out or app restart. No sending or publication.`, buttons: ['Cancel', 'Connect'], defaultId: 0, cancelId: 0 });
@@ -860,6 +872,14 @@ app.whenReady().then(async () => {
     if (!externalWatchTimer) externalWatchTimer = setInterval(watchExternalTick, 6000);
     watchExternalTick(); publish(); return snapshot();
   });
+  // Guided install (owner decision Q5): open Chrome's extensions page and show the folder to load. Never installs anything itself.
+  ipcMain.handle('agent:extension-install', async event => {
+    fromAgent(event);
+    await openInChrome('chrome://extensions');
+    shell.showItemInFolder(path.join(__dirname, 'browser-extension', 'manifest.json'));
+    return true;
+  });
+  ipcMain.handle('agent:open-chrome', async event => { fromAgent(event); await openInChrome(); return true; });
   ipcMain.handle('agent:open-web', async (event, url) => {
     fromAgent(event);
     try {

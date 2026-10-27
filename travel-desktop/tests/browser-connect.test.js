@@ -47,3 +47,18 @@ test('a new process requires fresh approval and an occupied rendezvous port fail
  assert.equal((await first.post()).status, 200);
  assert.equal(secondaryApprovals, 1); assert.equal(secondaryConnections, 1);
 });
+
+test('hello marks the extension as installed without sign-in, trust or a connection; other origins are refused', async t => {
+ const seen = [];
+ const f = await setup(t, { onSeen: at => seen.push(at) });
+ const port = f.server.server.address().port;
+ const hello = headers => fetch(`http://127.0.0.1:${port}/hello`, { method: 'POST', headers: { Connection: 'close', ...headers } });
+ assert.equal(f.server.status(null).extensionSeenAt, null);
+ assert.equal((await hello({ Origin: 'https://evil.example' })).status, 403);
+ assert.equal(f.server.status(null).extensionSeenAt, null);
+ f.session(null);
+ assert.equal((await hello({ Origin: origin })).status, 204);
+ const status = f.server.status('first-person:1');
+ assert.ok(Number.isSafeInteger(status.extensionSeenAt)); assert.equal(seen.length, 1);
+ assert.equal(status.approved, false); assert.deepEqual(f.counts(), [0, 0]);
+});

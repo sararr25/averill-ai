@@ -513,3 +513,42 @@ button{transition:color var(--ds-duration-fast),background-color var(--ds-durati
 /* Tabs keep their full label and wrap to a second row rather than shrinking into each other. */
 .agent-body .agent-nav{flex-wrap:wrap;row-gap:var(--av-space-1)}
 .agent-body .agent-nav button,.agent-body .nav-more>summary{flex:none;white-space:nowrap}
+
+/* ---- Current work: Working on now, extension install/connect, recent work (phase C, 27 October 2026) ---- */
+.agent-body.review-idle .review-hero{display:none}
+.header-status{display:flex;align-items:center;gap:var(--av-space-2);margin-left:auto}.header-status .live-pill{margin-left:0}
+.connection-icon{display:inline-flex;color:var(--av-text-secondary)}.connection-icon .line-icon{width:22px;height:22px}.connection-icon.connected{color:var(--av-accent-strong)}
+.working-now{margin:0 0 var(--av-space-6);padding:var(--av-space-5);border:1px solid var(--av-border);border-radius:var(--av-radius-panel);background:var(--av-surface)}
+.working-now.is-open{border-color:var(--av-accent-strong)}
+.working-now-head{display:flex;gap:var(--av-space-4);align-items:flex-start}
+.working-tool-icon{display:grid;place-items:center;width:48px;height:48px;flex:none;border-radius:var(--av-radius-control);background:var(--av-accent-soft);color:var(--av-accent-strong)}.working-tool-icon .line-icon{width:28px;height:28px}
+.working-now h2{font:var(--av-type-title);margin:var(--av-space-1) 0;overflow-wrap:anywhere}
+.working-now p{font:var(--av-type-body);color:var(--av-text-secondary);margin:0}
+.working-now .eyebrow{font:var(--av-type-meta);letter-spacing:.08em;color:var(--av-text-secondary)}
+.working-task{display:flex;align-items:center;flex-wrap:wrap;gap:var(--av-space-2);margin:var(--av-space-4) 0 0;font:var(--av-type-label);color:var(--av-text)}
+.working-task select{width:auto;min-width:200px}
+.working-actions,.extension-panel{display:flex;flex-wrap:wrap;align-items:center;gap:var(--av-space-2);margin-top:var(--av-space-4)}
+.working-actions button,.extension-panel button{gap:var(--av-space-2)}.working-actions .line-icon,.extension-panel button .line-icon{width:18px;height:18px}
+.working-actions [data-icon]{display:inline-flex}
+#working-check-hint:not(:empty){margin-top:var(--av-space-2)}
+#working-now-empty>p{margin-top:var(--av-space-4)}
+.extension-panel{display:block;padding:var(--av-space-4);border-radius:var(--av-radius-control);background:var(--av-surface-raised)}
+.extension-panel h3{font:var(--av-type-item);margin:0 0 var(--av-space-1)}.extension-panel>button{margin-top:var(--av-space-3)}
+.install-steps{list-style:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:var(--av-space-3);margin:var(--av-space-4) 0 0;padding:0}
+.install-steps li{display:flex;flex-direction:column;gap:var(--av-space-2);font:var(--av-type-meta);color:var(--av-text)}
+.install-steps svg{width:100%;height:auto}
+.ill-frame{fill:var(--av-surface);stroke:var(--av-control-border);stroke-width:1.5}.ill-line{fill:var(--av-border)}.ill-accent{fill:var(--av-accent)}.ill-knob{fill:var(--av-on-accent)}.ill-ink{fill:var(--av-on-accent)}
+.recent-work{margin:0 0 var(--av-space-6)}
+.recent-work h3{display:flex;align-items:center;gap:var(--av-space-2);font:var(--av-type-section);margin:0 0 var(--av-space-3)}
+.recent-work ul{list-style:none;margin:0;padding:0;display:grid;gap:var(--av-space-2)}
+.recent-work details{border:1px solid var(--av-border);border-radius:var(--av-radius-control);background:var(--av-surface);padding:var(--av-space-3) var(--av-space-4)}
+.recent-work summary{display:flex;align-items:center;gap:var(--av-space-3);cursor:pointer;flex-wrap:wrap}
+.recent-icon{display:inline-flex;color:var(--av-accent-strong)}.recent-icon .line-icon{width:20px;height:20px}
+.recent-name{font:var(--av-type-label);color:var(--av-text)}.recent-work small{font:var(--av-type-meta);color:var(--av-text-secondary);margin-left:auto}
+.recent-work details p,.recent-work details li{font:var(--av-type-body);color:var(--av-text-secondary)}
+/* The card names the open draft and has Disconnect, so the older live bar would only repeat it. */
+.agent-body.working-open .review-context.is-live{display:none}
+/* Reading order in Current work: what you are working on, what to fix, then recent work and the help below. */
+.agent-body[data-area="review"] .review-feed>#recent-work{order:1}
+.agent-body[data-area="review"] .review-feed>:is(.browser-checklist,.review-chat){order:2}
+.working-now{position:relative}.agent-body .working-now>.guide-help{position:absolute;top:12px;right:12px}

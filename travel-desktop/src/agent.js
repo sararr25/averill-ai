@@ -36,7 +36,7 @@ function landingArea(){return !current.workspace?.configured||current.onboarding
 function showTab(name) {
   if(!areas.has(name))return;
   const connectionRequested=name==='work';
-  if(connectionRequested)name='review';
+  if(connectionRequested)name='setup';
   if(connectionRequested)el('work-controls').open=true;
   document.querySelector('.nav-more').open=false;
   const changed=document.body.dataset.area!==name;
@@ -92,6 +92,7 @@ function render() {
   renderHero();
   renderWorkStep();
   renderBrowserChecklist();
+  renderWorkingNow();
   renderOnlineChecks();
   el('browser-guided-status').textContent = current.browserConnectionError || '';
   el('browser-guided-status').hidden = !current.browserConnectionError;
@@ -198,6 +199,8 @@ function renderFirstRun(){
   el('review-start').dataset.target=approved||!admin?'work':'setup';
 }
 function renderHero() {
+  // With nothing to fix, the Working on now card says everything; the hero only returns for corrections.
+  document.body.classList.toggle('review-idle',!externalReview&&!(current.findings||[]).length&&!(current.shared||[]).length);
   el('review-start').hidden=Boolean(externalReview||(current.shared||[]).length||(current.findings||[]).length);el('review-steps').hidden=el('review-start').hidden;renderFirstRun();
   const awaitingCheck=!externalReview&&Boolean(current.externalObservation)&&!(current.shared||[]).length&&!(current.findings||[]).length;
   if(awaitingCheck){el('review-steps').hidden=true;el('review-start').textContent='Check approved rules';el('review-start').dataset.target='check';el('review-start').disabled=reviewPending;}else el('review-start').disabled=false;
@@ -628,7 +631,7 @@ function renderTaskReview(result){
   const output=el('external-task-result');
   if(result.contentHash!==current.externalObservation?.contentHash){output.textContent='The visible work changed. Check the current text again.';return;}
   el('work-controls').open=false;
-  externalReview={identity:workIdentity(),result};drawTaskReview(output,result);renderHero();showTab('review');el('hero-title').focus();
+  externalReview={identity:workIdentity(),result,checkedAt:Date.now()};rememberRecentWork(externalReview);drawTaskReview(output,result);renderHero();renderWorkingNow();showTab('review');el('hero-title').focus();
 }
 async function checkWork(fresh){
   if(reviewPending)return;
@@ -700,7 +703,7 @@ function renderWorkStep(){
  if(identity!==workStepIdentity){workStepIdentity=identity;document.querySelector('.browser-adapter').open=!selected;document.querySelector('.native-adapter').open=selected&&!captured&&current.externalWindow.adapter!=='browser-dom';}
  el('work-next').textContent=reviewPending?'Checking your work… You can stop sharing at any time.':captured?'Text captured. Choose the work type below, then check approved rules.':selected?(current.externalWindow.adapter==='browser-dom'?'Finish editing the selected field. Advice clears while you type.':'Window selected. Read visible text to capture one frame.'):(ready?'Connect this tab in the extension, then select a draft field.':'Start by connecting a browser field or choosing an app window.');
  // One primary action per state: nothing to check or stop until work is shared; local recheck only after a result.
- el('external-task').closest('.context-form').hidden=!selected;
+ el('external-task-review').closest('.context-form').hidden=!selected;
  el('stop-external').closest('.sharing-controls').hidden=!selected&&!ready;
  document.querySelector('.work-question').hidden=!captured;document.querySelector('.captured-text').hidden=!captured;
  el('external-local-recheck').hidden=!externalReview||current.externalWindow?.adapter==='browser-dom';
@@ -763,8 +766,95 @@ el('login-form').addEventListener('submit', async (event) => {
   catch (error) { el('login-feedback').textContent = error.message; }
   finally { submit.disabled = false; }
 });
+
+// ---- Current work (feedback round 27 October, C1/C2): what you are working on now, install/connect, recent work ----
+const WORK_TOOLS=[[/(^|\.)canva\.com$/,'Canva','image','canva'],[/brevo/,'Brevo','envelope','email'],[/linkedin/,'LinkedIn','globe','linkedin'],[/instagram/,'Instagram','image','instagram']];
+let inferredTaskHost=null,extensionPanelNote='';
+function workingTool(){
+ const host=current.browserBridge?.connected?current.browserBridge.pageHost||'':'';const match=WORK_TOOLS.find(([pattern])=>pattern.test(host));
+ if(match)return{name:match[1],icon:match[2],task:match[3]};
+ if(current.externalWindow&&current.externalWindow.adapter!=='browser-dom')return{name:'App window',icon:'desktop'};
+ return host?{name:host,icon:'globe'}:null;
+}
+const clock=at=>new Date(at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+function renderWorkingNow(){
+ const bridge=current.browserBridge||{},tool=workingTool();
+ const open=Boolean(current.auth?.signedIn&&(bridge.connected||current.externalWindow&&current.externalWindow.adapter!=='browser-dom'));
+ el('working-now').hidden=!current.auth?.signedIn;
+ el('working-now-connected').hidden=!open;el('working-now-empty').hidden=open;
+ el('working-now').classList.toggle('is-open',open);document.body.classList.toggle('working-open',open);
+ el('working-tool-icon').innerHTML=icon(open&&tool?tool.icon:'pencil-simple-line');
+ const name=open?current.externalWindow?.name||tool?.name||'Connected draft':'Nothing open yet';
+ el('working-now-title').textContent=name;
+ // The kind of check follows the site you connected, once per site; you can still change it.
+ if(open&&tool?.task&&bridge.pageHost!==inferredTaskHost){inferredTaskHost=bridge.pageHost;if(el('external-task').value!==tool.task){el('external-task').value=tool.task;el('external-task').dispatchEvent(new Event('change'));}}
+ const meta=[];if(open&&tool&&!name.includes(tool.name))meta.push(tool.name);
+ if(open&&externalReview){const count=externalReview.result.findings.length;meta.push(count?`${count} thing${count===1?'':'s'} to fix`:'Nothing to fix',`checked at ${clock(externalReview.checkedAt)}`);}
+ else if(open)meta.push('Not checked yet');
+ el('working-now-meta').textContent=meta.join(' · ');
+ const captured=Boolean(current.externalObservation);
+ el('working-check').disabled=!captured||reviewPending;
+ el('working-check-hint').textContent=reviewPending?'Checking…':captured?'':bridge.connected?'Click the draft field you want checked, in Chrome.':'Read the window first in Workspace settings › Connection tools.';
+ const icon_=el('connection-icon'),connected=Boolean(bridge.connected);icon_.innerHTML=icon(connected?'plugs-connected':'plug');icon_.classList.toggle('connected',connected);
+ const label=connected?`Browser connected to ${bridge.pageHost}`:'Browser not connected';icon_.title=label;icon_.setAttribute('aria-label',label);
+ // The connection checklist explains Connect; it is noise before the extension is installed and once a draft is open.
+ el('browser-checklist').hidden=!current.auth?.signedIn||open||!current.browserConnect?.extensionSeenAt;
+ renderExtensionPanel();renderRecentWork();
+}
+function renderExtensionPanel(){
+ const panel=el('extension-panel'),seen=Boolean(current.browserConnect?.extensionSeenAt);
+ const key=JSON.stringify([seen,extensionPanelNote]);if(panel.dataset.key===key)return;panel.dataset.key=key;
+ const iconButton=(glyph,text,className)=>{const button=node('button',undefined,className);button.type='button';button.innerHTML=icon(glyph);button.append(document.createTextNode(text));return button;};
+ const parts=[];
+ if(!seen){
+  parts.push(node('h3','Install the Averill extension'),node('p','Averill reads only the draft field you choose in Chrome. Installing takes three steps and is needed once.'));
+  const install=iconButton('puzzle-piece','Install extension','agent-primary');
+  install.addEventListener('click',async()=>{try{await window.desktop.installExtension();extensionPanelNote='Chrome and the extension folder are open. Follow the three steps below. Averill notices the extension by itself.';}catch(error){extensionPanelNote=error.message;}renderExtensionPanel();});
+  parts.push(install,installSteps());
+ }else{
+  parts.push(node('h3','Extension installed'),node('p','Connect it to the tab with your draft. Averill shows the draft here once it is connected.'));
+  const connect=iconButton('plugs-connected','Connect','agent-primary');
+  connect.addEventListener('click',async()=>{try{await window.desktop.openChrome();extensionPanelNote='Chrome is open. On your draft tab, click the Averill icon, then Connect this tab. Nothing is connected until Averill shows your draft here.';}catch(error){extensionPanelNote=error.message;}renderExtensionPanel();});
+  parts.push(connect);
+ }
+ if(extensionPanelNote)parts.push(node('p',extensionPanelNote,'field-hint'));
+ panel.replaceChildren(...parts);
+}
+// Three small drawings of Chrome's extensions page. Colours come from the theme tokens.
+function installSteps(){
+ const frame='<rect class="ill-frame" x="2" y="2" width="156" height="92" rx="10"/><rect class="ill-line" x="12" y="14" width="64" height="8" rx="4"/>';
+ const steps=[
+  ['Turn on Developer mode, top right of the Extensions page.',`${frame}<rect class="ill-accent" x="118" y="10" width="30" height="16" rx="8"/><circle class="ill-knob" cx="140" cy="18" r="6"/><rect class="ill-line" x="12" y="44" width="136" height="10" rx="5"/><rect class="ill-line" x="12" y="62" width="100" height="10" rx="5"/>`],
+  ['Click Load unpacked.',`${frame}<rect class="ill-accent" x="12" y="34" width="62" height="20" rx="8"/><rect class="ill-ink" x="20" y="41" width="46" height="6" rx="3"/><rect class="ill-line" x="82" y="34" width="44" height="20" rx="8"/><rect class="ill-line" x="12" y="66" width="136" height="10" rx="5"/>`],
+  ['Choose the browser-extension folder Averill showed in Finder.',`${frame}<path class="ill-accent" d="M44 36h26l8 8h38a6 6 0 0 1 6 6v26a6 6 0 0 1-6 6H44a6 6 0 0 1-6-6V42a6 6 0 0 1 6-6z"/><rect class="ill-ink" x="56" y="58" width="48" height="6" rx="3"/>`]];
+ const list=node('ol',undefined,'install-steps');
+ steps.forEach(([text,drawing],index)=>{const item=node('li');item.innerHTML=`<svg viewBox="0 0 160 96" aria-hidden="true">${drawing}</svg>`;item.append(node('span',`${index+1}. ${text}`));list.append(item);});
+ return list;
+}
+// Recent work: only the draft name, kind of check, time and the correction titles, for the signed-in person on this Mac.
+function recentWorkKey(){const id=current.auth?.person?.id||current.workspace?.activePersonId;return id?`averill:recent-work:${id}`:null;}
+function recentWork(){const key=recentWorkKey();return key?JSON.parse(localStorage.getItem(key)||'[]'):[];}
+function rememberRecentWork(review){
+ const key=recentWorkKey();if(!key)return;const tool=workingTool();
+ const entry={name:current.externalWindow?.name||tool?.name||'Draft',tool:tool?.name||'',icon:tool?.icon||'file',task:el('external-task').selectedOptions[0]?.textContent||'',at:review.checkedAt,fixes:review.result.findings.map(finding=>finding.suggestion||'Correction').slice(0,5),count:review.result.findings.length};
+ // The same result can be drawn more than once; a recheck of unchanged text replaces its row instead of adding one.
+ entry.hash=review.result.contentHash||null;const earlier=recentWork();const same=earlier[0]&&entry.hash&&earlier[0].hash===entry.hash&&earlier[0].task===entry.task;
+ localStorage.setItem(key,JSON.stringify([entry,...earlier.slice(same?1:0)].slice(0,8)));
+}
+function renderRecentWork(){
+ const items=recentWork(),list=el('recent-work-list');el('recent-work').hidden=!items.length;
+ const key=JSON.stringify(items);if(list.dataset.key===key)return;list.dataset.key=key;
+ list.replaceChildren(...items.map(item=>{const row=node('li');const details=node('details');const summary=node('summary');const mark=node('span',undefined,'recent-icon');mark.innerHTML=icon(item.icon);
+  summary.append(mark,node('span',item.name,'recent-name'),node('small',`${new Date(item.at).toLocaleDateString([],{day:'numeric',month:'short'})} ${clock(item.at)} · ${item.count?`${item.count} to fix`:'nothing to fix'}`));
+  details.append(summary,node('p',`Checked as ${item.task}${item.tool?` in ${item.tool}`:''}.`));
+  if(item.fixes.length){const fixes=node('ul');for(const fix of item.fixes)fixes.append(node('li',fix));details.append(fixes);}
+  row.append(details);return row;}));
+}
+el('working-check').addEventListener('click',()=>checkWork(false));
+el('working-ask').addEventListener('click',()=>{el('review-chat').open=true;el('question').focus();});
+{const stop=node('button',undefined,'secondary-button');stop.type='button';stop.id='working-disconnect';stop.innerHTML=icon('x');stop.append(document.createTextNode('Disconnect'));stop.addEventListener('click',()=>el('stop-external').click());document.querySelector('.working-actions').append(stop);}
 window.desktop.onSnapshot((value) => { current = value; render(); });
-window.desktop.onOpenContext(value => { if (value?.sourceId) { showTab('knowledge'); showSource(value.sourceId); return; } showTab('work'); el(current.externalObservation?'external-task-review':current.externalWindow?'review-external':'browser-pair').focus(); });
+window.desktop.onOpenContext(value => { if (value?.sourceId) { showTab('knowledge'); showSource(value.sourceId); return; } showTab('review'); const next = !el('working-check').disabled ? el('working-check') : el('extension-panel').querySelector('button'); if (next) { next.focus(); return; } el(current.externalObservation?'external-task-review':current.externalWindow?'review-external':'browser-pair').focus(); });
 window.desktop.snapshot().then((value) => { current = value; render(); showTab(preferredArea()); });
 
 for (const target of document.querySelectorAll('[data-icon]')) target.innerHTML = icon(target.dataset.icon);

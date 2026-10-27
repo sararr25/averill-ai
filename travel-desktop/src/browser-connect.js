@@ -4,22 +4,24 @@ const CONNECT_PORT = 43147;
 
 // A loopback rendezvous, never a source/observation API. Trust lasts only for the signed-in session.
 class BrowserConnect {
-  constructor({ getSession, approve, connect, onChange = () => {}, port = CONNECT_PORT }) {
-    this.getSession = getSession; this.approve = approve; this.connect = connect; this.onChange = onChange; this.port = port;
+  constructor({ getSession, approve, connect, onChange = () => {}, onSeen = () => {}, seenAt = null, port = CONNECT_PORT }) {
+    this.getSession = getSession; this.approve = approve; this.connect = connect; this.onChange = onChange; this.onSeen = onSeen; this.seenAt = seenAt; this.port = port;
     this.trusted = new Map(); this.pending = false;
   }
   revoke() { this.trusted.clear(); }
   // Desktop checklist step 1: an extension was approved for this signed-in session.
-  status(session) { return { approved: Boolean(session) && [...this.trusted.values()].includes(session), pending: this.pending }; }
+  status(session) { return { approved: Boolean(session) && [...this.trusted.values()].includes(session), pending: this.pending, extensionSeenAt: this.seenAt }; }
   stop() { this.revoke(); this.server?.close(); this.server?.closeIdleConnections(); this.server = null; }
   async start() {
     this.server = http.createServer(async (request, response) => {
       const origin = request.headers.origin;
-      if (!EXTENSION.test(origin || '') || request.headers.host !== `127.0.0.1:${this.server?.address()?.port}` || request.url !== '/connect') { response.writeHead(403); response.end(); return; }
+      if (!EXTENSION.test(origin || '') || request.headers.host !== `127.0.0.1:${this.server?.address()?.port}` || !['/connect', '/hello'].includes(request.url)) { response.writeHead(403); response.end(); return; }
       response.setHeader('Access-Control-Allow-Origin', origin); response.setHeader('Vary', 'Origin');
       response.setHeader('Content-Type', 'application/json'); response.setHeader('Cache-Control', 'no-store');
       if (request.method === 'OPTIONS') { response.setHeader('Access-Control-Allow-Methods', 'POST'); response.setHeader('Access-Control-Allow-Headers', 'Content-Type'); response.writeHead(204); response.end(); return; }
       if (request.method !== 'POST') { response.writeHead(405); response.end('{}'); return; }
+      // "The extension is installed": a bodyless announcement. It grants no trust and needs no sign-in.
+      if (request.url === '/hello') { this.seenAt = Date.now(); this.onSeen(this.seenAt); this.onChange(); response.writeHead(204); response.end(); return; }
       const session = this.getSession();
       if (!session) { response.writeHead(401); response.end('{"error":"Sign in to Averill, then connect again."}'); return; }
       if (this.pending) { response.writeHead(409); response.end('{"error":"Finish the connection request already open in Averill."}'); return; }

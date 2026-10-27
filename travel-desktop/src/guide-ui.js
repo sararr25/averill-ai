@@ -1,8 +1,8 @@
 // In-app guide: a skippable first-run offer, a "?" control per screen and short step panels.
 // Steps live in GUIDE_STEPS by screen and role (admin, lead, employee, or all); progress is saved per person on this Mac.
 const GUIDE_SCREENS = {
-  review: { tab: 'review', label: 'Review', anchor: '.review-hero' },
-  work: { tab: 'review', label: 'Work', anchor: '#work-controls' },
+  review: { tab: 'review', label: 'Current work', anchor: '#working-now' },
+  work: { tab: 'setup', label: 'Connection tools', anchor: '#work-controls' },
   knowledge: { tab: 'knowledge', label: 'Library', anchor: '[data-tab="knowledge"] .section-head' },
   learn: { tab: 'learn', label: 'Learn', anchor: '[data-tab="learn"] .section-head' },
   setup: { tab: 'setup', label: 'Setup', anchor: '[data-tab="setup"] .section-head' },
@@ -16,24 +16,24 @@ const learnSteps = [
 ];
 const workSteps = [
   { target: '#work-next', title: 'Where to start', body: 'This line always tells you the next thing to do while sharing work.' },
-  { target: '#browser-pair', title: 'Connect a browser field', body: 'Connects one field in Chrome through the Averill extension, such as a Brevo email or a LinkedIn post.' },
+  { target: '#browser-pair', title: 'Pairing recovery', body: 'If Connect in the Averill extension does not work, pair one browser field by hand here.' },
   { target: '#choose-external', title: 'Or share an app window', body: 'Shares one app window, for example Canva. macOS asks for Screen Recording permission first. Stop sharing at any time.' },
 ];
 const GUIDE_STEPS = {
   review: {
     employee: [
-      { target: '#hero-title', title: 'Your review', body: 'Averill checks your drafts against Vamo’s approved rules and shows the source for every finding.' },
-      { target: '#review-start', title: 'Choose what to review', body: 'Pick the draft you are working on: a Brevo email, a LinkedIn post or the paid Instagram Reel.' },
+      { target: '#working-now-title', title: 'What you are working on', body: 'Averill follows the draft you connect in Chrome, such as a Brevo email or a LinkedIn post, and checks it against Vamo’s approved rules.' },
+      { target: '#extension-panel > button, #working-check', title: 'Connect, then check', body: 'Install or connect the Averill extension here. With a draft open, Check now shows what to fix and the source for every finding.' },
       { target: '#review-chat > summary', title: 'Ask about company guidance', body: 'Ask a question, for example the approved launch date. Answers quote the approved source.' },
     ],
     lead: [
-      { target: '#hero-title', title: 'Review as Marketing lead', body: 'You can check any Marketing draft against the rules you approved, with the source for every finding.' },
-      { target: '#review-start', title: 'Choose what to review', body: 'Pick a draft your team is working on, such as the Winter Escapes launch email.' },
+      { target: '#working-now-title', title: 'Review as Marketing lead', body: 'Connect any Marketing draft and check it against the rules you approved, with the source for every finding.' },
+      { target: '#extension-panel > button, #working-check', title: 'Connect, then check', body: 'Install or connect the Averill extension here, then use Check now on the draft your team is working on.' },
       { target: '#review-chat > summary', title: 'Ask about company guidance', body: 'Check what the approved brief says before you approve a campaign.' },
     ],
     admin: [
-      { target: '#hero-title', title: 'Review as owner', body: 'The same check your team uses: drafts against approved rules, with the source for every finding.' },
-      { target: '#review-start', title: 'Try a check yourself', body: 'Choose a draft to see what your team sees when a rule is broken.' },
+      { target: '#working-now-title', title: 'Review as owner', body: 'The same check your team uses: drafts against approved rules, with the source for every finding.' },
+      { target: '#extension-panel > button, #working-check', title: 'Try a check yourself', body: 'Connect a draft and press Check now to see what your team sees when a rule is broken.' },
     ],
   },
   work: { all: workSteps },
@@ -81,7 +81,7 @@ function guideSteps(screen) {
 }
 function guideTarget(step) {
   const texts = [].concat(step.match || []);
-  return [...document.querySelectorAll(step.target)].find(element => texts.every(text => element.textContent.includes(text))) || null;
+  return [...document.querySelectorAll(step.target)].find(element => !element.closest('[hidden]') && texts.every(text => element.textContent.includes(text))) || null;
 }
 function guideShowScreen(screen) {
   const info = GUIDE_SCREENS[screen];

@@ -10,7 +10,7 @@ app.whenReady().then(async()=>{try{
  const companion=BrowserWindow.getAllWindows().find(w=>w.webContents.getURL().includes('companion.html'));
  assert.ok(companion && companion.isVisible());
  await companion.webContents.executeJavaScript("document.getElementById('open').click()");
- await pause(100);assert.equal(await run("document.body.dataset.area"),'review');assert.ok(await run("document.getElementById('work-controls').open"));
+ await pause(100);assert.equal(await run("document.body.dataset.area"),'review');assert.ok(await run("document.activeElement.closest('#working-now')!==null"),'Open Averill lands on the Working on now card');
  assert.ok(await run("document.querySelector('#context-form') && document.querySelector('.demo-fixtures').open === false"));
  assert.equal(await run("document.documentElement.scrollWidth <= innerWidth"),true);
  await run("(async()=>{current=await window.desktop.snapshot();render();showTab('setup');window.testEvents=[];window.desktop.onOperation(e=>window.testEvents.push(e));document.querySelector('.onboarding-section button').click();})()");

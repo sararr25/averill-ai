@@ -2,6 +2,9 @@ importScripts('end-reasons.js', 'canva-design.js');
 const { isReason } = globalThis.AverillEndReasons;
 const CanvaDesign = globalThis.AverillCanvaDesign;
 const CONNECT_ENDPOINT = 'http://127.0.0.1:43147/connect';
+// Tells Averill on this Mac that the extension is installed, so the app can offer Connect instead of Install.
+// Sends no data; runs each time Chrome starts this worker. Averill not running is normal, so a failure is ignored.
+fetch('http://127.0.0.1:43147/hello', { method: 'POST' }).catch(() => {});
 const CONTENT_FILES = ['end-reasons.js', 'editor-adapter.js', 'field-select.js', 'content.js'];
 // FB-14: the Canva design reader is injected before content.js on canva.com only. No new permission: same activeTab grant.
 const CANVA_HOST = /(^|\.)canva\.com$/;
