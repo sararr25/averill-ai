@@ -28,8 +28,9 @@ app.whenReady().then(async()=>{try{
  await run("document.querySelector('#knowledge-search').value='cobalt';document.querySelector('#knowledge-search').dispatchEvent(new Event('input'))");await pause(250);assert.equal(await run("document.querySelectorAll('.knowledge-card').length"),1);
  assert.equal(await run('document.documentElement.scrollWidth<=innerWidth'),true);assert.equal(await run('document.querySelector(".agent-main").getBoundingClientRect().bottom<=innerHeight+1'),true);
  await run("(async()=>{current=await window.desktop.learningAction('start',{});render();showTab('learn')})()");await pause(100);
- assert.ok(await run("[...document.querySelectorAll('#learning-panel button')].some(b=>b.textContent.includes('continue')&&b.classList.contains('agent-primary'))"));
- await run("[...document.querySelectorAll('#learning-panel button')].find(b=>b.textContent.includes('continue')).click()");await pause(150);assert.ok(await run("document.activeElement.tagName==='H4'"));
+ // D1: the lesson is one page with every step; Finish stays locked until Averill has seen the readable steps in Canva.
+ assert.equal(await run("document.querySelectorAll('#learning-panel .lesson-step').length"),6);
+ assert.ok(await run("[...document.querySelectorAll('#learning-panel button')].some(b=>b.textContent==='Finish lesson'&&b.disabled&&b.classList.contains('agent-primary'))"));
  assert.equal(await run("document.querySelectorAll('#learning-panel > [data-current-learning]').length"),1,'Learn must have one leading activity');
  assert.ok(await run("document.querySelector('#learning-panel > [data-current-learning] h4')"),'Active lesson step leads');
  cancel=false;fs.writeFileSync(fixture,'Updated company knowledge: cobalt palette and clearer source review.');

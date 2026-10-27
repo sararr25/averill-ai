@@ -552,3 +552,14 @@ button{transition:color var(--ds-duration-fast),background-color var(--ds-durati
 .agent-body[data-area="review"] .review-feed>#recent-work{order:1}
 .agent-body[data-area="review"] .review-feed>:is(.browser-checklist,.review-chat){order:2}
 .working-now{position:relative}.agent-body .working-now>.guide-help{position:absolute;top:12px;right:12px}
+
+/* ---- Learn: Canva lesson as one page with ticks (phase D, 27 October 2026) ---- */
+.lesson-steps{list-style:none;margin:var(--av-space-4) 0;padding:0;display:grid;gap:var(--av-space-3)}
+.lesson-step{display:grid;grid-template-columns:32px 1fr;gap:var(--av-space-3);padding:var(--av-space-3);border:1px solid var(--av-border);border-radius:var(--av-radius-control);background:var(--av-surface-raised)}
+.lesson-step.done{border-color:var(--av-accent-strong)}
+.lesson-mark{display:inline-flex;color:var(--av-text-secondary)}.lesson-mark .line-icon{width:28px;height:28px}.lesson-step.done .lesson-mark{color:var(--av-accent-strong)}
+.agent-body .lesson-step h4{margin:0}.agent-body .lesson-step p{margin:var(--av-space-1) 0}
+.lesson-step small{display:block;font:var(--av-type-meta);color:var(--av-text-secondary)}.lesson-step.done small{color:var(--av-accent-strong)}
+.lesson-step details summary{cursor:pointer;font:var(--av-type-label);color:var(--av-text);margin-top:var(--av-space-1)}
+.lesson-finish{margin-top:var(--av-space-4);padding-top:var(--av-space-4);border-top:1px solid var(--av-border)}
+.agent-body .learning-card .secondary-button .line-icon{width:18px;height:18px}

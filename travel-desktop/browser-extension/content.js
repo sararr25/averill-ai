@@ -325,7 +325,7 @@
  // A finding shows a blocking card until the next check is clean or the employee presses "Export anyway". Averill never edits,
  // exports or shares the design and never touches Canva's own controls.
  const DESIGN=globalThis.AverillCanvaDesign;let design=null;
- const DESIGN_CSS='.dcard{max-height:calc(100vh - 84px)}.dcard.block{border:2px solid #ffb8bf}.dcard.block h2{color:#ffb8bf}.dlabel{margin-left:auto;font-size:13px;font-weight:600;color:#b8b2c6}.watch{display:flex;align-items:center;gap:10px;min-height:32px;margin:0 0 12px;font-weight:600;font-size:14px;cursor:pointer}.watch input{flex:none;width:24px;height:24px;margin:0;accent-color:#d6ef91;cursor:pointer}.watch input:focus-visible{outline:3px solid #d6ef91;outline-offset:2px}.dlist{list-style:none;margin:0 0 12px;padding:0}.dfind{background:#35313f;border-radius:12px;padding:12px;margin:0 0 8px}.dfind b{display:block;font-size:13px;font-weight:600;color:#f3f1f8;overflow-wrap:anywhere}.dfind p{font-size:13px;color:#f3f1f8;margin:6px 0 0}.dfind p.measure{color:#ffc794;font-weight:600}.dfind .source{background:#2b2835;margin:8px 0 0}.dfind .source summary{min-height:24px}.dnote{font-size:12px;color:#b8b2c6;margin:8px 0 0;line-height:1.5}';
+ const DESIGN_CSS='.dex{margin-top:14px;padding-top:12px;border-top:1px solid #484351}.dex h3{font-size:15px;margin:0 0 8px}.dexlist{list-style:none;margin:0 0 8px;padding:0;display:grid;gap:8px}.dexlist li{display:grid;grid-template-columns:24px 1fr;column-gap:8px}.dexlist li span{grid-row:span 2;font-weight:700;color:#b8b2c6}.dexlist li.done span{color:#d6ef91}.dexlist b{font-size:14px}.dexlist small{color:#b8b2c6;font-size:13px}.dcard{max-height:calc(100vh - 84px)}.dcard.block{border:2px solid #ffb8bf}.dcard.block h2{color:#ffb8bf}.dlabel{margin-left:auto;font-size:13px;font-weight:600;color:#b8b2c6}.watch{display:flex;align-items:center;gap:10px;min-height:32px;margin:0 0 12px;font-weight:600;font-size:14px;cursor:pointer}.watch input{flex:none;width:24px;height:24px;margin:0;accent-color:#d6ef91;cursor:pointer}.watch input:focus-visible{outline:3px solid #d6ef91;outline-offset:2px}.dlist{list-style:none;margin:0 0 12px;padding:0}.dfind{background:#35313f;border-radius:12px;padding:12px;margin:0 0 8px}.dfind b{display:block;font-size:13px;font-weight:600;color:#f3f1f8;overflow-wrap:anywhere}.dfind p{font-size:13px;color:#f3f1f8;margin:6px 0 0}.dfind p.measure{color:#ffc794;font-weight:600}.dfind .source{background:#2b2835;margin:8px 0 0}.dfind .source summary{min-height:24px}.dnote{font-size:12px;color:#b8b2c6;margin:8px 0 0;line-height:1.5}';
  function designTeardown(){if(!design)return;clearTimeout(design.timer);design.observer.disconnect();design.abort.abort();design.host.remove();design=null}
  function findingSignature(value){return value.findings.map(f=>`${f.type}|${f.element}|${f.text}`).sort().join('\n')}
  function designPanel(){
@@ -396,6 +396,13 @@
    const list=node('ol',undefined,'dlist');
    for(const f of result.findings.slice(0,12)){const item=node('li',undefined,'dfind');item.append(node('b',`“${String(f.text).slice(0,120)}”`),node('p',String(f.problem).slice(0,300)));if(f.measured)item.append(node('p',String(f.measured).slice(0,200),'measure'));if(f.source)item.append(source(f));list.append(item)}
    main.append(list);if(d.state==='blocking')main.append(button('Export anyway',exportAnyway,'secondary'));notes();
+  }
+  // D1: an open Canva lesson, with the steps Averill has seen in this design. Grouping cannot be read here: it is confirmed in Averill.
+  const ex=result?.exercise;
+  if(d.on&&ex&&Array.isArray(ex.steps)){
+   const box=node('div',undefined,'dex');box.append(node('h3',`Lesson: ${String(ex.title).slice(0,80)}`));const list=node('ol',undefined,'dexlist');
+   ex.steps.slice(0,8).forEach((step,i)=>{const kind=step.check==='confirm'?'confirm':step.done?'done':'todo';const item=node('li',undefined,kind);item.append(node('span',kind==='done'?'✓':String(i+1)),node('b',String(step.title).slice(0,100)),node('small',kind==='confirm'?'You confirm this in Averill':kind==='done'?'Checked by Averill':'Not in the design yet'));list.append(item)});
+   box.append(list,node('p','When every step shows a tick, finish the lesson in Averill with one confirmation.','hint'));main.append(box);
   }
   if(d.error&&d.state!=='error')main.append(node('p',d.error,'error'));
   const footer=node('div',undefined,'footer');footer.append(button('Stop sharing',async()=>{await send({kind:'stop'});stop('stopped_by_user')}));

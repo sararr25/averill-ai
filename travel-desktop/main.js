@@ -80,7 +80,14 @@ const browserBridge = new BrowserBridge({
     if (payload.kind === 'ask') return contextualReview.ask(payload);
     if (payload.kind === 'public-check') return contextualReview.publicCheck(payload);
     if (payload.kind === 'image-check') return contextualReview.imageCheck(payload);
-    if (payload.kind === 'design-check') return contextualReview.designCheck(payload);
+    if (payload.kind === 'design-check') {
+      const result = contextualReview.designCheck(payload);
+      if (payload.action === 'override') return result;
+      // D1: the same reading ticks the steps of an open Canva lesson. Only step titles and ticks go back to the card.
+      const exercise = learning.checkDesign(companyWorkspace, require('./browser-extension/canva-design').validate({ design: payload.design, elements: payload.elements }));
+      if (exercise) { workspace.save(app.getPath('userData'), companyWorkspace); publish(); }
+      return exercise ? { ...result, exercise } : result;
+    }
     throw new Error('Unsupported contextual action');
   },
 });
@@ -420,7 +427,7 @@ app.whenReady().then(async () => {
     }
     else if(action==='project-start')learning.startProject(companyWorkspace,payload.projectId,payload.sourceId);
     else if(action==='project-confirm')learning.confirmProject(companyWorkspace,payload.sessionId,payload.note);
-    else if (action === 'confirm') learning.confirm(companyWorkspace, payload.sessionId, payload.stepId);
+    else if (action === 'finish') learning.finish(companyWorkspace, payload.sessionId, { selfConfirmAll: payload.selfConfirmAll === true });
     else if (action === 'exclude') learning.exclude(companyWorkspace, payload.sessionId);
     else if (action === 'delete-history') { learning.deleteHistory(companyWorkspace); ruleExercises.deleteMine(companyWorkspace); guide.clearMine(companyWorkspace); }
     else if (action === 'quiz') learning.beginQuiz(companyWorkspace);

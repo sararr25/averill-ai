@@ -19,9 +19,9 @@ workspace.updateSource(data, imported[0].id, 'approved');
 workspace.updateSource(data, imported[1].id, 'approved');
 // imported[2] stays pending, so Knowledge shows approved and to-review chips together.
 
-// Confirm every lesson step this week, then answer the quiz: first choice correct, second wrong.
+// Finish the lesson this week (employee-confirmed, no Canva reading here), then answer the quiz: first choice correct, second wrong.
 const session = learning.start(data, imported[0].id);
-for (const step of learning.snapshot(data).steps) learning.confirm(data, session.id, step.id);
+learning.finish(data, session.id, { selfConfirmAll: true });
 const quiz = learning.beginQuiz(data);
 quiz.questions.forEach((question, index) => {
   if (question.type === 'choice' || question.type === 'source') learning.answer(data, quiz.id, question.id, index === 0 ? question.correct : (question.correct + 1) % question.options.length);

@@ -136,6 +136,26 @@ app.whenReady().then(async () => { try {
   await step('Averill never edits the design: text, colour and position are only what the test set', async () => {
     assert.deepEqual(await page("(()=>{const b=document.querySelector('[data-qa-text=body]');return [b.style.transform,b.querySelector('span').textContent,b.querySelector('span').style.color]})()"), ['translate(120px, 1276.17px)', BODY, NEAR_BLACK]);
   });
+  // Feedback round 27 October, D1: the Canva lesson runs inside Canva and ticks itself from the same design reading.
+  await step('D1 lesson: after Start in Averill, the Canva card lists the six lesson steps with the ticks Averill saved', async () => {
+    await run("window.desktop.learningAction('start',{})");
+    await moveBody(121); await until(`Boolean(${D}?.querySelector('.dex'))`, 'lesson in the card');
+    const listed = await page(`[...${D}.querySelectorAll('.dexlist li')].map(li=>[li.className,li.querySelector('b').textContent])`);
+    const learn = (await run('window.desktop.snapshot()')).learning, lesson = learn.sessions.find(s => s.title === 'Canva layout essentials' && !s.finishedAt);
+    const title = Object.fromEntries(learn.steps.map(s => [s.id, s.title]));
+    assert.equal(listed.length, 6); assert.deepEqual(listed.at(-1), ['confirm', title.group], 'grouping is confirmed by the employee');
+    assert.deepEqual(listed.filter(([kind]) => kind === 'done').map(([, t]) => t).sort(), Object.keys(lesson.checks).map(id => title[id]).sort(), 'card ticks match the saved lesson');
+    console.log('D1 ticks on the synthetic page:', JSON.stringify(lesson.live.result));
+    assert.deepEqual(Object.keys(lesson.checks).sort(), ['align', 'contrast', 'hierarchy', 'margin', 'size'], 'this clean post shows every readable step');
+    await moveBody(120);
+  });
+  await shot('d1-lesson-in-canva');
+  await step('D1 lesson: one confirmation finishes it; readable steps are recorded as checked by Averill, grouping as confirmed by the employee', async () => {
+    const lesson = (await run('window.desktop.snapshot()')).learning.sessions.find(s => s.title === 'Canva layout essentials' && !s.finishedAt);
+    const done = (await run(`window.desktop.learningAction('finish',{sessionId:${JSON.stringify(lesson.id)}})`)).learning.sessions.find(s => s.id === lesson.id);
+    assert.ok(done.finishedAt);
+    assert.deepEqual(Object.fromEntries(done.confirmed.map(c => [c.id, c.kind])), { hierarchy: 'checked-by-averill', size: 'checked-by-averill', align: 'checked-by-averill', margin: 'checked-by-averill', contrast: 'checked-by-averill', group: 'employee-confirmed' });
+  });
   await step('Unrecognised structure: "Averill cannot read this design", nothing sent', async () => {
     const before = designCalls.length;
     await page("document.querySelectorAll('div[style]').forEach(d=>{if(d.style.width==='1080px'&&d.style.height==='1440px'&&!d.style.transform)d.style.width='1000px'});void 0");

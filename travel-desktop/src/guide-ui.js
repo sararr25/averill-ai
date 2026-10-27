@@ -10,7 +10,7 @@ const GUIDE_SCREENS = {
 // target: CSS selector; match: text (or list of texts) the element must contain when several share the selector.
 const NOTE = 'marketing-personal-note-v1.md';
 const learnSteps = [
-  { target: '#learning-panel .learning-card', title: 'Your current lesson', body: 'A short Canva lesson. You do each step in Canva and confirm it here; Averill does not inspect your design.' },
+  { target: '#learning-panel .learning-card', title: 'Your current lesson', body: 'A short Canva lesson done in Canva. Averill ticks the steps it can see in your design; you confirm grouping once at the end.' },
   { target: '#learning-panel details.learning-card summary', match: 'Start a task-based exercise', title: 'Task-based exercises', body: 'Pick a concrete result, such as a campaign visual, and work through it step by step.' },
   { target: '#practice-section', title: 'Practise company rules', body: 'Short offline questions built from the rules your company approved.' },
 ];

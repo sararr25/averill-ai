@@ -124,7 +124,7 @@ if (!process.versions.electron) {
     await run(`window.desktop.updateSource(${JSON.stringify(source.id)},'approved',0,'Restore synthetic rehearsal authority')`);
     const learned=await run("window.desktop.learningAction('start',{})");
     const lesson=learned.learning.sessions[0];
-    await run(`window.desktop.learningAction('confirm',{sessionId:${JSON.stringify(lesson.id)},stepId:'select'})`);
+    await run(`window.desktop.learningAction('finish',{sessionId:${JSON.stringify(lesson.id)},selfConfirmAll:true})`);
     const quiz=await run("window.desktop.learningAction('quiz',{})");
     assert.ok(quiz.learning.quiz.questions.length);
     const companion=BrowserWindow.getAllWindows().find(w=>w.webContents.getURL().includes('companion.html'));
@@ -134,7 +134,7 @@ if (!process.versions.electron) {
     assert.equal((await snap()).browserBridge.ready,false);
     await run('window.desktop.logout()'); await login('employee@vamo.example');
     assert.equal((await snap()).learning.sessions.length,0);
-    await assert.rejects(()=>run(`window.desktop.learningAction('confirm',{sessionId:${JSON.stringify(lesson.id)},stepId:'position'})`),/unavailable/);
+    await assert.rejects(()=>run(`window.desktop.learningAction('finish',{sessionId:${JSON.stringify(lesson.id)},selfConfirmAll:true})`),/unavailable/);
     const receipt={verifiedAt:new Date().toISOString(),packagedResources:root!==desktop,liveSyntheticReview:live,providerRequests:calls,checks:['consent declined','local correction','source revocation','typing invalidation','floating Stop','learning confirmation','weekly practice','person isolation'],boundary:'synthetic bridge client and regression consent-dialog decisions; no installed Chrome or real email platform proof'};
     fs.writeFileSync(path.join(out,'verification.json'),JSON.stringify(receipt,null,2)+'\n');
     console.log('PASS consent cancellation, local correction, revocation, Stop, weekly practice and person isolation'+(live?'; one live consented Nemotron review':''));
