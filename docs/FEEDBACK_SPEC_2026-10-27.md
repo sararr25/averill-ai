@@ -21,13 +21,13 @@ Order: A (bugs) first, then B (visual system), then C and D (redesigns).
 
 ## Decisions (owner, 27 October 2026)
 
-- **D1. Current work content:** both the work open now, at the top, and a list of recent projects below it.
-- **D2. Readability:** a light and a dark theme. The app follows macOS and defaults to light. The dark theme gets more contrast.
-- **D3. Exercise verification:** automatic wherever the extension can read the design, plus **one** confirmation per page/session for the rest. No more confirming every step.
-- **D4. Exercise tools:** Canva first, then Brevo (email), then LinkedIn and Instagram drafts. Exercises always happen inside the real tool.
-- **D5. Extension install:** guided install now. Chrome Web Store publishing (one-time $5 fee, Google review of a few days) after the hackathon, and only with the owner's go-ahead for the payment.
-- **D6. Icons:** Phosphor, through better-icons.
-- **D7. Order:** bugs first, then the visual system, then the redesigns.
+- **Q1. Current work content:** both the work open now, at the top, and a list of recent projects below it.
+- **Q2. Readability:** a light and a dark theme. The app follows macOS and defaults to light. The dark theme gets more contrast.
+- **Q3. Exercise verification:** automatic wherever the extension can read the design, plus **one** confirmation per page/session for the rest. No more confirming every step.
+- **Q4. Exercise tools:** Canva first, then Brevo (email), then LinkedIn and Instagram drafts. Exercises always happen inside the real tool.
+- **Q5. Extension install:** guided install now. Chrome Web Store publishing (one-time $5 fee, Google review of a few days) after the hackathon, and only with the owner's go-ahead for the payment.
+- **Q6. Icons:** Phosphor, through better-icons.
+- **Q7. Order:** bugs first, then the visual system, then the redesigns.
 
 ## A. Bugs
 
@@ -64,14 +64,14 @@ Order: A (bugs) first, then B (visual system), then C and D (redesigns).
 
 ## C. Current work and extension
 
-**C1. Current work shows the work.** (#5, D1)
+**C1. Current work shows the work.** (#5, Q1)
 1. **Working on now** card: the tool icon, the document name (for example "Winter Escapes 2027 · Brevo"), when it was last checked and how many things there are to fix. It has one main button, "Check now", and a secondary button, "Ask about this", which opens the guidance chat.
 2. **To fix**: the findings from the last check, each with its source.
 3. **Recent work**: past drafts or projects, newest first. One click opens a draft's history.
 4. The connection state is an icon in the header (connected or not connected). Pairing recovery and app window capture move to Workspace settings.
 - Empty state: an illustration, the line "Open your draft in Chrome or Canva and Averill will follow along", and the install/connect button from C2.
 
-**C2. Install and connect in one place.** (#6, D5)
+**C2. Install and connect in one place.** (#6, Q5)
 - The desktop app detects the extension: the extension pings the local connect port `43147`.
 - Not installed: an **Install extension** button opens Chrome at `chrome://extensions`, reveals the extension folder in Finder and shows 3 illustrated steps (Developer mode → Load unpacked → choose the folder).
 - Installed but not connected: a **Connect** button.
@@ -80,7 +80,7 @@ Order: A (bugs) first, then B (visual system), then C and D (redesigns).
 
 ## D. Exercises inside the real tool
 
-**D1. Canva layout essentials, inside Canva.** (#4, D3, D4)
+**D1. Canva layout essentials, inside Canva.** (#4, Q3, Q4)
 - "Start exercise" opens Canva on a practice design. The extension shows an overlay inside Canva listing every step of the page.
 - Steps that Averill can read from the design tick themselves off, through `canva-design.js` (for example: elements aligned, text inside the safe margin, sizes). Each step is labelled either "Checked by Averill" or "Confirmed by you".
 - At the end of the page the user gives one confirmation, covering only the steps Averill cannot check.
