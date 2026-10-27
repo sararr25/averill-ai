@@ -28,8 +28,9 @@
 .agent-body .finding-navigation{display:flex;align-items:center;gap:8px;margin:0 0 14px;color:var(--ds-color-text-muted);font-size:11px}
 .agent-body .finding-navigation:empty{display:none}
 .agent-body .conversation-context{border-left:2px solid var(--ds-color-verified);padding:8px 10px;color:var(--ds-color-text-secondary);font-size:12px;line-height:1.45}
-.agent-body[data-area="review"] .agent-tab.active[data-tab="review"]{height:100%;min-height:0;overflow:hidden}
-.agent-body[data-area="review"] .review-feed{display:flex;flex-direction:column;flex:1;min-height:0;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--ds-color-border) transparent}
+/* Current work scrolls with .agent-main like every other tab; an inner scroller never got a height here and clipped the feed. */
+.agent-body[data-area="review"] .agent-tab.active[data-tab="review"]{height:auto;min-height:0;overflow:visible}
+.agent-body[data-area="review"] .review-feed{display:flex;flex-direction:column;overflow:visible}
 .agent-body[data-area="review"] .review-hero{flex:1 0 auto;min-height:0}
 .agent-body[data-area="review"] .review-conversation{max-height:none;overflow:visible}
 .agent-body[data-area="review"] .review-conversation .conversation{max-height:none}

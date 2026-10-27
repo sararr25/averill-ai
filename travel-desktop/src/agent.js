@@ -97,8 +97,7 @@ function render() {
   el('browser-guided-status').hidden = !current.browserConnectionError;
   el('browser-copy-pair').disabled = !current.browserBridge?.ready;
   el('stop-external').disabled = !current.externalWindow && !current.browserBridge?.ready;
-  if (current.browserBridge?.connected) el('browser-pair-status').textContent = 'Browser field connected. Finish editing to review the selected field.';
-  else if (!current.browserBridge?.ready) el('browser-pair-status').textContent = '';
+  el('browser-pair-status').textContent = browserPairStatus(current.browserBridge);
   el('review-external').disabled = !current.externalWindow;
   el('watch-external').disabled = !current.externalWindow || current.externalWindow.adapter === 'browser-dom';
   el('watch-external').textContent = current.externalWatching ? 'Pause observing' : 'Start observing';
@@ -547,9 +546,18 @@ function screenPermissionHelp(list, message = 'Averill cannot see other app wind
   list.append(node('p', message));
   list.append(action('Open Screen Recording settings', async () => { await window.desktop.openScreenSettings(); return current; }));
 }
+// Pairing only opens a local endpoint; it is "connected" only once the extension binds to it.
+var browserPairRequested = false;
+function browserPairStatus(bridge) {
+  if (bridge?.connected) return `Connected${bridge.pageHost ? ` to ${bridge.pageHost}` : ''}. Finish editing to review the selected field.`;
+  if (bridge?.ready) return 'Waiting for the extension… Open Averill in Chrome on your draft tab and click Connect.';
+  if (browserPairRequested) return 'Not connected. Open the Averill extension on your draft tab and click Connect.';
+  return '';
+}
 el('browser-pair').addEventListener('click', async () => {
-  try { await window.desktop.pairBrowser(); el('browser-pair-status').textContent = 'Pairing is ready for two minutes. Copy details into the extension on your chosen draft tab.'; }
-  catch (error) { el('browser-pair-status').textContent = error.message; }
+  browserPairRequested = true;
+  try { await window.desktop.pairBrowser(); el('browser-pair-status').textContent = browserPairStatus(current.browserBridge); }
+  catch (error) { browserPairRequested = false; el('browser-pair-status').textContent = error.message; }
 });
 el('browser-copy-pair').addEventListener('click', async () => {
   try { await window.desktop.copyBrowserPair(); el('browser-pair-status').textContent = 'Pairing copied. Paste only into the Averill extension; it stays on this Mac.'; }

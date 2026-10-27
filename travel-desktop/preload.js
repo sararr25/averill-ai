@@ -22,6 +22,8 @@ async function invoke(channel,...args){
   if(channel==='onboarding:apply')message=`Saved ${result.documentsAdded} documents and created ${result.peopleAdded} accounts. Company knowledge is available in Knowledge; approval controls its use.`;
   if(channel==='onboarding:analyze')message='Nebius interpretation completed. Review the proposed people and company knowledge before saving.';
   if(channel==='cloud:list')message=`Folder loaded: ${result.items.length} items${result.cursor?' · more available':''}.`;
+  // Opening the pairing endpoint is not a connection; the pair status line reports when the extension really connects.
+  if(channel==='agent:browser-pair'){announce({id,channel,state:'notice',message:'Waiting for the extension to connect. Nothing is connected yet.'});return result;}
   if(channel==='agent:ask'||channel==='agent:ask-demo')message=`Answer ready · ${result.mode==='local'?'local processing':'Nebius'}.`;
   const failed=result===false||(channel==='agent:source'&&!result);announce({id,channel,state:failed?'error':'success',message:failed?'The action did not complete. Check access and try again.':message,intake});return result;
  }catch(error){announce({id,channel,state:'error',message:String(error.message||'The action failed. Try again.').replace(/^Error invoking remote method '[^']+': (?:Error: )?/,'')});throw error;}

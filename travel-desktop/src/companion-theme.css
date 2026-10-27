@@ -76,7 +76,8 @@
 .agent-body .ai-control .ai-toggle:disabled{opacity:.6;border-style:dashed}
 .agent-body .ask-form button[type=submit]{display:grid;place-items:center;width:var(--av-control-primary);height:var(--av-control-primary);min-height:0;padding:0;border:0;border-radius:50%;background:var(--av-accent);color:var(--av-on-accent)}
 .agent-body .review-composer .ask-form .composer-attach{display:inline-flex;align-items:center;width:auto;min-width:0;height:var(--av-control-default);padding:0 var(--av-space-3);margin-right:var(--av-space-1);border:0;border-radius:var(--av-radius-control);background:none;color:var(--av-accent);font:var(--av-type-label);white-space:nowrap}
-.agent-body .knowledge-card button,.agent-body .learning-card button{margin:0}
+/* One spacing rule for every control inside a card: an 8px gap on the right and above, so inline buttons, links and selects never touch. */
+.agent-body :is(.knowledge-card,.learning-card,.knowledge-approval) :is(button,select):not(summary *){margin:var(--av-space-2) var(--av-space-2) 0 0}
 .agent-body :is(.finding-actions,.context-actions,.external-controls,.workspace-actions,.outbound-actions,.guide-actions){display:flex;flex-wrap:wrap;align-items:center;gap:var(--av-space-2)}
 .agent-body .finding-actions{margin-top:var(--av-space-3)}
 
