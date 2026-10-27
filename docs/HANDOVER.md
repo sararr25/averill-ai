@@ -402,7 +402,7 @@ The owner first requested preparation steps 2 and 3, then a stop. Those were del
 
 - `travel-desktop/main.js`, `preload.js`: windows, sender checks, sharing, services, workspace and learning IPC.
 - `travel-desktop/src/learning.js`, `learning-ui.js`, `tests/learning.test.js`: Learn state/UI/tests.
-- `travel-desktop/src/agent.*`, `agent-theme.css`, `agent-controls.css`: assistant and tabs.
+- `travel-desktop/src/agent.*`, `app.css`: assistant and tabs. Since 27 October 2026 `app.css` is the app's only stylesheet (the old agent-controls, agent-theme, ui-refinements, guided-ui, companion-theme and todo rules merged in load order); colours come from `design-system/companion/tokens.css`, light by default and dark when macOS is dark. `scripts/verify-phase-b.cjs` checks contrast and text size in both themes.
 - `travel-desktop/src/work.*`, `work-theme.css`: supplied campaign editors.
 - `travel-desktop/src/workspace.js`, `workspace-answer.js`: local sources, roles, approval and company answers.
 - `travel-desktop/src/engine.js`, `assistant.js`, `campaign.js`: campaign rules/local answers/Nebius.

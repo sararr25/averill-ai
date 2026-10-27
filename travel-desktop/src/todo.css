@@ -1,7 +1,0 @@
-/* To do tab only: reuses the shared card, button and type classes from companion-theme.css; this file adds just the layout the new section needs. */
-#todo-content .section-head{flex-direction:row;align-items:center;justify-content:flex-start;gap:var(--av-space-2)}
-#todo-content .section-head span{display:inline-flex;align-items:center;min-width:24px;height:22px;padding:0 var(--av-space-2);border:1px solid var(--av-border);border-radius:var(--av-radius-pill);font:var(--av-type-meta);color:var(--av-text-secondary)}
-#todo-content .section-note{margin:0 0 var(--av-space-3)}
-.todo-item .finding-actions{margin-top:var(--av-space-3)}
-#todo-badge{margin-left:6px;background:var(--av-accent-soft);border-color:var(--av-accent);color:var(--av-accent)}
-#todo-badge[hidden]{display:none}
