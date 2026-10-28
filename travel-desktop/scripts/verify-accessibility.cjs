@@ -53,6 +53,45 @@ const localFetch=global.fetch;global.fetch=(url,options)=>{assert.equal(new URL(
       checks.push(`Role ${index}: four destinations at 520/960px and 200% zoom; named buttons, 24px minimum targets, no page overflow, reduced motion`);
     }
     await run('window.desktop.logout()'); assert.equal(await run("document.querySelectorAll('.knowledge-card').length"), 0); checks.push('Logout clears library material');
+    // T7.0: every weekly practice question type can be answered with the keyboard and has roles and names a screen reader announces.
+    {
+      await run("window.desktop.login('qa0@synthetic.example','Synthetic-password-123')"); await pause();
+      win.setSize(960, 1000); win.webContents.setZoomFactor(1);
+      await run("document.querySelector('[data-tab-button=learn]').click()"); await pause();
+      await run("(async()=>{current=await window.desktop.learningAction('start',{});current=await window.desktop.learningAction('finish',{sessionId:current.learning.sessions.find(s=>!s.finishedAt).id,selfConfirmAll:true});current=await window.desktop.learningAction('quiz',{});render();})()"); await pause(400);
+      const dbg = win.webContents.debugger; await dbg.sendCommand('Emulation.setFocusEmulationEnabled', { enabled: true });
+      const key = async (name, code) => { for (const type of ['keyDown', 'keyUp']) await dbg.sendCommand('Input.dispatchKeyEvent', { type, key: name, code: code || name, windowsVirtualKeyCode: { ArrowRight: 39, ArrowLeft: 37, ' ': 32, Enter: 13, Tab: 9 }[name], text: type === 'keyDown' ? ({ ' ': ' ', Enter: '\r' }[name]) : undefined }); await pause(80); };
+      const info = await run(`(()=>{const qs=[...document.querySelectorAll('.practice-q')];const name=el=>el.getAttribute('aria-label')||(el.labels&&el.labels[0]?[...el.labels[0].querySelectorAll('img')].map(i=>i.alt).join(' ')+' '+el.labels[0].textContent.trim():'');return {types:qs.map(q=>q.dataset.type),legends:qs.map(q=>Boolean(q.querySelector('fieldset>legend')&&q.querySelector('legend').textContent.trim())),pictureNames:[...qs[0].querySelectorAll('input[type=radio]')].map(name),tapNames:[...document.querySelectorAll('.practice-q[data-type=tap] input')].map(name),textNames:[...document.querySelectorAll('.practice-q[data-type=text-picture] input')].map(name),images:[...document.querySelectorAll('.weekly-practice img')].map(i=>i.alt),orderNames:[...document.querySelectorAll('.order-move')].map(b=>b.getAttribute('aria-label')),progress:document.querySelector('.weekly-practice progress').getAttribute('aria-label'),alert:document.querySelector('.practice-error').getAttribute('role')}})()`);
+      assert.deepEqual(info.types, ['picture', 'tap', 'order', 'text-picture', 'task']);
+      assert(info.legends.every(Boolean), 'every question is a fieldset with a legend');
+      for (const list of [info.pictureNames, info.tapNames, info.textNames]) assert(list.length >= 3 && list.every(n => n.trim().length > 3), `named radios ${JSON.stringify(list)}`);
+      assert(info.pictureNames.every(n => /Post [ABC]:/.test(n)), 'picture options are named by their alt text and caption');
+      assert(info.images.every(a => a.length > 10), 'every image has alt text');
+      assert(info.orderNames.length === 8 && info.orderNames.every(n => /^Move (up|down): .+/.test(n)), JSON.stringify(info.orderNames));
+      assert.equal(info.alert, 'alert');
+      await run("document.querySelector('.practice-form').requestSubmit()"); await pause();
+      assert.match(await run("document.querySelector('.practice-error').textContent"), /Answer every question before you submit: 4 left/, 'an empty page is rejected with an announced error');
+      // Choose a picture: Tab into the group, arrow keys move the choice, Space confirms the focused one.
+      await run("document.querySelector('.practice-q[data-type=picture] input').focus()"); await key('ArrowRight', 'ArrowRight'); await key(' ', 'Space');
+      assert.equal(await run("document.querySelector('.practice-q[data-type=picture] input:checked')?.value"), 'b', 'arrow key selects the next picture');
+      // Tap the spot: areas are radios in one group, so the same keys work.
+      await run("document.querySelector('.practice-q[data-type=tap] input').focus()"); await key('ArrowRight', 'ArrowRight'); await key('ArrowRight', 'ArrowRight');
+      assert.equal(await run("document.querySelector('.practice-q[data-type=tap] input:checked')?.value"), 'button', 'arrow keys move between tap areas');
+      // Put in order: Enter on a Move button reorders and focus stays on a Move button of the same step.
+      const before = await run("[...document.querySelectorAll('.practice-order .step-text')].map(e=>e.textContent)");
+      await run("document.querySelector('.practice-order .order-move.down').focus()"); await key('Enter', 'Enter');
+      const after = await run("({order:[...document.querySelectorAll('.practice-order .step-text')].map(e=>e.textContent),focus:document.activeElement.getAttribute('aria-label'),status:document.querySelector('.practice-q[data-type=order] [role=status]').textContent})");
+      assert.equal(after.order[1], before[0], 'Move down by keyboard'); assert.match(after.focus, /^Move (up|down): /, 'focus stays on a move button'); assert.match(after.status, /moved to position 2 of 4/);
+      // Choose an answer with a picture: Space selects.
+      await run("document.querySelector('.practice-q[data-type=text-picture] input').focus()"); await key(' ', 'Space');
+      assert.equal(await run("document.querySelector('.practice-q[data-type=text-picture] input:checked')?.value"), 'edge');
+      // One page confirmation, then one submit by keyboard. An unanswered page is rejected with an announced error first.
+      await run("document.querySelector('.practice-confirm input').click()");
+      await run("document.querySelector('.weekly-practice .agent-primary').focus()"); await key('Enter', 'Enter'); await pause(500);
+      const done = await run("({score:document.querySelector('.practice-score')?.textContent,badges:document.querySelectorAll('.practice-badge').length,heading:document.activeElement.textContent})");
+      assert.match(done.score, /^\d of 4 right$/); assert.equal(done.badges, 4); assert.match(done.heading, /Weekly practice complete/);
+      checks.push('Weekly practice: all four question types and the task answered by keyboard (arrows, Space, Enter); fieldset legends, named radios, alt text, Move up/down names, announced errors and result');
+    }
     console.log(checks.join('\n')); console.log(`${checks.length} accessibility matrix checks passed; native VoiceOver not asserted`);
     if (out) fs.writeFileSync(path.join(out, 'verification.json'), JSON.stringify({ checks, limits: ['Renderer/authenticated role matrix; native VoiceOver and physical displays are separate'] }, null, 2));
   } catch(error) { console.error(error); exitCode=1; } finally { win.webContents.debugger.detach(); win.destroy(); fs.rmSync(profile, { recursive: true, force: true }); app.exit(exitCode); }

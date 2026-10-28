@@ -67,16 +67,30 @@ function parseImageLine(line) {
   return rule;
 }
 
-// Design rules (FB-14). Source line: Design rule: <task> | contrast-normal|contrast-large|safe-margin | "<number>".
-// contrast-* is a minimum WCAG contrast ratio (1 to 21); safe-margin is the minimum distance in pixels between any text box and
-// every edge of a 1080 pixel wide design (scaled for other widths).
-const DESIGN_LINE = /^Design rule:\s*(email|linkedin|instagram|canva|operations|people|any)\s*\|\s*(contrast-normal|contrast-large|safe-margin)\s*\|\s*"(\d{1,3}(?:\.\d{1,2})?)"\.?$/i;
+// Design rules (FB-14, T6). Source line: Design rule: <task> | <type> | "<value>".
+// Numeric types: contrast-* is a minimum WCAG contrast ratio (1 to 21); safe-margin is the minimum distance in pixels between any
+// text box and every edge of a 1080 pixel wide design (scaled for other widths); font-families is the most font families in one
+// design (1 to 5). Font types (font-headline|font-body|font-label) name one typeface, weight and size on a 1080 pixel wide post:
+// "<Family> <weight>, <min> to <max> px" or "<Family> <weight>, at least <min> px", for example "Fraunces 400, 72 to 120 px".
+const DESIGN_LINE = /^Design rule:\s*(email|linkedin|instagram|canva|operations|people|any)\s*\|\s*(contrast-normal|contrast-large|safe-margin|font-families|font-headline|font-body|font-label)\s*\|\s*"([^"]{1,60})"\.?$/i;
+const DESIGN_NUMBER = /^\d{1,3}(?:\.\d{1,2})?$/;
+const FONT_VALUE = /^([A-Z][A-Za-z]*(?: [A-Z][A-Za-z]*){0,3}) ([1-9]00), (?:(\d{1,3}) to (\d{1,3})|at least (\d{1,3})) px$/;
 function parseDesignLine(line) {
   const match = String(line || '').trim().match(DESIGN_LINE);
   if (!match) return null;
-  const rule = { task: match[1].toLowerCase(), type: match[2].toLowerCase(), value: match[3], number: Number(match[3]) };
+  const task = match[1].toLowerCase(), type = match[2].toLowerCase(), value = match[3];
+  if (type.startsWith('font-') && type !== 'font-families') {
+    const font = value.match(FONT_VALUE);
+    if (!font) return null;
+    const minPx = Number(font[3] ?? font[5]), maxPx = font[4] === undefined ? null : Number(font[4]);
+    if (!(minPx >= 1) || (maxPx !== null && maxPx < minPx)) return null;
+    return { task, type, value, family: font[1], weight: Number(font[2]), minPx, maxPx };
+  }
+  if (!DESIGN_NUMBER.test(value)) return null;
+  const rule = { task, type, value, number: Number(value) };
   if (rule.type.startsWith('contrast-') && !(rule.number >= 1 && rule.number <= 21)) return null;
   if (rule.type === 'safe-margin' && !(Number.isInteger(rule.number) && rule.number <= 540)) return null;
+  if (rule.type === 'font-families' && !(Number.isInteger(rule.number) && rule.number >= 1 && rule.number <= 5)) return null;
   return rule;
 }
 

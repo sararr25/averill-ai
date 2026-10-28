@@ -1,0 +1,542 @@
+{
+ "_note": "Real canva.com editor page, carousel DAHZTPxfC5c slide 2 of 5 (Instagram Post 4:5, 1080x1350), captured 28 Oct 2026 at 43% zoom with Claude in Chrome, read-only. Same sanitising as the 25/28 Oct fixtures plus transform-origin. New structures: rotated text wrappers (translate(x, y) rotate(deg)), a group (caption text plus underline image) whose children are positioned inside the group wrapper, a polaroid shape with a rotated photo, and an accessibility label div inside the text layer. Canva shows one page at a time in the editor; the grid view draws pages as canvas pictures only.",
+ "tree": {
+  "t": "div",
+  "s": {
+   "height": "585px",
+   "width": "468px"
+  },
+  "c": [
+   {
+    "t": "div",
+    "s": {
+     "height": "1350px",
+     "transform": "scale(0.433333)",
+     "width": "1080px"
+    },
+    "c": [
+     {
+      "t": "div",
+      "c": [
+       {
+        "t": "div",
+        "s": {
+         "height": "1350px",
+         "width": "1080px"
+        },
+        "c": [
+         {
+          "t": "div",
+          "c": [
+           {
+            "t": "div",
+            "c": [
+             {
+              "t": "div"
+             }
+            ]
+           }
+          ]
+         },
+         {
+          "t": "div",
+          "s": {
+           "height": "1134px",
+           "left": "108px",
+           "position": "absolute",
+           "top": "108px",
+           "width": "864px"
+          }
+         },
+         {
+          "t": "div",
+          "c": [
+           {
+            "t": "div",
+            "s": {
+             "height": "76.2px",
+             "transform": "translate(108px, 116px) rotate(-7.23673deg)",
+             "width": "710.172px"
+            },
+            "c": [
+             {
+              "t": "div",
+              "s": {
+               "height": "76.2px",
+               "width": "710.172px"
+              },
+              "c": [
+               {
+                "t": "div",
+                "c": [
+                 {
+                  "t": "div"
+                 },
+                 {
+                  "t": "div",
+                  "c": [
+                   {
+                    "t": "div",
+                    "s": {
+                     "transform": "translate(0px, -6.4px)"
+                    },
+                    "c": [
+                     {
+                      "t": "div",
+                      "c": [
+                       {
+                        "t": "div",
+                        "c": [
+                         {
+                          "t": "div",
+                          "c": [
+                           {
+                            "t": "p",
+                            "s": {
+                             "color": "rgb(0, 0, 0)",
+                             "line-height": "89px"
+                            },
+                            "c": [
+                             {
+                              "t": "span",
+                              "s": {
+                               "color": "rgb(0, 0, 0)",
+                               "font-size": "1em"
+                              },
+                              "x": "Nyhavn"
+                             }
+                            ]
+                           }
+                          ]
+                         }
+                        ]
+                       }
+                      ]
+                     }
+                    ]
+                   }
+                  ]
+                 }
+                ]
+               }
+              ]
+             }
+            ]
+           }
+          ]
+         },
+         {
+          "t": "div",
+          "s": {
+           "height": "894.096px",
+           "transform": "translate(267.626px, 369.795px) rotate(8.28745deg)",
+           "width": "769.638px"
+          },
+          "c": [
+           {
+            "t": "div",
+            "s": {
+             "height": "894.096px",
+             "left": "0px",
+             "position": "absolute",
+             "top": "0px",
+             "transform": "scale(1)",
+             "width": "769.638px",
+             "transform-origin": "0px 0px"
+            },
+            "c": [
+             {
+              "t": "div",
+              "s": {
+               "height": "894.096px",
+               "left": "0px",
+               "top": "0px",
+               "width": "769.638px"
+              },
+              "c": [
+               {
+                "t": "div",
+                "s": {
+                 "height": "500.697px",
+                 "transform": "scale(1.7857, 1.7857)",
+                 "width": "431px",
+                 "transform-origin": "0px 0px"
+                }
+               },
+               {
+                "t": "div",
+                "s": {
+                 "height": "500.697px",
+                 "transform": "scale(1.7857, 1.7857)",
+                 "width": "431px",
+                 "transform-origin": "0px 0px"
+                },
+                "c": [
+                 {
+                  "t": "div",
+                  "s": {
+                   "transform-origin": "212.296px 208.29px"
+                  },
+                  "c": [
+                   {
+                    "t": "div",
+                    "s": {
+                     "height": "514.049px",
+                     "opacity": "1",
+                     "transform": "translate(19.5272px, -48.7345px) translate(192.768px, 257.024px) rotate(0deg) translate(-192.768px, -257.024px)",
+                     "width": "385.537px",
+                     "transform-origin": "0px 0px"
+                    },
+                    "c": [
+                     {
+                      "t": "img"
+                     }
+                    ]
+                   }
+                  ]
+                 }
+                ]
+               },
+               {
+                "t": "div",
+                "s": {
+                 "height": "500.697px",
+                 "transform": "scale(1.7857, 1.7857)",
+                 "width": "431px",
+                 "transform-origin": "0px 0px"
+                }
+               },
+               {
+                "t": "div",
+                "s": {
+                 "height": "500.697px",
+                 "transform": "scale(1.7857, 1.7857)",
+                 "width": "431px",
+                 "transform-origin": "0px 0px"
+                }
+               }
+              ]
+             },
+             {
+              "t": "div"
+             }
+            ]
+           }
+          ]
+         },
+         {
+          "t": "div",
+          "s": {
+           "height": "155.41px",
+           "transform": "translate(106.029px, 1086.59px)",
+           "width": "864px"
+          },
+          "c": [
+           {
+            "t": "div",
+            "s": {
+             "height": "155.41px",
+             "transform": "scale(1, 1)",
+             "width": "864px",
+             "transform-origin": "0px 0px"
+            },
+            "c": [
+             {
+              "t": "div",
+              "s": {
+               "height": "36.8757px",
+               "transform": "translate(1.04383px, 106.919px) rotate(4.75646deg)",
+               "width": "281.69px"
+              },
+              "c": [
+               {
+                "t": "div",
+                "c": [
+                 {
+                  "t": "div",
+                  "c": [
+                   {
+                    "t": "div",
+                    "c": [
+                     {
+                      "t": "div",
+                      "c": [
+                       {
+                        "t": "div",
+                        "c": [
+                         {
+                          "t": "div",
+                          "s": {
+                           "height": "36.8757px",
+                           "transform": "translate(0px, 0px) rotate(0deg)",
+                           "width": "281.69px"
+                          },
+                          "c": [
+                           {
+                            "t": "img"
+                           }
+                          ]
+                         }
+                        ]
+                       }
+                      ]
+                     }
+                    ]
+                   }
+                  ]
+                 },
+                 {
+                  "t": "div",
+                  "s": {
+                   "height": "36.8757px",
+                   "left": "0px",
+                   "position": "absolute",
+                   "top": "0px",
+                   "transform": "scale(1)",
+                   "width": "281.69px",
+                   "transform-origin": "0px 0px"
+                  }
+                 }
+                ]
+               }
+              ]
+             },
+             {
+              "t": "div",
+              "c": [
+               {
+                "t": "div",
+                "s": {
+                 "height": "105.733px",
+                 "transform": "translate(0px, -7.10543e-15px)",
+                 "width": "864px"
+                },
+                "c": [
+                 {
+                  "t": "div",
+                  "s": {
+                   "height": "105.733px",
+                   "width": "864px"
+                  },
+                  "c": [
+                   {
+                    "t": "div",
+                    "s": {
+                     "transform": "translate(0px, -4.13335px)"
+                    },
+                    "c": [
+                     {
+                      "t": "div",
+                      "c": [
+                       {
+                        "t": "div",
+                        "c": [
+                         {
+                          "t": "div",
+                          "c": [
+                           {
+                            "t": "p",
+                            "s": {
+                             "color": "rgb(0, 0, 0)",
+                             "line-height": "57px"
+                            },
+                            "c": [
+                             {
+                              "t": "span",
+                              "s": {
+                               "color": "rgb(0, 0, 0)",
+                               "font-size": "1em"
+                              },
+                              "x": "The painted houses before the tour boats wake up."
+                             }
+                            ]
+                           },
+                           {
+                            "t": "p",
+                            "s": {
+                             "color": "rgb(0, 0, 0)",
+                             "line-height": "57px"
+                            },
+                            "c": [
+                             {
+                              "t": "span",
+                              "s": {
+                               "color": "rgb(0, 0, 0)",
+                               "font-size": "1em"
+                              },
+                              "x": "Bring a coffee: the quay is yours."
+                             }
+                            ]
+                           }
+                          ]
+                         }
+                        ]
+                       }
+                      ]
+                     }
+                    ]
+                   }
+                  ]
+                 }
+                ]
+               }
+              ]
+             }
+            ]
+           }
+          ]
+         },
+         {
+          "t": "div",
+          "c": [
+           {
+            "t": "div",
+            "s": {
+             "height": "76.2px",
+             "transform": "translate(516.716px, 236.626px)",
+             "width": "333.638px"
+            },
+            "c": [
+             {
+              "t": "div",
+              "s": {
+               "height": "76.2px",
+               "width": "333.638px"
+              },
+              "c": [
+               {
+                "t": "div",
+                "c": [
+                 {
+                  "t": "div"
+                 },
+                 {
+                  "t": "div",
+                  "c": [
+                   {
+                    "t": "div",
+                    "s": {
+                     "transform": "translate(0px, -6.4px)"
+                    },
+                    "c": [
+                     {
+                      "t": "div",
+                      "c": [
+                       {
+                        "t": "div",
+                        "c": [
+                         {
+                          "t": "div",
+                          "c": [
+                           {
+                            "t": "p",
+                            "s": {
+                             "color": "rgb(0, 0, 0)",
+                             "line-height": "89px"
+                            },
+                            "c": [
+                             {
+                              "t": "span",
+                              "s": {
+                               "color": "rgb(0, 0, 0)",
+                               "font-size": "1em"
+                              },
+                              "x": "at 7:30"
+                             }
+                            ]
+                           }
+                          ]
+                         }
+                        ]
+                       }
+                      ]
+                     }
+                    ]
+                   }
+                  ]
+                 }
+                ]
+               }
+              ]
+             }
+            ]
+           }
+          ]
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "t": "div",
+      "c": [
+       {
+        "t": "div",
+        "c": [
+         {
+          "t": "div",
+          "c": [
+           {
+            "t": "p",
+            "s": {
+             "font-size": "64px"
+            },
+            "x": "Nyhavn"
+           }
+          ]
+         },
+         {
+          "t": "div"
+         },
+         {
+          "t": "div",
+          "c": [
+           {
+            "t": "div",
+            "x": "2 elements, To start navigating the group contents, press Enter"
+           },
+           {
+            "t": "div"
+           },
+           {
+            "t": "div",
+            "c": [
+             {
+              "t": "p",
+              "s": {
+               "font-size": "41.3335px"
+              },
+              "x": "The painted houses before the tour boats wake up."
+             },
+             {
+              "t": "p",
+              "s": {
+               "font-size": "41.3335px"
+              },
+              "x": "Bring a coffee: the quay is yours."
+             }
+            ]
+           }
+          ]
+         },
+         {
+          "t": "div",
+          "c": [
+           {
+            "t": "p",
+            "s": {
+             "font-size": "64px"
+            },
+            "x": "at 7:30"
+           }
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ }
+}

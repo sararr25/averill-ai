@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Home, Users, BriefcaseBusiness, MessageSquare, Bell, Grid3X3, Search, ImagePlus, MoreHorizontal, ThumbsUp, MessageCircle, Repeat2, Send, ChevronDown, Hash, ExternalLink, Plus, Globe, Building2, MapPin } from 'lucide-react';
 import { CreateDialog } from '../components/shared/CreateDialog';
 import { DemoEnvironmentBadge, PlatformSwitcher } from '../components/shared/DemoControls';
+import { LinkedInText, LinkPreviewCard, firstUrl } from '../components/shared/LinkedInParts';
 import { getDrafts, getPosts, VAMO_HEADLINE } from '../services/social-posts';
 import type { SocialPost } from '../types/social';
 
@@ -11,9 +12,8 @@ const tabs = ['Home','About','Posts','Jobs','People'];
 
 function LinkedInPost({ post }: { post: SocialPost }) {
   const [liked,setLiked] = useState(false);
-  const [expanded,setExpanded] = useState(false);
-  const long = post.text.length > 320;
-  return <article className="li-card li-post"><header><img className="li-avatar" src={AVATAR} alt=""/><div><strong>Vamo</strong><small>{VAMO_HEADLINE}</small><small>{new Date(post.createdAt).toLocaleDateString('en-GB',{day:'numeric',month:'short'})} · <Globe size={11}/></small></div><button aria-label="More options" disabled title="Outside the local demo"><MoreHorizontal size={22}/></button></header><p className={long && !expanded ? 'li-text clamped' : 'li-text'}>{post.text}</p>{long && !expanded && <button className="li-see-more" onClick={() => setExpanded(true)}>…see more</button>}{post.imageUrl && <img className="li-post-image" src={post.imageUrl} alt={post.text.split('\n')[0]}/>}{(post.likes || post.comments) ? <div className="li-counts"><span>👍❤️ {post.likes ?? 0}</span><span>{post.comments ?? 0} comments{post.reposts ? ` · ${post.reposts} reposts` : ''}</span></div> : null}<div className="li-actions"><button onClick={() => setLiked(!liked)} aria-pressed={liked} className={liked ? 'liked' : ''}><ThumbsUp size={20}/>{liked?'Liked':'Like'}</button><span><MessageCircle size={20}/>Comment</span><span><Repeat2 size={20}/>Repost</span><span><Send size={20}/>Send</span></div>{post.topComments?.length ? <div className="li-comments">{post.topComments.map(comment => <div className="li-comment" key={comment.author}><strong>{comment.author}</strong><p>{comment.text}</p></div>)}</div> : null}</article>;
+  const url = firstUrl(post.text);
+  return <article className="li-card li-post"><header><img className="li-avatar" src={AVATAR} alt=""/><div><strong>Vamo <span className="li-company-tag">· Company</span></strong><small>{VAMO_HEADLINE}</small><small>{new Date(post.createdAt).toLocaleDateString('en-GB',{day:'numeric',month:'short'})} · <Globe size={11}/></small></div><button aria-label="More options" disabled title="Outside the local demo"><MoreHorizontal size={22}/></button></header><LinkedInText text={post.text}/>{url ? <LinkPreviewCard url={url} imageUrl={post.imageUrl}/> : post.imageUrl && <img className="li-post-image" src={post.imageUrl} alt={post.text.split('\n')[0]}/>}{(post.likes || post.comments) ? <div className="li-counts"><span>👍❤️ {post.likes ?? 0}</span><span>{post.comments ?? 0} comments{post.reposts ? ` · ${post.reposts} reposts` : ''}</span></div> : null}<div className="li-actions"><button onClick={() => setLiked(!liked)} aria-pressed={liked} className={liked ? 'liked' : ''}><ThumbsUp size={20}/>{liked?'Liked':'Like'}</button><span><MessageCircle size={20}/>Comment</span><span><Repeat2 size={20}/>Repost</span><span><Send size={20}/>Send</span></div>{post.topComments?.length ? <div className="li-comments">{post.topComments.map(comment => <div className="li-comment" key={comment.author}><strong>{comment.author}</strong><p>{comment.text}</p></div>)}</div> : null}</article>;
 }
 
 export function LinkedInDemo() {
@@ -33,7 +33,7 @@ export function LinkedInDemo() {
             <h1>Vamo</h1>
             <p className="li-company-tagline">{VAMO_HEADLINE}</p>
             <p className="li-company-meta">Travel Arrangements · Copenhagen, Capital Region of Denmark · 1,247 followers · 2-10 employees</p>
-            <div className="li-company-actions"><button className="li-follow" disabled title="Outside the local demo"><Plus size={16}/> Follow</button><button className="li-outline" disabled title="Outside the local demo">Visit website <ExternalLink size={14}/></button><button className="li-outline" disabled title="Outside the local demo">Message</button></div>
+            <div className="li-company-actions"><button className="li-follow" disabled title="Outside the local demo"><Plus size={16}/> Follow</button><a className="li-outline" href="https://vamo-travel-site.vercel.app" target="_blank" rel="noreferrer">Visit website <ExternalLink size={14}/></a><button className="li-outline" disabled title="Outside the local demo">Message</button></div>
           </div>
           <nav className="li-company-tabs" aria-label="Company page sections">{tabs.map(tab => <button key={tab} className={tab === 'Posts' ? 'active' : ''} disabled={tab !== 'Posts'} title={tab === 'Posts' ? undefined : 'Outside the local demo'}>{tab}</button>)}</nav>
         </section>
@@ -46,7 +46,7 @@ export function LinkedInDemo() {
         <div className="li-card li-about">
           <h2>About</h2>
           <p>Vamo plans trips for young travellers who’d rather collect stories than souvenirs. City breaks with open time built in, for people travelling solo, with a friend or with the whole group chat. Right now: Copenhagen, Vienna and Prague, each one walked and tested by the small crew that plans it.</p>
-          <dl><div><dt><Globe size={15}/> Website</dt><dd>vamo.example</dd></div><div><dt><Building2 size={15}/> Industry</dt><dd>Travel Arrangements</dd></div><div><dt><Users size={15}/> Company size</dt><dd>2-10 employees</dd></div><div><dt><MapPin size={15}/> Headquarters</dt><dd>Copenhagen, Denmark</dd></div><div><dt><Hash size={15}/> Specialties</dt><dd>Youth travel, city breaks, group trips, trip planning</dd></div></dl>
+          <dl><div><dt><Globe size={15}/> Website</dt><dd><a href="https://vamo-travel-site.vercel.app" target="_blank" rel="noreferrer">vamo-travel-site.vercel.app</a></dd></div><div><dt><Building2 size={15}/> Industry</dt><dd>Travel Arrangements</dd></div><div><dt><Users size={15}/> Company size</dt><dd>2-10 employees</dd></div><div><dt><MapPin size={15}/> Headquarters</dt><dd>Copenhagen, Denmark</dd></div><div><dt><Hash size={15}/> Specialties</dt><dd>Youth travel, city breaks, group trips, trip planning</dd></div></dl>
         </div>
         <div className="li-foot">About · Accessibility · Help Center<br/>Privacy &amp; Terms<br/><span>Demo Social Simulator © 2026</span></div>
       </aside>

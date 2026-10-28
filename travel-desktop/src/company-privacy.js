@@ -1,7 +1,7 @@
 const workspace = require('./workspace');
 function allowed(data) { return data?.privacy?.companyAI === true; }
 function requireAI(data) {
- if (!allowed(data)) throw new Error('Company AI is off. The owner must verify the Nebius confidentiality, retention and no-training settings, then enable company AI in Setup.');
+ if (!allowed(data)) throw new Error('Company AI is off. The owner must verify the Nebius confidentiality, retention and no-training settings, then enable company AI in More › Workspace settings.');
 }
 function configure(data, enabled) {
  if (workspace.person(data)?.role !== 'admin') throw new Error('Administrator access required.');

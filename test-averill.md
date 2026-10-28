@@ -36,20 +36,21 @@ Press **Disconnect** in Averill at any time to end sharing.
 
 Click **Sign out**, then pick a person. No password is needed.
 
-- **Maya (Marketing lead):** in **Company library**, Emma's practice note waits for approval. In **More › Workspace settings**, two versions of the social media guidelines conflict; choose **Supersede** on version 1. This also turns on the hashtag, image and design checks. Then the LinkedIn draft shows too many hashtags (LinkedIn allows 3), and the Reel draft shows a banned hashtag (`#lowestprice`). On the Instagram Reel draft, also choose **Check images too** under **Images**: the image prints "Lowest prices guaranteed", and Averill flags it.
+- **Maya (Marketing lead):** in **Company library**, Emma's practice note waits for approval. In **More › Workspace settings**, two versions of the social media guidelines conflict; choose **Supersede** on version 1. This also turns on the hashtag, image and design checks. Version 3 of the same guidelines is waiting too: it adds the typography rules. Ask "Which font should I use?" in the question box first: Averill says no approved rule covers fonts. Then click **Approve** on version 3 and **Supersede** on version 2, and ask again: the answer names Fraunces and DM Sans and cites version 3. Then the LinkedIn draft shows too many hashtags (LinkedIn allows 3), and the Reel draft shows a banned hashtag (`#lowestprice`). On the Instagram Reel draft, also choose **Check images too** under **Images**: the image prints "Lowest prices guaranteed", and Averill flags it.
 - **Alex (owner):** sees every department, the whole team under **Team and account access**, and the public-website check in **More › Workspace settings** (running it needs your own Tavily key, so in this demo you can only see it).
 
 ## 5. Check a Canva design
 
 Do this after Maya's step in section 4.
 
-1. Open the starting post: **TEMPLATE LINK (the owner adds it before release)**. Canva makes your own copy.
+1. Open the starting carousel (five Instagram slides): **TEMPLATE LINK (the owner adds it before release)**. Canva makes your own copy.
 2. Connect the tab as in section 3, step 2.
 3. In Averill's design card, tick **Watch my design**. It is off by default.
-4. Finish the body line of the post in Canva.
-5. Try pistachio green text (`#93C572`) or drag text near the edge of the design. Averill shows **Fix before you export** with the rule it broke. Fixing the design clears the warning. You can choose **Export anyway**; Averill records that choice for the session. Averill never edits or exports your design.
+4. Averill reads only the slide that is open. Flip through all five slides with the page bar at the bottom of Canva, so Averill can check each one. The card shows how many slides it has checked, for example **Checked 3 of 5 slides**. It keeps **Fix before you export** until every slide has been checked and has no problems.
+5. The starting carousel already breaks some rules: Averill flags low contrast on slide 1 and texts too close to the edge on slides 1 and 2. Fix them in Canva and watch the warnings clear. On the last slide, finish the body line of the post.
+6. Try pistachio green text (`#93C572`) or drag text near the edge of a slide. Averill shows **Fix before you export** with the slide number and the rule it broke. Fixing the design clears the warning. If you edit a slide that Averill has already checked, open it again so Averill reads it again. You can choose **Export anyway**; Averill records that choice for the session. Averill never edits or exports your design.
 
-The check covers the one-page Instagram-size design on canva.com only.
+The check covers Instagram-size designs on canva.com only, one open slide at a time. Turned (rotated) text is checked too. Averill does not read the grid view of all slides.
 
 ## 6. Learn Canva layout inside Canva
 

@@ -29,7 +29,7 @@ function renderPublicSite() {
       if (ok?.length) run(read, () => window.desktop.crawlSite(), 'Reading public pages…');
     });
     host.append(read);
-    if (!current.services?.tavily) host.append(node('p', 'Add a Tavily key in Setup to read the website.', 'knowledge-meta'));
+    if (!current.services?.tavily) host.append(node('p', 'Add a Tavily key in Workspace settings › AI and services to read the website.', 'knowledge-meta'));
     if (site.crawledAt) host.append(node('p', `${site.pages.length} pages read ${new Date(site.crawledAt).toLocaleString()}${site.comparedAt ? ` · compared ${new Date(site.comparedAt).toLocaleString()}` : ''}`, 'knowledge-meta'));
     if (site.crawledAt && !site.findings?.length) host.append(node('p', 'No disagreement with approved rules found on the pages read. This is not a full content review.'));
     for (const item of site.findings || []) {

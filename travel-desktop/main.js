@@ -22,7 +22,7 @@ const remoteImport = require('./src/remote-import');
 const { CloudImports } = require('./src/cloud-import');
 const cloud = new CloudImports({root:()=>app.getPath('userData'),secure:safeStorage,open:url=>shell.openExternal(url)});
 const learning = require('./src/learning');
-const { answerWorkspace, localWorkspaceAnswer } = require('./src/workspace-answer');
+const { answerWorkspace, localWorkspaceAnswer, designTopics } = require('./src/workspace-answer');
 const { searchPublicWeb, factCheckPublic } = require('./src/web-search');
 const { nativeWindow, observation, windowNumber } = require('./src/external-observation');
 const { clampCompanion } = require('./src/companion-position');
@@ -84,8 +84,11 @@ const browserBridge = new BrowserBridge({
       const result = contextualReview.designCheck(payload);
       if (payload.action === 'override') return result;
       // D1: the same reading ticks the steps of an open Canva lesson. Only step titles and ticks go back to the card.
-      const exercise = learning.checkDesign(companyWorkspace, require('./browser-extension/canva-design').validate({ design: payload.design, elements: payload.elements }));
-      if (exercise) { workspace.save(app.getPath('userData'), companyWorkspace); publish(); }
+      const reading = require('./browser-extension/canva-design').validate({ design: payload.design, elements: payload.elements });
+      const exercise = learning.checkDesign(companyWorkspace, reading);
+      // T7.2/T7.3: the same reading ticks the Canva tasks of this week's practice and the automatic steps of task exercises.
+      const practiceTicked = learning.tickPractice(companyWorkspace, reading);
+      if (exercise || practiceTicked) { workspace.save(app.getPath('userData'), companyWorkspace); publish(); }
       return exercise ? { ...result, exercise } : result;
     }
     throw new Error('Unsupported contextual action');
@@ -121,7 +124,8 @@ async function runPublicCheck(task, claims, origin) {
 function reviewState() { return { signedIn: signedIn(), workspace: companyWorkspace, observed: externalObservation, epoch: externalEpoch, aiEnabled, key: runtimeKeys.nebius }; }
 // One company-question path for the desktop Ask and the in-page card: local unless the owner's AI policy and the session AI switch allow the model.
 function answerCompany(question, context = '') {
-  if (!(aiEnabled && privacy.allowed(companyWorkspace))) return localWorkspaceAnswer(companyWorkspace, question);
+  // T6: design questions are answered from approved design rule lines only, so they never reach the semantic index or Nemotron.
+  if (!(aiEnabled && privacy.allowed(companyWorkspace)) || designTopics(question)) return localWorkspaceAnswer(companyWorkspace, question);
   return semanticIndex.search(app.getPath('userData'), companyWorkspace, question, { key: runtimeKeys.nebius }).catch(() => ({ results: [] }))
     .then(found => answerWorkspace(companyWorkspace, question, runtimeKeys.nebius, undefined, found.results, context));
 }
@@ -341,7 +345,17 @@ function openWork(kind) {
   publish();
 }
 
+// One Averill per profile: a second launch quits and brings the first window forward. The lock is per userData folder, so verify scripts with temporary profiles do not collide.
+const singleInstance = app.requestSingleInstanceLock();
+if (!singleInstance) app.quit();
+else app.on('second-instance', () => {
+  if (!agentWindow || agentWindow.isDestroyed()) return;
+  if (agentWindow.isMinimized()) agentWindow.restore();
+  agentWindow.show(); agentWindow.focus();
+});
+
 app.whenReady().then(async () => {
+  if (!singleInstance) return;
   await browserConnect.start().catch(error => {
     browserConnectionError = error.code === 'EADDRINUSE' ? 'Another app is using the browser connection. Close other Averill instances, then restart this app. Advanced connection recovery is still available below.' : 'The guided browser connection could not start. Restart Averill or use Advanced connection recovery below.';
   });
@@ -426,12 +440,14 @@ app.whenReady().then(async () => {
       learning.completeFinding(companyWorkspace, payload.sessionId, payload.reflection, check);
     }
     else if(action==='project-start')learning.startProject(companyWorkspace,payload.projectId,payload.sourceId);
-    else if(action==='project-confirm')learning.confirmProject(companyWorkspace,payload.sessionId,payload.note);
+    else if(action==='project-finish')learning.finishProject(companyWorkspace,payload.sessionId,{note:payload.note,selfConfirmAll:payload.selfConfirmAll===true});
     else if (action === 'finish') learning.finish(companyWorkspace, payload.sessionId, { selfConfirmAll: payload.selfConfirmAll === true });
     else if (action === 'exclude') learning.exclude(companyWorkspace, payload.sessionId);
     else if (action === 'delete-history') { learning.deleteHistory(companyWorkspace); ruleExercises.deleteMine(companyWorkspace); guide.clearMine(companyWorkspace); }
     else if (action === 'quiz') learning.beginQuiz(companyWorkspace);
-    else if (action === 'answer') learning.answer(companyWorkspace, payload.quizId, payload.questionId, payload.value);
+    else if (action === 'quiz-submit') learning.submitQuiz(companyWorkspace, payload.quizId, { answers: payload.answers, tried: payload.tried === true });
+    else if (action === 'quiz-retry') learning.retryQuiz(companyWorkspace, payload.quizId);
+    else if (action === 'quiz-note') learning.saveQuizNote(companyWorkspace, payload.quizId, payload.note);
     else throw new Error('Unknown learning action');
     return persistWorkspace();
   });
@@ -707,10 +723,24 @@ app.whenReady().then(async () => {
     publish();
     return snapshot();
   });
-  ipcMain.handle('agent:ask', (event, question) => {
+  ipcMain.handle('agent:ask', async (event, question, consent) => {
     fromAgent(event);
     if(aiEnabled&&privacy.credentials(question))throw new Error('Remove credentials before using external AI.');
     if (companyWorkspace) {
+      // T1.3: in the demo workspace without a local key, non-design questions go to the capped demo server only after the
+      // employee confirmed what is sent (consent === true). consent === undefined asks the renderer for that confirmation.
+      if (companyWorkspace.demoAccounts === true && !aiEnabled && signedIn()) {
+        const plan = judgeServer.askPlan(companyWorkspace, question);
+        if (plan && consent === undefined) return { consentRequired: true, items: plan.items };
+        if (plan && consent === true) {
+          const personId = companyWorkspace.activePersonId;
+          const result = await judgeServer.ask(companyWorkspace, question);
+          if (personId !== companyWorkspace.activePersonId || !signedIn()) throw new Error('The signed-in person changed during the question.');
+          workspace.save(app.getPath('userData'), companyWorkspace);
+          return result;
+        }
+        if (plan) return { ...await answerCompany(question), ai: { status: 'declined', notice: 'Not sent to NVIDIA Nemotron. This is the local approved-source answer.' } };
+      }
       return answerCompany(question);
     }
     return aiEnabled && privacy.allowed(companyWorkspace) ? answerQuestion(question, runtimeKeys.nebius, companyWorkspace) : { ...localAnswer(String(question || '').slice(0, 1000)), mode: 'local' };

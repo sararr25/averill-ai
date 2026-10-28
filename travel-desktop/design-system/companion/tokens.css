@@ -3,7 +3,7 @@
    less tinted, higher-contrast take on the original plum. Contrast is checked by scripts/verify-phase-b.cjs. */
 :root {
   color-scheme: light dark;
-  --av-canvas: #f6f5f8;
+  --av-canvas: #ecebf1;
   --av-surface: #ffffff;
   --av-surface-raised: #f0eef4;
   --av-surface-hover: #e7e4ed;

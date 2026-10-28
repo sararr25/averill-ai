@@ -28,6 +28,7 @@ global.fetch = async (url, options) => { assert.equal(new URL(url).hostname, '12
 require('../main.js');
 const pause = ms => new Promise(resolve => setTimeout(resolve, ms)); const checks = [];
 const PAGE = 'https://www.canva.com/qa';
+const PISTACHIO_CSS = 'rgb(147, 197, 114)', CAROUSEL_SAFE = { nyhavn: [112, 160], group: [108, 1086.59], polaroid: [267.626, -1000] };
 app.whenReady().then(async () => { try {
   let agent; for (let i = 0; i < 100; i++) { agent = BrowserWindow.getAllWindows().find(w => w.webContents.getURL().includes('agent.html')); if (agent && !agent.webContents.isLoading() && await agent.webContents.executeJavaScript('Boolean(window.desktop)')) break; await pause(100); }
   const run = s => agent.webContents.executeJavaScript(s);
@@ -37,7 +38,14 @@ app.whenReady().then(async () => { try {
     const url = new URL(request.url);
     if (url.hostname !== 'www.canva.com') return new Response('', { status: 404 });
     if (url.pathname.startsWith('/qa/img/')) return new Response(qa.image(path.basename(url.pathname)), { headers: { 'Content-Type': 'image/png', 'Access-Control-Allow-Origin': 'https://www.canva.com' } });
-    if (url.pathname.startsWith('/qa/assets/')) { const name = path.basename(url.pathname); if (!['mark.svg', 'plus-jakarta-sans.ttf'].includes(name)) return new Response('', { status: 404 }); return new Response(fs.readFileSync(path.join(APP, 'browser-extension/assets', name)), { headers: { 'Content-Type': name.endsWith('.svg') ? 'image/svg+xml' : 'font/ttf' } }); }
+    if (url.pathname.startsWith('/qa/assets/')) { const name = path.basename(url.pathname); if (!['mark.svg', 'plus-jakarta-sans.ttf'].includes(name) && !/^howto-(text|size|align|margin|contrast|group)\.svg$/.test(name)) return new Response('', { status: 404 }); return new Response(fs.readFileSync(path.join(APP, 'browser-extension/assets', name)), { headers: { 'Content-Type': name.endsWith('.svg') ? 'image/svg+xml' : 'font/ttf' } }); }
+    // Carousel (owner decision 28 October 2026): slide N of 5 from the carousel capture, with every text inside the safe area
+    // and the polaroid moved off the page; bad=1 makes "at 7:30" pistachio on cream.
+    if (url.pathname === '/qa/carousel') {
+      const bad = url.searchParams.get('bad') === '1';
+      const mutate = tree => { const walk = (node, inTime) => { const time = inTime || node.qa === 'time'; if (time && ['span', 'p'].includes(node.t)) node.s = { ...(node.s || {}), color: PISTACHIO_CSS }; for (const child of node.c || []) walk(child, time); }; if (bad) walk(tree, false); };
+      return new Response(qa.build({ fixture: 'carousel', slide: { index: Number(url.searchParams.get('slide')), count: 5 }, positions: CAROUSEL_SAFE, mutate }), { headers: { 'Content-Type': 'text/html; charset=utf-8' } });
+    }
     if (url.pathname === '/qa') return new Response(qa.build({ zoom: url.searchParams.get('zoom') === '1' ? 1 : qa.CAPTURED_ZOOM, left: url.searchParams.get('zoom') === '1' ? 60 : 380, top: url.searchParams.get('zoom') === '1' ? -285 : 96, positions: qa.SAFE_POSITIONS }), { headers: { 'Content-Type': 'text/html; charset=utf-8' } });
     return new Response('', { status: 404 });
   });
@@ -64,6 +72,12 @@ app.whenReady().then(async () => { try {
   };
   const shot = async name => { if (SHOTS) fs.writeFileSync(path.join(SHOTS, name + '.png'), (await editor.webContents.capturePage()).toPNG()); };
   const step = async (name, fn) => { try { await fn(); checks.push(name); } catch (error) { error.message = `Step failed: ${name}: ${error.message}`; throw error; } };
+  // T5.2: the card starts minimised while the watch is off, so a test that needs the toggle opens the card first.
+  const toggleWatch = async () => { if (await page(`Boolean(${D}.querySelector('.dmin'))`)) await tap({ css: 'button.dpill' }); await tap({ css: 'input[type=checkbox]' }); };
+  const hostRect = () => page(`(()=>{const r=${D}.host.getBoundingClientRect();return {left:Math.round(r.left),top:Math.round(r.top),right:Math.round(r.right),bottom:Math.round(r.bottom)}})()`);
+  const centerOf = css => page(`(()=>{const e=${D}.querySelector(${JSON.stringify(css)});const r=e.getBoundingClientRect();return {x:Math.round(r.x+r.width/2),y:Math.round(r.y+r.height/2)}})()`);
+  const drag = async (css, dx, dy) => { const at = await centerOf(css); editor.webContents.sendInputEvent({ type: 'mouseDown', button: 'left', clickCount: 1, ...at }); for (let i = 1; i <= 6; i++) { editor.webContents.sendInputEvent({ type: 'mouseMove', x: Math.round(at.x + dx * i / 6), y: Math.round(at.y + dy * i / 6) }); await pause(30); } editor.webContents.sendInputEvent({ type: 'mouseUp', button: 'left', clickCount: 1, x: Math.round(at.x + dx), y: Math.round(at.y + dy) }); await pause(100); };
+  const scheme = async value => { if (!editor.webContents.debugger.isAttached()) editor.webContents.debugger.attach('1.3'); await editor.webContents.debugger.sendCommand('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-color-scheme', value }] }); await pause(150); };
   const setBodyColor = color => page(`document.querySelectorAll('[data-qa-text=body] span').forEach(s=>s.style.color=${JSON.stringify(color)});[...document.querySelectorAll('[data-qa-layer] span')].at(-1).style.color=${JSON.stringify(color)};void 0`);
   const setBodyText = value => page(`document.querySelector('[data-qa-text=body] span').textContent=${JSON.stringify(value)};[...document.querySelectorAll('[data-qa-layer] span')].at(-1).textContent=${JSON.stringify(value)};void 0`);
   const moveBody = x => page(`document.querySelector('[data-qa-text=body]').style.transform='translate(${x}px, 1276.17px)';void 0`);
@@ -76,18 +90,22 @@ app.whenReady().then(async () => { try {
     assert.equal((await relay({ kind: 'connect-tab' }, { id: chrome.runtime.id })).connected, true); assert.equal(approvals, 1);
     assert.deepEqual(injected[0], ['end-reasons.js', 'editor-adapter.js', 'field-select.js', 'canva-design.js', 'content.js']);
     await until(`Boolean(${D})`);
+    const mini = await page(`(()=>{const b=${D}.querySelector('.dmin');return b?{pill:b.querySelector('.dpill').textContent,checkbox:Boolean(${D}.querySelector('input[type=checkbox]')),radius:getComputedStyle(b).borderRadius}:null})()`);
+    assert.deepEqual(mini, { pill: 'Design check: Off', checkbox: false, radius: '14px' }, 'T5.2: starts minimised while the watch is off, with no pill-shaped controls');
+    await tap({ css: 'button.dpill' }); await until(`Boolean(${D}.querySelector('input[type=checkbox]'))`, 'card expanded');
     const off = await page(`(()=>{const t=${D}.querySelector('input[type=checkbox]');return {checked:t.checked,label:t.getAttribute('aria-label'),size:[t.getBoundingClientRect().width,t.getBoundingClientRect().height]}})()`);
     assert.deepEqual(off, { checked: false, label: 'Watch my design', size: [24, 24] });
     await pause(1500); assert.equal(designCalls.length, 0, 'nothing is read or sent before the toggle');
   });
   await shot('fb14-off');
   await step('Watch on: dark text passes; the card sits right of the page frame without covering it', async () => {
-    await tap({ css: 'input[type=checkbox]' });
+    await toggleWatch();
     await until(clean, 'clean card');
     const geometry = await page(`(()=>{const c=${D}.host.getBoundingClientRect(),f=AverillCanvaDesign.frameRect(document);return {cardLeft:c.left,frameRight:f.right,inView:c.top>=0&&c.right<=innerWidth&&c.bottom<=innerHeight,pills:[...${D}.querySelectorAll('*')].filter(e=>getComputedStyle(e).borderRadius==='999px').length}})()`);
     assert(geometry.cardLeft >= geometry.frameRight, JSON.stringify(geometry)); assert(geometry.inView); assert.equal(geometry.pills, 0, 'no pills');
     const sent = designCalls.at(-1).payload;
-    assert.deepEqual(Object.keys(sent).sort(), ['design', 'elements', 'kind']);
+    assert.deepEqual(Object.keys(sent).sort(), ['design', 'elements', 'kind', 'slide']);
+    assert.deepEqual(sent.slide, { index: 1, count: 1 }, 'a one-page design is slide 1 of 1');
     assert.deepEqual(sent.elements.map(e => e.text), ['vamo', 'copenhagen before 8', BODY]);
     assert(!JSON.stringify(sent).includes('data:'), 'no image data'); assert(JSON.stringify(sent).length < 4000);
     assert((await text()).includes('Checked 3 texts for contrast, safe area, approved wording.'));
@@ -140,7 +158,7 @@ app.whenReady().then(async () => { try {
   await step('D1 lesson: after Start in Averill, the Canva card lists the six lesson steps with the ticks Averill saved', async () => {
     await run("window.desktop.learningAction('start',{})");
     await moveBody(121); await until(`Boolean(${D}?.querySelector('.dex'))`, 'lesson in the card');
-    const listed = await page(`[...${D}.querySelectorAll('.dexlist li')].map(li=>[li.className,li.querySelector('b').textContent])`);
+    const listed = await page(`[...${D}.querySelectorAll('.dexlist>li')].map(li=>[li.className,li.querySelector('b').textContent])`);
     const learn = (await run('window.desktop.snapshot()')).learning, lesson = learn.sessions.find(s => s.title === 'Canva layout essentials' && !s.finishedAt);
     const title = Object.fromEntries(learn.steps.map(s => [s.id, s.title]));
     assert.equal(listed.length, 6); assert.deepEqual(listed.at(-1), ['confirm', title.group], 'grouping is confirmed by the employee');
@@ -150,6 +168,38 @@ app.whenReady().then(async () => { try {
     await moveBody(120);
   });
   await shot('d1-lesson-in-canva');
+  await step('T5.3 each lesson step has a "How to do this in Canva" panel: short steps, a local sketch and an official Canva help link', async () => {
+    await page(`${D}.querySelectorAll('details.how').forEach(d=>{d.open=true})`); await pause(150);
+    const panels = await page(`[...${D}.querySelectorAll('.dexlist>li')].map(li=>{const h=li.querySelector('details.how');const img=h?.querySelector('img');const a=h?.querySelector('a');return {step:li.querySelector('b').textContent,summary:h?.querySelector('summary').textContent,steps:h?.querySelectorAll('ol li').length,img:img?.getAttribute('src'),loaded:img?.complete&&img.naturalWidth>0,link:a?.href,target:a?.target,rel:a?.rel}})`);
+    assert.equal(panels.length, 6);
+    for (const p of panels) { assert.equal(p.summary, 'How to do this in Canva', p.step); assert(p.steps >= 2 && p.steps <= 5, p.step); assert(/\/qa\/assets\/howto-[a-z]+\.svg$/.test(p.img), p.img); assert.equal(p.loaded, true, p.img); assert(/^https:\/\/www\.canva\.com\/help\/article\/[a-z-]+\/$/.test(p.link), p.link); assert.equal(p.target, '_blank'); assert.equal(p.rel, 'noopener noreferrer'); }
+    assert.deepEqual(panels.map(p => p.link.split('/').at(-2)), ['add-text-to-design', 'change-font-size', 'align-position-elements', 'margins', 'change-text-color', 'group-ungroup-layer-elements']);
+    await page(`${D}.querySelector('details.how[data-how=size]').scrollIntoView({block:'center'})`); await pause(100);
+    await shot('t5-howto-panel');
+    await page(`${D}.querySelectorAll('details.how').forEach(d=>{d.open=false})`); await pause(100);
+  });
+  await step('T5.3 an open panel stays open after the card is rebuilt by the next check', async () => {
+    await page(`${D}.querySelector('details.how[data-how=align]').open=true`); await pause(100);
+    await moveBody(122); await until(`${D}.querySelector('details.how[data-how=align]')?.open===true`, 'panel stays open'); await moveBody(120);
+    await page(`${D}.querySelector('details.how[data-how=align]').open=false`);
+  });
+  await step('Question box in the design card: a design question is answered from the approved Design rule lines with the measured facts', async () => {
+    await page(`${D}.querySelector('textarea#averill-design-ask').value='How far from the edge must text be?';void 0`);
+    await tap({ css: 'button', label: 'Ask the question' });
+    await until(`/Design rule/.test(${D}.querySelector('.out')?.textContent||'')`, 'answer');
+    const answer = await page(`${D}.querySelector('.out').textContent`);
+    assert(/108/.test(answer), answer); assert(/social-media-guidelines-v2\.md/.test(answer), answer);
+    assert.equal(await page(`${D}.querySelector('label[for=averill-design-ask]').textContent`), 'Ask about this design or company rules');
+    await page(`${D}.querySelector('.ask').scrollIntoView({block:'center'})`); await shot('t5-design-question');
+    console.log('Design question answer:', answer.replace(/\s+/g, ' ').slice(0, 400));
+  });
+  await step('Q3: the card follows the system colour scheme (light by default, dark when the Mac is dark)', async () => {
+    const colours = async () => page(`(()=>{const c=${D}.querySelector('.card');const s=getComputedStyle(c);const f=${D}.querySelector('.watch input');return {bg:s.backgroundColor,text:s.color}})()`);
+    await page(`${D}.querySelector('.main').scrollTop=0`); await scheme('light'); assert.deepEqual(await colours(), { bg: 'rgb(255, 255, 255)', text: 'rgb(29, 26, 36)' }); await shot('t5-card-light');
+    await scheme('dark'); assert.deepEqual(await colours(), { bg: 'rgb(43, 40, 53)', text: 'rgb(243, 241, 248)' }); await shot('t5-card-dark');
+    await tap({ css: 'button', label: 'Minimise the design check' }); assert.equal(await page(`${D}.querySelector('.dpill').textContent`), 'Design check: No problems · 5 of 6 steps', 'the pill counts the lesson steps'); await shot('t5-minimised-dark'); await scheme('light'); await shot('t5-minimised-light'); await tap({ css: 'button.dpill' });
+    await page(`${D}.querySelector('.watch input').focus()`);
+  });
   await step('D1 lesson: one confirmation finishes it; readable steps are recorded as checked by Averill, grouping as confirmed by the employee', async () => {
     const lesson = (await run('window.desktop.snapshot()')).learning.sessions.find(s => s.title === 'Canva layout essentials' && !s.finishedAt);
     const done = (await run(`window.desktop.learningAction('finish',{sessionId:${JSON.stringify(lesson.id)}})`)).learning.sessions.find(s => s.id === lesson.id);
@@ -167,7 +217,7 @@ app.whenReady().then(async () => { try {
     tabUrl = PAGE + '?zoom=1'; await load(tabUrl);
     updatedListener(9, { status: 'complete' }, { id: 9, url: tabUrl }); await until(`Boolean(${D})`, 'reinjected');
     assert.deepEqual(injected.at(-1), ['end-reasons.js', 'editor-adapter.js', 'field-select.js', 'canva-design.js', 'content.js']); assert.equal(approvals, 1);
-    await tap({ css: 'input[type=checkbox]' }); await until(clean, 'clean at 100%');
+    await toggleWatch(); await until(clean, 'clean at 100%');
     assert.equal(designCalls.at(-1).payload.design.scale, 1);
     assert.equal(designCalls.at(-1).payload.elements[2].box.x, 120);
     await setBodyColor(PISTACHIO); await until(blocking, 'block at 100%');
@@ -179,10 +229,94 @@ app.whenReady().then(async () => { try {
     designDelay = 2000; await setBodyColor(PISTACHIO);
     for (let i = 0; i < 80 && !designInFlight; i++) await pause(50);
     assert.equal(designInFlight, 1, 'a design check is in flight');
-    await tap({ css: 'input[type=checkbox]' }); await pause(2500); designDelay = 0;
-    await tap({ css: 'input[type=checkbox]' });
+    await toggleWatch(); await pause(2500); designDelay = 0;
+    await toggleWatch();
     await until(blocking, 'blocking card after the watch is turned back on');
     await setBodyColor(NEAR_BLACK); await until(clean, 'clean again');
+  });
+  // Owner decision 28 October 2026: a carousel is checked slide by slide; results accumulate for this tab session.
+  const openSlide = async (index, bad = false) => {
+    tabUrl = `${PAGE}/carousel?slide=${index}${bad ? '&bad=1' : ''}`; await load(tabUrl);
+    updatedListener(9, { status: 'complete' }, { id: 9, url: tabUrl }); await until(`Boolean(${D})`, 'reinjected on slide ' + index);
+    const before = designCalls.length;
+    await toggleWatch();
+    await until(`${D}.querySelector('h2')?.textContent && ${D}.querySelector('h2').textContent!=='Checking your design.'`, 'checked slide ' + index);
+    assert(designCalls.length > before, 'a check was sent');
+    const sent = designCalls.at(-1).payload;
+    assert.deepEqual(sent.slide, { index, count: 5 }); assert.deepEqual([sent.design.width, sent.design.height], [1080, 1350]);
+    return sent;
+  };
+  await step('Carousel slide 1 of 5, clean: still "Fix before you export" because 4 slides are unread; it lists the slides to open', async () => {
+    const sent = await openSlide(1);
+    assert.deepEqual(sent.elements.map(e => e.text), ['Nyhavn', 'The painted houses before the tour boats wake up.\nBring a coffee: the quay is yours.', 'at 7:30'], 'the rotated title and the grouped caption are read');
+    assert.equal(designCalls.at(-1).value.state, 'incomplete', JSON.stringify(designCalls.at(-1).value.findings.map(f => [f.text, f.measured])));
+    await until(blocking, 'blocking for unread slides');
+    const t = await text();
+    assert(t.includes('Averill has not checked every slide yet.'), t); assert(t.includes('Checked 1 of 5 slides (now on slide 1).'), t);
+    assert(t.includes('Open the other slides so Averill can check them: 2, 3, 4, 5.'), t);
+    assert.equal(await page(`${D}.querySelectorAll('.dfind').length`), 0);
+  });
+  await shot('carousel-slide1-incomplete');
+  await step('Carousel slide 2 with pistachio "at 7:30": blocked with the finding cited for slide 2', async () => {
+    await openSlide(2, true); await until(blocking, 'slide 2 blocks');
+    const list = await findings();
+    assert.deepEqual(list.map(f => [f.text, f.lines[0]]), [['Slide 2: “at 7:30”', 'This text is hard to read on its background.']]);
+    assert((await text()).includes('Checked 2 of 5 slides (now on slide 2).'));
+  });
+  await shot('carousel-slide2-finding');
+  await step('Slide 2 fixed: the finding is gone but the card still blocks until slides 3 to 5 are read', async () => {
+    await openSlide(2); await until(blocking, 'still blocking');
+    assert.equal(designCalls.at(-1).value.state, 'incomplete'); assert.equal(await page(`${D}.querySelectorAll('.dfind').length`), 0);
+    assert((await text()).includes('them: 3, 4, 5.'));
+  });
+  await step('Slides 3, 4 and 5 read and clean: "No design problems found." with 5 of 5 slides checked', async () => {
+    for (const index of [3, 4]) { await openSlide(index); assert.equal(designCalls.at(-1).value.state, 'incomplete'); }
+    await openSlide(5); await until(clean, 'clean after every slide');
+    assert.deepEqual(designCalls.at(-1).value.slides, { current: 5, count: 5, checked: [1, 2, 3, 4, 5] });
+    assert((await text()).includes('Checked 5 of 5 slides (now on slide 5).'));
+  });
+  await shot('carousel-all-clean');
+  await step('T5.2 minimise and restore: the pill shows the status and the step count, restoring returns focus to the minimise button', async () => {
+    tabUrl = PAGE; await load(PAGE); updatedListener(9, { status: 'complete' }, { id: 9, url: PAGE }); await until(`Boolean(${D})`, 'reinjected on the single design');
+    await toggleWatch(); await until(clean, 'clean before minimising'); await tap({ css: 'button', label: 'Minimise the design check' });
+    await until(`Boolean(${D}.querySelector('.dmin'))`, 'minimised');
+    assert.equal(await page(`${D}.querySelector('.dpill').textContent`), 'Design check: No problems');
+    await shot('t5-minimised'); await tap({ css: 'button.dpill' });
+    await until(`Boolean(${D}.querySelector('h2'))`, 'restored');
+    assert.equal(await page(`${D}.activeElement?.getAttribute('aria-label')`), 'Minimise the design check');
+  });
+  await step('T5.2 drag the card by its handle: it moves, never above the top safe offset and never outside the window', async () => {
+    const before = await hostRect(); await drag('[data-act=grip]', -300, 150);
+    const moved = await hostRect(); assert(moved.left < before.left - 250 && moved.top > before.top + 100, JSON.stringify([before, moved]));
+    await drag('[data-act=grip]', -3000, -3000); const top = await hostRect();
+    assert.equal(top.top, 72, 'clamped below Canva\'s top bar'); assert.equal(top.left, 12, 'clamped to the left edge');
+    await drag('[data-act=grip]', 6000, 6000); const bottom = await hostRect();
+    assert(bottom.right <= 1400 - 12 && bottom.bottom <= 900 - 12, JSON.stringify(bottom));
+  });
+  await step('T5.2 keyboard: arrow keys on the focused handle move the card by 16 px (Shift: 64 px)', async () => {
+    await page(`${D}.querySelector('[data-act=grip]').focus()`); const before = await hostRect();
+    editor.webContents.sendInputEvent({ type: 'keyDown', keyCode: 'Left' }); editor.webContents.sendInputEvent({ type: 'keyUp', keyCode: 'Left' }); await pause(100);
+    const after = await hostRect(); assert.equal(after.left, before.left - 16, JSON.stringify([before, after]));
+    editor.webContents.sendInputEvent({ type: 'keyDown', keyCode: 'Up', modifiers: ['shift'] }); editor.webContents.sendInputEvent({ type: 'keyUp', keyCode: 'Up', modifiers: ['shift'] }); await pause(100);
+    assert.equal((await hostRect()).top, Math.max(72, after.top - 64));
+  });
+  await step('T5.2 the position is kept after the card is rebuilt and after a same-site reload', async () => {
+    await drag('[data-act=grip]', -200, -3000); const placed = await hostRect();
+    await setBodyColor(PISTACHIO); await until(blocking, 'rebuilt by a new check'); const rebuilt = await hostRect(); assert(rebuilt.left === placed.left && rebuilt.top === placed.top, 'same place after a re-render: ' + JSON.stringify([placed, rebuilt]));
+    await setBodyColor(NEAR_BLACK); await until(clean, 'clean again');
+    await load(PAGE); updatedListener(9, { status: 'complete' }, { id: 9, url: PAGE }); await until(`Boolean(${D})`, 'reinjected');
+    const reloaded = await hostRect(); assert(reloaded.left === placed.left && reloaded.top === placed.top, JSON.stringify([placed, reloaded]));
+    assert.equal(await page(`Boolean(${D}.querySelector('.dmin'))`), true, 'the watch is off again after a reload, so the card starts minimised at the remembered place');
+  });
+  await step('T5.2 a blocking warning opens a minimised card by itself, and a card minimised by choice stays minimised for the same problems', async () => {
+    await toggleWatch(); await until(clean, 'watch on'); await tap({ css: 'button', label: 'Minimise the design check' }); await until(`Boolean(${D}.querySelector('.dmin'))`);
+    await setBodyColor(PISTACHIO); await until(blocking, 'blocking card opens by itself');
+    assert.equal(await page(`Boolean(${D}.querySelector('.dmin'))`), false);
+    await tap({ css: 'button', label: 'Minimise the design check' }); await until(`Boolean(${D}.querySelector('.dmin'))`);
+    assert.equal(await page(`${D}.querySelector('.dpill').textContent`), 'Design check: 1 problem', 'minimised by choice, the same problems do not reopen it');
+    await pause(2600); assert.equal(await page(`Boolean(${D}.querySelector('.dmin'))`), true);
+    await tap({ css: 'button.dpill' }); await setBodyColor(NEAR_BLACK); await until(clean, 'clean');
+    await page("sessionStorage.removeItem('averill-design-card-position')"); 
   });
   await step('Stop sharing ends the watch; a later design check is refused by the worker', async () => {
     await tap({ css: 'button', label: 'Stop sharing' });

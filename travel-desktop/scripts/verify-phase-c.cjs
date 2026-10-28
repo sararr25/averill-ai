@@ -52,6 +52,8 @@ app.whenReady().then(async()=>{try{
  state=await run("({open:document.getElementById('working-now').classList.contains('is-open'),title:document.getElementById('working-now-title').textContent,meta:document.getElementById('working-now-meta').textContent,task:document.getElementById('external-task').value,check:document.getElementById('working-check').disabled,icon:document.getElementById('connection-icon').getAttribute('aria-label')})");
  assert.ok(state.open);assert.equal(state.task,'email');assert.equal(state.check,false,'Check now is ready once a field is captured');
  assert.match(state.meta,/Brevo|Not checked yet/);assert.match(state.icon,/^Browser connected to brevo\.example/);
+ // T3: the header pill and the plug icon say the same thing as the connection.
+ assert.equal(await run("document.getElementById('sharing-status').textContent"),'SHARING: brevo.example');
  await run("document.getElementById('working-check').click()");
  for(let i=0;i<50&&!(await run("/to fix/.test(document.getElementById('working-now-meta').textContent)"));i++)await pause(100);
  state=await run("({meta:document.getElementById('working-now-meta').textContent,hero:getComputedStyle(document.querySelector('.review-hero')).display,title:document.getElementById('hero-title').textContent,recent:[...document.querySelectorAll('#recent-work-list > li')].map(li=>li.textContent)})");
@@ -66,6 +68,8 @@ app.whenReady().then(async()=>{try{
  await run("document.getElementById('working-disconnect').click()");await pause(500);
  state=await run("({title:document.getElementById('working-now-title').textContent,recent:document.querySelectorAll('#recent-work-list > li').length})");
  assert.equal(state.title,'Nothing open yet');assert.equal(state.recent,1);
+ assert.equal(await run("document.getElementById('sharing-status').textContent"),'NOT SHARING','After Disconnect nothing is shared');
+ assert.equal(await run("document.getElementById('connection-icon').getAttribute('aria-label')"),'Browser not connected');
  win.webContents.debugger.detach();
  console.log('PASS phase C: guided install and honest Connect, Working on now card with automatic email check type, Check now, corrections, recent work, disconnect. Screenshots in '+shots);app.quit();
 }catch(error){console.error(error.stack);app.exit(1);}});

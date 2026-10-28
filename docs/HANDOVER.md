@@ -1,3 +1,47 @@
+# Feedback round, 28 October 2026: built
+
+**State:** branch `feat/feedback-2026-10-28` (local, not pushed), 8 commits after `0357f12`. Not merged, no release.
+
+**Done (all verified by script, synthetic unless marked live):**
+- T3 pill shows SHARING: <host> / WINDOW / NOT SHARING; single-instance lock. T1.2 AI pill states and Workspace settings copy. T2.1 to T2.3 one focus ring, solid pills, focus check in verify-phase-b.
+- T1.1 (live, owner's Mac): stale 25 October Averill (pid 20011) quit; profile backed up to `averill-ai-desktop-backup-2026-10-28`; `averill-secrets.enc.json` copied from the 25 October backup. Decryption not yet confirmed: open Averill as Alex and check the AI pill; if it says "add a key", paste the keys again.
+- T1.3 demo question box asks Nemotron through the judge server (`POST /api/ask`, new) after consent; local answer always shown. Route NOT deployed (deploys from main).
+- T4 drafts with credited Unsplash photos (`demo-tools/social-simulator/public/vamo/photos/CREDITS.md`), live Vamo links, LinkedIn composer without duplicate image. Not deployed.
+- T5.1 reader (live, read-only on canva.com): soft line breaks, rotated text, groups, SVG clip paths; carousel checked slide by slide ("Checked X of 5"). Real starting carousel DAHZTPxfC5c ("Copenhagen", built from the owner's template, photos credited Unsplash). Owner decision: its existing contrast/margin problems on slides 1 and 2 stay as findings for judges.
+- T5.2/T5.3 card minimise, drag, remembered position, light/dark per macOS, "How to do this in Canva" panels from Canva help pages, question box on the design card. T2.4 canvas #ecebf1.
+- T6 font rules in social-media-guidelines-v3 (pending for Maya); design questions answered only from approved Design rule lines.
+- T7 one-page visual weekly practice (4 question types, one submit, retry wrong), task exercises one page, pre-D1 sessions migrated.
+
+**Checks (last runs):** npm test 243 (one existing flaky test, `image-check.test.js` 6 MB bridge, fails on `0357f12` too); verify phase-b, phase-c, contextual 20, canva-design 28, accessibility 10, guide 28, ui-e2e 23, feedback, demo-ai 10 all pass.
+
+**Needs the owner:**
+- Reload the extension in Chrome and run the card on the real carousel (only the reader was tested live; card UI only on the synthetic page).
+- Confirm the keys decrypt (above).
+- Canva template link for test-averill.md (placeholder stays), push/merge/deploy (simulator, judge server /api/ask), release.
+- Open the T4 drafts on a preview deploy for the spec's screenshot check.
+
+# Feedback round, 28 October 2026: planned, not started
+
+**State (28 October):**
+- `main` holds phases A to D1 (PR #55) and the updated judge guide (PR #56).
+- Release `v0.1.0-judge.20261028` is published (ZIP SHA-256 `b02aaf25…e20d`).
+- The owner tested it and reported 11 problems. All of them are ticketed in `docs/FEEDBACK_SPEC_2026-10-28.md` (T1 to T7, decisions Q1 to Q5). No code has been changed for them yet. Q1 to Q5 are answered (see the spec). Next session: follow the spec's "Order of work".
+- **Learn test (owner, 27 and 28 October; T7.0):** the weekly test must be interactive, multiple choice and visual. Every question has an image or illustration, answers can be pictures, and there is tap-the-spot and put-in-order. Everything is on one page with one submit and one confirmation. Show an inline mockup of 3 question types in chat before building. Text-box reflections and per-question buttons are what the owner rejected.
+
+**Facts found while writing the spec (28 October):**
+- **Nebius/Tavily "off":** the current profile `~/Library/Application Support/averill-ai-desktop` is a Try-the-demo workspace without `averill-secrets.enc.json`. The keys from before are only in `averill-ai-desktop-backup-2026-10-25/`. Keys can be added as Alex in More › Workspace settings (admin only). The question box has no judge-server route, so it says "key needed" even in the demo.
+- **Two Averill copies were running:**
+  - the new one (opened 28 October, holds port 43147);
+  - one from 25 October (pid 20011), whose app folder had already been deleted.
+  The owner should quit the old one. The app has no single-instance lock (ticket T3).
+- **"NOT SHARING" while Chrome is connected:** the header pill ignores the browser connection (`agent.js:142`).
+- **Learn "unchanged":** D1 changed only the Canva lesson. The weekly practice and the task exercises still confirm per question and per step. The owner's profile also has three unfinished sessions from before D1.
+- **Drafts:** the editable drafts use drawn SVGs and `vamo.example` links (FB-02 asked for photos). The live Vamo site is `https://vamo-travel-site.vercel.app`.
+- **Canva:** the real page fails with "The two text layers on this page do not match". The card is fixed at the top right and cannot be moved or minimised.
+- **Fonts:** the Vamo pack has no typography rule, so "which font should I use" cannot be answered from approved sources. The Vamo site uses Fraunces and DM Sans.
+
+**Lesson for whoever continues:** before building, restate each owner sentence and the screen it refers to, and check the result on the real surface. Last round, "test" meant the weekly practice, and only the Canva lesson was changed.
+
 # Feedback round, 25 to 26 October 2026
 
 **State (26 October):** branch `feat/feedback-blocks-a-d` pushed; pull request [#55](https://github.com/sararr25/averill-ai/pull/55) open against `main`, not merged. Release ZIP built locally only (not published). Spec: `docs/FEEDBACK_SPEC_2026-10-25.md` (FB-01 to FB-15, decisions D1 to D4). Canva spike: `docs/CANVA_SPIKE_2026-10-25.md`. Screenshots: `docs/review-evidence-2026-10-25/`.
