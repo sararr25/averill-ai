@@ -1,6 +1,29 @@
 # Feedback round, 28 October 2026: built
 
-**State:** branch `feat/feedback-2026-10-28` (local, not pushed), 8 commits after `0357f12`. Not merged, no release.
+**State:** merged to `main` (PR #57, `f95a046`). Production updated: averill-demo-sim (new drafts) and averill-judge-ai (`POST /api/ask` answers 400 to an empty request, so the route exists; no real question sent). Release ZIP built locally only: `travel-desktop/dist/Averill-macOS-arm64.zip`, SHA-256 `a490e5eb7d0465f7227ed914903b7482e2515c0b476903433317cb47e08514d5`, `verify:release` PASS (234 files, 3224 entries). No GitHub release published (owner's word only).
+
+**Owner test as a judge:**
+1. Unzip, open `Averill.app`.
+2. To see the judges' first run, quit Averill and rename `~/Library/Application Support/averill-ai-desktop` temporarily (it is already a Try-the-demo workspace; backup also in `averill-ai-desktop-backup-2026-10-28`).
+3. Follow `test-averill.md`. Section 5 template link is still a placeholder: use the carousel "Copenhagen" (DAHZTPxfC5c).
+4. Reload the Chrome extension from `Averill.app/Contents/Resources/app/browser-extension`.
+
+**About the keys:** `averill-secrets.enc.json` is encrypted with the macOS keychain item of the app, so only Averill can open it; it was copied but never decrypted in a run. The demo does not need it: in the demo workspace Check now and the question box go through the judge server.
+
+**Not tested (read before claiming anything):**
+- The packaged ZIP was built and integrity-checked, but not opened and clicked through (no first run, sign-in, Learn, Canva lesson in the packaged app). The single-instance lock was tested only with dev Electron.
+- The Chrome extension in real Chrome: the card's minimise, drag, light/dark, tutorial panels and design-card questions were tested only on the synthetic Canva page. The 72 px top offset was not checked against Canva's real top bar.
+- Only the reader was tested live (read-only) on canva.com: all 5 carousel slides read. The full card flow (Watch my design, "Checked X of 5", Fix before you export, Export anyway) was not run on real Canva.
+- No real Nemotron or Tavily call this round: `/api/ask` exists in production but no question was answered live; the app's question box was tested in outage mode only.
+- Whether the copied keys decrypt (see above).
+- T4 drafts: checked on the preview deploy (no broken images, no console errors, Brevo button to winter.html). The Averill image and field checks were not run against these new drafts on the live site; the flaw-matrix unit tests pass on the new files.
+- Learn on the owner's real profile copy: migration checked at data level only (accounts have passwords, so no screenshot).
+- VoiceOver; the card follows Chrome's `prefers-color-scheme`, which follows macOS only if Chrome is set to the system theme.
+- `tests/image-check.test.js` "bridge accepts up to 6 MB" fails intermittently; it also fails on `0357f12` (before this round), so it is not caused by this work, but it is not fixed.
+- Instagram image sizes were matched against search summaries, not Instagram's own help pages (JavaScript-only pages).
+- Group step: the lesson text still says Command+G; Canva's help only mentions the toolbar Group button.
+
+**Carousel:** built by the owner from a template, texts and photos replaced via the Canva connector (all Unsplash, taken in Copenhagen; credits: Ezgi Deliklitas, Jacco Rienks, nika tchokhonelidze, William V, Tanya Prodaan, Annie Spratt). Owner decision: the contrast/margin problems found on slides 1 and 2 stay as judge findings; the guide says so. The owner may set Fraunces / DM Sans fonts by hand (the connector cannot set fonts).
 
 **Done (all verified by script, synthetic unless marked live):**
 - T3 pill shows SHARING: <host> / WINDOW / NOT SHARING; single-instance lock. T1.2 AI pill states and Workspace settings copy. T2.1 to T2.3 one focus ring, solid pills, focus check in verify-phase-b.
