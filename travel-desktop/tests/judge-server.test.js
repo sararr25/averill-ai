@@ -62,3 +62,71 @@ test('an outage says so explicitly and keeps the local check', async () => {
   assert.match(broken.status, /unavailable \(503\)/);
   assert.ok(broken.findings.length >= 1);
 });
+
+// T1.3: the question box through the judge server.
+const question = 'Can we claim lowest prices guaranteed?';
+const quoteOf = async () => {
+  const { relevantSources } = require('../src/workspace-answer');
+  const hit = relevantSources(data, question)[0];
+  return { title: hit.source.title, quote: hit.passage.quote };
+};
+
+test('askPlan lists what leaves the Mac, and design or unmatched questions stay local', () => {
+  const plan = judgeServer.askPlan(data, question);
+  assert.match(plan.items[0], /lowest prices guaranteed/);
+  assert.match(plan.items[1], /approved source/);
+  assert.equal(judgeServer.askPlan(data, 'Which font should headlines use?'), null);
+  assert.equal(judgeServer.askPlan(data, 'zzzz qqqq xxxx'), null);
+  assert.throws(() => judgeServer.askPlan(data, 'lowest prices password: hunter2hunter2'), /credentials/);
+});
+
+test('a design question never calls the server', async () => {
+  let called = false;
+  const result = await judgeServer.ask(data, 'Which font should headlines use?', { fetcher: async () => { called = true; } });
+  assert.equal(called, false);
+  assert.equal(result.mode, 'local'); assert.equal(result.ai, undefined);
+});
+
+test('ask sends a capped request and keeps a Nemotron answer only when its quotes are verbatim', async () => {
+  const { title, quote } = await quoteOf();
+  let sent;
+  const good = async (url, options) => { sent = { url, headers: options.headers, body: JSON.parse(options.body) }; return reply(200, { model: 'nvidia/nemotron-test', answer: quote.slice(0, 20), evidence: [{ sourceTitle: title, quote }] })(); };
+  const result = await judgeServer.ask(data, question, { fetcher: good, endpoint: 'https://judge.example' });
+  assert.equal(sent.url, 'https://judge.example/api/ask');
+  assert.match(sent.headers['X-Averill-Client'], /^[0-9a-f-]{36}$/);
+  assert.equal(sent.body.question, question);
+  assert.ok(sent.body.sources.length >= 1 && sent.body.sources.length <= 5 && sent.body.sources.every(source => source.text.length <= 3000));
+  assert.equal(result.ai.status, 'suggestion'); assert.equal(result.ai.sources[0].quote, quote);
+  assert.match(result.text, /Matching passage/, 'the local answer stays next to it');
+  // Unquoted claim, invented quote, and an answer outside the quote are all dropped with an explicit notice.
+  for (const bad of [
+    { answer: 'Yes, you can.', evidence: [] },
+    { answer: 'Yes, you can.', evidence: [{ sourceTitle: title, quote: 'This sentence is not in any approved source.' }] },
+    { answer: 'Yes, you can.', evidence: [{ sourceTitle: title, quote }] },
+    { answer: quote.slice(0, 20), evidence: [{ sourceTitle: 'other.md', quote }] },
+  ]) {
+    const dropped = await judgeServer.ask(data, question, { fetcher: reply(200, { model: 'm', ...bad }) });
+    assert.equal(dropped.ai.status, 'unverified'); assert.equal(dropped.ai.text, undefined);
+    assert.match(dropped.ai.notice, /could not be verified|no answer that could be verified/);
+    assert.match(dropped.text, /Matching passage/);
+  }
+});
+
+test('ask shows the limit message verbatim and an explicit outage notice, with the local answer both times', async () => {
+  const limit = await judgeServer.ask(data, question, { fetcher: reply(429, { error: 'Daily AI limit reached. Try again tomorrow.', limit: true }) });
+  assert.deepEqual([limit.ai.status, limit.ai.notice], ['limit', 'Daily AI limit reached. Try again tomorrow.']);
+  const down = await judgeServer.ask(data, question, { fetcher: async () => { throw new Error('offline'); } });
+  assert.equal(down.ai.status, 'unavailable'); assert.match(down.ai.notice, /could not be reached/);
+  const broken = await judgeServer.ask(data, question, { fetcher: reply(503, {}) });
+  assert.match(broken.ai.notice, /unavailable \(503\)/);
+  for (const result of [limit, down, broken]) assert.match(result.text, /Matching passage/);
+});
+
+test('ask is refused outside the judge demo workspace', async () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'averill-real-'));
+  try {
+    const real = workspace.create(dir, 'Real Co', 'Owner');
+    await assert.rejects(() => judgeServer.ask(real, question, { fetcher: async () => {} }), /only available in the judge demo/);
+    assert.throws(() => judgeServer.askPlan(real, question), /only available in the judge demo/);
+  } finally { fs.rmSync(dir, { recursive: true, force: true }); }
+});

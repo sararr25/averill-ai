@@ -2,6 +2,8 @@
 // The local approved-rules check always runs first; server findings are kept only when both quotes are found verbatim.
 const crypto = require('node:crypto');
 const { localReview, currentSources } = require('./task-review');
+const { relevantSources, localWorkspaceAnswer, designTopics } = require('./workspace-answer');
+const privacy = require('./company-privacy');
 
 const ENDPOINT = process.env.AVERILL_JUDGE_SERVER || 'https://averill-judge-ai.vercel.app';
 const HOST = new URL(ENDPOINT).host;
@@ -63,6 +65,66 @@ async function review(data, task, observedText, observedField = null, { fetcher 
   return { ...local, mode: 'model', provider: PROVIDER, model: body.model, steps, findings, status: findings.length ? 'These parts of your draft don’t match the approved rules.' : local.status };
 }
 
+// T1.3: the question box in the demo workspace. Design questions stay local (approved design rule lines only); everything
+// else may go to /api/ask after consent, with only the best-matching passages of approved, non-restricted sources.
+function askSources(data, question) {
+  if (designTopics(question)) return [];
+  return relevantSources(data, question)
+    .filter(({ source }) => source.confidentiality !== 'restricted' && !source.containsCredentials)
+    .slice(0, 5).map(({ source, content, passage }) => {
+      const at = Math.max(0, content.indexOf(passage.quote));
+      const start = Math.max(0, at - 1000);
+      return { source, text: content.slice(start, start + 3000), content };
+    });
+}
+// What a consent dialog must list before a question leaves this Mac, or null when the question stays local.
+function askPlan(data, question) {
+  if (!data?.demoAccounts) throw new Error('The demo AI server is only available in the judge demo workspace.');
+  const input = String(question || '').trim().slice(0, 500);
+  const sources = input ? askSources(data, input) : [];
+  if (!sources.length) return null;
+  if (privacy.credentials(input)) throw new Error('Remove credentials before using external AI.');
+  return { items: [`Your question: ${input}`, `Matching passages from ${sources.length} approved source${sources.length === 1 ? '' : 's'}: ${sources.map(({ source }) => source.title).join(', ')}`] };
+}
+const asked = (local, ai) => ({ ...local, ai });
+async function ask(data, question, { fetcher = globalThis.fetch, endpoint = ENDPOINT } = {}) {
+  if (!data?.demoAccounts) throw new Error('The demo AI server is only available in the judge demo workspace.');
+  const input = String(question || '').trim().slice(0, 500);
+  const local = localWorkspaceAnswer(data, input);
+  const sources = input ? askSources(data, input) : [];
+  if (!sources.length) return local;
+  if (privacy.credentials(input)) throw new Error('Remove credentials before using external AI.');
+  let response, body;
+  try {
+    response = await fetcher(`${endpoint}/api/ask`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Averill-Client': clientId(data) },
+      body: JSON.stringify({ question: input, sources: sources.map(({ source, text }) => ({ title: source.title, version: source.version, text })) }),
+      signal: AbortSignal.timeout(45000),
+    });
+    body = await response.json().catch(() => ({}));
+  } catch { return asked(local, { status: 'unavailable', notice: 'The demo AI server could not be reached. The local approved-source answer below still applies.' }); }
+  if (!response.ok) {
+    const limit = response.status === 429 && body.error;
+    return asked(local, { status: limit ? 'limit' : 'unavailable', notice: limit ? body.error : `The demo AI server is unavailable (${response.status}). The local approved-source answer below still applies.` });
+  }
+  // Keep the model answer only when every quote is verbatim in the passage that was sent and the answer sits inside a quote.
+  const quotes = [];
+  for (const item of Array.isArray(body.evidence) ? body.evidence : []) {
+    const match = sources.find(({ source }) => source.title === item?.sourceTitle);
+    if (match && typeof item.quote === 'string' && item.quote.trim().length >= 10 && contains(match.text, item.quote)) quotes.push({ match, quote: item.quote.trim() });
+  }
+  const answer = typeof body.answer === 'string' ? body.answer.trim() : '';
+  if (!answer || !quotes.length || !quotes.some(({ quote }) => contains(quote, answer))) {
+    return asked(local, { status: 'unverified', model: body.model, notice: 'NVIDIA Nemotron gave no answer that could be verified against the approved sources, so it is not shown. The local approved-source answer below still applies.' });
+  }
+  const cited = quotes.map(({ match: { source, content }, quote }) => ({
+    id: source.id, title: source.title, kind: 'workspace', version: source.version, approvedAt: source.approvedAt,
+    approvedBy: data.people.find(person => person.id === source.approvedBy)?.name || 'Unknown approver', quote,
+    line: content.includes(quote) ? content.slice(0, content.indexOf(quote)).split('\n').length : null, reason: 'Quoted by Nemotron, verified against the source',
+  }));
+  return asked(local, { status: 'suggestion', model: body.model, provider: PROVIDER, text: answer, sources: cited });
+}
+
 const SEARCH_LIMIT = 'Daily online check limit reached. Try again tomorrow.';
 
 // Demo workspace only: a transport for src/tavily.js that sends one public search to the owner's capped judge server
@@ -87,4 +149,4 @@ function searchTransport(data, { fetcher = globalThis.fetch, endpoint = ENDPOINT
   };
 }
 
-module.exports = { review, validated, searchTransport, ENDPOINT, HOST, SEARCH_LIMIT };
+module.exports = { review, ask, askPlan, validated, searchTransport, ENDPOINT, HOST, SEARCH_LIMIT };

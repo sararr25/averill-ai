@@ -2,7 +2,7 @@
 const { LimitError } = require('./limits');
 const providers = require('./providers');
 
-const LIMITS = { draft: 4000, sourceText: 3000, sources: 5, query: 300 };
+const LIMITS = { draft: 4000, sourceText: 3000, sources: 5, query: 300, question: 500 };
 const TASKS = new Set(['email', 'linkedin', 'instagram']);
 // Tavily credits differ by call type: a search is one unit, a small crawl five.
 const TAVILY_UNITS = { search: 1, crawl: 5 };
@@ -17,16 +17,26 @@ function identity(req) {
   return { client, ip: forwarded.split(',')[0].trim().slice(0, 64) || 'unknown' };
 }
 
+const cleanSources = list => (Array.isArray(list) ? list : []).slice(0, LIMITS.sources)
+  .map(source => ({ title: text(source?.title, 120), version: text(String(source?.version ?? ''), 20), text: text(source?.text, LIMITS.sourceText) }))
+  .filter(source => source.title && source.text);
+
 function reviewInput(body) {
   const task = text(body?.task, 20);
   const draft = text(body?.draft, LIMITS.draft);
   if (!TASKS.has(task)) throw new RequestError('Unsupported work type.');
   if (!draft) throw new RequestError('Draft text is required.');
-  const sources = (Array.isArray(body.sources) ? body.sources : []).slice(0, LIMITS.sources)
-    .map(source => ({ title: text(source?.title, 120), version: text(String(source?.version ?? ''), 20), text: text(source?.text, LIMITS.sourceText) }))
-    .filter(source => source.title && source.text);
+  const sources = cleanSources(body.sources);
   if (!sources.length) throw new RequestError('At least one approved source is required.');
   return { task, draft, sources };
+}
+
+function askInput(body) {
+  const question = text(body?.question, LIMITS.question);
+  if (!question) throw new RequestError('A question is required.');
+  const sources = cleanSources(body.sources);
+  if (!sources.length) throw new RequestError('At least one approved source is required.');
+  return { question, sources };
 }
 
 function searchInput(body) {
@@ -45,7 +55,7 @@ function searchInput(body) {
   throw new RequestError('Unsupported search type.');
 }
 
-function createHandlers({ limiter, review = providers.nemotronReview, tavily = providers.tavily }) {
+function createHandlers({ limiter, review = providers.nemotronReview, ask = providers.nemotronAsk, tavily = providers.tavily }) {
   async function run(req, res, work) {
     try {
       if (req.method !== 'POST') throw new RequestError('Use POST.', 405);
@@ -66,6 +76,18 @@ function createHandlers({ limiter, review = providers.nemotronReview, tavily = p
         return { model: result.model, findings: result.findings };
       } catch (error) {
         // Charge what Nebius reports even on a failed parse; release the reservation when nothing was used.
+        if (error.usedTokens) await limiter.settle(reservation, error.usedTokens); else await limiter.release(reservation);
+        throw error;
+      }
+    }),
+    ask: (req, res) => run(req, res, async (who, body) => {
+      const messages = providers.askMessages(askInput(body));
+      const reservation = await limiter.reserve('nebius', who, providers.estimateTokens(messages));
+      try {
+        const result = await ask(messages);
+        await limiter.settle(reservation, result.usedTokens ?? reservation.units);
+        return { model: result.model, answer: result.answer, evidence: result.evidence };
+      } catch (error) {
         if (error.usedTokens) await limiter.settle(reservation, error.usedTokens); else await limiter.release(reservation);
         throw error;
       }

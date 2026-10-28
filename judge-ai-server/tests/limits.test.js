@@ -107,3 +107,51 @@ test('a prefixed Redis URL from the Vercel integration is found and used for cou
   assert.equal(await store.incrby('k', 3, 60), 7);
   assert.deepEqual(ops, [['incrBy', 'k', 3], ['expire', 'k', 60]]);
 });
+
+const askBody = { question: 'Can we say lowest prices guaranteed?', sources: reviewBody.sources };
+
+test('ask charges tokens, validates input, refuses past the cap and releases when nothing was used', async () => {
+  const store = memoryStore(); let calls = 0, seen, mode = 'ok';
+  const limiter = createLimiter({ store, limits: { ...caps, nebius: { global: 5000, client: 2000, ip: 5000 } } });
+  const handlers = createHandlers({ limiter, ask: async messages => {
+    calls++; seen = messages;
+    if (mode === 'fail') throw Object.assign(new Error('Nebius request failed (500).'), { status: 502 });
+    return { model: 'nemotron', answer: 'Do not claim', evidence: [{ sourceTitle: 'brand-and-legal.md', quote: 'Do not claim "lowest prices guaranteed".' }], usedTokens: 900 };
+  } });
+  const ok = await call(handlers.ask, { ...askBody, question: 'q'.repeat(900) });
+  assert.equal(ok.status, 200); assert.equal(ok.body.answer, 'Do not claim'); assert.equal(ok.body.evidence.length, 1);
+  assert.ok(seen.at(-1).content.includes('QUESTION: ' + 'q'.repeat(500)) && !seen.at(-1).content.includes('q'.repeat(501)));
+  assert.equal(store.counts.get(`nebius:${new Date().toISOString().slice(0, 10)}:ip:9.9.9.9`), 900);
+  mode = 'fail';
+  assert.equal((await call(handlers.ask, askBody)).status, 502);
+  assert.equal(store.counts.get(`nebius:${new Date().toISOString().slice(0, 10)}:ip:9.9.9.9`), 900, 'failed call released its reservation');
+  mode = 'ok';
+  await call(handlers.ask, askBody);
+  const refused = await call(handlers.ask, askBody);
+  assert.equal(refused.status, 429); assert.equal(refused.body.error, MESSAGES.nebius); assert.equal(refused.body.limit, true);
+  const before = calls;
+  assert.equal((await call(handlers.ask, askBody, {})).status, 400, 'client id required');
+  assert.equal((await call(handlers.ask, { ...askBody, question: '  ' })).status, 400);
+  assert.equal((await call(handlers.ask, { ...askBody, sources: [] })).status, 400);
+  assert.equal((await call(handlers.ask, askBody, undefined, 'GET')).status, 405);
+  assert.equal(calls, before, 'invalid or refused requests never reach Nebius');
+});
+
+test('ask refuses without a usage store', async () => {
+  let called = false;
+  const handlers = createHandlers({ limiter: null, ask: async () => { called = true; } });
+  assert.equal((await call(handlers.ask, askBody)).status, 503);
+  assert.equal(called, false);
+});
+
+test('nemotronAsk parses the model answer and rejects unreadable output with its usage', async () => {
+  const { nemotronAsk } = require('../lib/providers');
+  const reply = content => async url => ({ ok: true, status: 200, json: async () => url.endsWith('/models') ? { data: [{ id: 'nvidia/nemotron-super-test' }] } : { choices: [{ message: { content } }], usage: { total_tokens: 321 } } });
+  process.env.NEBIUS_MODEL = 'nvidia/nemotron-test';
+  try {
+    const good = await nemotronAsk([{ role: 'user', content: 'x' }], { key: 'k', fetcher: reply(JSON.stringify({ answer: 'a', evidence: [{ sourceTitle: 't', quote: 'a' }] })) });
+    assert.deepEqual([good.answer, good.usedTokens, good.model], ['a', 321, 'nvidia/nemotron-test']);
+    await assert.rejects(() => nemotronAsk([{ role: 'user', content: 'x' }], { key: 'k', fetcher: reply('not json') }), error => error.status === 502 && error.usedTokens === 321);
+    await assert.rejects(() => nemotronAsk([], { key: '', fetcher: reply('') }), error => error.status === 503);
+  } finally { delete process.env.NEBIUS_MODEL; }
+});

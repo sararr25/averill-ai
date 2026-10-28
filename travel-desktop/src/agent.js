@@ -131,10 +131,10 @@ function render() {
   const admin=current.workspace?.people?.find(person=>person.id===current.workspace.activePersonId)?.role==='admin';
   // No local key: the demo workspace sends Check now through the judge server (consent in checkWork); an admin can add a key; everyone else is told who can.
   const noKey=!current.services?.nebius&&!current.aiEnabled,demoJudge=noKey&&Boolean(current.auth?.demo),addKey=noKey&&!demoJudge&&admin;
-  el('ai-toggle').textContent = current.aiEnabled ? 'Nemotron AI: on' : current.services?.nebius ? 'Nemotron AI: off' : demoJudge ? 'Nemotron AI: Check now only' : admin ? 'Nemotron AI: add a key' : 'Nemotron AI: off (ask your admin)';
+  el('ai-toggle').textContent = current.aiEnabled ? 'Nemotron AI: on' : current.services?.nebius ? 'Nemotron AI: off' : demoJudge ? 'Nemotron AI: on, via demo server' : admin ? 'Nemotron AI: add a key' : 'Nemotron AI: off (ask your admin)';
   el('ai-toggle').dataset.action=addKey?'add-key':'toggle';
   el('ai-toggle').setAttribute('aria-pressed',String(Boolean(current.aiEnabled)));
-  el('ai-toggle').nextElementSibling.textContent = current.aiEnabled ? 'NVIDIA Nemotron via Nebius. Your question and relevant approved text sources are sent to Nebius.' : demoJudge ? 'In this demo, Check now also asks NVIDIA Nemotron through the Averill demo server, only after you confirm what is sent.' : addKey ? 'Add a Nebius key in More › Workspace settings › AI and services to use NVIDIA Nemotron. Until then answers stay local.' : noKey ? 'No Nebius key is set, so answers stay local. Ask your admin to add one.' : 'Optional NVIDIA Nemotron via Nebius. Off: answers stay local.';
+  el('ai-toggle').nextElementSibling.textContent = current.aiEnabled ? 'NVIDIA Nemotron via Nebius. Your question and relevant approved text sources are sent to Nebius.' : demoJudge ? 'In this demo, Check now and your questions also ask NVIDIA Nemotron through the Averill demo server, only after you confirm what is sent. Design questions stay on this Mac.' : addKey ? 'Add a Nebius key in More › Workspace settings › AI and services to use NVIDIA Nemotron. Until then answers stay local.' : noKey ? 'No Nebius key is set, so answers stay local. Ask your admin to add one.' : current.auth?.demo ? 'Optional NVIDIA Nemotron via your own Nebius key. Off: Check now and your questions still use the Averill demo server after you confirm what is sent; design questions stay local.' : 'Optional NVIDIA Nemotron via Nebius. Off: answers stay local.';
   el('ai-toggle').disabled = noKey&&!addKey;
   el('web-form').querySelector('button').disabled = !current.services?.tavily;
   el('web-unavailable').hidden=Boolean(current.services?.tavily);
@@ -474,9 +474,10 @@ async function showSource(id, trigger = document.activeElement) {
   openSourceDialog(trigger);
 }
 
-function addMessage(text, role, sources = []) {
+function addMessage(text, role, sources = [], tag = null) {
   const message = document.createElement('div');
   message.className = role === 'user' ? 'user-message' : 'assistant-message';
+  if (tag) { const chip = node('span', tag.label, tag.title ? 'ai-chip' : 'knowledge-meta'); if (tag.title) chip.title = tag.title; message.append(chip); }
   const paragraph = document.createElement('p'); paragraph.textContent = text;
   message.append(paragraph);
   for (const source of sources) {
@@ -500,8 +501,14 @@ el('ask-form').addEventListener('submit', async (event) => {
   addMessage(question, 'user'); el('question').value = '';
   el('answer-status').textContent = 'Checking approved sources…';
   try {
-    const response = current.shared?.length ? await window.desktop.askDemo(question) : await window.desktop.ask(question);
-    addMessage(response.text, 'assistant', response.sources);
+    let response = current.shared?.length ? await window.desktop.askDemo(question) : await window.desktop.ask(question);
+    if (response.consentRequired) {
+      const sent = await confirmOutbound({ service: 'Averill demo server', title: 'Also ask NVIDIA Nemotron', note: 'The approved-source answer is found on this Mac first. The items below then go to averill-judge-ai.vercel.app, which asks NVIDIA Nemotron on Nebius with the demo owner’s key. Daily limits apply. The Nemotron answer is shown only when its quotes match an approved source. Design questions never leave this Mac.', items: response.items });
+      response = await window.desktop.ask(question, Boolean(sent?.length));
+    }
+    if (response.ai?.status === 'suggestion') addMessage(response.ai.text, 'assistant', response.ai.sources, { label: 'Nemotron suggestion · quotes validated against approved sources', title: `NVIDIA Nemotron via ${response.ai.provider}${response.ai.model ? ` (${response.ai.model})` : ''}` });
+    else if (response.ai) addMessage(response.ai.notice, 'assistant', [], { label: response.ai.status === 'declined' ? 'Nemotron not asked' : 'Nemotron unavailable' });
+    addMessage(response.text, 'assistant', response.sources, response.ai ? { label: 'Local approved-source answer' } : undefined);
     if(!current.shared?.length&&!response.sources?.length&&current.workspace?.configured){const message=el('conversation').lastElementChild;const request=node('button','Ask a reviewer privately','secondary-button');request.type='button';request.addEventListener('click',async()=>{request.disabled=true;try{current=await window.desktop.requestClarification(question);render();message.append(node('p','Private clarification requested. Track it in Knowledge.'));}catch(error){request.disabled=false;el('answer-status').textContent=error.message;}});message.append(request);}
     el('answer-status').textContent = '';
   } catch (error) {

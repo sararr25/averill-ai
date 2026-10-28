@@ -723,10 +723,24 @@ app.whenReady().then(async () => {
     publish();
     return snapshot();
   });
-  ipcMain.handle('agent:ask', (event, question) => {
+  ipcMain.handle('agent:ask', async (event, question, consent) => {
     fromAgent(event);
     if(aiEnabled&&privacy.credentials(question))throw new Error('Remove credentials before using external AI.');
     if (companyWorkspace) {
+      // T1.3: in the demo workspace without a local key, non-design questions go to the capped demo server only after the
+      // employee confirmed what is sent (consent === true). consent === undefined asks the renderer for that confirmation.
+      if (companyWorkspace.demoAccounts === true && !aiEnabled && signedIn()) {
+        const plan = judgeServer.askPlan(companyWorkspace, question);
+        if (plan && consent === undefined) return { consentRequired: true, items: plan.items };
+        if (plan && consent === true) {
+          const personId = companyWorkspace.activePersonId;
+          const result = await judgeServer.ask(companyWorkspace, question);
+          if (personId !== companyWorkspace.activePersonId || !signedIn()) throw new Error('The signed-in person changed during the question.');
+          workspace.save(app.getPath('userData'), companyWorkspace);
+          return result;
+        }
+        if (plan) return { ...await answerCompany(question), ai: { status: 'declined', notice: 'Not sent to NVIDIA Nemotron. This is the local approved-source answer.' } };
+      }
       return answerCompany(question);
     }
     return aiEnabled && privacy.allowed(companyWorkspace) ? answerQuestion(question, runtimeKeys.nebius, companyWorkspace) : { ...localAnswer(String(question || '').slice(0, 1000)), mode: 'local' };

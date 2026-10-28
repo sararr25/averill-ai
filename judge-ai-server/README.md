@@ -4,8 +4,9 @@ Small Vercel project (ticket JD-10) that lets judges use NVIDIA Nemotron and Tav
 
 ## Endpoints
 - `POST /api/review` — `{ task: "email"|"linkedin"|"instagram", draft, sources: [{ title, version, text }] }`. Fixed model (Nemotron Super, picked from the key's model list unless `NEBIUS_MODEL` is set) and fixed prompt. Draft capped at 4,000 characters, up to 5 sources of 3,000 characters each, 800 output tokens.
+- `POST /api/ask` — `{ question, sources: [{ title, version, text }] }` (question capped at 500 characters, same source caps as review, 800 output tokens). Returns `{ model, answer, evidence: [{ sourceTitle, quote }] }`; the app keeps the answer only when each quote is verbatim in the source it sent. Uses the same Nebius token counters as `/api/review`.
 - `POST /api/search` — `{ kind: "search", query }` (1 unit) or `{ kind: "crawl", url }` (https only, 10 pages, 5 units).
-- Both need header `X-Averill-Client` (the app's install id, 8–64 letters, digits or dashes).
+- All need header `X-Averill-Client` (the app's install id, 8–64 letters, digits or dashes).
 
 ## Daily caps (reset at 00:00 UTC)
 | Variable | Default | Meaning |
