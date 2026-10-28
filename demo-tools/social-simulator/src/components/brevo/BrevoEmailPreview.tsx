@@ -27,11 +27,11 @@ export function BrevoEmailPreview({ campaign }: Props) {
       <h2>{headline}</h2>
       {structured ? <>
         {campaign.intro && campaign.intro.split(/\n{2,}/).map((block,index) => <p key={index}>{block}</p>)}
-        {campaign.sections!.map(section => <div className="vamo-email-section" key={section.heading}><h3>{section.heading}</h3><p>{section.body}</p></div>)}
+        {campaign.sections!.map(section => <div className="vamo-email-section" key={section.heading}>{section.imageUrl && <img className="vamo-email-city" src={section.imageUrl} alt={`${section.heading} in winter`}/>}<h3>{section.heading}</h3><p>{section.body}</p></div>)}
       </> : paragraphs.length ? paragraphs.map((block,index) => <p key={index}>{block}</p>) : <p>Your email content will appear here.</p>}
-      {campaign.cta && <p className="vamo-email-cta"><a href={campaign.cta.url} onClick={noNavigation}>{campaign.cta.label}</a></p>}
+      {campaign.cta && <p className="vamo-email-cta"><a href={campaign.cta.url} onClick={noNavigation} title={campaign.cta.url}>{campaign.cta.label}</a></p>}
       {structured && campaign.signOff && campaign.signOff.split(/\n{2,}/).map((block,index) => <p className="vamo-email-signoff" key={index}>{block}</p>)}
-      <div className="vamo-email-sign"><span className="vamo-wordmark small">VAMO<i>✳</i></span>Go somewhere good · Copenhagen · vamo.example</div>
+      <div className="vamo-email-sign"><span className="vamo-wordmark small">VAMO<i>✳</i></span>Go somewhere good · Copenhagen · vamo-travel-site.vercel.app</div>
       {hasFooter && <footer className="vamo-email-footer">
         <p>{COMPANY_ADDRESS}</p>
         <p><strong>Why you get this email:</strong> {BREVO_FOOTER}</p>

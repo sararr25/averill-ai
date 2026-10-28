@@ -1,5 +1,5 @@
 export type BrevoCampaignStatus = 'Draft' | 'Scheduled' | 'Sent';
-export type BrevoSection = { heading: string; body: string };
+export type BrevoSection = { heading: string; body: string; imageUrl?: string };
 export type BrevoCta = { label: string; url: string };
 export type BrevoCampaign = {
   id: string;
