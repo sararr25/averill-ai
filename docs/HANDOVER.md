@@ -1,3 +1,17 @@
+# Live Canva test, 28 October 2026 (evening)
+
+Run by Claude in the owner's Chrome on the real carousel DAHZTPxfC5c, with dev Electron on a fresh Try-the-demo profile (`--user-data-dir` in a temporary folder; the owner's profile was not changed). Maya superseded guidelines v1 and v2 and approved v3 first.
+
+**Worked (live):** card opens from minimised; Watch my design; header pill "SHARING: www.canva.com"; "Sharing ended" card with the reason after sign-out. Findings, each citing social-media-guidelines.md v3: slide 1 has 4 (contrast "before 8" 1.13:1, "Copenhagen" 2.83:1; margins "3 things to do in" 107 px, "Copenhagen" 97 px), slide 2 has 2 margins ("Nyhavn" 72 px, body line), slide 3 has 1 margin ("The harbour" 89 px). Export anyway button shown.
+
+**Failed:** the carousel gate. On slides 4 and 5 the card said "No design problems found" (2 texts) although slides 1 to 3 had findings, and "Checked X of 5" never appeared, so no slide number reached Averill. The page markers are read correctly on the live page (open page 5, thumbnails 1 to 5, bar 5/5, same logic as `slideOf`), and the repo code passes `slide` end to end. Likely cause, not confirmed: Chrome was still running an extension copy from before the 28 October files (Chrome loads it from `travel-desktop/browser-extension`; it was not reloaded in this session).
+
+**Not tested:** clicking Export anyway; warnings clearing after a fix.
+
+**Found:** the owner's normal workspace has only the old social-media-guidelines v1/v2 (no Design rule lines), so the card shows "No approved design rules yet". Guide updated (slide 3 finding, troubleshooting line).
+
+**Next:** reload the extension at chrome://extensions, connect the tab, and repeat slides 1 to 5, Export anyway and a fix.
+
 # Feedback round, 28 October 2026: built
 
 **State:** merged to `main` (PR #57, `f95a046`). Production updated: averill-demo-sim (new drafts) and averill-judge-ai (`POST /api/ask` answers 400 to an empty request, so the route exists; no real question sent). Release ZIP built locally only: `travel-desktop/dist/Averill-macOS-arm64.zip`, SHA-256 `a490e5eb7d0465f7227ed914903b7482e2515c0b476903433317cb47e08514d5`, `verify:release` PASS (234 files, 3224 entries). No GitHub release published (owner's word only).

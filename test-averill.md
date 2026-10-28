@@ -47,7 +47,7 @@ Do this after Maya's step in section 4.
 2. Connect the tab as in section 3, step 2.
 3. In Averill's design card, tick **Watch my design**. It is off by default.
 4. Averill reads only the slide that is open. Flip through all five slides with the page bar at the bottom of Canva, so Averill can check each one. The card shows how many slides it has checked, for example **Checked 3 of 5 slides**. It keeps **Fix before you export** until every slide has been checked and has no problems.
-5. The starting carousel already breaks some rules: Averill flags low contrast on slide 1 and texts too close to the edge on slides 1 and 2. Fix them in Canva and watch the warnings clear. On the last slide, finish the body line of the post.
+5. The starting carousel already breaks some rules: Averill flags low contrast on slide 1 and texts too close to the edge on slides 1, 2 and 3. Fix them in Canva and watch the warnings clear. On the last slide, finish the body line of the post.
 6. Try pistachio green text (`#93C572`) or drag text near the edge of a slide. Averill shows **Fix before you export** with the slide number and the rule it broke. Fixing the design clears the warning. If you edit a slide that Averill has already checked, open it again so Averill reads it again. You can choose **Export anyway**; Averill records that choice for the session. Averill never edits or exports your design.
 
 The check covers Instagram-size designs on canva.com only, one open slide at a time. Turned (rotated) text is checked too. Averill does not read the grid view of all slides.
@@ -67,5 +67,5 @@ No Canva account? Under **I cannot connect Canva**, you can finish the lesson by
 - **After a restart:** pick any person on the sign-in screen. Demo accounts need no password.
 - **Extension says "Averill is not reachable":** make sure the Averill you just downloaded is open (quit any older copy), then click **Connect this tab** again.
 - **The extension card says sharing ended:** the card gives the reason. To reconnect, click the Averill icon in the Chrome toolbar, then choose **Connect this tab**.
-- **Hashtag or image checks are missing:** this Mac has an older workspace. Import `social-media-guidelines-v2` again in **More › Workspace settings**.
+- **Hashtag or image checks are missing, or the Canva card says "No approved design rules yet":** this Mac has an older workspace. Import `social-media-guidelines-v2` again in **More › Workspace settings**, or start from a fresh **Try the demo**.
 - **Canva shows "Averill cannot read this design":** Canva has changed its page layout. The rest of Averill still works.
