@@ -5,7 +5,7 @@ const GUIDE_SCREENS = {
   work: { tab: 'setup', label: 'Connection tools', anchor: '#work-controls' },
   knowledge: { tab: 'knowledge', label: 'Library', anchor: '[data-tab="knowledge"] .section-head' },
   learn: { tab: 'learn', label: 'Learn', anchor: '[data-tab="learn"] .section-head' },
-  setup: { tab: 'setup', label: 'Setup', anchor: '[data-tab="setup"] .section-head' },
+  setup: { tab: 'setup', label: 'Workspace settings', anchor: '[data-tab="setup"] .section-head' },
 };
 // target: CSS selector; match: text (or list of texts) the element must contain when several share the selector.
 const NOTE = 'marketing-personal-note-v1.md';

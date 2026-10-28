@@ -73,7 +73,7 @@
 .agent-body .ai-control button{white-space:nowrap}
 .agent-body .ai-control .ai-toggle{min-height:var(--av-control-small);padding:0 var(--av-space-3);border:1px solid var(--av-accent);border-radius:var(--av-radius-pill);background:transparent;color:var(--av-accent);font:var(--av-type-meta);font-weight:600}
 .agent-body .ai-control .ai-toggle[aria-pressed=true]{background:var(--av-accent);color:var(--av-on-accent)}
-.agent-body .ai-control .ai-toggle:disabled{opacity:.6;border-style:dashed}
+.agent-body .ai-control .ai-toggle:disabled{opacity:1;cursor:default}
 .agent-body .ask-form button[type=submit]{display:grid;place-items:center;width:var(--av-control-primary);height:var(--av-control-primary);min-height:0;padding:0;border:0;border-radius:50%;background:var(--av-accent);color:var(--av-on-accent)}
 .agent-body .review-composer .ask-form .composer-attach{display:inline-flex;align-items:center;width:auto;min-width:0;height:var(--av-control-default);padding:0 var(--av-space-3);margin-right:var(--av-space-1);border:0;border-radius:var(--av-radius-control);background:none;color:var(--av-accent);font:var(--av-type-label);white-space:nowrap}
 /* One spacing rule for every control inside a card: an 8px gap on the right and above, so inline buttons, links and selects never touch. */

@@ -1,0 +1,64 @@
+/* Weekly practice and task exercise pages (T7.0 to T7.3). Companion tokens only; light and dark follow prefers-color-scheme. */
+.agent-body .weekly-practice .practice-progress{margin:var(--av-space-4) 0 var(--av-space-2)}
+.agent-body .weekly-practice .practice-progress-text{margin:0 0 var(--av-space-2);font:var(--av-type-label);color:var(--av-text)}
+.agent-body .weekly-practice progress{display:block;width:100%;height:6px;border:0;border-radius:var(--av-radius-pill);background:var(--av-surface-raised);appearance:none;overflow:hidden}
+.agent-body .weekly-practice progress::-webkit-progress-bar{background:var(--av-surface-raised);border-radius:var(--av-radius-pill)}
+.agent-body .weekly-practice progress::-webkit-progress-value{background:var(--av-accent-strong);border-radius:var(--av-radius-pill);transition:width .2s}
+@media(prefers-reduced-motion:reduce){.agent-body .weekly-practice progress::-webkit-progress-value{transition:none}}
+.practice-form{margin:0}
+.practice-list{list-style:none;margin:var(--av-space-4) 0 0;padding:0;display:grid;gap:var(--av-space-4)}
+.practice-q{padding:var(--av-space-4);border:1px solid var(--av-border);border-radius:var(--av-radius-panel);background:var(--av-surface-raised)}
+.practice-q.right{border-color:var(--av-accent-strong)}
+.practice-q.wrong{border-color:var(--av-error)}
+.practice-set{border:0;margin:0;padding:0;min-width:0}
+.practice-legend{padding:0;margin:0 0 var(--av-space-3);display:grid;gap:var(--av-space-1)}
+.practice-type{font:var(--av-type-meta);color:var(--av-text-secondary);letter-spacing:.02em}
+.practice-prompt{font:var(--av-type-item);color:var(--av-text)}
+.practice-picture{display:block;width:100%;height:auto;border-radius:var(--av-radius-control)}
+.practice-picture.wide{max-width:420px;margin:0 0 var(--av-space-3)}
+.practice-options{display:grid;gap:var(--av-space-3)}
+.practice-options.picture{grid-template-columns:repeat(3,minmax(0,1fr))}
+.practice-pick,.practice-choice{position:relative;display:grid;gap:var(--av-space-2);margin:0!important;padding:var(--av-space-2);border:2px solid var(--av-border);border-radius:var(--av-radius-control);background:var(--av-surface);color:var(--av-text);cursor:pointer;font:var(--av-type-body)}
+.practice-choice{padding:var(--av-space-3) var(--av-space-4);min-height:var(--av-target-min)}
+.practice-caption{font:var(--av-type-label);text-align:center}
+.practice-pick:hover,.practice-choice:hover{background:var(--av-surface-hover)}
+.practice-pick:has(input:checked),.practice-choice:has(input:checked),.practice-pick.is-yours,.practice-choice.is-yours{border-color:var(--av-focus);background:var(--av-accent-soft)}
+.practice-pick:has(input:focus-visible),.practice-choice:has(input:focus-visible){outline:3px solid var(--av-focus);outline-offset:2px}
+.practice-pick.is-right,.practice-choice.is-right{border-color:var(--av-accent-strong)}
+.practice-pick.is-yours:not(.is-right),.practice-choice.is-yours:not(.is-right){border-color:var(--av-error);background:var(--av-error-soft)}
+.practice-tap{position:relative;max-width:420px}
+.tap-area{position:absolute;display:block;box-sizing:border-box;min-width:24px;min-height:24px;margin:0!important;border:2px dashed transparent;border-radius:6px;cursor:pointer}
+.tap-area:hover{border-color:var(--av-focus);background:color-mix(in srgb,var(--av-accent-soft) 60%,transparent)}
+.tap-area:has(input:checked),.tap-area.is-yours{border:2px solid var(--av-focus);background:color-mix(in srgb,var(--av-accent-soft) 85%,transparent)}
+.tap-area:has(input:focus-visible){outline:3px solid var(--av-focus);outline-offset:2px}
+.tap-area.is-right{border:2px solid var(--av-accent-strong)}
+.tap-area.is-yours:not(.is-right){border-color:var(--av-error);background:color-mix(in srgb,var(--av-error-soft) 85%,transparent)}
+.practice-order{margin:0;padding-left:var(--av-space-6);display:grid;gap:var(--av-space-2)}
+.practice-order li{padding:var(--av-space-2) var(--av-space-3);border:1px solid var(--av-border);border-radius:var(--av-radius-control);background:var(--av-surface);color:var(--av-text)}
+.practice-order li::marker{font-weight:700;color:var(--av-text-secondary)}
+.agent-body .practice-order li{display:flex;align-items:center;justify-content:space-between;gap:var(--av-space-3)}
+.order-actions{display:inline-flex;gap:var(--av-space-1)}
+.agent-body .practice-order .order-move{width:32px;min-width:32px;min-height:32px;margin:0;padding:0;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--av-control-border);border-radius:var(--av-radius-control);background:var(--av-surface-raised);color:var(--av-text)}
+.agent-body .practice-order .order-move.down .line-icon{transform:rotate(180deg)}
+.agent-body .practice-order .order-move:disabled{opacity:.4}
+.agent-body .practice-order .order-move:focus-visible{outline:3px solid var(--av-focus);outline-offset:2px}
+.practice-task p{margin:0 0 var(--av-space-2)}
+.practice-task-state{font:var(--av-type-label);color:var(--av-text)}
+.practice-task-state.seen{color:var(--av-accent-strong)}
+.practice-feedback{margin-top:var(--av-space-3);padding-top:var(--av-space-3);border-top:1px solid var(--av-border)}
+.agent-body .practice-feedback p{margin:var(--av-space-1) 0}
+.agent-body .practice-badge{display:inline-flex;align-items:center;gap:var(--av-space-2);margin:0 0 var(--av-space-2);padding:2px var(--av-space-3);border-radius:var(--av-radius-pill);font:var(--av-type-label)}
+.agent-body .practice-badge.right{background:var(--av-success-soft);color:var(--av-success)}
+.agent-body .practice-badge.wrong{background:var(--av-error-soft);color:var(--av-error)}
+.practice-badge .line-icon{width:18px;height:18px}
+.practice-rule{margin:var(--av-space-3) 0 0;padding:var(--av-space-3);border-left:3px solid var(--av-accent-strong);background:var(--av-surface);color:var(--av-text);font:var(--av-type-body)}
+.practice-rule cite{display:block;margin-bottom:var(--av-space-1);font:var(--av-type-meta);font-style:normal;color:var(--av-text-secondary)}
+.practice-confirm{display:block;margin:var(--av-space-4) 0 var(--av-space-2)}
+.agent-body .practice-error{margin:var(--av-space-2) 0 0;font:var(--av-type-label);color:var(--av-error)}
+.agent-body .practice-error:empty{display:none}
+.practice-form>.agent-primary{margin-top:var(--av-space-3)}
+.practice-summary{margin-top:var(--av-space-4);padding-top:var(--av-space-4);border-top:1px solid var(--av-border)}
+.agent-body .practice-score{margin:0 0 var(--av-space-2);font:var(--av-type-section);color:var(--av-text)}
+.practice-note{margin-top:var(--av-space-3)}
+@media(max-width:620px){.practice-options.picture{grid-template-columns:1fr 1fr 1fr;gap:var(--av-space-2)}.practice-caption{font:var(--av-type-meta)}}
+@media(max-width:420px){.practice-options.picture{grid-template-columns:1fr}}

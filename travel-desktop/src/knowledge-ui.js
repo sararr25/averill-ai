@@ -41,7 +41,7 @@ async function renderKnowledge(){
   // A refresh replaces the cards; keep keyboard focus on the same control when it still exists.
   const focusKey=(host.contains(document.activeElement)||decisions.contains(document.activeElement))?document.activeElement.dataset.focusKey:null;
   host.replaceChildren();decisions.replaceChildren();queue.hidden=awaitingDecision===0;
-  if(!result.documents.length){host.append(node('p',result.total?'No documents match this search or status.':'No company documents yet. Add files in Setup; they appear here immediately for review.'));return;}
+  if(!result.documents.length){host.append(node('p',result.total?'No documents match this search or status.':'No company documents yet. Add files in More › Workspace settings; they appear here immediately for review.'));return;}
   for(const file of result.documents){
    const card=node('article',undefined,'knowledge-card');
    const status=node('strong',file.kind==='uploaded'?'Uploaded · review needed':file.scope==='private'?`Private · ${file.status}`:file.status==='approved'?`Approved ${file.scope==='company'?'company-wide':'department'} knowledge`:`${file.status} · not used for answers`,'knowledge-state');
@@ -49,7 +49,7 @@ async function renderKnowledge(){
    card.append(node('h3',file.name),status);
    const technical=node('details',undefined,'knowledge-details');technical.append(node('summary','Source details and tools'));
    technical.append(node('p',`${file.kind==='uploaded'?'Upload proposal':file.scope==='company'?'Company-wide':file.scope==='private'?'Only you':file.department} · v${file.version||'1'} · ${file.readable?'Text extracted':'No readable text'} · ${file.confidentiality} · ${file.aiAllowed?'AI permission recorded':'Local only'}`,'knowledge-meta'));
-   if(file.kind==='uploaded')card.append(node('p','This file has been received. Confirm the onboarding proposal in Setup to save it as a source; approval is a separate step.'));
+   if(file.kind==='uploaded')card.append(node('p','This file has been received. Confirm the onboarding proposal in Workspace settings to save it as a source; approval is a separate step.'));
    const metadata=node('details',undefined,'knowledge-details');metadata.append(node('summary','Approval details'));
    if(file.kind==='saved'){
     metadata.append(node('p',`Approved ${file.approvedAt?new Date(file.approvedAt).toLocaleString():'not recorded'} · Approver ${file.approvedBy||'not recorded'}${file.conflict?' · Conflict: excluded from answers':''}${file.supersedesId?' · Replaces an earlier source':''}${file.supersededBy?' · Replaced by a later source':''}`,'knowledge-meta'));
@@ -63,7 +63,7 @@ async function renderKnowledge(){
     const open=node('button','Open original file','secondary-button');open.type='button';open.addEventListener('click',()=>window.desktop.openWorkspaceSource(file.id).catch(()=>{}));technical.append(open);
     if(file.status==='superseded'&&file.supersededBy)card.append(briefingButton(file));
     if(file.canDelete){const remove=node('button','Delete local source copy','danger-link');remove.type='button';remove.addEventListener('click',async()=>{if(!window.confirm(`Delete the local copy and extracted text of ${file.name}? The original outside Averill and system backups are not deleted.`))return;try{current=await window.desktop.removeSource(file.id);render();}catch(error){summary.textContent=error.message;}});technical.append(remove);}
-    if(file.status!=='approved'){const manage=node('button','Manage in Setup','secondary-button');manage.type='button';manage.addEventListener('click',()=>{showTab('setup');const target=[...document.querySelectorAll('[data-source-id]')].find(element=>element.dataset.sourceId===file.id);if(target){for(let parent=target.parentElement;parent;parent=parent.parentElement)if(parent.tagName==='DETAILS')parent.open=true;target.scrollIntoView({block:'center'});target.tabIndex=-1;target.focus();}});technical.append(manage);}
+    if(file.status!=='approved'){const manage=node('button','Manage in Workspace settings','secondary-button');manage.type='button';manage.addEventListener('click',()=>{showTab('setup');const target=[...document.querySelectorAll('[data-source-id]')].find(element=>element.dataset.sourceId===file.id);if(target){for(let parent=target.parentElement;parent;parent=parent.parentElement)if(parent.tagName==='DETAILS')parent.open=true;target.scrollIntoView({block:'center'});target.tabIndex=-1;target.focus();}});technical.append(manage);}
     const candidates=(current.workspace.sources||[]).filter(source=>source.id!==file.id&&source.status==='approved'&&source.scope===file.scope&&source.department===file.department);
     if(candidates.length){
       const label=node('label','Compare with an approved source');const select=node('select');select.append(new Option('Choose a document',''));
@@ -79,7 +79,7 @@ async function renderKnowledge(){
       }
       const requestCard=node('article',undefined,'knowledge-card');requestCard.append(node('h3',file.name),node('p',`${file.department} · v${file.version} · ${file.status}`),knowledgeExcerpt(file.excerpt,''));const readProposal=node('button','Read proposal','secondary-button');readProposal.type='button';readProposal.dataset.focusKey=`library:${file.id}:proposal`;readProposal.addEventListener('click',()=>showFile(readProposal));requestCard.append(readProposal);if(previous){requestCard.append(previous.closest('label'));const compare=[...technical.querySelectorAll('button')].find(b=>b.textContent==='Compare extracted versions');if(compare)requestCard.append(compare);}requestCard.append(decision);decisions.append(requestCard);
     }
-   }else{const review=node('button','Review this file in Setup','secondary-button');review.type='button';review.addEventListener('click',()=>{showTab('setup');const target=[...document.querySelectorAll('[data-file-id]')].find(element=>element.dataset.fileId===file.id);if(target){target.open=true;target.scrollIntoView({block:'center'});target.querySelector('summary')?.focus();}});card.append(review);}
+   }else{const review=node('button','Review this file in Workspace settings','secondary-button');review.type='button';review.addEventListener('click',()=>{showTab('setup');const target=[...document.querySelectorAll('[data-file-id]')].find(element=>element.dataset.fileId===file.id);if(target){target.open=true;target.scrollIntoView({block:'center'});target.querySelector('summary')?.focus();}});card.append(review);}
    host.append(card);
   }
  if(focusKey)[...document.querySelectorAll('[data-focus-key]')].find(element=>element.dataset.focusKey===focusKey&&!element.disabled)?.focus();

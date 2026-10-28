@@ -21,7 +21,8 @@ test('judge demo creates approved Marketing sources and a signed-in-ready employ
     assert.equal(data.authEnabled, true);
     const marketing = judgeDemo.marketingSources.length + judgeDemo.conflictingVersions.length;
     const others = Object.values(judgeDemo.otherSources).flat().length;
-    assert.equal(data.sources.length, marketing + others + 1);
+    // Plus Emma's proposed note and guidelines version 3, which waits for Maya (T6).
+    assert.equal(data.sources.length, marketing + others + 2);
     assert.equal(accounts.publicAccounts(data).length, 3);
     assert.equal(workspace.approvedSources(data).length, marketing);
     assert.ok(workspace.approvedSources(data).every(source => source.department === 'Marketing'));
@@ -107,9 +108,9 @@ test('judge demo seeds at least two open tasks for each of Emma, Maya and Alex, 
     assert.ok(titles['Emma Larsen'].includes('Finish the Instagram Reel caption'));
     assert.ok(titles['Alex Holm'].includes('Check the Vamo website against the new brief'));
     assert.equal(workspace.load(root).tasks.length, judgeDemo.taskSeeds.length);
-    // Maya also needs to review Emma's proposed note; Emma does not.
+    // Maya also needs to review Emma's proposed note and guidelines version 3; Emma does not.
     workspace.switchPerson(data, byName('Maya Jensen').id);
-    assert.equal(todo.list(data).review.length, 1);
+    assert.equal(todo.list(data).review.length, 2);
     workspace.switchPerson(data, byName('Emma Larsen').id);
     assert.equal(todo.list(data).review.length, 0);
   } finally { fs.rmSync(root, { recursive: true, force: true }); }

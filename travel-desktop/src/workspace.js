@@ -146,7 +146,7 @@ function updateSource(data, sourceId, action, priority = 0, reason = '', superse
   if(action==='approved'&&before!=='approved'){source.approvedAt=new Date().toISOString();source.approvedBy=data.activePersonId;}
   if(action!=='approved'){source.approvedAt=null;source.approvedBy=null;}
   if(action!==before||supersedesId||String(reason||'').trim()){
-    source.decisions||=[];source.decisions.push({action,reason:clean(reason||`${action} in Setup`,500),by:data.activePersonId,at:new Date().toISOString(),supersedesId:supersedesId||null});
+    source.decisions||=[];source.decisions.push({action,reason:clean(reason||`${action} in Workspace settings`,500),by:data.activePersonId,at:new Date().toISOString(),supersedesId:supersedesId||null});
   }
   return source;
 }

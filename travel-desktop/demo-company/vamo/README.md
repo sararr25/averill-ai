@@ -37,4 +37,4 @@ Organic LinkedIn: 16 October 2026, 09:00 Copenhagen; email: 15 October, 10:00; p
 
 ## One-click judge demo
 
-`src/judge-demo.js` builds the judge workspace from this pack: all Marketing sources plus `newsletter-style-guide.md`; `social-media-guidelines-v1.md` and `-v2.md` approved under one title so Maya sees a version conflict; Operations and People sources approved; Noah, Oliver, Lina and Freja on the roster without sign-in accounts; and Emma's personal note proposed and pending Maya's review.
+`src/judge-demo.js` builds the judge workspace from this pack: all Marketing sources plus `newsletter-style-guide.md`; `social-media-guidelines-v1.md` and `-v2.md` approved under one title so Maya sees a version conflict; `-v3.md` (v2 plus a Typography and layout section with Fraunces/DM Sans `Design rule:` lines) imported under the same title as version 3 and left pending, so font questions get "No approved rule covers fonts" until Maya approves it and supersedes version 2; Operations and People sources approved; Noah, Oliver, Lina and Freja on the roster without sign-in accounts; and Emma's personal note proposed and pending Maya's review.

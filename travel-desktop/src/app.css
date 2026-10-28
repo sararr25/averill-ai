@@ -422,9 +422,17 @@ button{transition:color var(--ds-duration-fast),background-color var(--ds-durati
 .agent-body .ai-control button{white-space:nowrap}
 .agent-body .ai-control .ai-toggle{min-height:var(--av-control-small);padding:0 var(--av-space-3);border:1px solid var(--av-accent-strong);border-radius:var(--av-radius-pill);background:transparent;color:var(--av-accent-strong);font:var(--av-type-meta);font-weight:600}
 .agent-body .ai-control .ai-toggle[aria-pressed=true]{background:var(--av-accent);color:var(--av-on-accent)}
-.agent-body .ai-control .ai-toggle:disabled{opacity:.6;border-style:dashed}
+.agent-body .ai-control .ai-toggle:disabled{opacity:1;cursor:default}
 .agent-body .ask-form button[type=submit]{display:grid;place-items:center;width:var(--av-control-primary);height:var(--av-control-primary);min-height:0;padding:0;border:0;border-radius:50%;background:var(--av-accent);color:var(--av-on-accent)}
 .agent-body .review-composer .ask-form .composer-attach{display:inline-flex;align-items:center;width:auto;min-width:0;height:var(--av-control-default);padding:0 var(--av-space-3);margin-right:var(--av-space-1);border:0;border-radius:var(--av-radius-control);background:none;color:var(--av-accent-strong);font:var(--av-type-label);white-space:nowrap}
+/* T2.1: one focus ring per box (border plus 1px shadow, 2px in all). The box draws it; the controls inside draw none (buttons get an inset mark instead, so the focused one is still visible). */
+.agent-body .review-composer .ask-form:focus-within{border-color:var(--av-focus);box-shadow:0 0 0 1px var(--av-focus)}
+.agent-body .ask-form :is(input,button):focus-visible{outline:none}
+.agent-body .ask-form button:focus-visible{box-shadow:inset 0 0 0 2px var(--av-focus)}
+/* The work chip sits on the input's baseline, flush with the box padding, and shortens long draft names. */
+.agent-body .review-composer .ask-form .composer-attach{display:block;padding:0 var(--av-space-2) 0 0;font-size:14px;font-weight:600;line-height:var(--av-control-default);max-width:45%;overflow:hidden;text-overflow:ellipsis}
+.agent-body .review-composer .ask-form input{line-height:20px}
+.agent-body .ask-form{align-items:center}.agent-body :is(.review-composer,.agent-tab) .ask-form>:is(button,input){align-self:center}
 /* One spacing rule for every control inside a card: an 8px gap on the right and above, so inline buttons, links and selects never touch. */
 .agent-body :is(.knowledge-card,.learning-card,.knowledge-approval) :is(button,select):not(summary *){margin:var(--av-space-2) var(--av-space-2) 0 0}
 .agent-body :is(.finding-actions,.context-actions,.external-controls,.workspace-actions,.outbound-actions,.guide-actions){display:flex;flex-wrap:wrap;align-items:center;gap:var(--av-space-2)}

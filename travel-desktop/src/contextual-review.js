@@ -10,6 +10,7 @@ const { internalTexts } = require('./public-check');
 const { approvedSources } = require('./workspace');
 const imageCheck = require('./image-check');
 const designCheck = require('./design-check');
+const canvaDesign = require('../browser-extension/canva-design');
 
 const digest = value => crypto.createHash('sha256').update(JSON.stringify(value)).digest('hex');
 const ASK_MAX = 500, ASK_CONTEXT_MAX = 1500;
@@ -145,7 +146,10 @@ class ContextualReview {
       return { state: 'override-recorded', checkId: entry.checkId, at: entry.at };
     }
     const result = designCheck.evaluate({ workspace: state.workspace, payload: { design: payload.design, elements: payload.elements } });
-    this.lastDesign = { id: result.id, personId, epoch: state.epoch, at: new Date().toISOString(), findingCount: result.findings.length, elementCount: result.elementCount, types: [...new Set(result.findings.map(f => f.type))] };
+    // T6: the measured numbers (no text) stay in memory, bound to this person, session, tab and page, for design questions in the card.
+    const { design, elements } = canvaDesign.validate({ design: payload.design, elements: payload.elements });
+    const reading = { tabId: payload.tabId, pageOrigin: payload.pageOrigin, design, elements: elements.map(({ fontSize, box, colors, background }) => ({ fontSize, box, colors, background })) };
+    this.lastDesign = { id: result.id, personId, epoch: state.epoch, at: new Date().toISOString(), findingCount: result.findings.length, elementCount: result.elementCount, types: [...new Set(result.findings.map(f => f.type))], reading };
     return result;
   }
   designStatus(personId) {
@@ -204,7 +208,7 @@ class ContextualReview {
   // FB-07: a typed question from the in-page card. Same answer path as the desktop Ask, but the
   // reply is rebuilt from validated citations only: approved, visible, not restricted, no credentials,
   // and every quote must appear exactly in the stored source text.
-  async ask({ question, fieldId, revision, task }) {
+  async ask({ question, fieldId, revision, task, tabId, pageOrigin }) {
     const state = this.getState();
     if (!state?.signedIn || !state.workspace || typeof this.answer !== 'function') throw stale();
     const input = typeof question === 'string' ? question.trim() : '';
@@ -234,6 +238,16 @@ class ContextualReview {
     // The same draft statements are offered for an online double-check after an answer, never sent from here.
     const publicCheck = context && now.observed?.fieldId === fieldId && now.observed.revision === revision ? this.offer(now, now.observed, task, []) : null;
     const offer = publicCheck ? { publicCheck } : {};
+    // T6: a design question is answered from design rule lines only (workspace-answer.js), or says plainly that no approved rule
+    // covers it. In a Canva tab with a design reading from this person, session, tab and page, the reading's own numbers follow.
+    if (raw?.design) {
+      const last = this.lastDesign, types = Array.isArray(raw.design.types) ? raw.design.types.map(String) : [];
+      const facts = last?.reading && last.personId === personId && last.epoch === epoch && Number.isSafeInteger(tabId) && last.reading.tabId === tabId && last.reading.pageOrigin === pageOrigin ? designCheck.facts(last.reading, types) : [];
+      const extra = facts.length ? ` ${facts.join(' ')}` : '';
+      if (!citations.length) return { id: crypto.randomUUID(), state: 'no-source', message: `${raw.sources?.length ? 'No approved rule covers this.' : String(raw.text).slice(0, 300)}${extra}`, text: '', citations: [], facts, mode: 'local', usedField: Boolean(context), ...offer };
+      const text = stripped ? `Approved design rules, from ${citations[0].title}. Read the quoted lines.` : String(raw.text).slice(0, 1200);
+      return { id: crypto.randomUUID(), state: 'answered', text: `${text}${extra}`, citations, facts, mode: 'local', usedField: Boolean(context), ...offer };
+    }
     if (!citations.length) return { id: crypto.randomUUID(), state: 'no-source', message: 'No approved source answers this.', text: '', citations: [], mode: 'local', usedField: Boolean(context), ...offer };
     // If any cited source was removed, the original prose may quote it. Rebuild from what survived.
     const model = !stripped && raw.mode === 'model' && typeof raw.text === 'string';

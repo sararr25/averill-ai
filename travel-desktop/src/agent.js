@@ -128,18 +128,20 @@ function render() {
     el('external-task-result').replaceChildren();
   }
   el('answer-mode').textContent = current.aiEnabled ? 'Nebius AI enabled' : 'Local source answers';
-  el('ai-toggle').textContent = current.aiEnabled ? 'Nemotron AI: on' : current.services?.nebius ? 'Nemotron AI: off' : 'Nemotron AI: key needed in Setup';
-  el('ai-toggle').setAttribute('aria-pressed',String(Boolean(current.aiEnabled)));
-  el('ai-toggle').nextElementSibling.textContent = current.aiEnabled ? 'NVIDIA Nemotron via Nebius. Your question and relevant approved text sources are sent to Nebius.' : 'Optional NVIDIA Nemotron via Nebius. Off: answers stay local.';
-  el('ai-toggle').disabled = !current.services?.nebius && !current.aiEnabled;
   const admin=current.workspace?.people?.find(person=>person.id===current.workspace.activePersonId)?.role==='admin';
-  el('ai-setup').hidden=Boolean(current.services?.nebius)||!admin;
+  // No local key: the demo workspace sends Check now through the judge server (consent in checkWork); an admin can add a key; everyone else is told who can.
+  const noKey=!current.services?.nebius&&!current.aiEnabled,demoJudge=noKey&&Boolean(current.auth?.demo),addKey=noKey&&!demoJudge&&admin;
+  el('ai-toggle').textContent = current.aiEnabled ? 'Nemotron AI: on' : current.services?.nebius ? 'Nemotron AI: off' : demoJudge ? 'Nemotron AI: Check now only' : admin ? 'Nemotron AI: add a key' : 'Nemotron AI: off (ask your admin)';
+  el('ai-toggle').dataset.action=addKey?'add-key':'toggle';
+  el('ai-toggle').setAttribute('aria-pressed',String(Boolean(current.aiEnabled)));
+  el('ai-toggle').nextElementSibling.textContent = current.aiEnabled ? 'NVIDIA Nemotron via Nebius. Your question and relevant approved text sources are sent to Nebius.' : demoJudge ? 'In this demo, Check now also asks NVIDIA Nemotron through the Averill demo server, only after you confirm what is sent.' : addKey ? 'Add a Nebius key in More › Workspace settings › AI and services to use NVIDIA Nemotron. Until then answers stay local.' : noKey ? 'No Nebius key is set, so answers stay local. Ask your admin to add one.' : 'Optional NVIDIA Nemotron via Nebius. Off: answers stay local.';
+  el('ai-toggle').disabled = noKey&&!addKey;
   el('web-form').querySelector('button').disabled = !current.services?.tavily;
   el('web-unavailable').hidden=Boolean(current.services?.tavily);
-  el('web-unavailable').textContent=admin?'Public research is not configured. Add a Tavily key in Setup to search.':'Public research is not configured. Ask your administrator to add a Tavily key.';
+  el('web-unavailable').textContent=admin?'Public research is not configured. Add a Tavily key in More › Workspace settings › AI and services to search.':'Public research is not configured. Ask your administrator to add a Tavily key.';
   el('web-setup').hidden=Boolean(current.services?.tavily)||!admin;
   el('shared-count').textContent = `${current.shared.length} shared`;
-  el('sharing-status').textContent = current.externalWatching ? 'OBSERVING' : current.shared.length ? `${current.shared.length} SHARED` : current.externalWindow ? 'WINDOW SELECTED' : 'NOT SHARING';
+  el('sharing-status').textContent = visibleNow().pill;
   el('finding-count').textContent = current.findings.length ? `${current.findings.length} to review` : 'No issues';
   const list = el('window-list');
   list.replaceChildren();
@@ -187,12 +189,12 @@ function render() {
   }
 }
 
-// First-run guide: until the company has an approved source, the first step is Setup, not sharing.
+// First-run guide: until the company has an approved source, the first step is Workspace settings, not sharing.
 function renderFirstRun(){
   const steps=el('review-steps');if(steps.hidden)return;
   const approved=(current.workspace?.sources||[]).some(source=>source.status==='approved');
   const admin=current.workspace?.people?.find(person=>person.id===current.workspace.activePersonId)?.role==='admin';
-  const items=[...(approved?[]:[['Add',admin?'and approve company files in Setup':'company files by asking your admin to approve them']]),['Share','one draft field or app window'],['Check','it against approved company rules'],['Fix','it in your own tool, then recheck']];
+  const items=[...(approved?[]:[['Add',admin?'and approve company files in Workspace settings':'company files by asking your admin to approve them']]),['Share','one draft field or app window'],['Check','it against approved company rules'],['Fix','it in your own tool, then recheck']];
   const key=JSON.stringify(items);if(steps.dataset.key===key)return;steps.dataset.key=key;
   steps.replaceChildren(...items.map(([verb,rest])=>{const li=node('li');li.append(node('strong',verb),document.createTextNode(` ${rest}`));return li;}));
   el('review-start').textContent=approved||!admin?'Choose what to review':'Add company files';
@@ -247,10 +249,13 @@ function renderHero() {
   document.body.classList.toggle('has-finding', Boolean(item));
   document.body.classList.toggle('has-shared',sharedNames.length>0);
   const sourceAction = el('ask-form').querySelector('.composer-attach');
-  const sourceLabel = item?.source ? 'Open current source' : 'Open Work to choose a window';
+  // With no source to open, the chip names the connected draft, or sends you to the Working on now card to connect one.
+  const draft = connectedDraftName();
+  const chip = item?.source ? 'Source' : draft || 'Connect a draft';
+  const sourceLabel = item?.source ? 'Open current source' : draft ? `${draft}. Go to the Working on now card` : 'Connect a draft in the Working on now card';
   sourceAction.setAttribute('aria-label', sourceLabel);
   sourceAction.title = sourceLabel;
-  sourceAction.textContent = item?.source ? 'Source' : 'Choose work';
+  sourceAction.textContent = chip;
   el('hero-label').textContent = item ? 'FINDING' : sharedNames.length ? 'CHECKED' : 'READY';
   const connected=!item&&!sharedNames.length&&Boolean(current.externalObservation);
   el('hero-title').textContent = item?.kind === 'handover' ? 'This brief is out of date.' : item ? item.title : sharedNames.length ? 'No issues found.' : 'Ready when you are.';
@@ -352,7 +357,7 @@ function renderWorkspace() {
   const active = data.people.find((entry) => entry.id === data.activePersonId);
   panel.append(node('strong', data.company));
   panel.append(node('p', `Departments: ${data.departments.join(', ')}.`));
-  panel.append(node('p',data.sources.some(source=>source.status==='approved')?'Approved sources are available. Open Work to review a draft; AI services are optional.':'Next: add company files, review their extracted text, then approve eligible sources.','setup-next'));
+  panel.append(node('p',data.sources.some(source=>source.status==='approved')?'Approved sources are available. Open Current work to review a draft; AI services are optional.':'Next: add company files, review their extracted text, then approve eligible sources.','setup-next'));
   if (!current.auth?.enabled) {
     const select = node('select'); select.setAttribute('aria-label', 'Legacy demo role');
     for (const person of data.people) {
@@ -753,11 +758,18 @@ el('source-dialog').addEventListener('close', () => {
   else if (document.body.dataset.area === 'knowledge') el('knowledge-search').focus();
 });
 el('ai-toggle').addEventListener('click', async () => {
+  if (el('ai-toggle').dataset.action === 'add-key') { openAiServices(); return; }
   if (!current.aiEnabled && !window.confirm('Enable Nebius for this session? Your questions and relevant approved company text sources will be sent to Nebius. Images and window captures are not sent by this control.')) return;
   current = await window.desktop.aiMode(!current.aiEnabled); render();
 });
-el('ai-setup').addEventListener('click',()=>showTab('setup'));
-el('web-setup').addEventListener('click',()=>showTab('setup'));
+// Workspace settings › AI and services holds the key forms (admins only). Fail loudly if the group is missing instead of leaving a dead click.
+function openAiServices(service='Nebius'){
+  showTab('setup');
+  const group=[...document.querySelectorAll('.setup-group')].find(details=>details.querySelector('summary')?.textContent==='AI and services');
+  if(!group)throw new Error('AI and services are not available in Workspace settings.');
+  group.open=true;group.scrollIntoView({block:'start'});group.querySelector(`input[placeholder^="${service}"]`).focus();
+}
+el('web-setup').addEventListener('click',()=>openAiServices('Tavily'));
 el('open-source').addEventListener('click', () => { if (activeSourceId) window.desktop.openSource(activeSourceId); });
 el('login-account').addEventListener('change', () => { el('login-email').value = el('login-account').value; el('login-password').value = ''; el('login-password').focus(); });
 el('login-form').addEventListener('submit', async (event) => {
@@ -775,6 +787,27 @@ function workingTool(){
  if(match)return{name:match[1],icon:match[2],task:match[3]};
  if(current.externalWindow&&current.externalWindow.adapter!=='browser-dom')return{name:'App window',icon:'desktop'};
  return host?{name:host,icon:'globe'}:null;
+}
+// One answer to "what can Averill see now": the header pill and the plug icon both read it (a connected browser tab covers fields and Canva designs).
+function visibleNow(){
+ const bridge=current.browserBridge||{},win=current.externalWindow;
+ if(bridge.connected)return{browser:true,host:bridge.pageHost,pill:`SHARING: ${bridge.pageHost}`};
+ if(win&&win.adapter!=='browser-dom')return{browser:false,pill:`WINDOW: ${win.app||win.name}`};
+ if(current.shared.length)return{browser:false,pill:`${current.shared.length} SHARED`};
+ return{browser:false,pill:'NOT SHARING'};
+}
+// Name of the draft Averill follows now (the Working on now card shows the same), or null when nothing is connected.
+function connectedDraftName(){
+ const bridge=current.browserBridge||{};
+ const open=Boolean(current.auth?.signedIn&&(bridge.connected||current.externalWindow&&current.externalWindow.adapter!=='browser-dom'));
+ return open?current.externalWindow?.name||workingTool()?.name||'Connected draft':null;
+}
+function goToWorkingNow(){
+ showTab('review');
+ const card=el('working-now');card.scrollIntoView({block:'start'});
+ const target=[el('working-check'),el('working-ask'),card.querySelector('#extension-panel button')].find(button=>button&&button.offsetParent&&!button.disabled);
+ if(!target)throw new Error('The Working on now card has no control to focus.');
+ target.focus();
 }
 const clock=at=>new Date(at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
 function renderWorkingNow(){
@@ -795,8 +828,8 @@ function renderWorkingNow(){
  const captured=Boolean(current.externalObservation);
  el('working-check').disabled=!captured||reviewPending;
  el('working-check-hint').textContent=reviewPending?'Checking…':captured?'':bridge.connected?'Click the draft field you want checked, in Chrome.':'Read the window first in Workspace settings › Connection tools.';
- const icon_=el('connection-icon'),connected=Boolean(bridge.connected);icon_.innerHTML=icon(connected?'plugs-connected':'plug');icon_.classList.toggle('connected',connected);
- const label=connected?`Browser connected to ${bridge.pageHost}`:'Browser not connected';icon_.title=label;icon_.setAttribute('aria-label',label);
+ const icon_=el('connection-icon'),now=visibleNow(),connected=now.browser;icon_.innerHTML=icon(connected?'plugs-connected':'plug');icon_.classList.toggle('connected',connected);
+ const label=connected?`Browser connected to ${now.host}`:'Browser not connected';icon_.title=label;icon_.setAttribute('aria-label',label);
  // The connection checklist explains Connect; it is noise before the extension is installed and once a draft is open.
  el('browser-checklist').hidden=!current.auth?.signedIn||open||!current.browserConnect?.extensionSeenAt;
  renderExtensionPanel();renderRecentWork();
@@ -861,5 +894,5 @@ for (const target of document.querySelectorAll('[data-icon]')) target.innerHTML 
 el('ask-form').querySelector('.composer-attach').addEventListener('click', (event) => {
   const source = (current.findings?.find(item=>`${item.kind}:${item.id}`===selectedFindingId)||current.findings?.[0])?.source;
   if (source) source.kind === 'asset' ? window.desktop.openSource(source.id) : showSource(source.id, event.currentTarget);
-  else showTab('work');
+  else goToWorkingNow();
 });

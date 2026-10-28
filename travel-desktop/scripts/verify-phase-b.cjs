@@ -2,11 +2,25 @@
 // PHASE_B_CAPTURE=<dir> only writes per-tab screenshots (used to prove a refactor renders identically).
 const {app,BrowserWindow,dialog}=require('electron');const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
 const root=path.resolve(__dirname,'..');const profile=fs.mkdtempSync('/tmp/averill-phase-b-');app.setPath('userData',profile);
-const capture=process.env.PHASE_B_CAPTURE;const shots=capture||path.resolve(root,'../docs/screenshots/2026-10-27');fs.mkdirSync(shots,{recursive:true});
+const capture=process.env.PHASE_B_CAPTURE;const shots=capture||process.env.PHASE_B_SHOTS||path.resolve(root,'../docs/screenshots/2026-10-27');fs.mkdirSync(shots,{recursive:true});
 const fixture=path.join(profile,'company-guide.txt');fs.writeFileSync(fixture,'Company knowledge: cobalt palette and weekly planning.');
 dialog.showOpenDialog=async()=>({canceled:false,filePaths:[fixture]});
 require(path.join(root,'main.js'));
 const pause=ms=>new Promise(r=>setTimeout(r,ms));
+// One focus ring (T2.3): when focusing a control restyles a container around it (border, shadow or outline), the control must not also draw its own outline.
+// It opens every closed <details> so hidden controls are covered, and returns the controls it looked at so the test can prove the question box was among them.
+const FOCUS_RING=`(()=>{const style=document.createElement('style');style.textContent='*,*::before,*::after{transition:none!important}';document.head.append(style);
+ const closed=[...document.querySelectorAll('details:not([open])')];for(const d of closed)d.open=true;
+ const snap=a=>{const s=getComputedStyle(a);return [s.borderTopColor,s.boxShadow,s.outlineStyle,s.outlineColor,s.outlineWidth].join('|')};
+ const name=e=>e.id?'#'+e.id:e.tagName.toLowerCase()+(e.className&&typeof e.className==='string'?'.'+e.className.trim().split(/\\s+/).join('.'):'');
+ const focusable=[...document.querySelectorAll('.agent-tab.active :is(input:not([type=hidden]),select,textarea,button,summary,a[href])')].filter(e=>!e.disabled&&e.checkVisibility({visibilityProperty:true})&&e.getBoundingClientRect().width>0&&!e.closest('[hidden],[aria-hidden=true]'));
+ const bad=[],seen=[];
+ for(const f of focusable){const chain=[];for(let a=f.parentElement;a&&a!==document.body;a=a.parentElement)chain.push(a);const before=chain.map(snap);f.focus({focusVisible:true});
+  const own=getComputedStyle(f);const hasOutline=own.outlineStyle!=='none'&&parseFloat(own.outlineWidth)>0;
+  const changed=chain.filter((a,i)=>snap(a)!==before[i]);seen.push(name(f));
+  if(hasOutline&&changed.length)bad.push(name(f)+' draws its own outline inside '+name(changed[0])+', which also changes on focus');
+  f.blur();}
+ for(const d of closed)d.open=false;style.remove();return {bad,seen,hasFocus:document.hasFocus()}})()`;
 const TABS=['todo','review','knowledge','learn','research','setup'];
 // Every visible text node: its rendered colour against the first opaque background behind it, and its font size.
 const AUDIT=`(()=>{const parse=c=>{const m=c.match(/[\\d.]+/g);return m?m.map(Number):[0,0,0,0]};const lin=v=>{v/=255;return v<=.04045?v/12.92:((v+.055)/1.055)**2.4};const lum=([r,g,b])=>.2126*lin(r)+.7152*lin(g)+.0722*lin(b);
@@ -26,6 +40,8 @@ app.whenReady().then(async()=>{try{
  win.setSize(560,900);await pause(200);
  win.webContents.debugger.attach('1.3');
  const report=[];
+ // :focus and :focus-within only apply while the page has focus; the test window is usually in the background.
+ await win.webContents.debugger.sendCommand('Emulation.setFocusEmulationEnabled',{enabled:true});
  for(const scheme of ['light','dark']){
   await win.webContents.debugger.sendCommand('Emulation.setEmulatedMedia',{features:[{name:'prefers-color-scheme',value:scheme},{name:'prefers-reduced-motion',value:'reduce'}]});await pause(150);
   for(const tab of TABS){
@@ -35,6 +51,8 @@ app.whenReady().then(async()=>{try{
    for(const item of await run(AUDIT)){const large=item.size>=18.66||(item.size>=14&&item.weight>=700);const need=large?4.5:item.size>=15?7:4.5;
     if(item.ratio<need)report.push(`${scheme}/${tab}: contrast ${item.ratio} < ${need} for "${item.text}" (${item.size}px)`);
     if(item.size<13)report.push(`${scheme}/${tab}: ${item.size}px text "${item.text}"`);}
+   const ring=await run(FOCUS_RING);if(!ring.hasFocus)report.push(`${scheme}/${tab}: the page has no focus, so the focus-ring check proved nothing`);for(const problem of ring.bad)report.push(`${scheme}/${tab}: ${problem}`);
+   if(tab==='review')for(const need of ['#question'])if(!ring.seen.includes(need))report.push(`${scheme}/${tab}: focus check did not reach ${need}`);
   }
  }
  // Every tab is fully inside the window and no two tabs overlap, at the narrowest supported width.
@@ -43,5 +61,5 @@ app.whenReady().then(async()=>{try{
  win.webContents.debugger.detach();
  if(capture){console.log('CAPTURED '+shots);app.quit();return;}
  assert.deepEqual(report,[],'Readability problems:\n'+report.join('\n'));
- console.log('PASS phase B: every visible text in light and dark is at least 13px and meets 7:1 body / 4.5:1 small and large contrast. Screenshots in '+shots);app.quit();
+ console.log('PASS phase B: every visible text in light and dark is at least 13px and meets 7:1 body / 4.5:1 small and large contrast, and no control draws a second focus ring inside a container that already shows one. Screenshots in '+shots);app.quit();
 }catch(error){console.error(error.stack);app.exit(1);}});

@@ -17,6 +17,8 @@ const marketingSources = [
 ];
 // Two approved versions under one title: Maya sees a version conflict to resolve by superseding v1.
 const conflictingVersions = [['social-media-guidelines-v1.md', '1'], ['social-media-guidelines-v2.md', '2']];
+// T6: version 3 adds the typography rules. It arrives pending under the same title and counts only after Maya approves it.
+const proposedVersion = ['social-media-guidelines-v3.md', '3', 40];
 const otherSources = {
   Operations: [['trip-brief-procedure-v1.md', '1', 80], ['supplier-checklist-v1.md', '1', 70], ['brand-and-company-context-v2.md', '2', 60]],
   People: [['employee-onboarding-v2.md', '2', 80], ['time-off-and-travel-policy-v1.md', '1', 70], ['brand-and-company-context-v2.md', '2', 60]],
@@ -49,7 +51,7 @@ const team = [
 async function create(userData, packRoot) {
   if (workspace.load(userData)) throw new Error('A workspace already exists on this Mac. The judge demo only starts on a fresh install.');
   const marketing = path.join(packRoot, 'vamo', 'Marketing');
-  const required = [...marketingSources, ...conflictingVersions].map(([file]) => path.join('Marketing', file))
+  const required = [...marketingSources, ...conflictingVersions, proposedVersion].map(([file]) => path.join('Marketing', file))
     .concat(Object.entries(otherSources).flatMap(([department, files]) => files.map(([file]) => path.join(department, file))), privateNote);
   for (const file of required) {
     if (!fs.existsSync(path.join(packRoot, 'vamo', file))) throw new Error(`Judge demo file is missing: ${file}`);
@@ -79,6 +81,12 @@ async function create(userData, packRoot) {
     const source = workspace.importFile(userData, data, path.join(marketing, file), { department: 'Marketing', version, title: 'social-media-guidelines.md' });
     workspace.updateSource(data, source.id, 'approved', 40, 'Pre-approved for the judge demo');
   }
+  {
+    const [file, version, priority] = proposedVersion;
+    const source = workspace.importFile(userData, data, path.join(marketing, file), { department: 'Marketing', version, title: 'social-media-guidelines.md' });
+    // Pending, so not used for answers or checks; the priority only carries over when Maya clicks Approve.
+    source.priority = priority;
+  }
   for (const member of roster) workspace.addPerson(data, member.name, member.role, member.department);
   for (const [department, files] of Object.entries(otherSources)) {
     for (const [file, version, priority] of files) {
@@ -96,4 +104,4 @@ async function create(userData, packRoot) {
   return { data, personId: emma.id };
 }
 
-module.exports = { create, taskSeeds, marketingSources, conflictingVersions, otherSources, roster, team };
+module.exports = { create, taskSeeds, marketingSources, conflictingVersions, proposedVersion, otherSources, roster, team };

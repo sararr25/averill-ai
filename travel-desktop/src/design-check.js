@@ -87,4 +87,26 @@ function evaluate({ workspace, payload }) {
   return { id: crypto.randomUUID(), state, findings: findings.slice(0, 30), checked, notes, elementCount: elements.length, design: { width: design.width, height: design.height } };
 }
 
-module.exports = { FORMAT, BASE_WIDTH, LARGE_PX, LARGE_BOLD_PX, isLarge, safeZone, designRules, evaluate };
+// T6: the open design's own numbers, added to a design question asked in the Canva card. Only what the reader measured
+// (font sizes, box positions, contrast), in design pixels; the reader cannot see font families, so no fact names one.
+// reading: { design, elements } as returned by canva.validate. types: the design rule types the question is about.
+function facts(reading, types) {
+  const { design, elements } = reading, out = [];
+  const wants = prefix => types.some(type => type.startsWith(prefix));
+  if (!elements.length) return out;
+  if (wants('font-')) {
+    const sizes = elements.map(element => element.fontSize).sort((a, b) => b - a);
+    out.push(`Your headline (largest text) uses ${Math.round(sizes[0])} px${design.width === BASE_WIDTH ? '' : ` on a ${Math.round(design.width)} px wide design`}.`);
+    if (sizes.length > 1) out.push(`Your smallest text uses ${Math.round(sizes.at(-1))} px.`);
+    out.push('Averill cannot see which font your design uses.');
+  }
+  if (wants('contrast-')) out.push(`Your lowest text contrast is ${floor2(Math.min(...elements.map(element => canva.worstContrast(element.colors, element.background))))}:1.`);
+  if (wants('safe-margin')) {
+    const [edge, gap] = elements.flatMap(element => Object.entries(safeZone(element.box, design, 0).gaps)).sort((a, b) => a[1] - b[1])[0];
+    const px = Math.round(gap);
+    out.push(px < 0 ? `Your closest text box is ${-px} px past the ${edge} edge.` : `Your closest text box is ${px} px from the ${edge} edge.`);
+  }
+  return out;
+}
+
+module.exports = { FORMAT, BASE_WIDTH, LARGE_PX, LARGE_BOLD_PX, isLarge, safeZone, designRules, evaluate, facts };

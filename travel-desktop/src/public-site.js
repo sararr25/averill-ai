@@ -21,7 +21,7 @@ async function configure(data, url, resolver) {
 
 async function crawl(data, { key, fetcher, resolver, limit = MAX_PAGES } = {}) {
   requireAdmin(data);
-  if (!data.publicSite?.url) throw new Error('Add the company website in Setup first.');
+  if (!data.publicSite?.url) throw new Error('Add the company website in Workspace settings first.');
   const pages = await tavily.crawl(data.publicSite.url, { key, purpose: 'public-site', limit: Math.min(MAX_PAGES, limit), resolver, fetcher });
   const fetchedAt = new Date().toISOString();
   data.publicSite.pages = pages.map(page => ({ url: page.url, text: String(page.content || '').slice(0, 20000), fetchedAt }));
