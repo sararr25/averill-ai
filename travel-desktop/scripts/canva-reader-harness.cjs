@@ -39,6 +39,10 @@ app.whenReady().then(async () => {
     await variant('captured', qa.build());
     // 2. The same design at 100% zoom, page partly off screen (top at minus 285 px, as in the spike).
     await variant('zoom100', qa.build({ zoom: 1, left: 60, top: -285 }));
+    // 2b. The 28 October capture: the headline's visual span holds 'copenhagen<br>before 8', the text layer 'copenhagen before 8'.
+    await variant('captured-1028', qa.build({ fixture: '2026-10-28' }));
+    // A visual text that really differs from its layer text still fails closed.
+    await variant('text-mismatch-1028', qa.build({ fixture: '2026-10-28' }), "document.querySelector('[data-qa-text=headline] span').firstChild.nodeValue='stockholm'");
     // 3. Unreadable variants: fail closed, never guess.
     await variant('no-frame', qa.build(), "document.querySelectorAll('div[style]').forEach(d=>{if(d.style.width==='1080px'&&d.style.height==='1440px'&&!d.style.transform)d.style.width='1000px'})");
     await variant('layer-mismatch', qa.build(), "document.querySelector('[data-qa-layer] p:last-of-type').closest('div').remove()");

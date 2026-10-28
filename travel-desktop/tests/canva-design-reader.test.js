@@ -38,6 +38,17 @@ function assertCaptured(result, scale) {
 test('the captured page at 40% zoom: 3 texts, design boxes within 1 px of the captured translate values, scale 0.4007', () => assertCaptured(results.captured, 0.4007));
 test('the same design at 100% zoom with the page partly off screen reads the same numbers', () => assertCaptured(results.zoom100, 1));
 
+test('28 October capture: a soft line break in the visual headline matches the text layer (real canva.com structure)', () => {
+  const result = results['captured-1028'];
+  assert.equal(result.state, 'ok', JSON.stringify(result));
+  assert.deepEqual(result.elements.map(e => e.text), ['vamo', 'copenhagen\nbefore 8', 'finish this line: what makes the city good before 8?']);
+  assert.deepEqual(result.elements.map(e => [e.box.x, e.box.y]), [[120, 120], [120, 900], [120, 1270]], 'captured translate values');
+  assert.deepEqual(result.elements.map(e => Math.round(e.fontSize * 10) / 10), [32.2, 106.7, 23.1], 'font sizes from the text layer');
+  assert.doesNotThrow(() => canva.validate({ design: result.design, elements: result.elements }));
+  assert.equal(results['text-mismatch-1028'].state, 'unreadable');
+  assert.match(results['text-mismatch-1028'].reason, /two text layers on this page do not match/);
+});
+
 test('unrecognised structures fail closed with a reason, never a guess', () => {
   for (const [name, reason] of [['no-frame', /cannot find the design page/], ['layer-mismatch', /cannot match every text/], ['rotated-text', /rotated or stretched/], ['foreign-image', /cannot be read by the page/], ['two-pages', /more than one page/]]) {
     assert.equal(results[name].state, 'unreadable', name);

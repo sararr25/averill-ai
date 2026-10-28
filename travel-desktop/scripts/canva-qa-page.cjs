@@ -6,10 +6,16 @@ const fs = require('node:fs');
 const path = require('node:path');
 const zlib = require('node:zlib');
 
-const FIXTURE = path.join(__dirname, '..', 'tests', 'fixtures', 'canva-page-structure-2026-10-25.json');
+// Two captures of the same design: 25 October (headline glyphs drawn elsewhere, its visual span holds only <br>) and
+// 28 October (the visual span holds the two lines around a <br>; tests/fixtures/canva-page-structure-2026-10-28.json).
+const FIXTURES = { '2026-10-25': 'canva-page-structure-2026-10-25.json', '2026-10-28': 'canva-page-structure-2026-10-28.json' };
 const CAPTURED_ZOOM = 0.400694;
-// Captured design positions (translate values) of the three texts, design pixels.
-const CAPTURED = { vamo: [32.0489, 16.875], headline: [64.0151, 891.786], body: [71.4707, 1276.17] };
+// Captured design positions (translate values) of the three texts, design pixels, per capture.
+const POSITIONS = {
+  '2026-10-25': { vamo: [32.0489, 16.875], headline: [64.0151, 891.786], body: [71.4707, 1276.17] },
+  '2026-10-28': { vamo: [120, 120], headline: [120, 900], body: [120, 1270] },
+};
+const CAPTURED = POSITIONS['2026-10-25'];
 const TEXT_SCALE = 1.40625;
 const NEAR_BLACK = 'rgb(16, 15, 13)', CREAM = [245, 240, 229];
 
@@ -38,21 +44,22 @@ function image(name) { if (!IMAGES[name]) return null; imageCache[name] ||= IMAG
 
 const escape = text => String(text).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const styleText = s => Object.entries(s || {}).map(([k, v]) => `${k}:${v}`).join(';');
-const fixture = () => JSON.parse(fs.readFileSync(FIXTURE, 'utf8'));
+const fixture = (name = '2026-10-25') => JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'tests', 'fixtures', FIXTURES[name]), 'utf8'));
 const translateOf = node => /translate\(([-\d.]+)px, ([-\d.]+)px\)/.exec(node.s?.transform || '');
 
 // options: zoom (default the captured 0.400694), left/top of the zoom root on screen, positions { vamo|headline|body: [x, y, width?] },
-// imageBase (URL prefix of the PNGs), mutate(tree) for unreadable variants.
+// imageBase (URL prefix of the PNGs), mutate(tree) for unreadable variants, fixture ('2026-10-25' default or '2026-10-28').
 function build(options = {}) {
   const zoom = options.zoom ?? CAPTURED_ZOOM;
-  const tree = fixture().tree;
+  const captured = POSITIONS[options.fixture || '2026-10-25'];
+  const tree = fixture(options.fixture).tree;
   const visualFont = [], innerWidth = {};
   // Mark the three text wrappers and apply requested design positions.
   const walk = (node, fn, parent = null) => { fn(node, parent); for (const child of node.c || []) walk(child, fn, node); };
   walk(tree, node => {
     const t = translateOf(node);
     if (!t) return;
-    const name = Object.keys(CAPTURED).find(key => Math.abs(CAPTURED[key][0] - Number(t[1])) < 0.001 && Math.abs(CAPTURED[key][1] - Number(t[2])) < 0.001);
+    const name = Object.keys(captured).find(key => Math.abs(captured[key][0] - Number(t[1])) < 0.001 && Math.abs(captured[key][1] - Number(t[2])) < 0.001);
     if (!name) return;
     node.qa = name;
     const wanted = options.positions?.[name];
@@ -73,6 +80,7 @@ function build(options = {}) {
   const images = ['page.png', 'photo.png', 'panel.png'];
   const render = (node, inLayer, owner) => {
     if (node.t === 'br') return '<br>';
+    if (node.t === '#text') return escape(node.x);
     if (node.t === 'img') return `<img${options.crossOrigin === false ? '' : ' crossorigin="anonymous"'} alt="" src="${escape((options.imageBase || '/qa/img/') + images[imageIndex++ % images.length])}">`;
     const style = { ...(node.s || {}) };
     const attrs = [];
@@ -103,4 +111,4 @@ html,body{margin:0;height:100%;overflow:hidden;background:#ebecf0;font-family:"H
 // Inside the 108 px safe area (Vamo's margin): the captured starting post has all three texts outside it (see the FB-14 report).
 const SAFE_POSITIONS = { vamo: [120, 120], headline: [120, 891.786, 820], body: [120, 1276.17] };
 
-module.exports = { FIXTURE, CAPTURED, CAPTURED_ZOOM, SAFE_POSITIONS, NEAR_BLACK, build, image };
+module.exports = { FIXTURES, POSITIONS, CAPTURED, CAPTURED_ZOOM, SAFE_POSITIONS, NEAR_BLACK, build, image };

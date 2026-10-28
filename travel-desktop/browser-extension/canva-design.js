@@ -96,6 +96,14 @@
   const round = (value, places = 2) => Math.round(value * 10 ** places) / 10 ** places;
   const px = value => { const m = /^(-?\d+(?:\.\d+)?(?:e-?\d+)?)px$/.exec(String(value || '').trim()); return m ? Number(m[1]) : null; };
 
+  // Text of a paragraph with each <br> (Canva's soft line break, Shift+Enter) read as a line break; textContent drops it.
+  function textOf(p) {
+    let text = '';
+    const walk = node => { for (const child of node.childNodes) { if (child.nodeType === 3) text += child.nodeValue; else if (child.nodeName === 'BR') text += '\n'; else if (child.nodeType === 1) walk(child); } };
+    walk(p);
+    return text.replace(/\u200b/g, '').trim();
+  }
+
   function reader(doc) {
     const win = doc.defaultView;
     const styles = new Map();
@@ -177,7 +185,7 @@
       const first = runs[0];
       visual.push({
         wrapper, box: { x, y, width, height }, opacity, colors,
-        text: paragraphs.map(p => p.textContent.replace(/​/g, '').trim()).join('\n').trim(),
+        text: paragraphs.map(textOf).join('\n').trim(),
         fontSize: parseFloat(r.style(first).fontSize) * relative(first), fontWeight: parseInt(r.style(first).fontWeight, 10) || 400,
       });
     }
@@ -198,7 +206,7 @@
       for (const paragraphs of groups.values()) {
         const runs = paragraphs.flatMap(p => { const spans = [...p.querySelectorAll('span')]; return spans.length ? spans : [p]; });
         layer.push({
-          text: paragraphs.map(p => p.textContent.replace(/​/g, '').trim()).join('\n').trim(),
+          text: paragraphs.map(textOf).join('\n').trim(),
           fontSize: Math.max(...paragraphs.map(p => px(p.style.fontSize) * relative(p))),
           fontWeight: parseInt(r.style(runs[0]).fontWeight, 10) || 400,
           colors: runs.map(run => r.style(run).color),
