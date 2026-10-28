@@ -140,24 +140,56 @@ class ContextualReview {
     if (payload.action === 'override') {
       // "Export anyway": recorded for this signed-in session only, for the last check this person ran, if it had findings.
       const last = this.lastDesign;
-      if (!last || last.id !== payload.checkId || last.personId !== personId || last.epoch !== state.epoch || !last.findingCount) throw stale();
+      if (!last || last.id !== payload.checkId || last.personId !== personId || last.epoch !== state.epoch || !last.blocking) throw stale();
       const entry = { checkId: last.id, at: new Date().toISOString(), findingCount: last.findingCount, types: last.types, personId };
       this.designOverrides.push(entry);
       return { state: 'override-recorded', checkId: entry.checkId, at: entry.at };
     }
-    const result = designCheck.evaluate({ workspace: state.workspace, payload: { design: payload.design, elements: payload.elements } });
+    const checked = canvaDesign.validate('slide' in payload ? { design: payload.design, elements: payload.elements, slide: payload.slide } : { design: payload.design, elements: payload.elements });
+    const single = designCheck.evaluate({ workspace: state.workspace, payload: { design: checked.design, elements: checked.elements } });
+    const result = 'slide' in checked ? this.accumulateSlides(single, checked, payload, personId, state.epoch) : single;
     // T6: the measured numbers (no text) stay in memory, bound to this person, session, tab and page, for design questions in the card.
-    const { design, elements } = canvaDesign.validate({ design: payload.design, elements: payload.elements });
+    const { design, elements } = checked;
     const reading = { tabId: payload.tabId, pageOrigin: payload.pageOrigin, design, elements: elements.map(({ fontSize, box, colors, background }) => ({ fontSize, box, colors, background })) };
-    this.lastDesign = { id: result.id, personId, epoch: state.epoch, at: new Date().toISOString(), findingCount: result.findings.length, elementCount: result.elementCount, types: [...new Set(result.findings.map(f => f.type))], reading };
+    this.lastDesign = { id: result.id, personId, epoch: state.epoch, at: new Date().toISOString(), findingCount: result.findings.length, blocking: result.state === 'findings' || result.state === 'incomplete', elementCount: result.elementCount, types: [...new Set(result.findings.map(f => f.type))], reading };
     return result;
+  }
+  // Owner decision (28 October 2026): Canva shows one carousel slide at a time, so each reading covers the open slide only.
+  // Results are kept per slide for this person, session, tab, page origin, design size and slide count (any change starts
+  // again); a slide read again replaces its earlier result. The design is clean only when every slide has been read and none
+  // has findings; until then the card keeps blocking ("incomplete"). A reading whose slide Averill cannot tell (slide null)
+  // is checked but never counted, so it can never clear the gate.
+  accumulateSlides(single, checked, payload, personId, epoch) {
+    const { slide, design } = checked;
+    const key = slide && [personId, epoch, payload.tabId, payload.pageOrigin, design.width, design.height, slide.count].join('|');
+    if (slide) {
+      if (this.designSlides?.key !== key) this.designSlides = { key, count: slide.count, slides: new Map() };
+      this.designSlides.slides.set(slide.index, { findings: single.findings.map(f => ({ ...f, slide: slide.index })), elementCount: single.elementCount, state: single.state });
+    }
+    const kept = slide ? this.designSlides : null;
+    const entries = kept ? [...kept.slides.entries()].sort((a, b) => a[0] - b[0]) : [];
+    const findings = (kept ? entries.flatMap(([, entry]) => entry.findings) : single.findings).slice(0, 30);
+    const checkedSlides = entries.map(([index]) => index);
+    const notes = [...single.notes];
+    if (!slide) notes.unshift('Averill cannot tell which slide this is, so this reading does not count towards checking every slide.');
+    let state;
+    if (single.state === 'insufficient-evidence') state = 'insufficient-evidence';
+    else if (findings.length) state = 'findings';
+    else if (!slide || checkedSlides.length < slide.count) state = 'incomplete';
+    else state = 'clean';
+    if (state === 'incomplete' && slide) notes.unshift(`Open the other slides so Averill can check them: ${Array.from({ length: slide.count }, (_, i) => i + 1).filter(i => !checkedSlides.includes(i)).join(', ')}.`);
+    return {
+      ...single, state, findings, notes,
+      elementCount: kept ? entries.reduce((sum, [, entry]) => sum + entry.elementCount, 0) : single.elementCount,
+      slides: slide ? { current: slide.index, count: slide.count, checked: checkedSlides } : { current: null, count: null, checked: [] },
+    };
   }
   designStatus(personId) {
     const mine = entry => entry && entry.personId === personId;
     const last = mine(this.lastDesign) ? this.lastDesign : null;
     return { last: last && { at: last.at, findingCount: last.findingCount, elementCount: last.elementCount, types: last.types }, overrides: this.designOverrides.filter(mine).map(({ at, findingCount, types }) => ({ at, findingCount, types })) };
   }
-  clearDesign() { this.lastDesign = null; this.designOverrides = []; }
+  clearDesign() { this.lastDesign = null; this.designOverrides = []; this.designSlides = null; }
   validate(expected, task, generation) {
     if (generation !== this.generation || identity(this.getState(), task) !== expected) throw stale();
   }

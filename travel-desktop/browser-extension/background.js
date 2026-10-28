@@ -179,7 +179,7 @@ async function relayContext(message, sender) {
 }
 
 // FB-14: a Canva design check. Only texts and numbers, validated here before anything is sent: at most 30 texts of up to
-// 500 characters, bounded numbers, no unknown keys, no image data. "Export anyway" sends only the id of the last check.
+// 500 characters, bounded numbers, no unknown keys, no image data, and the open carousel slide (index and count) or null. "Export anyway" sends only the id of the last check.
 async function relayDesign(message, sender) {
   const { pair } = await load();
   if (!validPair(pair) || sender.tab?.id !== pair.tabId || sender.frameId !== 0 || sender.origin !== pair.pageOrigin) return { stopped: true, reason: endedFor(sender.tab?.id) };
@@ -189,7 +189,7 @@ async function relayDesign(message, sender) {
     if (!CanvaDesign.validCheckId(message.checkId)) return { error: 'Check the design again first.' };
     payload = { kind: 'design-check', action: 'override', checkId: message.checkId };
   } else {
-    try { payload = { kind: 'design-check', ...CanvaDesign.validate({ design: message.design, elements: message.elements }) }; }
+    try { payload = { kind: 'design-check', ...CanvaDesign.validate('slide' in message ? { design: message.design, elements: message.elements, slide: message.slide } : { design: message.design, elements: message.elements }) }; }
     catch (error) { return { error: `Averill cannot read this design. ${error.message}` }; }
   }
   try {

@@ -350,7 +350,7 @@
   d.busy=true;d.lastRun=Date.now();
   const read=DESIGN.read(document,{imageCache:d.cache});
   if(read.state!=='ok'){d.busy=false;d.result=null;d.lastSent='';d.override=null;d.state='unreadable';d.reason=read.reason;renderDesign();if(d.pending){d.pending=false;scheduleDesign()}return}
-  const payload={design:read.design,elements:read.elements},sig=JSON.stringify(payload);
+  const payload={design:read.design,elements:read.elements,slide:read.slide},sig=JSON.stringify(payload);
   if(!force&&sig===d.lastSent&&d.result){d.busy=false;if(d.pending){d.pending=false;scheduleDesign()}return}
   if(!d.result&&d.state!=='checking'){d.state='checking';renderDesign()}
   const value=await send({kind:'design-check',...payload});
@@ -359,9 +359,9 @@
   if(!d.on){d.pending=false;return}
   if(value.stopped)return;
   if(value.error){d.state='error';d.error=String(value.error).slice(0,300);d.result=null;d.lastSent=''}
-  else if(['findings','clean','insufficient-evidence'].includes(value.state)&&Array.isArray(value.findings)){
+  else if(['findings','clean','insufficient-evidence','incomplete'].includes(value.state)&&Array.isArray(value.findings)){
    d.result=value;d.lastSent=sig;d.checkedAt=new Date();d.error='';
-   if(value.state==='findings')d.state=d.override&&d.override.signature===findingSignature(value)?'overridden':'blocking';
+   if(value.state==='findings'||value.state==='incomplete')d.state=d.override&&d.override.signature===findingSignature(value)?'overridden':'blocking';
    else{d.override=null;d.state=value.state==='clean'?'clean':'insufficient'}
   }else{d.state='error';d.error='The design check could not finish. Try again.';d.result=null;d.lastSent=''}
   renderDesign();
@@ -383,18 +383,22 @@
   const main=node('div',undefined,'main');
   const watch=node('label',undefined,'watch'),toggle=node('input');toggle.type='checkbox';toggle.checked=d.on;toggle.setAttribute('aria-label','Watch my design');toggle.addEventListener('change',()=>setWatch(toggle.checked));watch.append(toggle,node('span','Watch my design'));main.append(watch);
   const result=d.result,count=result?.findings?.length||0,plural=count===1?'':'s';
+  // Carousel (28 October 2026): which slides this tab session has read so far.
+  const carousel=Number.isInteger(result?.slides?.count)&&result.slides.count>1;
+  const slideSummary=()=>{const s=result?.slides;if(carousel)main.append(node('p',`Checked ${s.checked.length} of ${s.count} slide${s.count===1?'':'s'} (now on slide ${s.current}).`,'hint'))};
   const notes=()=>{for(const note of (result?.notes||[]).slice(0,4))main.append(node('p',String(note).slice(0,240),'dnote'))};
   if(!d.on)main.append(node('p','When this is on, Averill reads the texts, colors and positions of this design after you pause editing, and checks contrast, the safe area and approved wording. Only text and numbers go to Averill on this device. Averill never edits, exports or shares your design.','hint'));
   else if(d.state==='checking')main.append(node('h2','Checking your design.'),node('p','Reading the texts, colors and positions on this page.','hint'));
   else if(d.state==='unreadable')main.append(node('h2','Averill cannot read this design'),node('p',String(d.reason).slice(0,300)),node('p','Nothing was checked. Check contrast and margins yourself before you export. Canva may have changed its page, or the design uses something Averill does not read yet.','hint'));
   else if(d.state==='error')main.append(node('h2','The design check could not finish.'),node('p',d.error,'error'),button('Check again',()=>runDesign(true),'secondary'));
-  else if(d.state==='clean'){const n=result.elementCount;main.append(node('h2','No design problems found.'),node('p',`Checked ${n} text${n===1?'':'s'} for ${(result.checked||[]).join(', ')}. Last check ${d.checkedAt.toLocaleTimeString()}. Averill keeps watching while you edit.`,'hint'));notes()}
+  else if(d.state==='clean'){const n=result.elementCount;main.append(node('h2','No design problems found.'),node('p',`Checked ${n} text${n===1?'':'s'} for ${(result.checked||[]).join(', ')}. Last check ${d.checkedAt.toLocaleTimeString()}. Averill keeps watching while you edit.`,'hint'));slideSummary();notes()}
   else if(d.state==='insufficient'){main.append(node('h2','No approved design rules yet.'),node('p','There are not enough approved design rules to check this design. Ask your lead to approve them. Nothing was changed.'));notes()}
   else if(d.state==='blocking'||d.state==='overridden'){
-   if(d.state==='blocking')main.append(node('h2','Fix before you export'),node('p',`Averill found ${count} problem${plural} in this design. Averill cannot stop Canva’s export, so fix ${count===1?'it':'them'} first.`));
+   if(d.state==='blocking')main.append(node('h2','Fix before you export'),node('p',count?`Averill found ${count} problem${plural} in this design. Averill cannot stop Canva’s export, so fix ${count===1?'it':'them'} first.`:'Averill has not checked every slide yet. Flip through all slides with the page bar so Averill can check each one.'));
    else main.append(node('h2','Export anyway recorded.'),node('p',`You chose to export with ${count} known problem${plural}. Averill recorded this for this session only. The problem${plural} ${count===1?'is':'are'} still in the design.`,'hint'));
    const list=node('ol',undefined,'dlist');
-   for(const f of result.findings.slice(0,12)){const item=node('li',undefined,'dfind');item.append(node('b',`“${String(f.text).slice(0,120)}”`),node('p',String(f.problem).slice(0,300)));if(f.measured)item.append(node('p',String(f.measured).slice(0,200),'measure'));if(f.source)item.append(source(f));list.append(item)}
+   slideSummary();
+   for(const f of result.findings.slice(0,12)){const item=node('li',undefined,'dfind');item.append(node('b',`${carousel&&Number.isInteger(f.slide)?`Slide ${f.slide}: `:''}“${String(f.text).slice(0,120)}”`),node('p',String(f.problem).slice(0,300)));if(f.measured)item.append(node('p',String(f.measured).slice(0,200),'measure'));if(f.source)item.append(source(f));list.append(item)}
    main.append(list);if(d.state==='blocking')main.append(button('Export anyway',exportAnyway,'secondary'));notes();
   }
   // D1: an open Canva lesson, with the steps Averill has seen in this design. Grouping cannot be read here: it is confirmed in Averill.

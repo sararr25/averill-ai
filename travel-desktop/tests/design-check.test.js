@@ -182,6 +182,52 @@ test('contextual designCheck: canva.com only, signed in only, and Export anyway 
   assert.throws(() => review.designCheck({ ...payload(), pageOrigin: CANVA }), /changed|again/i);
 });
 
+test('carousel (owner decision 28 October 2026): results accumulate per slide; blocking until every slide is read and clean', () => {
+  const { state, review } = service();
+  const P = { width: 1080, height: 1350, scale: 0.433 };
+  const at = (index, elements = [element({ box: { x: 120, y: 1200, width: 700, height: 40 } })], extra = {}) => review.designCheck({ ...payload(elements, P), slide: index === null ? null : { index, count: 5 }, pageOrigin: CANVA, tabId: 3, kind: 'design-check', ...extra });
+  const bad = [element({ box: { x: 120, y: 1200, width: 700, height: 40 }, colors: [PISTACHIO] })];
+  const one = at(1);
+  assert.equal(one.state, 'incomplete', 'slide 1 clean, 4 slides unread');
+  assert.deepEqual(one.slides, { current: 1, count: 5, checked: [1] });
+  assert.match(one.notes[0], /Open the other slides so Averill can check them: 2, 3, 4, 5\./);
+  // "Export anyway" is allowed while the gate blocks for unread slides.
+  assert.equal(review.designCheck({ action: 'override', checkId: one.id, pageOrigin: CANVA }).state, 'override-recorded');
+  const two = at(2, bad);
+  assert.equal(two.state, 'findings');
+  assert.deepEqual(two.findings.map(f => [f.slide, f.type]), [[2, 'contrast']], 'findings cite their slide');
+  // Slide 1 read again: slide 2's finding is kept.
+  assert.equal(at(1).findings.length, 1);
+  // Slide 2 fixed: its result is replaced, but slides 3 to 5 are still unread.
+  const fixed = at(2);
+  assert.equal(fixed.state, 'incomplete'); assert.equal(fixed.findings.length, 0);
+  at(3); at(4);
+  const five = at(5);
+  assert.equal(five.state, 'clean'); assert.deepEqual(five.slides.checked, [1, 2, 3, 4, 5]); assert.equal(five.elementCount, 5);
+  // A slide edited after its check is re-read and replaces its result.
+  const edited = at(4, bad);
+  assert.equal(edited.state, 'findings'); assert.deepEqual(edited.findings.map(f => f.slide), [4]);
+  assert.equal(at(4).state, 'clean');
+  // A reading whose slide Averill cannot tell is checked but never counted, and never clean.
+  const unknown = at(null);
+  assert.equal(unknown.state, 'incomplete'); assert.deepEqual(unknown.slides, { current: null, count: null, checked: [] });
+  assert.match(unknown.notes[0], /cannot tell which slide this is/);
+  assert.equal(at(null, bad).findings[0].slide, undefined);
+  assert.equal(at(5).state, 'clean', 'the counted slides are untouched by an unknown reading');
+  // Another tab, origin, person, session or slide count starts again.
+  assert.equal(at(5, undefined, { tabId: 4 }).state, 'incomplete');
+  assert.equal(at(5).slides.checked.length, 1);
+  at(1); at(2); at(3); at(4);
+  assert.equal(at(5).state, 'clean');
+  state.epoch = 2;
+  assert.deepEqual(at(5).slides.checked, [5]);
+  assert.equal(review.designCheck({ ...payload(undefined, P), slide: { index: 1, count: 4 }, pageOrigin: CANVA, tabId: 3 }).slides.checked.length, 1);
+  review.clearDesign();
+  assert.deepEqual(at(5).slides.checked, [5]);
+  // Strict validation of the slide field on the main side too.
+  assert.throws(() => at(6), /Invalid slide/);
+});
+
 test('bridge: a design check is refused without a connection, for another tab or origin, and after Stop', async t => {
   const { review } = service();
   const bridge = new BrowserBridge({ onObservation: () => {}, onStop: () => {}, onRequest: body => body.kind === 'design-check' ? review.designCheck(body) : { reviewId: null } });

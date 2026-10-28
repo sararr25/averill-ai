@@ -43,13 +43,14 @@ Click **Sign out**, then pick a person. No password is needed.
 
 Do this after Maya's step in section 4.
 
-1. Open the starting post: **TEMPLATE LINK (the owner adds it before release)**. Canva makes your own copy.
+1. Open the starting carousel (five Instagram slides): **TEMPLATE LINK (the owner adds it before release)**. Canva makes your own copy.
 2. Connect the tab as in section 3, step 2.
 3. In Averill's design card, tick **Watch my design**. It is off by default.
-4. Finish the body line of the post in Canva.
-5. Try pistachio green text (`#93C572`) or drag text near the edge of the design. Averill shows **Fix before you export** with the rule it broke. Fixing the design clears the warning. You can choose **Export anyway**; Averill records that choice for the session. Averill never edits or exports your design.
+4. Averill reads only the slide that is open. Flip through all five slides with the page bar at the bottom of Canva, so Averill can check each one. The card shows how many slides it has checked, for example **Checked 3 of 5 slides**. It keeps **Fix before you export** until every slide has been checked and has no problems.
+5. On the last slide, finish the body line of the post in Canva.
+6. Try pistachio green text (`#93C572`) or drag text near the edge of a slide. Averill shows **Fix before you export** with the slide number and the rule it broke. Fixing the design clears the warning. If you edit a slide that Averill has already checked, open it again so Averill reads it again. You can choose **Export anyway**; Averill records that choice for the session. Averill never edits or exports your design.
 
-The check covers the one-page Instagram-size design on canva.com only.
+The check covers Instagram-size designs on canva.com only, one open slide at a time. Turned (rotated) text is checked too. Averill does not read the grid view of all slides.
 
 ## 6. Learn Canva layout inside Canva
 

@@ -28,6 +28,7 @@ global.fetch = async (url, options) => { assert.equal(new URL(url).hostname, '12
 require('../main.js');
 const pause = ms => new Promise(resolve => setTimeout(resolve, ms)); const checks = [];
 const PAGE = 'https://www.canva.com/qa';
+const PISTACHIO_CSS = 'rgb(147, 197, 114)', CAROUSEL_SAFE = { nyhavn: [112, 160], group: [108, 1086.59], polaroid: [267.626, -1000] };
 app.whenReady().then(async () => { try {
   let agent; for (let i = 0; i < 100; i++) { agent = BrowserWindow.getAllWindows().find(w => w.webContents.getURL().includes('agent.html')); if (agent && !agent.webContents.isLoading() && await agent.webContents.executeJavaScript('Boolean(window.desktop)')) break; await pause(100); }
   const run = s => agent.webContents.executeJavaScript(s);
@@ -38,6 +39,13 @@ app.whenReady().then(async () => { try {
     if (url.hostname !== 'www.canva.com') return new Response('', { status: 404 });
     if (url.pathname.startsWith('/qa/img/')) return new Response(qa.image(path.basename(url.pathname)), { headers: { 'Content-Type': 'image/png', 'Access-Control-Allow-Origin': 'https://www.canva.com' } });
     if (url.pathname.startsWith('/qa/assets/')) { const name = path.basename(url.pathname); if (!['mark.svg', 'plus-jakarta-sans.ttf'].includes(name)) return new Response('', { status: 404 }); return new Response(fs.readFileSync(path.join(APP, 'browser-extension/assets', name)), { headers: { 'Content-Type': name.endsWith('.svg') ? 'image/svg+xml' : 'font/ttf' } }); }
+    // Carousel (owner decision 28 October 2026): slide N of 5 from the carousel capture, with every text inside the safe area
+    // and the polaroid moved off the page; bad=1 makes "at 7:30" pistachio on cream.
+    if (url.pathname === '/qa/carousel') {
+      const bad = url.searchParams.get('bad') === '1';
+      const mutate = tree => { const walk = (node, inTime) => { const time = inTime || node.qa === 'time'; if (time && ['span', 'p'].includes(node.t)) node.s = { ...(node.s || {}), color: PISTACHIO_CSS }; for (const child of node.c || []) walk(child, time); }; if (bad) walk(tree, false); };
+      return new Response(qa.build({ fixture: 'carousel', slide: { index: Number(url.searchParams.get('slide')), count: 5 }, positions: CAROUSEL_SAFE, mutate }), { headers: { 'Content-Type': 'text/html; charset=utf-8' } });
+    }
     if (url.pathname === '/qa') return new Response(qa.build({ zoom: url.searchParams.get('zoom') === '1' ? 1 : qa.CAPTURED_ZOOM, left: url.searchParams.get('zoom') === '1' ? 60 : 380, top: url.searchParams.get('zoom') === '1' ? -285 : 96, positions: qa.SAFE_POSITIONS }), { headers: { 'Content-Type': 'text/html; charset=utf-8' } });
     return new Response('', { status: 404 });
   });
@@ -87,7 +95,8 @@ app.whenReady().then(async () => { try {
     const geometry = await page(`(()=>{const c=${D}.host.getBoundingClientRect(),f=AverillCanvaDesign.frameRect(document);return {cardLeft:c.left,frameRight:f.right,inView:c.top>=0&&c.right<=innerWidth&&c.bottom<=innerHeight,pills:[...${D}.querySelectorAll('*')].filter(e=>getComputedStyle(e).borderRadius==='999px').length}})()`);
     assert(geometry.cardLeft >= geometry.frameRight, JSON.stringify(geometry)); assert(geometry.inView); assert.equal(geometry.pills, 0, 'no pills');
     const sent = designCalls.at(-1).payload;
-    assert.deepEqual(Object.keys(sent).sort(), ['design', 'elements', 'kind']);
+    assert.deepEqual(Object.keys(sent).sort(), ['design', 'elements', 'kind', 'slide']);
+    assert.deepEqual(sent.slide, { index: 1, count: 1 }, 'a one-page design is slide 1 of 1');
     assert.deepEqual(sent.elements.map(e => e.text), ['vamo', 'copenhagen before 8', BODY]);
     assert(!JSON.stringify(sent).includes('data:'), 'no image data'); assert(JSON.stringify(sent).length < 4000);
     assert((await text()).includes('Checked 3 texts for contrast, safe area, approved wording.'));
@@ -184,6 +193,48 @@ app.whenReady().then(async () => { try {
     await until(blocking, 'blocking card after the watch is turned back on');
     await setBodyColor(NEAR_BLACK); await until(clean, 'clean again');
   });
+  // Owner decision 28 October 2026: a carousel is checked slide by slide; results accumulate for this tab session.
+  const openSlide = async (index, bad = false) => {
+    tabUrl = `${PAGE}/carousel?slide=${index}${bad ? '&bad=1' : ''}`; await load(tabUrl);
+    updatedListener(9, { status: 'complete' }, { id: 9, url: tabUrl }); await until(`Boolean(${D})`, 'reinjected on slide ' + index);
+    const before = designCalls.length;
+    await tap({ css: 'input[type=checkbox]' });
+    await until(`${D}.querySelector('h2')?.textContent && ${D}.querySelector('h2').textContent!=='Checking your design.'`, 'checked slide ' + index);
+    assert(designCalls.length > before, 'a check was sent');
+    const sent = designCalls.at(-1).payload;
+    assert.deepEqual(sent.slide, { index, count: 5 }); assert.deepEqual([sent.design.width, sent.design.height], [1080, 1350]);
+    return sent;
+  };
+  await step('Carousel slide 1 of 5, clean: still "Fix before you export" because 4 slides are unread; it lists the slides to open', async () => {
+    const sent = await openSlide(1);
+    assert.deepEqual(sent.elements.map(e => e.text), ['Nyhavn', 'The painted houses before the tour boats wake up.\nBring a coffee: the quay is yours.', 'at 7:30'], 'the rotated title and the grouped caption are read');
+    assert.equal(designCalls.at(-1).value.state, 'incomplete', JSON.stringify(designCalls.at(-1).value.findings.map(f => [f.text, f.measured])));
+    await until(blocking, 'blocking for unread slides');
+    const t = await text();
+    assert(t.includes('Averill has not checked every slide yet.'), t); assert(t.includes('Checked 1 of 5 slides (now on slide 1).'), t);
+    assert(t.includes('Open the other slides so Averill can check them: 2, 3, 4, 5.'), t);
+    assert.equal(await page(`${D}.querySelectorAll('.dfind').length`), 0);
+  });
+  await shot('carousel-slide1-incomplete');
+  await step('Carousel slide 2 with pistachio "at 7:30": blocked with the finding cited for slide 2', async () => {
+    await openSlide(2, true); await until(blocking, 'slide 2 blocks');
+    const list = await findings();
+    assert.deepEqual(list.map(f => [f.text, f.lines[0]]), [['Slide 2: “at 7:30”', 'This text is hard to read on its background.']]);
+    assert((await text()).includes('Checked 2 of 5 slides (now on slide 2).'));
+  });
+  await shot('carousel-slide2-finding');
+  await step('Slide 2 fixed: the finding is gone but the card still blocks until slides 3 to 5 are read', async () => {
+    await openSlide(2); await until(blocking, 'still blocking');
+    assert.equal(designCalls.at(-1).value.state, 'incomplete'); assert.equal(await page(`${D}.querySelectorAll('.dfind').length`), 0);
+    assert((await text()).includes('them: 3, 4, 5.'));
+  });
+  await step('Slides 3, 4 and 5 read and clean: "No design problems found." with 5 of 5 slides checked', async () => {
+    for (const index of [3, 4]) { await openSlide(index); assert.equal(designCalls.at(-1).value.state, 'incomplete'); }
+    await openSlide(5); await until(clean, 'clean after every slide');
+    assert.deepEqual(designCalls.at(-1).value.slides, { current: 5, count: 5, checked: [1, 2, 3, 4, 5] });
+    assert((await text()).includes('Checked 5 of 5 slides (now on slide 5).'));
+  });
+  await shot('carousel-all-clean');
   await step('Stop sharing ends the watch; a later design check is refused by the worker', async () => {
     await tap({ css: 'button', label: 'Stop sharing' });
     await until(`!${D}`, 'design card removed');
