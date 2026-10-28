@@ -1,3 +1,25 @@
+# Feedback round, 28 October 2026: built
+
+**State:** branch `feat/feedback-2026-10-28` (local, not pushed), 8 commits after `0357f12`. Not merged, no release.
+
+**Done (all verified by script, synthetic unless marked live):**
+- T3 pill shows SHARING: <host> / WINDOW / NOT SHARING; single-instance lock. T1.2 AI pill states and Workspace settings copy. T2.1 to T2.3 one focus ring, solid pills, focus check in verify-phase-b.
+- T1.1 (live, owner's Mac): stale 25 October Averill (pid 20011) quit; profile backed up to `averill-ai-desktop-backup-2026-10-28`; `averill-secrets.enc.json` copied from the 25 October backup. Decryption not yet confirmed: open Averill as Alex and check the AI pill; if it says "add a key", paste the keys again.
+- T1.3 demo question box asks Nemotron through the judge server (`POST /api/ask`, new) after consent; local answer always shown. Route NOT deployed (deploys from main).
+- T4 drafts with credited Unsplash photos (`demo-tools/social-simulator/public/vamo/photos/CREDITS.md`), live Vamo links, LinkedIn composer without duplicate image. Not deployed.
+- T5.1 reader (live, read-only on canva.com): soft line breaks, rotated text, groups, SVG clip paths; carousel checked slide by slide ("Checked X of 5"). Real starting carousel DAHZTPxfC5c ("Copenhagen", built from the owner's template, photos credited Unsplash). Owner decision: its existing contrast/margin problems on slides 1 and 2 stay as findings for judges.
+- T5.2/T5.3 card minimise, drag, remembered position, light/dark per macOS, "How to do this in Canva" panels from Canva help pages, question box on the design card. T2.4 canvas #ecebf1.
+- T6 font rules in social-media-guidelines-v3 (pending for Maya); design questions answered only from approved Design rule lines.
+- T7 one-page visual weekly practice (4 question types, one submit, retry wrong), task exercises one page, pre-D1 sessions migrated.
+
+**Checks (last runs):** npm test 243 (one existing flaky test, `image-check.test.js` 6 MB bridge, fails on `0357f12` too); verify phase-b, phase-c, contextual 20, canva-design 28, accessibility 10, guide 28, ui-e2e 23, feedback, demo-ai 10 all pass.
+
+**Needs the owner:**
+- Reload the extension in Chrome and run the card on the real carousel (only the reader was tested live; card UI only on the synthetic page).
+- Confirm the keys decrypt (above).
+- Canva template link for test-averill.md (placeholder stays), push/merge/deploy (simulator, judge server /api/ask), release.
+- Open the T4 drafts on a preview deploy for the spec's screenshot check.
+
 # Feedback round, 28 October 2026: planned, not started
 
 **State (28 October):**
