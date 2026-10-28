@@ -21,7 +21,13 @@
     {
       "resources": [
         "assets/plus-jakarta-sans.ttf",
-        "assets/mark.svg"
+        "assets/mark.svg",
+        "assets/howto-text.svg",
+        "assets/howto-size.svg",
+        "assets/howto-align.svg",
+        "assets/howto-margin.svg",
+        "assets/howto-contrast.svg",
+        "assets/howto-group.svg"
       ],
       "matches": [
         "http://*/*",
