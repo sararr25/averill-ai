@@ -25,6 +25,7 @@ Rule for this round: a ticket is done only when the owner's own words below are 
 9. "se chiedo cose come 'which font should i use' non mi risponde, o peggio mi risponde parlandomi del wording" → T6
 10. "il design del post è orribile. anche qui deve sembrare vero e professionale" → T5
 11. "la parte learn con il test: non è cambiato assolutamente nulla" → T7
+12. "per la parte del test come avevo detto in precedenza deve essere interattivo, a risposta multipla, con immagini, illustrazioni etc." (28 October, also asked on 27 October: "dovrebbe essere un test interattivo fatto meglio") → T7.0
 
 ## Decisions (owner, 28 October 2026)
 
@@ -273,6 +274,49 @@ General rules for all three:
 - A screenshot of "Which font should I use?" answered with the Fraunces/DM Sans rule and its citation, in the app and in the Canva card.
 
 ## T7. Learn: the test confirms per session and runs in the tool
+
+**T7.0 The test is interactive, multiple choice and visual (owner, 27 and 28 October):**
+
+Today the weekly practice is mostly text: written reflections in text boxes and a few radio buttons with text-only options.
+
+**Questions:**
+- Every question is multiple choice.
+- Drop free-text reflections from the test. Keep a reflection only as an optional note after the result.
+- Every question shows a picture: an illustration, a photo or a small mock of the tool.
+- Where it fits, the answer options are pictures too. Examples:
+  - "Which of these posts has the clearest headline?" with 3 or 4 post thumbnails;
+  - "Where is the safe margin broken?" with a design and clickable areas;
+  - "Which email footer is complete?" with footer previews.
+
+**Question types:**
+- choose one picture;
+- choose one text answer with a picture;
+- tap the spot in an image;
+- put 3 or 4 steps in order (with keyboard support).
+
+**Interaction:**
+- One page, as in T7.1.
+- Selected answers are clearly highlighted.
+- After "Submit practice", each question shows right or wrong, the right answer and a short explanation. Where it applies, the explanation cites the approved company rule.
+- You can retry only the wrong answers.
+- A progress bar shows "3 of 6 answered".
+
+**Visuals:**
+- Use the companion design system: Phosphor icons and illustrations in the app style, real photos from Q2 in post mock-ups, light and dark.
+- Every image has alt text, and the question can be answered with the keyboard and VoiceOver.
+- Illustrations are local files (SVG, or images with credits) and never generated at runtime, so Learn still works offline (AGENTS.md).
+
+**Content:**
+- Questions come from the steps the person practised (Canva lesson, task exercises, approved rules), like today.
+- Each question has a picture source recorded in the question bank.
+
+**Mockup first:**
+- Show the owner an inline mockup of 3 question types, light and dark, in chat before building. Mockups stay out of the repo (owner rule).
+
+**Accept:**
+- Screenshots of each question type before and after submitting, in light and dark.
+- `verify-accessibility` covers keyboard and screen-reader answering of every type.
+- `tests/learning.test.js` covers scoring for each type.
 
 **T7.1 Weekly practice as one page:**
 - Show all questions on one page with one "Submit practice" button.

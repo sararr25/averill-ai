@@ -4,6 +4,7 @@
 - `main` holds phases A to D1 (PR #55) and the updated judge guide (PR #56).
 - Release `v0.1.0-judge.20261028` is published (ZIP SHA-256 `b02aaf25…e20d`).
 - The owner tested it and reported 11 problems. All of them are ticketed in `docs/FEEDBACK_SPEC_2026-10-28.md` (T1 to T7, decisions Q1 to Q5). No code has been changed for them yet. Q1 to Q5 are answered (see the spec). Next session: follow the spec's "Order of work".
+- **Learn test (owner, 27 and 28 October; T7.0):** the weekly test must be interactive, multiple choice and visual. Every question has an image or illustration, answers can be pictures, and there is tap-the-spot and put-in-order. Everything is on one page with one submit and one confirmation. Show an inline mockup of 3 question types in chat before building. Text-box reflections and per-question buttons are what the owner rejected.
 
 **Facts found while writing the spec (28 October):**
 - **Nebius/Tavily "off":** the current profile `~/Library/Application Support/averill-ai-desktop` is a Try-the-demo workspace without `averill-secrets.enc.json`. The keys from before are only in `averill-ai-desktop-backup-2026-10-25/`. Keys can be added as Alex in More › Workspace settings (admin only). The question box has no judge-server route, so it says "key needed" even in the demo.
