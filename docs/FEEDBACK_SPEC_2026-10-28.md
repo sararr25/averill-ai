@@ -26,9 +26,17 @@ Rule for this round: a ticket is done only when the owner's own words below are 
 10. "il design del post è orribile. anche qui deve sembrare vero e professionale" → T5
 11. "la parte learn con il test: non è cambiato assolutamente nulla" → T7
 
-## Decisions the owner must take
+## Decisions (owner, 28 October 2026)
 
-Each has a recommendation. Work on the related ticket waits for the answer.
+- **Q1:** the question box goes through the judge server in the demo, with the same consent and daily limit as Check now (T1.3 is in scope).
+- **Q2:** Unsplash or Pexels photos, with a `CREDITS.md`.
+- **Q3:** the card follows macOS like the app (light by default, dark when the Mac is dark). The owner added that the light version is currently too light. T2.4 (a slightly darker light background) therefore applies to both the app and the extension card. Show the mockup first.
+- **Q4:** Claude in Chrome reads the owner's real canva.com page, read-only and without editing anything.
+- **Q5:** Claude builds the starting post in the owner's Canva account through the Canva connector; the owner approves it before the template link is made.
+
+The options below are kept for the record.
+
+## Decisions the owner had to take
 
 - **Q1 (T1). Nemotron for the question box in the demo.** The demo workspace already sends **Check now** to Nemotron through the judge server, after consent. The question box ("Ask about approved company sources") does not, so it says "key needed". The options are:
   - Recommended: send question-box questions through the judge server too, with the same consent and daily limit.
