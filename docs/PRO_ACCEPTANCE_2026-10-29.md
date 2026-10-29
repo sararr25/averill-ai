@@ -1,6 +1,6 @@
 # Latest verified increment — 29 October 2026
 
-**Repository checkpoint:** implementation saved locally at `2d1ee83`. A final integrity check after staging/committing the new test file verifies **244 source files**, both helpers and 3234 ZIP entries with the same archive hash. Push to `github.com/sararr25/averill-ai` on `docs/canva-live-test-2026-10-28` was blocked by automatic review because Vercel deploy approval did not explicitly authorize GitHub transfer; owner approval is pending. No workaround or release publication. The pre-existing `.gitignore` change remains uncommitted.
+**Repository checkpoint:** implementation saved locally at `2d1ee83`. A final integrity check after staging/committing the new test file verifies **244 source files**, both helpers and 3234 ZIP entries with the same archive hash. The owner explicitly authorized GitHub transfer on 29 October. Commits `2d1ee83` and `f9f452b` were pushed successfully to `github.com/sararr25/averill-ai`, branch `docs/canva-live-test-2026-10-28`. The earlier automatic-review block was resolved by that authorization. No merge on main or release publication. The pre-existing `.gitignore` change remains uncommitted.
 
 This section supersedes the package/count/status statements in the earlier Pro ledger below. See [Canva correction](CANVA_GENERAL_HELP_2026-10-29.md).
 
