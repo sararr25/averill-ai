@@ -1,0 +1,13 @@
+{
+  "verifiedAt": "2026-10-29T15:56:14.064Z",
+  "sourceRevisionAtBuild": "2d1ee830be3ccd50b549ebf800136cae692ebb2e",
+  "sourceWorkingTreeDirty": true,
+  "archive": "Averill-macOS-arm64.zip",
+  "archiveSha256": "f561c62949437c0d20c123703e89b6f8d103a3804fadcaa813e64c208fd83d62",
+  "bundleFiles": 3234,
+  "trackedSourceFiles": 244,
+  "verifiedSourceFiles": 244,
+  "includesUncommittedRuntimeFiles": true,
+  "signed": false,
+  "target": "macOS-arm64"
+}
