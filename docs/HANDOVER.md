@@ -1,5 +1,7 @@
 # Latest correction: Canva general assistance and public AI — 29 October 2026
 
+**Owner-requested cleanup, 29 October:** the two old `Averill-before-*.app` copies listed in `review-evidence-2026-10-29/design-basics/old-versions-cleanup.json` were moved to macOS Trash (not emptied). Open `travel-desktop/dist/Averill.app`; its current runtime matches source and the retained ZIP hash is unchanged. Accounts, provider keys, source approvals and profile were not changed. The identical current packaging bundle is retained for release verification.
+
 **Repository checkpoint:** implementation saved locally at `2d1ee83`. A final integrity check after staging/committing the new test file verifies **244 source files**, both helpers and 3234 ZIP entries with the same archive hash. The owner explicitly authorized GitHub transfer on 29 October. Commits `2d1ee83` and `f9f452b` were pushed successfully to `github.com/sararr25/averill-ai`, branch `docs/canva-live-test-2026-10-28`. The earlier automatic-review block was resolved by that authorization. No merge on main or release publication. The pre-existing `.gitignore` change remains uncommitted.
 
 This section supersedes the package/count/status statements in the earlier Pro ledger below. See [Canva correction](CANVA_GENERAL_HELP_2026-10-29.md).
