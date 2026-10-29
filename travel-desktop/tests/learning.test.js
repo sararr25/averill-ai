@@ -81,9 +81,9 @@ test('learning is isolated by person and exclusion invalidates practice',t=>{con
 test('revoked and conflicting sources cannot justify questions; rule questions cite the approved source',t=>{
  const {dir,data}=fixture(t);const f=path.join(dir,'brief.md');fs.writeFileSync(f,'Approved instructions');const src=workspace.importFile(dir,data,f);workspace.updateSource(data,src.id,'approved');
  const s=learning.start(data,src.id,now);learning.finish(data,s.id,{selfConfirmAll:true},now);const q=learning.beginQuiz(data,now);
- const question=q.questions.find(x=>x.bankId==='source-check');assert.ok(question);assert.equal(question.rule.version,String(src.version));assert.equal(question.rule.title,src.title);
+ const question=q.questions.find(x=>x.source?.id===src.id);assert.ok(question);assert.equal(question.source.version,String(src.version));assert.equal(question.source.title,src.title);assert(!q.questions.some(x=>x.bankId==='source-check'),'no generic document-version question replaces a practised skill');
  learning.submitQuiz(data,q.id,{answers:right(q),tried:true},now);
- assert.equal(learning.snapshot(data,now).quiz.questions.find(x=>x.id===question.id).result.rule.title,src.title,'feedback cites the source');
+ assert.equal(learning.snapshot(data,now).quiz.questions.find(x=>x.id===question.id).source.title,src.title,'question retains the practised source');
  workspace.updateSource(data,src.id,'superseded');assert.equal(learning.snapshot(data,now).quiz.questions.find(x=>x.id===question.id).available,false);
  assert.throws(()=>learning.record(data,{tool:'Newsletter',note:'I checked the audience',sourceId:src.id,confirmed:true},now));workspace.updateSource(data,src.id,'approved');const f2=path.join(dir,'other.md');fs.writeFileSync(f2,'Other instructions');const other=workspace.importFile(dir,data,f2,{title:src.title});workspace.updateSource(data,other.id,'approved');assert.equal(learning.snapshot(data,now).sessions[0].sourceAvailable,false);
 });
@@ -92,7 +92,7 @@ test('a revoked source makes a fresh submission impossible',t=>{
  const s=learning.start(data,src.id,now);learning.finish(data,s.id,{selfConfirmAll:true},now);const q=learning.beginQuiz(data,now);
  workspace.updateSource(data,src.id,'superseded');assert.throws(()=>learning.submitQuiz(data,q.id,{answers:right(q),tried:true},now),/changed/);assert.deepEqual(q.results,{});
 });
-test('Copenhagen week rollover and recorded work without a free-text question',t=>{const {data}=fixture(t);assert.equal(learning.weekKey(new Date('2026-09-27T22:30:00Z')),'2026-09-28');learning.record(data,{tool:'Newsletter',note:'I practised checking my audience against the approved brief.',confirmed:true},now);const q=learning.beginQuiz(data,now);assert.ok(q.questions.every(x=>['picture','text-picture','tap','order','task'].includes(x.type)),'no free-text reflection in the test');assert.ok(q.questions.some(x=>x.bankId==='task-brevo-footer'),'a newsletter activity adds a Brevo draft task');assert.throws(()=>learning.beginQuiz(data,new Date('2026-09-28T10:00:00Z')));});
+test('Copenhagen week rollover and recorded work without a free-text question',t=>{const {data}=fixture(t);assert.equal(learning.weekKey(new Date('2026-09-27T22:30:00Z')),'2026-09-28');learning.record(data,{tool:'Newsletter',note:'I practised checking the footer and unsubscribe link in my email.',confirmed:true},now);const q=learning.beginQuiz(data,now);assert.ok(q.questions.every(x=>['picture','text-picture','tap','order','task'].includes(x.type)),'no free-text reflection in the test');assert.ok(q.questions.some(x=>x.bankId==='task-brevo-footer'),'confirmed footer practice adds the matching Brevo draft task');assert.throws(()=>learning.beginQuiz(data,new Date('2026-09-28T10:00:00Z')));});
 test('finding exercises keep employee confirmation separate from supported checks',t=>{const {data}=fixture(t);const finding={kind:'linkedin',id:'linkedin-claim',title:'Wrong claim',body:'Use approved copy',action:'Revise the claim',source:{id:'linkedin',title:'LinkedIn guidance'}};const exercise=learning.startFinding(data,finding,now);assert.equal(learning.startFinding(data,finding,now).id,exercise.id);learning.completeFinding(data,exercise.id,'I changed the post and checked the campaign guidance.','not-checked',now);assert.equal(exercise.exercise.check,'not-checked');assert.equal(exercise.confirmed[0].kind,'employee-confirmed');});
 test('task exercises are one page with one confirmation; Canva steps tick from the design reading',t=>{
  const {data}=fixture(t);const project=learning.startProject(data,'linkedin_visual',null,now);assert.equal(project.project.steps.length,3);
@@ -158,10 +158,22 @@ test('design readings tick lesson steps for the active person; finishing records
  const first=learning.checkDesign(data,{design,elements:[text(96,120,800,700,120),text(40,300,1000,300,50)]},now);
  assert.deepEqual(first.steps.filter(x=>x.done).map(x=>x.id),['hierarchy','size','margin','contrast']);assert.equal(first.steps.at(-1).check,'confirm');
  assert.throws(()=>learning.finish(data,s.id,{},now),/Align the two texts/);
- learning.checkDesign(data,{design,elements:[text(96,120,800,700,120),text(40,120,1000,600,50,[200,200,190])]},now);
+ const regressed=learning.checkDesign(data,{design,elements:[text(96,120,800,700,120),text(40,120,1000,600,50,[200,200,190])]},now);
+ assert.equal(regressed.steps.find(step=>step.id==='contrast').done,false,'a current defect clears the displayed tick');
+ assert.throws(()=>learning.finish(data,s.id,{},now),/Make every text easy to read/);
  assert.ok(s.checks.contrast,'a step once seen stays ticked');assert.equal(s.live.result.contrast,false,'the live reading still shows today’s problem');
+ learning.checkDesign(data,{design,elements:[text(96,120,800,700,120),text(40,120,1000,600,50)]},now);
  learning.finish(data,s.id,{},now);
  assert.deepEqual(Object.fromEntries(s.confirmed.map(c=>[c.id,c.kind])),{hierarchy:'checked-by-averill',size:'checked-by-averill',align:'checked-by-averill',margin:'checked-by-averill',contrast:'checked-by-averill',group:'employee-confirmed'});
  const e=workspace.addPerson(data,'Employee','employee','Marketing');workspace.switchPerson(data,e.id);
  assert.equal(learning.checkDesign(data,{design,elements:[text(96,120,800,700,120)]},now),null,'another person’s reading never touches this lesson');
+});
+
+test('current lesson uses stricter company constraints as well as the general baseline',t=>{
+ const {data}=fixture(t);learning.start(data,null,now);
+ const reading={design,elements:[text(96,80,800,700,120),text(40,80,1000,600,50)]};
+ assert.equal(learning.checkDesign(data,reading,now).steps.find(s=>s.id==='margin').done,true);
+ const stricter=learning.checkDesign(data,{...reading,constraints:{margin:108}},now);
+ assert.equal(stricter.steps.find(s=>s.id==='margin').done,false);
+ assert.equal(stricter.steps.find(s=>s.id==='margin').seenBefore,true);
 });

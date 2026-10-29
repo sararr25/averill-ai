@@ -12,7 +12,7 @@ function confirmOutbound({ service, title, note, items, editable = false }) {
     const label = node('label'); label.htmlFor = box.id;
     let field = null;
     if (editable) { field = node('textarea'); field.value = item; field.rows = 2; field.maxLength = 400; field.setAttribute('aria-label', `Item ${index + 1}`); label.append(field); }
-    else label.textContent = item;
+    else { label.textContent = typeof item === 'object' && item ? `${item.label || 'Request text'}\n${item.text || ''}` : item; label.style.whiteSpace = 'pre-wrap'; }
     row.append(box, label); list.append(row);
     return { box, field, item };
   });

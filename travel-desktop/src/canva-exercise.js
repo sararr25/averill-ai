@@ -9,15 +9,15 @@ const { BASE_WIDTH, isLarge } = require('./design-check');
 const LESSON_MARGIN = 60, EDGE_TOLERANCE = 0.5, HIERARCHY_RATIO = 1.5, ALIGN_SHARE = 0.01;
 const AUTO_STEPS = ['hierarchy', 'size', 'align', 'margin', 'contrast'];
 
-function evaluate({ design, elements }) {
+function evaluate({ design, elements, constraints = {} }) {
   const texts = [...elements].sort((a, b) => b.fontSize - a.fontSize);
   const [headline, support] = texts;
   const tolerance = ALIGN_SHARE * design.width;
   const edges = box => [box.x, box.x + box.width / 2, box.x + box.width];
   const aligned = Boolean(support) && edges(headline.box).some((edge, i) => Math.abs(edge - edges(support.box)[i]) <= tolerance);
-  const margin = LESSON_MARGIN * design.width / BASE_WIDTH - EDGE_TOLERANCE;
+  const margin = Math.max(LESSON_MARGIN, constraints.margin || 0) * design.width / BASE_WIDTH - EDGE_TOLERANCE;
   const inside = ({ box }) => box.x >= margin && box.y >= margin && design.width - (box.x + box.width) >= margin && design.height - (box.y + box.height) >= margin;
-  const readable = element => worstContrast(element.colors, element.background) >= (isLarge(element, design) ? 3 : 4.5);
+  const readable = element => worstContrast(element.colors, element.background) >= (isLarge(element, design) ? Math.max(3, constraints.large || 0) : Math.max(4.5, constraints.normal || 0));
   return {
     hierarchy: texts.length >= 2,
     size: Boolean(support) && headline.fontSize >= HIERARCHY_RATIO * support.fontSize,

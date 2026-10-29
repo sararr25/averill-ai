@@ -1,3 +1,13 @@
+Public tutoring correction, 29 October 2026: functional tool help may use the configured Nebius key with company AI off, only after its outbound preview. `nebius.publicToolHelp` constructs a closed generic operation and bounded official public excerpts; it accepts no arbitrary question, draft, role, prompt or company text. Company chat, intake and embeddings retain the owner policy gate. Mixed answers append mandatory company requirements locally. General contrast/inset findings remain distinct from company approval, and lesson ticks describe current measurements and clear on regression. See `docs/CANVA_GENERAL_HELP_2026-10-29.md`.
+
+# Pro relevance increment — 29 October 2026
+
+Approved implementation: weekly practice relevance version 3 selects only skills actually practised. Shorter quizzes replace unrelated Canva filler. Linked company-rule questions require the practised source; generic document-version questions are no longer inserted. Old quiz records stay intact and require a refreshed relevant set before a new submission.
+
+Online tool guidance stays outside Learn. An explicit “I tried this” uses a person/authority-bound, single-use practice ID. It records the skill/tool/profile and dated public-guidance references as employee-confirmed. It does not infer mastery or expose a score to managers. Recorded email footer practice produces the matching visual footer question and a practical task, not unrelated Canva questions. Unsupported recorded activities offer a useful next step when no grounded question exists.
+
+The four visual formats, one-page submit, wrong-only retry, current Copenhagen week, private records and source invalidation are preserved. See scripts/verify-pro-ui.cjs, tests/work-assistant.test.js and the current HANDOVER for actual verification.
+
 ## Library and Learn hierarchy increment — 18 October 2026
 
 Library reading leads with title, approval state, excerpt and Read. Metadata, originals, comparison and destructive actions expand separately. Approval forms move to a distinct queue, shown only for the authenticated person's matching `canReview` requests. Main-process role/reason/version validation is unchanged. Readers restore focus to their library or queue trigger. Private clarification/rule operations expand separately.

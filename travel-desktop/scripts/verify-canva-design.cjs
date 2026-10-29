@@ -27,7 +27,7 @@ let designDelay = 0, designInFlight = 0; // Holds design-check requests back so 
 global.fetch = async (url, options) => { assert.equal(new URL(url).hostname, '127.0.0.1', 'No provider request allowed'); if (designDelay && String(options?.body || '').includes('"design-check"')) { designInFlight++; await new Promise(resolve => setTimeout(resolve, designDelay)); designInFlight--; } return originalFetch(url, options); };
 require('../main.js');
 const pause = ms => new Promise(resolve => setTimeout(resolve, ms)); const checks = [];
-const PAGE = 'https://www.canva.com/qa';
+const PAGE = 'https://www.canva.com/design/SYNTHETIC_DESIGN/qa';
 const PISTACHIO_CSS = 'rgb(147, 197, 114)', CAROUSEL_SAFE = { nyhavn: [112, 160], group: [108, 1086.59], polaroid: [267.626, -1000] };
 app.whenReady().then(async () => { try {
   let agent; for (let i = 0; i < 100; i++) { agent = BrowserWindow.getAllWindows().find(w => w.webContents.getURL().includes('agent.html')); if (agent && !agent.webContents.isLoading() && await agent.webContents.executeJavaScript('Boolean(window.desktop)')) break; await pause(100); }
@@ -35,7 +35,7 @@ app.whenReady().then(async () => { try {
   await run("window.desktop.enableAccounts('owner@synthetic.example','Synthetic-password-123')");
   const ses = session.fromPartition('canva-design-qa');
   ses.protocol.handle('https', request => {
-    const url = new URL(request.url);
+    const url = new URL(request.url); url.pathname = url.pathname.replace('/design/SYNTHETIC_DESIGN', '');
     if (url.hostname !== 'www.canva.com') return new Response('', { status: 404 });
     if (url.pathname.startsWith('/qa/img/')) return new Response(qa.image(path.basename(url.pathname)), { headers: { 'Content-Type': 'image/png', 'Access-Control-Allow-Origin': 'https://www.canva.com' } });
     if (url.pathname.startsWith('/qa/assets/')) { const name = path.basename(url.pathname); if (!['mark.svg', 'plus-jakarta-sans.ttf'].includes(name) && !/^howto-(text|size|align|margin|contrast|group)\.svg$/.test(name)) return new Response('', { status: 404 }); return new Response(fs.readFileSync(path.join(APP, 'browser-extension/assets', name)), { headers: { 'Content-Type': name.endsWith('.svg') ? 'image/svg+xml' : 'font/ttf' } }); }
@@ -51,7 +51,7 @@ app.whenReady().then(async () => { try {
   });
   const extOrigin = 'chrome-extension://' + 'c'.repeat(32);
   let tabUrl = PAGE;
-  const chrome = { runtime: { id: 'c'.repeat(32), onMessage: { addListener: f => { backgroundListener = f; } } }, action: { setBadgeText: async () => {}, setBadgeBackgroundColor: async () => {} }, storage: { session: { get: async keys => Object.fromEntries([].concat(keys).map(key => [key, storage[key] ? structuredClone(storage[key]) : undefined])), set: async object => Object.assign(storage, structuredClone(object)) } }, tabs: { query: async () => [{ id: 9, url: tabUrl }], sendMessage: async (_id, message) => { if (message.kind === 'ping') return { alive: await editor.webContents.executeJavaScript("typeof window.__averillStop==='function'") }; editor.webContents.send('test-extension-message', message); }, onRemoved: { addListener: () => {} }, onUpdated: { addListener: f => { updatedListener = f; } } }, scripting: { executeScript: async ({ files }) => { injected.push([...files]); for (const name of files) await editor.webContents.executeJavaScript(fs.readFileSync(path.join(APP, 'browser-extension', name), 'utf8')); } } };
+  const chrome = { runtime: { id: 'c'.repeat(32), getManifest: () => ({ version:'0.4.0' }), onMessage: { addListener: f => { backgroundListener = f; } } }, action: { setBadgeText: async () => {}, setBadgeBackgroundColor: async () => {} }, storage: { session: { get: async keys => Object.fromEntries([].concat(keys).map(key => [key, storage[key] ? structuredClone(storage[key]) : undefined])), set: async object => Object.assign(storage, structuredClone(object)) } }, tabs: { query: async () => [{ id: 9, url: tabUrl }], sendMessage: async (_id, message) => { if (message.kind === 'ping') return { alive: await editor.webContents.executeJavaScript("typeof window.__averillStop==='function'") }; editor.webContents.send('test-extension-message', message); }, onRemoved: { addListener: () => {} }, onUpdated: { addListener: f => { updatedListener = f; } } }, scripting: { executeScript: async ({ files }) => { injected.push([...files]); for (const name of files) await editor.webContents.executeJavaScript(fs.readFileSync(path.join(APP, 'browser-extension', name), 'utf8')); } } };
   const injected = [];
   const worker = vm.createContext({ chrome, URL, AbortSignal, setTimeout, fetch: (url, options) => global.fetch(url, { ...options, headers: { ...options.headers, Origin: extOrigin } }) }); worker.globalThis = worker;
   worker.importScripts = (...files) => { for (const name of files) vm.runInContext(fs.readFileSync(path.join(APP, 'browser-extension', name), 'utf8'), worker); };
@@ -61,7 +61,7 @@ app.whenReady().then(async () => { try {
   editor = new BrowserWindow({ width: 1400, height: 900, show: false, webPreferences: { session: ses, preload, contextIsolation: true, sandbox: true } });
   ipcMain.handle('test-extension', (event, payload) => { assert.equal(event.sender, editor.webContents); return relay(payload); });
   const page = async s => { try { return await editor.webContents.executeJavaScript(s); } catch (error) { console.error('Page operation:', s.slice(0, 160)); throw error; } };
-  const shim = () => page(`window.testShadows=[];const originalShadow=Element.prototype.attachShadow;Element.prototype.attachShadow=function(o){const r=originalShadow.call(this,o);window.testShadows.push(r);return r};window.designShadow=()=>window.testShadows.find(r=>r.host.hasAttribute('data-averill-design')&&r.host.isConnected);window.chrome={runtime:{getURL:p=>'https://www.canva.com/qa/'+p,sendMessage:p=>window.testExtension.send(p),onMessage:{addListener:f=>window.testExtension.onMessage(f)}}};void 0;`);
+  const shim = () => page(`window.testShadows=[];const originalShadow=Element.prototype.attachShadow;Element.prototype.attachShadow=function(o){const r=originalShadow.call(this,o);window.testShadows.push(r);return r};window.designShadow=()=>window.testShadows.find(r=>r.host.hasAttribute('data-averill-design')&&r.host.isConnected);window.chrome={runtime:{getManifest:()=>({version:'0.4.0'}),getURL:p=>'https://www.canva.com/qa/'+p,sendMessage:p=>window.testExtension.send(p),onMessage:{addListener:f=>window.testExtension.onMessage(f)}}};void 0;`);
   const load = async url => { await editor.loadURL(url); await page("Promise.all([...document.images].map(i=>i.complete?0:new Promise(r=>{i.onload=i.onerror=r})))"); await shim(); };
   const D = "designShadow()";
   const text = () => page(`${D}?.textContent||''`);
@@ -82,7 +82,7 @@ app.whenReady().then(async () => { try {
   const setBodyText = value => page(`document.querySelector('[data-qa-text=body] span').textContent=${JSON.stringify(value)};[...document.querySelectorAll('[data-qa-layer] span')].at(-1).textContent=${JSON.stringify(value)};void 0`);
   const moveBody = x => page(`document.querySelector('[data-qa-text=body]').style.transform='translate(${x}px, 1276.17px)';void 0`);
   const BODY = 'finish this line: what makes the city good before 8?', NEAR_BLACK = 'rgb(16, 15, 13)', PISTACHIO = 'rgb(147, 197, 114)';
-  const clean = `${D}?.querySelector('h2')?.textContent==='No design problems found.'`, blocking = `${D}?.querySelector('h2')?.textContent==='Fix before you export'`;
+  const clean = `${D}?.querySelector('h2')?.textContent==='No issues in the measured checks.'`, blocking = `${D}?.querySelector('h2')?.textContent==='Fix before you export'`;
   const findings = () => page(`[...${D}.querySelectorAll('.dfind')].map(f=>({text:f.querySelector('b').textContent,lines:[...f.querySelectorAll(':scope>p')].map(p=>p.textContent),title:f.querySelector('summary')?.firstChild.textContent,version:f.querySelector('summary small')?.textContent,quote:f.querySelector('.quote')?.textContent}))`);
 
   await load(PAGE);
@@ -104,7 +104,7 @@ app.whenReady().then(async () => { try {
     const geometry = await page(`(()=>{const c=${D}.host.getBoundingClientRect(),f=AverillCanvaDesign.frameRect(document);return {cardLeft:c.left,frameRight:f.right,inView:c.top>=0&&c.right<=innerWidth&&c.bottom<=innerHeight,pills:[...${D}.querySelectorAll('*')].filter(e=>getComputedStyle(e).borderRadius==='999px').length}})()`);
     assert(geometry.cardLeft >= geometry.frameRight, JSON.stringify(geometry)); assert(geometry.inView); assert.equal(geometry.pills, 0, 'no pills');
     const sent = designCalls.at(-1).payload;
-    assert.deepEqual(Object.keys(sent).sort(), ['design', 'elements', 'kind', 'slide']);
+    assert.deepEqual(Object.keys(sent).sort(), ['clientVersion', 'design', 'designId', 'elements', 'kind', 'protocol', 'slide']);
     assert.deepEqual(sent.slide, { index: 1, count: 1 }, 'a one-page design is slide 1 of 1');
     assert.deepEqual(sent.elements.map(e => e.text), ['vamo', 'copenhagen before 8', BODY]);
     assert(!JSON.stringify(sent).includes('data:'), 'no image data'); assert(JSON.stringify(sent).length < 4000);
@@ -183,21 +183,42 @@ app.whenReady().then(async () => { try {
     await moveBody(122); await until(`${D}.querySelector('details.how[data-how=align]')?.open===true`, 'panel stays open'); await moveBody(120);
     await page(`${D}.querySelector('details.how[data-how=align]').open=false`);
   });
+  await step('Lesson ticks describe current measurements and clear when margin or contrast regresses', async () => {
+    const todo = id => `${D}.querySelectorAll('.dexlist>li')[${id}].classList.contains('todo')`;
+    await moveBody(80); await until(todo(3), 'margin tick cleared');
+    assert.match(await page(`${D}.querySelectorAll('.dexlist>li')[3].textContent`), /needs attention now/);
+    await moveBody(120); await until(clean, 'margin restored');
+    await setBodyColor(PISTACHIO); await until(todo(4), 'contrast tick cleared');
+    await setBodyColor(NEAR_BLACK); await until(clean, 'contrast restored');
+  });
   await step('Question box in the design card: a design question is answered from the approved Design rule lines with the measured facts', async () => {
     await page(`${D}.querySelector('textarea#averill-design-ask').value='How far from the edge must text be?';void 0`);
     await tap({ css: 'button', label: 'Ask the question' });
     await until(`/Design rule/.test(${D}.querySelector('.out')?.textContent||'')`, 'answer');
     const answer = await page(`${D}.querySelector('.out').textContent`);
     assert(/108/.test(answer), answer); assert(/social-media-guidelines-v2\.md/.test(answer), answer);
-    assert.equal(await page(`${D}.querySelector('label[for=averill-design-ask]').textContent`), 'Ask about this design or company rules');
+    assert.equal(await page(`${D}.querySelector('label[for=averill-design-ask]').textContent`), 'Ask for design or Canva help');
     await page(`${D}.querySelector('.ask').scrollIntoView({block:'center'})`); await shot('t5-design-question');
     console.log('Design question answer:', answer.replace(/\s+/g, ' ').slice(0, 400));
+  });
+  await step('Functional Canva help remains visible offline without company citations, with official help and explicit practice', async () => {
+    await page(`${D}.querySelector('textarea#averill-design-ask').value='How do I group elements in Canva?';void 0`);
+    await tap({ css: 'button', label: 'Ask the question' });
+    await until(`${D}.querySelector('.out')?.textContent.includes('Local tool guidance')`, 'local functional answer');
+    const answer = await page(`${D}.querySelector('.out').textContent`);
+    assert.match(answer, /choose Group in the editor toolbar/);
+    assert(!answer.includes('No approved source answers this.'));
+    assert.equal(await page(`${D}.querySelector('.out a').href`), 'https://www.canva.com/help/');
+    assert(answer.includes('I tried this · save to my practice'));
+    await tap({ css: 'button', label: 'I tried this · save to my practice' });
+    await until(`${D}.querySelector('.out')?.textContent.includes('Saved as your confirmed practice.')`, 'confirmed practice saved');
+    assert.equal(await page(`${D}.querySelector('.out .error')`), null, 'success is not rendered as an error');
   });
   await step('Q3: the card follows the system colour scheme (light by default, dark when the Mac is dark)', async () => {
     const colours = async () => page(`(()=>{const c=${D}.querySelector('.card');const s=getComputedStyle(c);const f=${D}.querySelector('.watch input');return {bg:s.backgroundColor,text:s.color}})()`);
     await page(`${D}.querySelector('.main').scrollTop=0`); await scheme('light'); assert.deepEqual(await colours(), { bg: 'rgb(255, 255, 255)', text: 'rgb(29, 26, 36)' }); await shot('t5-card-light');
     await scheme('dark'); assert.deepEqual(await colours(), { bg: 'rgb(43, 40, 53)', text: 'rgb(243, 241, 248)' }); await shot('t5-card-dark');
-    await tap({ css: 'button', label: 'Minimise the design check' }); assert.equal(await page(`${D}.querySelector('.dpill').textContent`), 'Design check: No problems · 5 of 6 steps', 'the pill counts the lesson steps'); await shot('t5-minimised-dark'); await scheme('light'); await shot('t5-minimised-light'); await tap({ css: 'button.dpill' });
+    await tap({ css: 'button', label: 'Minimise the design check' }); assert.equal(await page(`${D}.querySelector('.dpill').textContent`), 'Design check: Measured checks passed · 5 of 6 steps', 'the pill counts the lesson steps'); await shot('t5-minimised-dark'); await scheme('light'); await shot('t5-minimised-light'); await tap({ css: 'button.dpill' });
     await page(`${D}.querySelector('.watch input').focus()`);
   });
   await step('D1 lesson: one confirmation finishes it; readable steps are recorded as checked by Averill, grouping as confirmed by the employee', async () => {
@@ -269,7 +290,7 @@ app.whenReady().then(async () => { try {
     assert.equal(designCalls.at(-1).value.state, 'incomplete'); assert.equal(await page(`${D}.querySelectorAll('.dfind').length`), 0);
     assert((await text()).includes('them: 3, 4, 5.'));
   });
-  await step('Slides 3, 4 and 5 read and clean: "No design problems found." with 5 of 5 slides checked', async () => {
+  await step('Slides 3, 4 and 5 read and clean: "No issues in the measured checks." with 5 of 5 slides checked', async () => {
     for (const index of [3, 4]) { await openSlide(index); assert.equal(designCalls.at(-1).value.state, 'incomplete'); }
     await openSlide(5); await until(clean, 'clean after every slide');
     assert.deepEqual(designCalls.at(-1).value.slides, { current: 5, count: 5, checked: [1, 2, 3, 4, 5] });
@@ -280,7 +301,7 @@ app.whenReady().then(async () => { try {
     tabUrl = PAGE; await load(PAGE); updatedListener(9, { status: 'complete' }, { id: 9, url: PAGE }); await until(`Boolean(${D})`, 'reinjected on the single design');
     await toggleWatch(); await until(clean, 'clean before minimising'); await tap({ css: 'button', label: 'Minimise the design check' });
     await until(`Boolean(${D}.querySelector('.dmin'))`, 'minimised');
-    assert.equal(await page(`${D}.querySelector('.dpill').textContent`), 'Design check: No problems');
+    assert.equal(await page(`${D}.querySelector('.dpill').textContent`), 'Design check: Measured checks passed');
     await shot('t5-minimised'); await tap({ css: 'button.dpill' });
     await until(`Boolean(${D}.querySelector('h2'))`, 'restored');
     assert.equal(await page(`${D}.activeElement?.getAttribute('aria-label')`), 'Minimise the design check');
@@ -323,6 +344,16 @@ app.whenReady().then(async () => { try {
     await until(`!${D}`, 'design card removed');
     const refused = await relay({ kind: 'design-check', design: { width: 1080, height: 1440, scale: 1 }, elements: [] });
     assert.equal(refused.stopped, true);
+  });
+  await step('Logout clears the native sharing pill and connection icon after a real bridge connection', async () => {
+    await relay({ kind: 'connect-tab' }, { id: chrome.runtime.id });
+    for(let i=0;i<30&&!await run("document.getElementById('sharing-status').textContent.startsWith('SHARING:')");i++)await pause(60);
+    assert.match(await run("document.getElementById('sharing-status').textContent"), /^SHARING:/);
+    await run('window.desktop.logout()');
+    for(let i=0;i<30&&await run("document.getElementById('sharing-status').textContent!=='NOT SHARING'");i++)await pause(60);
+    assert.equal(await run("document.getElementById('sharing-status').textContent"), 'NOT SHARING');
+    assert.equal(await run("document.getElementById('connection-icon').getAttribute('aria-label')"), 'Browser not connected');
+    assert.equal((await run('window.desktop.snapshot()')).browserBridge.ready, false);
   });
   console.log(checks.map(c => 'PASS ' + c).join('\n'));
   console.log(`FB-14 verify-canva-design: ${checks.length} steps passed; ${designCalls.length} design-check relays; zero provider requests. Synthetic Canva page and transport, not real canva.com.`);

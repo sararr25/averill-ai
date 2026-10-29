@@ -73,6 +73,7 @@ const browserBridge = new BrowserBridge({
   onRequest: payload => {
     requireSession();
     if (browserBridge.personId !== companyWorkspace.activePersonId) throw new Error('Browser session changed');
+    if (payload.kind === 'save-practice') return saveAssistantPractice(payload.practiceId);
     if (payload.kind === 'status') return contextualReview.status();
     if (payload.kind === 'review') return contextualReview.review(payload);
     if (payload.kind === 'proposal') return contextualReview.proposal(payload);
@@ -85,6 +86,7 @@ const browserBridge = new BrowserBridge({
       if (payload.action === 'override') return result;
       // D1: the same reading ticks the steps of an open Canva lesson. Only step titles and ticks go back to the card.
       const reading = require('./browser-extension/canva-design').validate({ design: payload.design, elements: payload.elements });
+      reading.constraints = result.lessonConstraints;
       const exercise = learning.checkDesign(companyWorkspace, reading);
       // T7.2/T7.3: the same reading ticks the Canva tasks of this week's practice and the automatic steps of task exercises.
       const practiceTicked = learning.tickPractice(companyWorkspace, reading);
@@ -123,17 +125,38 @@ async function runPublicCheck(task, claims, origin) {
 }
 function reviewState() { return { signedIn: signedIn(), workspace: companyWorkspace, observed: externalObservation, epoch: externalEpoch, aiEnabled, key: runtimeKeys.nebius }; }
 // One company-question path for the desktop Ask and the in-page card: local unless the owner's AI policy and the session AI switch allow the model.
-function answerCompany(question, context = '') {
-  // T6: design questions are answered from approved design rule lines only, so they never reach the semantic index or Nemotron.
+const { WorkAssistant } = require('./src/work-assistant');
+const workAssistant = new WorkAssistant();
+function saveAssistantPractice(id) { requireSession(); const payload = workAssistant.takePractice(companyWorkspace, id); const session = learning.record(companyWorkspace, payload); workspace.save(app.getPath('userData'), companyWorkspace); publish(); return { saved: true, sessionId: session.id }; }
+async function assistCompany(question, context = '', options = {}) {
+  const answeringWorkspace = companyWorkspace;
+  const personId = companyWorkspace.activePersonId, epoch = externalEpoch;
+  const answerAI = aiEnabled;
+  const observationKey = JSON.stringify([externalObservation?.fieldId, externalObservation?.revision, externalObservation?.contentHash]);
+  const assisted = await workAssistant.answer(companyWorkspace, question, {
+    context, task: options.task || (selectedExternalWindow?.name?.toLowerCase().includes('canva') ? 'canva' : undefined),
+    scope: options.scope || 'desktop', consent: options.consent,
+    nebiusKey: aiEnabled ? runtimeKeys.nebius : '', publicNebiusKey: runtimeKeys.nebius, tavilyKey: runtimeKeys.tavily,
+    modelTransport: companyWorkspace.demoAccounts && !runtimeKeys.nebius ? (request, fetcher) => judgeServer.assist(companyWorkspace, request, { fetcher }) : undefined,
+    searchTransportFactory: companyWorkspace.demoAccounts && !runtimeKeys.tavily ? fetcher => judgeServer.searchTransport(companyWorkspace, { fetcher }) : undefined,
+    validate: () => { if (!signedIn() || companyWorkspace !== answeringWorkspace || companyWorkspace.activePersonId !== personId || externalEpoch !== epoch || aiEnabled !== answerAI || context && JSON.stringify([externalObservation?.fieldId, externalObservation?.revision, externalObservation?.contentHash]) !== observationKey) throw new Error('The work session changed. Ask again.'); },
+  });
+  return assisted;
+}
+async function answerCompany(question, context = '', options = {}) {
+  const personId = companyWorkspace.activePersonId, epoch = externalEpoch;
+  const assisted = await assistCompany(question, context, options);
+  if (assisted) return assisted;
   if (!(aiEnabled && privacy.allowed(companyWorkspace)) || designTopics(question)) return localWorkspaceAnswer(companyWorkspace, question);
-  return semanticIndex.search(app.getPath('userData'), companyWorkspace, question, { key: runtimeKeys.nebius }).catch(() => ({ results: [] }))
-    .then(found => answerWorkspace(companyWorkspace, question, runtimeKeys.nebius, undefined, found.results, context));
+  const found = await semanticIndex.search(app.getPath('userData'), companyWorkspace, question, { key: runtimeKeys.nebius }).catch(() => ({ results: [] }));
+  if (!signedIn() || companyWorkspace.activePersonId !== personId || externalEpoch !== epoch) throw new Error('The work session changed.');
+  return answerWorkspace(companyWorkspace, question, runtimeKeys.nebius, undefined, found.results, context);
 }
 const contextualReview = new ContextualReview({
   getState: reviewState,
   online: onlineCheckState,
   checkOnline: (claims, task) => runPublicCheck(task, claims, 'browser card'),
-  answer: (question, context) => answerCompany(question, context),
+  answer: (question, context, options) => answerCompany(question, context, options),
   openSource: sourceId => { agentWindow.show(); agentWindow.focus(); agentWindow.webContents.send('agent:open-context', { sourceId }); },
 });
 
@@ -197,6 +220,7 @@ function signedIn() {
 function requireSession() { if (!signedIn()) throw new Error('Sign in to your account first.'); }
 // reason names why an active browser connection ends (see browser-extension/end-reasons.js).
 function stopExternal(clearSelection = true, reason = 'stopped_by_user') {
+  workAssistant.cancelAll();
   contextualReview.invalidate();
   browserBridge.stop(browserBridge.server ? reason : null);
   externalEpoch += 1;
@@ -217,7 +241,7 @@ function isOwnWindowSource(source) {
 }
 function clearSessionWork() {
   browserSessionEpoch++; browserConnect.revoke();
-  shared.clear(); aiEnabled = false; stopExternal(true, 'signed_out'); contextualReview.clearDesign();
+  shared.clear(); aiEnabled = false; stopExternal(true, 'signed_out'); contextualReview.clearDesign(); workAssistant.clear();
   workState.clear();
   for (const window of workWindows.values()) if (!window.isDestroyed()) window.close();
   workWindows.clear();
@@ -242,6 +266,7 @@ function snapshot() {
     externalError: signedIn() ? externalError : '',
     services: { nebius: Boolean(runtimeKeys.nebius), tavily: Boolean(runtimeKeys.tavily) },
     designCheck: signedIn() ? contextualReview.designStatus(companyWorkspace.activePersonId) : null,
+    playbooks: signedIn() ? require('./src/role-playbooks').forPerson(workspace.person(companyWorkspace)) : [],
     onlineCheck: signedIn() ? { ...onlineCheckState(), last: lastPublicCheck?.personId === companyWorkspace.activePersonId ? lastPublicCheck : null } : null,
     publicSite: signedIn() ? publicSite.snapshot(companyWorkspace) : null,
     cloudActivity: signedIn() ? { mine: cloudActivity.forPerson(companyWorkspace, companyWorkspace.activePersonId), totals: workspace.person(companyWorkspace)?.role === 'admin' ? cloudActivity.summary(companyWorkspace) : null } : null,
@@ -723,10 +748,13 @@ app.whenReady().then(async () => {
     publish();
     return snapshot();
   });
+  ipcMain.handle('assistant:practice', (event, id) => { fromAgent(event); return saveAssistantPractice(id); });
   ipcMain.handle('agent:ask', async (event, question, consent) => {
     fromAgent(event);
     if(aiEnabled&&privacy.credentials(question))throw new Error('Remove credentials before using external AI.');
     if (companyWorkspace) {
+      const assisted = await answerCompany(question, externalObservation?.field?.value || '', { consent });
+      if (assisted.assistant || assisted.consentRequired) return assisted;
       // T1.3: in the demo workspace without a local key, non-design questions go to the capped demo server only after the
       // employee confirmed what is sent (consent === true). consent === undefined asks the renderer for that confirmation.
       if (companyWorkspace.demoAccounts === true && !aiEnabled && signedIn()) {
@@ -741,12 +769,13 @@ app.whenReady().then(async () => {
         }
         if (plan) return { ...await answerCompany(question), ai: { status: 'declined', notice: 'Not sent to NVIDIA Nemotron. This is the local approved-source answer.' } };
       }
-      return answerCompany(question);
+      return assisted;
     }
     return aiEnabled && privacy.allowed(companyWorkspace) ? answerQuestion(question, runtimeKeys.nebius, companyWorkspace) : { ...localAnswer(String(question || '').slice(0, 1000)), mode: 'local' };
   });
-  ipcMain.handle('agent:ask-demo', (event, question) => {
+  ipcMain.handle('agent:ask-demo', async (event, question) => {
     fromAgent(event);
+    if (companyWorkspace) { const assisted = await assistCompany(question, externalObservation?.field?.value || ''); if (assisted) return assisted; }
     if(aiEnabled&&privacy.credentials(question))throw new Error('Remove credentials before using external AI.');
     return aiEnabled && privacy.allowed(companyWorkspace) ? answerQuestion(question, runtimeKeys.nebius, companyWorkspace) : { ...localAnswer(String(question || '').slice(0, 1000)), mode: 'local' };
   });

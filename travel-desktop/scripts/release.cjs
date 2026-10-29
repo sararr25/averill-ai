@@ -20,6 +20,7 @@ function verify() {
   const resource = path.join(bundle, 'Contents', 'Resources', 'app');
   // Electron Packager prunes the development lockfile and rewrites package.json.
   const tracked = execFileSync('git', ['ls-files', '-z', '.'], { cwd: root }).toString().split('\0').filter(relative => relative && !['package.json', 'package-lock.json'].includes(relative));
+  for (const directory of ['src', 'browser-extension', 'scripts']) for (const [relative] of inventory(path.join(root, directory))) { const name = path.join(directory, relative); if (directory === 'scripts' && !relative.endsWith('.cjs')) continue; if (!tracked.includes(name)) tracked.push(name); }
   const originalPackage = JSON.parse(fs.readFileSync(path.join(root, 'package.json')));
   const packaged = JSON.parse(fs.readFileSync(path.join(resource, 'package.json')));
   for (const field of ['name', 'version', 'main', 'dependencies']) {
@@ -37,9 +38,9 @@ function verify() {
     execFileSync('ditto', ['-x', '-k', archive, temporary]);
     const before = inventory(bundle), after = inventory(path.join(temporary, 'Averill.app'));
     if (JSON.stringify(before) !== JSON.stringify(after)) throw new Error('Archive differs from the app bundle.');
-    const evidence = { verifiedAt: new Date().toISOString(), sourceRevisionAtBuild: execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root }).toString().trim(), archive: path.basename(archive), archiveSha256: digest(archive), bundleFiles: before.length, trackedSourceFiles: tracked.length, signed: false, target: 'macOS-arm64' };
+    const evidence = { verifiedAt: new Date().toISOString(), sourceRevisionAtBuild: execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root }).toString().trim(), sourceWorkingTreeDirty: Boolean(execFileSync('git', ['status', '--porcelain'], { cwd: root }).toString().trim()), archive: path.basename(archive), archiveSha256: digest(archive), bundleFiles: before.length, trackedSourceFiles: tracked.length, verifiedSourceFiles: tracked.length, includesUncommittedRuntimeFiles: true, signed: false, target: 'macOS-arm64' };
     fs.writeFileSync(path.join(root, 'dist', 'release-verification.json'), JSON.stringify(evidence, null, 2) + '\n');
-    console.log(`PASS ${tracked.length} tracked source files, both native helpers and ${before.length} archived bundle entries; ZIP SHA-256 ${evidence.archiveSha256}`);
+    console.log(`PASS ${tracked.length} source files, both native helpers and ${before.length} archived bundle entries; ZIP SHA-256 ${evidence.archiveSha256}`);
   } finally { fs.rmSync(temporary, { recursive: true, force: true }); }
 }
 if (process.argv.includes('--verify')) verify();

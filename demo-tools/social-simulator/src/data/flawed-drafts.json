@@ -9,27 +9,24 @@
       "recipients": "All travel subscribers",
       "subject": "Winter Escapes 2027: lowest prices guaranteed",
       "previewText": "Copenhagen, Vienna and Prague, through our eyes.",
-      "body": "Hey traveller,\n\nWinter Escapes 2027 is open: three cities, planned by the crew that walks them. Our lowest prices guaranteed.\n\nCopenhagen\nHarbour walks, snow on the boats and a bakery on every corner.\n\nVienna\nChristmas markets at dusk and long café afternoons.\n\nPrague\nSide streets, snowy rooftops and a bridge at sunrise.\n\nExplore the winter collection: https://vamo-travel-site.vercel.app/winter.html\n\nGo for the place. Stay for the people.\n\nThe Vamo crew",
+      "body": "Hello traveller,\n\nDiscover curated winter city breaks with Winter Escapes 2027. Explore Copenhagen, Vienna and Prague, and find inspiration for your next short European break. Our lowest prices guaranteed.\n\nCopenhagen\nStart with the Copenhagen collection and explore the destination that interests you.\n\nVienna\nDiscover the Vienna collection and consider it for your next winter city break.\n\nPrague\nExplore the Prague collection and choose what you would like to discover next.\n\nExplore the winter collection: https://vamo-travel-site.vercel.app/winter.html\n\nGo for the place. Stay for the people.\n\nThe Vamo crew",
       "createdAt": "2026-09-28T08:00:00Z",
       "updatedAt": "2026-10-04T08:00:00Z",
       "imageUrl": "/vamo/photos/brevo-winter-hero-1200x600.jpg",
       "headline": "Winter Escapes 2027",
-      "intro": "Hey traveller,\n\nWinter Escapes 2027 is open: three cities, planned by the crew that walks them. Our lowest prices guaranteed.",
+      "intro": "Hello traveller,\n\nDiscover curated winter city breaks with Winter Escapes 2027. Explore Copenhagen, Vienna and Prague, and find inspiration for your next short European break. Our lowest prices guaranteed.",
       "sections": [
         {
           "heading": "Copenhagen",
-          "body": "Harbour walks, snow on the boats and a bakery on every corner.",
-          "imageUrl": "/vamo/photos/brevo-copenhagen-600x400.jpg"
+          "body": "Start with the Copenhagen collection and explore the destination that interests you."
         },
         {
           "heading": "Vienna",
-          "body": "Christmas markets at dusk and long café afternoons.",
-          "imageUrl": "/vamo/photos/brevo-vienna-600x400.jpg"
+          "body": "Discover the Vienna collection and consider it for your next winter city break."
         },
         {
           "heading": "Prague",
-          "body": "Side streets, snowy rooftops and a bridge at sunrise.",
-          "imageUrl": "/vamo/photos/brevo-prague-600x400.jpg"
+          "body": "Explore the Prague collection and choose what you would like to discover next."
         }
       ],
       "cta": {

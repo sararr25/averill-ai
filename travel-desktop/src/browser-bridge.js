@@ -91,11 +91,13 @@ class BrowserBridge {
       try {
         const imageCheck = request.url === '/context' && request.headers['x-averill-kind'] === 'image-check';
         const limit = imageCheck ? IMAGE_BODY_LIMIT : BODY_LIMIT;
-        if (imageCheck && Number(request.headers['content-length']) > limit) {
-          // Read and drop the body (bounded) so the sender sees a clean 413 instead of a reset connection.
+        if (Number(request.headers['content-length']) > limit) {
+          // Finish a bounded drain before closing: replying and closing mid-upload can reset the
+          // client's socket before it receives the refusal. Never buffer a rejected body.
           let dropped = 0;
-          for await (const chunk of request) { dropped += chunk.length; if (dropped > 4 * limit) { request.destroy(); return; } }
-          response.writeHead(413); response.end('{}'); return;
+          for await (const chunk of request) { dropped += chunk.length; if (dropped > 4 * IMAGE_BODY_LIMIT) { request.destroy(); return; } }
+          response.setHeader('Connection', 'close');
+          response.writeHead(imageCheck ? 413 : 400); response.end('{}'); return;
         }
         let bytes = 0, chunks = [];
         for await (const chunk of request) { bytes += chunk.length; if (bytes > limit) throw new Error('Too large'); chunks.push(chunk); }

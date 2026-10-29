@@ -1,0 +1,34 @@
+{
+  "verifiedAt": "2026-10-29T09:51:16.924966+00:00",
+  "authorization": "Owner explicitly authorized both production deployments on 29 October 2026",
+  "deployments": [
+    {
+      "project": "averill-judge-ai",
+      "deploymentId": "dpl_GJV7YvtXUjgkdmaMC1Fh3q5f65iy",
+      "alias": "https://averill-judge-ai.vercel.app",
+      "state": "READY",
+      "method": "Vercel connector; reviewed server source only"
+    },
+    {
+      "project": "averill-demo-sim",
+      "deploymentId": "dpl_H5SZfKM3CNzRVd4YPZrq4McpD3BV",
+      "alias": "https://averill-demo-sim.vercel.app",
+      "state": "READY",
+      "method": "Vercel CLI; isolated staging copy; source and public assets only"
+    }
+  ],
+  "simulatorLiveCheck": {
+    "surface": "Production alias through browser UI",
+    "draft": "Winter Escapes 2027 \u00b7 ready to review",
+    "meaningfulIntroCharacters": 294,
+    "guaranteePresent": false,
+    "requiredFooterPresent": true,
+    "heroLoaded": true,
+    "heroDimensions": [
+      1200,
+      600
+    ],
+    "modifiedOrSent": false
+  },
+  "githubReleasePublished": false
+}

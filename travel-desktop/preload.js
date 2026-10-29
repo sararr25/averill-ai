@@ -70,6 +70,7 @@ contextBridge.exposeInMainWorld('desktop', {
   openWork: (kind) => invoke('agent:open-work', kind),
   copyFinding: (kind,id) => invoke('agent:copy-finding',kind,id),
   share: (kind, enable) => invoke('agent:share', kind, enable),
+  saveAssistantPractice: id => invoke('assistant:practice', id),
   ask: (question, consent) => invoke('agent:ask', question, consent),
   askDemo: (question) => invoke('agent:ask-demo', question),
   aiMode: (enabled) => invoke('agent:ai-mode', enabled),

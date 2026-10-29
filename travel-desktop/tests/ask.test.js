@@ -151,7 +151,7 @@ test('the extension worker whitelists ask and forwards only the question and opt
   const value = await send({ kind: 'ask', question: 'q'.repeat(900), fieldId: 'field_1', revision: 2, text: 'LEAK', field: { value: 'LEAK' }, token: 'LEAK' }, page);
   assert.equal(value.state, 'answered');
   const sent = requests.at(-1); assert.match(sent.url, /\/context$/);
-  assert.deepEqual(Object.keys(sent.body).filter(k => sent.body[k] !== undefined).sort(), ['consent', 'fieldId', 'kind', 'pageOrigin', 'question', 'revision', 'tabId', 'useAI']);
+  assert.deepEqual(Object.keys(sent.body).filter(k => sent.body[k] !== undefined).sort(), ['fieldId', 'kind', 'pageOrigin', 'question', 'revision', 'tabId', 'useAI']);
   assert.equal(sent.body.question.length, 500); assert(!JSON.stringify(sent.body).includes('LEAK'));
   assert.deepEqual(await send({ kind: 'ask', question: '   ' }, page), { error: 'Type a question first.' });
   assert.match((await send({ kind: 'ask', question: 'bad' }, page)).error, /could not be answered/);

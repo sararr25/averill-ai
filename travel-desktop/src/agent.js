@@ -69,6 +69,9 @@ function sourceButton(source) {
 }
 
 function render() {
+  renderSharingStatus();
+  const tasks = el('role-playbooks');
+  if (tasks) { tasks.replaceChildren(); for (const item of current.playbooks || []) { const b = node('button', item.title, 'secondary-button'); b.type = 'button'; b.addEventListener('click', () => { el('question').value = item.prompt; updateSend(); el('question').focus(); }); tasks.append(b); } }
   if (!renderSession()) {
     invalidateWorkReview();
     lastExternalText = ''; lastExternalWindowId = null; lastObservationHash = null;
@@ -134,14 +137,14 @@ function render() {
   el('ai-toggle').textContent = current.aiEnabled ? 'Nemotron AI: on' : current.services?.nebius ? 'Nemotron AI: off' : demoJudge ? 'Nemotron AI: on, via demo server' : admin ? 'Nemotron AI: add a key' : 'Nemotron AI: off (ask your admin)';
   el('ai-toggle').dataset.action=addKey?'add-key':'toggle';
   el('ai-toggle').setAttribute('aria-pressed',String(Boolean(current.aiEnabled)));
-  el('ai-toggle').nextElementSibling.textContent = current.aiEnabled ? 'NVIDIA Nemotron via Nebius. Your question and relevant approved text sources are sent to Nebius.' : demoJudge ? 'In this demo, Check now and your questions also ask NVIDIA Nemotron through the Averill demo server, only after you confirm what is sent. Design questions stay on this Mac.' : addKey ? 'Add a Nebius key in More › Workspace settings › AI and services to use NVIDIA Nemotron. Until then answers stay local.' : noKey ? 'No Nebius key is set, so answers stay local. Ask your admin to add one.' : current.auth?.demo ? 'Optional NVIDIA Nemotron via your own Nebius key. Off: Check now and your questions still use the Averill demo server after you confirm what is sent; design questions stay local.' : 'Optional NVIDIA Nemotron via Nebius. Off: answers stay local.';
+  el('ai-toggle').nextElementSibling.textContent = current.aiEnabled ? 'NVIDIA Nemotron via Nebius. Your question and relevant approved text sources are sent to Nebius.' : demoJudge ? 'In this demo, Check now and your questions also ask NVIDIA Nemotron through the Averill demo server, only after you confirm what is sent. Measured design checks stay on this Mac. Public tool help can use official online guides after confirmation.' : addKey ? 'Add a Nebius key in More › Workspace settings › AI and services to use NVIDIA Nemotron. Until then answers stay local.' : noKey ? 'No Nebius key is set, so answers stay local. Ask your admin to add one.' : current.auth?.demo ? 'Optional NVIDIA Nemotron via your own Nebius key. Off: Check now and your questions still use the Averill demo server after you confirm what is sent; measured design checks stay local. Public tool help can use official guides after confirmation.' : 'Company AI is off. Public tool help can still ask Nemotron using only a generic operation and official public excerpts, after your confirmation.';
+  if (current.services?.nebius && !current.aiEnabled) el('ai-toggle').nextElementSibling.textContent = 'Company AI is off for this session. Public tool help can still ask Nemotron using only a generic operation and official public excerpts, after your confirmation. Company files and shared drafts remain local.';
   el('ai-toggle').disabled = noKey&&!addKey;
   el('web-form').querySelector('button').disabled = !current.services?.tavily;
   el('web-unavailable').hidden=Boolean(current.services?.tavily);
   el('web-unavailable').textContent=admin?'Public research is not configured. Add a Tavily key in More › Workspace settings › AI and services to search.':'Public research is not configured. Ask your administrator to add a Tavily key.';
   el('web-setup').hidden=Boolean(current.services?.tavily)||!admin;
   el('shared-count').textContent = `${current.shared.length} shared`;
-  el('sharing-status').textContent = visibleNow().pill;
   el('finding-count').textContent = current.findings.length ? `${current.findings.length} to review` : 'No issues';
   const list = el('window-list');
   list.replaceChildren();
@@ -228,10 +231,10 @@ function renderHero() {
   const context=el('review-context');context.replaceChildren();
   const sharedNames=(current.shared||[]).map(id=>kinds.find(kind=>kind.id===id)?.title||id);
   const contextKey=sharedNames.length?`demo:${[...current.shared].sort().join(',')}`:'company';
-  document.querySelector('.composer-label').textContent=sharedNames.length?'Ask about the shared campaign…':'Ask about approved company sources…';
-  el('question').setAttribute('aria-label',sharedNames.length?'Ask about the shared campaign':'Ask about approved company sources');
+  document.querySelector('.composer-label').textContent='What would you like to do?';
+  el('question').setAttribute('aria-label',sharedNames.length?'Ask about the shared campaign':'Ask for help with your work or tools');
   if(reviewContextKey!==null&&reviewContextKey!==contextKey&&el('conversation').querySelector('.user-message')){
-    el('conversation').append(node('div',contextKey==='company'?'Context changed: answers now use your accessible approved company sources.':'Context changed: answers now use the fixed sources for the shared demo work. Earlier answers belong to their previous context.','conversation-context'));
+    el('conversation').append(node('div',contextKey==='company'?'Company context changed: your accessible approved sources now apply. Tool help remains available.':'Company context changed to the shared demo work. Earlier answers belong to their previous context; tool help remains available.','conversation-context'));
   }
   reviewContextKey=contextKey;
   if(sharedNames.length){
@@ -478,9 +481,10 @@ function addMessage(text, role, sources = [], tag = null) {
   const message = document.createElement('div');
   message.className = role === 'user' ? 'user-message' : 'assistant-message';
   if (tag) { const chip = node('span', tag.label, tag.title ? 'ai-chip' : 'knowledge-meta'); if (tag.title) chip.title = tag.title; message.append(chip); }
-  const paragraph = document.createElement('p'); paragraph.textContent = text;
+  const paragraph = document.createElement('p'); paragraph.textContent = text; paragraph.style.whiteSpace = 'pre-wrap';
   message.append(paragraph);
   for (const source of sources) {
+    if (source.kind === 'public-help') { const link = node('button', source.title, 'source-link'); link.type = 'button'; link.addEventListener('click', () => window.desktop.openWeb(source.url)); message.append(link, node('small', `Official tool help · retrieved ${String(source.retrievedAt || '').slice(0, 10)}`)); if (source.quote) { const details=node('details'); details.append(node('summary','Official source excerpt'),node('blockquote',source.quote,'answer-evidence'));message.append(details); } continue; }
     message.append(sourceButton(source));
     if(source.quote)message.append(node('blockquote',`“${source.quote}” · v${source.version||'?'}${source.page?` · page ${source.page}`:` · line ${source.line||'?'}`} · Approved ${source.approvedAt?new Date(source.approvedAt).toLocaleDateString():'date unknown'} by ${source.approvedBy||'unknown'} · ${source.reason||'Relevant passage'}`,'answer-evidence'));
   }
@@ -499,17 +503,20 @@ el('ask-form').addEventListener('submit', async (event) => {
   if (!question || asking) return;
   asking = true; updateSend();
   addMessage(question, 'user'); el('question').value = '';
-  el('answer-status').textContent = 'Checking approved sources…';
+  el('answer-status').textContent = 'Preparing help for your task…';
   try {
     let response = current.shared?.length ? await window.desktop.askDemo(question) : await window.desktop.ask(question);
     if (response.consentRequired) {
-      const sent = await confirmOutbound({ service: 'Averill demo server', title: 'Also ask NVIDIA Nemotron', note: 'The approved-source answer is found on this Mac first. The items below then go to averill-judge-ai.vercel.app, which asks NVIDIA Nemotron on Nebius with the demo owner’s key. Daily limits apply. The Nemotron answer is shown only when its quotes match an approved source. Design questions never leave this Mac.', items: response.items });
-      response = await window.desktop.ask(question, Boolean(sent?.length));
+      const sent = await confirmOutbound({ service: response.service || 'Averill demo server', title: response.title || 'Also ask NVIDIA Nemotron', note: response.note || 'The approved-source answer is found on this Mac first. The items below then go to averill-judge-ai.vercel.app, which asks NVIDIA Nemotron on Nebius with the demo owner’s key. Daily limits apply. The Nemotron answer is shown only when its quotes match an approved source. Design questions never leave this Mac.', items: response.items });
+      response = await window.desktop.ask(question, response.allInputsRequired ? sent?.length === response.items.length : Boolean(sent?.length));
     }
+    if (response.assistant) { const follow = response.assistant.followUp; if (follow) response.text += `\n\n${follow}`; }
     if (response.ai?.status === 'suggestion') addMessage(response.ai.text, 'assistant', response.ai.sources, { label: 'Nemotron suggestion · quotes validated against approved sources', title: `NVIDIA Nemotron via ${response.ai.provider}${response.ai.model ? ` (${response.ai.model})` : ''}` });
     else if (response.ai) addMessage(response.ai.notice, 'assistant', [], { label: response.ai.status === 'declined' ? 'Nemotron not asked' : 'Nemotron unavailable' });
-    addMessage(response.text, 'assistant', response.sources, response.ai ? { label: 'Local approved-source answer' } : undefined);
-    if(!current.shared?.length&&!response.sources?.length&&current.workspace?.configured){const message=el('conversation').lastElementChild;const request=node('button','Ask a reviewer privately','secondary-button');request.type='button';request.addEventListener('click',async()=>{request.disabled=true;try{current=await window.desktop.requestClarification(question);render();message.append(node('p','Private clarification requested. Track it in Knowledge.'));}catch(error){request.disabled=false;el('answer-status').textContent=error.message;}});message.append(request);}
+    addMessage(response.text, 'assistant', response.sources, response.ai ? { label: 'Local approved-source answer' } : response.assistant?.publicOnly && response.mode === 'model' ? { label: 'Nemotron · public tool help · no company content sent' } : undefined);
+    if (response.assistant?.officialGuide && !response.sources?.some(s => s.kind === 'public-help')) { const guide = node('button', 'Open official tool help', 'source-link'); guide.type = 'button'; guide.addEventListener('click', () => window.desktop.openWeb(response.assistant.officialGuide)); el('conversation').lastElementChild.append(guide); }
+    if (response.assistant?.practiceId) { const b = node('button', 'I tried this · save to my practice', 'secondary-button'); b.type = 'button'; b.addEventListener('click', async () => { b.disabled = true; try { await window.desktop.saveAssistantPractice(response.assistant.practiceId); b.textContent = 'Saved as your confirmed practice'; } catch (error) { b.textContent = error.message; } }); el('conversation').lastElementChild.append(b); }
+    if(!response.assistant&&!current.shared?.length&&!response.sources?.length&&current.workspace?.configured){const message=el('conversation').lastElementChild;const request=node('button','Ask a reviewer privately','secondary-button');request.type='button';request.addEventListener('click',async()=>{request.disabled=true;try{current=await window.desktop.requestClarification(question);render();message.append(node('p','Private clarification requested. Track it in Knowledge.'));}catch(error){request.disabled=false;el('answer-status').textContent=error.message;}});message.append(request);}
     el('answer-status').textContent = '';
   } catch (error) {
     el('question').value = question;
@@ -803,6 +810,12 @@ function visibleNow(){
  if(current.shared.length)return{browser:false,pill:`${current.shared.length} SHARED`};
  return{browser:false,pill:'NOT SHARING'};
 }
+function renderSharingStatus(){
+ const now=visibleNow(),icon_=el('connection-icon');
+ el('sharing-status').textContent=now.pill;
+ icon_.innerHTML=icon(now.browser?'plugs-connected':'plug');icon_.classList.toggle('connected',now.browser);
+ const label=now.browser?`Browser connected to ${now.host}`:'Browser not connected';icon_.title=label;icon_.setAttribute('aria-label',label);
+}
 // Name of the draft Averill follows now (the Working on now card shows the same), or null when nothing is connected.
 function connectedDraftName(){
  const bridge=current.browserBridge||{};
@@ -829,14 +842,12 @@ function renderWorkingNow(){
  // The kind of check follows the site you connected, once per site; you can still change it.
  if(open&&tool?.task&&bridge.pageHost!==inferredTaskHost){inferredTaskHost=bridge.pageHost;if(el('external-task').value!==tool.task){el('external-task').value=tool.task;el('external-task').dispatchEvent(new Event('change'));}}
  const meta=[];if(open&&tool&&!name.includes(tool.name))meta.push(tool.name);
- if(open&&externalReview){const count=externalReview.result.findings.length;meta.push(count?`${count} thing${count===1?'':'s'} to fix`:'Nothing to fix',`checked at ${clock(externalReview.checkedAt)}`);}
+ if(open&&externalReview){const count=externalReview.result.findings.length;meta.push(count?`${count} thing${count===1?'':'s'} to fix`:'No text-rule conflicts',`checked at ${clock(externalReview.checkedAt)}`);}
  else if(open)meta.push('Not checked yet');
  el('working-now-meta').textContent=meta.join(' · ');
  const captured=Boolean(current.externalObservation);
  el('working-check').disabled=!captured||reviewPending;
  el('working-check-hint').textContent=reviewPending?'Checking…':captured?'':bridge.connected?'Click the draft field you want checked, in Chrome.':'Read the window first in Workspace settings › Connection tools.';
- const icon_=el('connection-icon'),now=visibleNow(),connected=now.browser;icon_.innerHTML=icon(connected?'plugs-connected':'plug');icon_.classList.toggle('connected',connected);
- const label=connected?`Browser connected to ${now.host}`:'Browser not connected';icon_.title=label;icon_.setAttribute('aria-label',label);
  // The connection checklist explains Connect; it is noise before the extension is installed and once a draft is open.
  el('browser-checklist').hidden=!current.auth?.signedIn||open||!current.browserConnect?.extensionSeenAt;
  renderExtensionPanel();renderRecentWork();
@@ -885,7 +896,7 @@ function renderRecentWork(){
  const items=recentWork(),list=el('recent-work-list');el('recent-work').hidden=!items.length;
  const key=JSON.stringify(items);if(list.dataset.key===key)return;list.dataset.key=key;
  list.replaceChildren(...items.map(item=>{const row=node('li');const details=node('details');const summary=node('summary');const mark=node('span',undefined,'recent-icon');mark.innerHTML=icon(item.icon);
-  summary.append(mark,node('span',item.name,'recent-name'),node('small',`${new Date(item.at).toLocaleDateString([],{day:'numeric',month:'short'})} ${clock(item.at)} · ${item.count?`${item.count} to fix`:'nothing to fix'}`));
+  summary.append(mark,node('span',item.name,'recent-name'),node('small',`${new Date(item.at).toLocaleDateString([],{day:'numeric',month:'short'})} ${clock(item.at)} · ${item.count?`${item.count} to fix`:'no text-rule conflicts'}`));
   details.append(summary,node('p',`Checked as ${item.task}${item.tool?` in ${item.tool}`:''}.`));
   if(item.fixes.length){const fixes=node('ul');for(const fix of item.fixes)fixes.append(node('li',fix));details.append(fixes);}
   row.append(details);return row;}));

@@ -14,6 +14,7 @@ function bodyOf({ intro, sections = [], cta, signOff }: Layout): string {
 }
 function campaign(base: Omit<BrevoCampaign, 'body'> & Layout): BrevoCampaign { return { ...base, body: bodyOf(base) }; }
 const seed: BrevoCampaign[] = [
+  campaign({ id:'vamo-brevo-winter-clean', name:'Winter Escapes 2027 · ready to review', status:'Draft', senderName:'Vamo', senderEmail:'hello@vamo.example', recipients:DENMARK, subject:'Discover your next winter city break with Vamo', previewText:'Explore Copenhagen, Vienna and Prague.', headline:'Discover curated winter city breaks', intro:'Hello traveller,\n\nDiscover curated winter city breaks with Vamo. Explore our Winter Escapes 2027 collections for Copenhagen, Vienna and Prague, and find inspiration for your next short European break. Start with the city that interests you, explore the collection and choose what you would like to discover next.', cta:{ label:'Explore the winter collection', url:'https://vamo-travel-site.vercel.app/winter.html' }, signOff:'The Vamo team', imageUrl:'/vamo/photos/brevo-winter-hero-1200x600.jpg', createdAt:'2026-10-29T08:00:00Z', updatedAt:'2026-10-29T08:00:00Z' }),
   flawed.brevo[0],
   // Planted flaws (see docs): launch draft above has a price guarantee, the full list and no footer; reminder has no footer; Vienna teaser has a price guarantee.
   // Sent and scheduled history so the account reads like an active newsletter. The winter launch draft above stays intentionally flawed for Averill's review.

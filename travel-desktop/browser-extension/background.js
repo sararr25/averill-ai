@@ -134,7 +134,9 @@ async function relayContext(message, sender) {
   const { pair } = await load();
   if (!validPair(pair) || sender.tab?.id !== pair.tabId || sender.frameId !== 0 || sender.origin !== pair.pageOrigin) return { stopped: true, reason: endedFor(sender.tab?.id) };
   const payload = { kind: message.kind, task: message.task, fieldId: message.fieldId, revision: message.revision, reviewId: message.reviewId, findingId: message.findingId, useAI: message.useAI === true, consent: message.consent === true };
+  if (message.kind === 'save-practice') { if (typeof message.practiceId !== 'string' || !/^[a-f0-9-]{36}$/.test(message.practiceId)) return { error:'Ask for fresh guidance first.' }; payload.practiceId = message.practiceId; }
   if (message.kind === 'ask') {
+    if (message.consent === undefined) delete payload.consent;
     // Only the typed question and, if a field is selected, its id and revision. The bridge holds the field text.
     const question = typeof message.question === 'string' ? message.question.slice(0, 500) : '';
     if (!question.trim()) return { error: 'Type a question first.' };
@@ -193,6 +195,7 @@ async function relayDesign(message, sender) {
     catch (error) { return { error: `Averill cannot read this design. ${error.message}` }; }
   }
   try {
+    if (payload.action !== 'override') { payload.designId = typeof message.designId === 'string' && /^[A-Za-z0-9_-]{5,100}$/.test(message.designId) ? message.designId : null; payload.clientVersion = chrome.runtime.getManifest?.().version || 'unknown'; payload.protocol = 2; }
     const response = await fetch(pair.endpoint.replace('/observation', '/context'), { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Averill-Token': pair.token }, body: JSON.stringify({ ...payload, tabId: pair.tabId, pageOrigin: pair.pageOrigin }), signal: AbortSignal.timeout(20000) });
     if (state.pair?.token !== pair.token) return { stopped: true, reason: endedFor(pair.tabId) };
     if (response.status === 400) return { error: message.action === 'override' ? 'The design or session changed. Check the design again.' : 'Averill could not check this design. Try again after your next edit.' };
@@ -213,7 +216,7 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
     return true;
   }
   if (message.kind === 'design-check') { relayDesign(message, sender).then(reply, () => reply({ error: 'The design check could not finish. Try again.' })); return true; }
-  if (['review', 'proposal', 'open', 'ask', 'public-check', 'image-check'].includes(message.kind)) { relayContext(message, sender).then(reply, () => reply({ error: 'Try a fresh review.' })); return true; }
+  if (['review', 'proposal', 'open', 'ask', 'save-practice', 'public-check', 'image-check'].includes(message.kind)) { relayContext(message, sender).then(reply, () => reply({ error: 'Try a fresh review.' })); return true; }
   if (!['field', 'heartbeat', 'editing', 'stop'].includes(message.kind)) { reply({ error: 'Unsupported action.' }); return; }
   (message.kind === 'stop' ? relayEvent(message, sender) : enqueue(() => relayEvent(message, sender))).then(reply, () => reply({ stopped: true, reason: 'lost_contact' }));
   return true;

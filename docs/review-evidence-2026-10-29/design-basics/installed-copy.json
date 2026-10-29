@@ -1,0 +1,14 @@
+{
+  "updatedApp": "/Users/sararuffini/Documents/Hackatons/Nvidia/averill-ai/travel-desktop/dist/Averill.app",
+  "backup": "/Users/sararuffini/Documents/Hackatons/Nvidia/averill-ai/travel-desktop/dist/Averill-before-design-help-20261029.app",
+  "verifiedRuntimeFiles": [
+    "main.js",
+    "src/design-check.js",
+    "src/learning.js",
+    "src/work-assistant.js",
+    "src/agent.js",
+    "browser-extension/content.js"
+  ],
+  "profileModified": false,
+  "archiveSha256": "06b8f8a38159796240e331d090acd5ecbff175ac42fc89781f5206002b341656"
+}

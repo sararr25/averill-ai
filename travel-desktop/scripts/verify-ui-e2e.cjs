@@ -40,7 +40,7 @@ app.whenReady().then(async()=>{try{
  const counted=await run("document.getElementById('hero-body').textContent");step('Headline counts the corrections',counted.startsWith('2 corrections'),counted);
  agent.setSize(520,850);await pause(450);
  const first=await run("(()=>{const c=document.querySelector('#review-work-result .review-evidence').getBoundingClientRect(),comp=document.querySelector('.review-composer').getBoundingClientRect(),list=document.getElementById('review-work-result');return {bottom:Math.round(c.bottom),composerTop:Math.round(comp.top),composerVisible:comp.bottom<=innerHeight+1,scrolls:list.scrollHeight>list.clientHeight||getComputedStyle(list.parentElement).overflowY!=='visible'}})()");
- step('First finding visible; question composer uses progressive disclosure',first.bottom<=850&&await run("!document.getElementById('review-chat').open"),JSON.stringify(first));
+ step('First finding visible; task help remains open and available',first.bottom<=850&&await run("document.getElementById('review-chat').open"),JSON.stringify(first));
  await shot('03-conflict-520.png');await shot('04-conflict-960.png',960,820);
  await send(2,'Winter Escapes 2027 — discover curated winter city breaks in Copenhagen, Vienna and Prague.\n\nYou are receiving this email because you subscribed to Vamo. Unsubscribe anytime.');
  const cleared=await run("({title:document.getElementById('hero-title').textContent,result:document.getElementById('review-work-result').innerText})");

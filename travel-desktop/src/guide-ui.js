@@ -24,12 +24,12 @@ const GUIDE_STEPS = {
     employee: [
       { target: '#working-now-title', title: 'What you are working on', body: 'Averill follows the draft you connect in Chrome, such as a Brevo email or a LinkedIn post, and checks it against Vamo’s approved rules.' },
       { target: '#extension-panel > button, #working-check', title: 'Connect, then check', body: 'Install or connect the Averill extension here. With a draft open, Check now shows what to fix and the source for every finding.' },
-      { target: '#review-chat > summary', title: 'Ask about company guidance', body: 'Ask a question, for example the approved launch date. Answers quote the approved source.' },
+      { target: '#review-chat > summary', title: 'Help with your work', body: 'Ask how to use your tool, improve a draft or explain a company requirement. Review the outbound preview before online help; sources distinguish public instructions from company rules.' },
     ],
     lead: [
       { target: '#working-now-title', title: 'Review as Marketing lead', body: 'Connect any Marketing draft and check it against the rules you approved, with the source for every finding.' },
       { target: '#extension-panel > button, #working-check', title: 'Connect, then check', body: 'Install or connect the Averill extension here, then use Check now on the draft your team is working on.' },
-      { target: '#review-chat > summary', title: 'Ask about company guidance', body: 'Check what the approved brief says before you approve a campaign.' },
+      { target: '#review-chat > summary', title: 'Help your team complete work', body: 'Use a suggested task for your role, ask for a checklist or review the approved campaign facts. Source approval and publication stay under human control.' },
     ],
     admin: [
       { target: '#working-now-title', title: 'Review as owner', body: 'The same check your team uses: drafts against approved rules, with the source for every finding.' },

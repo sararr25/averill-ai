@@ -139,7 +139,7 @@ function searchTransport(data, { fetcher = globalThis.fetch, endpoint = ENDPOINT
     try {
       response = await fetcher(`${endpoint}/api/search`, {
         method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Averill-Client': client },
-        body: JSON.stringify({ kind: 'search', query: body.query }), signal: AbortSignal.timeout(30000),
+        body: JSON.stringify({ kind: 'search', query: body.query, ...(body.include_domains ? { includeDomains: body.include_domains } : {}) }), signal: AbortSignal.timeout(30000),
       });
       reply = await response.json().catch(() => ({}));
     } catch { throw Object.assign(new Error('The demo search server could not be reached.'), { expose: true }); }
@@ -149,4 +149,12 @@ function searchTransport(data, { fetcher = globalThis.fetch, endpoint = ENDPOINT
   };
 }
 
-module.exports = { review, ask, askPlan, validated, searchTransport, ENDPOINT, HOST, SEARCH_LIMIT };
+// Typed assistance, never a raw model proxy. Sources are validated again by WorkAssistant after the response.
+async function assist(data, { question, context, intent, sources }, { fetcher = globalThis.fetch, endpoint = ENDPOINT } = {}) {
+  if (!data?.demoAccounts) throw new Error('Demo assistance is available only in the judge workspace.');
+  const response = await fetcher(`${endpoint}/api/ask`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Averill-Client': clientId(data) }, body: JSON.stringify({ mode: 'assist', intent: intent.kind, question: String(question).slice(0, 500), draft: String(context || '').slice(0, 1500), sources: sources.map((s, index) => ({ title: `source-${index}`, version: 'demo', text: s.text.slice(0, 3000) })) }), signal: AbortSignal.timeout(20000) });
+  const reply = await response.json().catch(() => ({}));
+  if (!response.ok) throw Object.assign(new Error(response.status === 429 ? reply.error || 'Daily AI limit reached.' : `The demo assistant is unavailable (${response.status}).`), { expose: true, limit: response.status === 429 });
+  return { model: reply.model, content: JSON.stringify({ answer: reply.answer, evidence: (reply.evidence || []).map(e => ({ source_id: /^source-\d+$/.test(e.sourceTitle) ? sources[Number(e.sourceTitle.slice(7))]?.id : null, quote: e.quote })) }) };
+}
+module.exports = { review, ask, askPlan, validated, searchTransport, assist, ENDPOINT, HOST, SEARCH_LIMIT };

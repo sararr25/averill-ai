@@ -1,0 +1,25 @@
+{
+  "verifiedAt": "2026-10-29T00:13:10.704Z",
+  "liveProviders": true,
+  "server": "local instance of judge-ai-server code; not the production deployment",
+  "payload": "Bundled fictional Vamo brief/legal guidance and public Canva grouping query",
+  "results": [
+    {
+      "task": "email",
+      "mode": "model",
+      "via": "demo-server",
+      "sourceCount": 4,
+      "characters": 1018,
+      "ms": 3180
+    },
+    {
+      "task": "canva",
+      "mode": "model",
+      "via": "demo-server",
+      "sourceCount": 2,
+      "characters": 126,
+      "ms": 1257
+    }
+  ],
+  "passed": true
+}

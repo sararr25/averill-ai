@@ -1,0 +1,55 @@
+{
+  "verifiedAt": "2026-10-29T10:09:07.470031+00:00",
+  "surface": "Real canva.com in installed Chrome, extension 0.4.0/protocol 2, packaged macOS Averill, marked temporary synthetic profile",
+  "designId": "DAHZTPxfC5c",
+  "source": "Bundled fictional Vamo social-media-guidelines-v3.md, version 3; approved only in disposable QA fixture",
+  "checks": [
+    {
+      "slide": 2,
+      "checked": 1,
+      "total": 5,
+      "aggregateFindings": 2
+    },
+    {
+      "slide": 1,
+      "checked": 2,
+      "total": 5,
+      "aggregateFindings": 6
+    },
+    {
+      "slide": 3,
+      "checked": 3,
+      "total": 5,
+      "aggregateFindings": 7
+    },
+    {
+      "slide": 4,
+      "checked": 4,
+      "total": 5,
+      "aggregateFindings": 7
+    },
+    {
+      "slide": 5,
+      "checked": 5,
+      "total": 5,
+      "aggregateFindings": 7
+    }
+  ],
+  "earlierFindingsPreservedOnCleanLastSlide": true,
+  "exportAnyway": "Recorded for session with seven known problems; no Canva export invoked",
+  "stopSharing": "Sharing ended shown in page, NOT SHARING in native app",
+  "designModified": false,
+  "additionalDefect": "Local tool-help with no workspace citation was hidden by the card. Corrected, regression-tested, and then verified visible on real Canva with official help and practice confirmation.",
+  "boundaries": [
+    "No edit/fix/recheck on original design: owner intends to retain its findings",
+    "No export or publication",
+    "No native VoiceOver or employee pilot evidence"
+  ],
+  "finalRetestedAt": "2026-10-29T11:05:47.881789+00:00",
+  "finalArchiveSha256": "959cbaaa8abe984acde6075831dfb6bf7065d8c88b7f32924a8717cec017ea81",
+  "functionalHelp": "Local grouping instructions and official-help link visible on real Canva, without observing the design or provider calls; confirmed practice saved from real browser card.",
+  "learning": "Native Learn received the browser-confirmed grouping activity and generated exactly one relevant illustrated grouping question.",
+  "tutorial": "Real Canva showed observed lesson steps as Checked by Averill and grouping separately as You confirm this in Averill; contextual how-to panel opened. Original design was not edited, so lesson completion was not claimed.",
+  "logout": "Real page showed signed-out Sharing ended; final executable immediately showed NOT SHARING and Browser not connected. Corrected earlier stale header; final 30th synthetic regression also passes.",
+  "passed": true
+}

@@ -388,7 +388,7 @@ button{transition:color var(--ds-duration-fast),background-color var(--ds-durati
 /* Fields: label above, one height, one radius. */
 .agent-body :is(input:not([type=checkbox]):not([type=radio]),select,textarea){box-sizing:border-box;max-width:100%;min-height:36px;padding:var(--av-space-2) var(--av-space-3);border:1px solid var(--av-control-border);border-radius:var(--av-radius-control);background:var(--av-surface);color:var(--av-text);font:400 14px/20px var(--av-font)}
 .agent-body label>:is(input:not([type=checkbox]):not([type=radio]),select,textarea){display:block;width:100%;margin-top:var(--av-space-2)}
-.agent-body .ask-form input:not([type=checkbox]):not([type=radio]){min-height:0;border:0;background:transparent;padding:0}
+.agent-body .ask-form input:not([type=checkbox]):not([type=radio]){min-height:var(--av-control-default);border:0;background:transparent;padding:0}
 .agent-body .knowledge-filters{gap:var(--av-space-4)}
 .agent-body .knowledge-filters label{margin:0}
 .agent-body .knowledge-filters .check-row{align-self:end;min-height:36px;padding:var(--av-space-2) var(--av-space-3)}
@@ -556,9 +556,9 @@ button{transition:color var(--ds-duration-fast),background-color var(--ds-durati
 .recent-work details p,.recent-work details li{font:var(--av-type-body);color:var(--av-text-secondary)}
 /* The card names the open draft and has Disconnect, so the older live bar would only repeat it. */
 .agent-body.working-open .review-context.is-live{display:none}
-/* Reading order in Current work: what you are working on, what to fix, then recent work and the help below. */
+/* Help leads in DOM reading order; shared-work checks and recent work follow it. */
 .agent-body[data-area="review"] .review-feed>#recent-work{order:1}
-.agent-body[data-area="review"] .review-feed>:is(.browser-checklist,.review-chat){order:2}
+.agent-body[data-area="review"] .review-feed>.browser-checklist{order:2}
 .working-now{position:relative}.agent-body .working-now>.guide-help{position:absolute;top:12px;right:12px}
 
 /* ---- Learn: Canva lesson as one page with ticks (phase D, 27 October 2026) ---- */

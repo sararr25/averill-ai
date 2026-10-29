@@ -11,6 +11,7 @@ const { approvedSources } = require('./workspace');
 const imageCheck = require('./image-check');
 const designCheck = require('./design-check');
 const canvaDesign = require('../browser-extension/canva-design');
+const sentenceRewrite = require('./sentence-rewrite');
 
 const digest = value => crypto.createHash('sha256').update(JSON.stringify(value)).digest('hex');
 const ASK_MAX = 500, ASK_CONTEXT_MAX = 1500;
@@ -43,15 +44,6 @@ function identity(state, task) {
   });
 }
 
-function exactProposal(finding, observed) {
-  const before = finding.observedExcerpt;
-  const text = observed.field?.value;
-  if (observed.sensitiveRedacted || finding.type !== 'forbidden-claim' || !['textarea', 'text', 'contenteditable'].includes(observed.field?.kind) || typeof text !== 'string' || typeof before !== 'string' || !before) return null;
-  const start = text.indexOf(before);
-  if (start < 0 || text.indexOf(before, start + 1) >= 0) return null;
-  // Prose/model suggestions are never interpreted as executable edits.
-  return { id: crypto.randomUUID(), start, end: start + before.length, before, after: '' };
-}
 
 class ContextualReview {
   // checkOnline(claims, task) runs the public check (Tavily). online() says whether it is available and how it is routed.
@@ -147,7 +139,8 @@ class ContextualReview {
     }
     const checked = canvaDesign.validate('slide' in payload ? { design: payload.design, elements: payload.elements, slide: payload.slide } : { design: payload.design, elements: payload.elements });
     const single = designCheck.evaluate({ workspace: state.workspace, payload: { design: checked.design, elements: checked.elements } });
-    const result = 'slide' in checked ? this.accumulateSlides(single, checked, payload, personId, state.epoch) : single;
+    // Missing slide metadata must never fall back to a single-page all-clear.
+    const result = this.accumulateSlides(single, { ...checked, slide: checked.slide || null }, payload, personId, state.epoch);
     // T6: the measured numbers (no text) stay in memory, bound to this person, session, tab and page, for design questions in the card.
     const { design, elements } = checked;
     const reading = { tabId: payload.tabId, pageOrigin: payload.pageOrigin, design, elements: elements.map(({ fontSize, box, colors, background }) => ({ fontSize, box, colors, background })) };
@@ -161,7 +154,7 @@ class ContextualReview {
   // is checked but never counted, so it can never clear the gate.
   accumulateSlides(single, checked, payload, personId, epoch) {
     const { slide, design } = checked;
-    const key = slide && [personId, epoch, payload.tabId, payload.pageOrigin, design.width, design.height, slide.count].join('|');
+    const key = slide && [personId, epoch, payload.tabId, payload.pageOrigin, payload.designId || 'unknown-design', design.width, design.height, slide.count].join('|');
     if (slide) {
       if (this.designSlides?.key !== key) this.designSlides = { key, count: slide.count, slides: new Map() };
       this.designSlides.slides.set(slide.index, { findings: single.findings.map(f => ({ ...f, slide: slide.index })), elementCount: single.elementCount, state: single.state });
@@ -171,16 +164,18 @@ class ContextualReview {
     const findings = (kept ? entries.flatMap(([, entry]) => entry.findings) : single.findings).slice(0, 30);
     const checkedSlides = entries.map(([index]) => index);
     const notes = [...single.notes];
+    if (!payload.designId) notes.push('Design identity is unavailable. Reload the Averill extension and reconnect this design before treating the carousel as checked.');
     if (!slide) notes.unshift('Averill cannot tell which slide this is, so this reading does not count towards checking every slide.');
     let state;
     if (single.state === 'insufficient-evidence') state = 'insufficient-evidence';
     else if (findings.length) state = 'findings';
-    else if (!slide || checkedSlides.length < slide.count) state = 'incomplete';
+    else if (!slide || !/^[A-Za-z0-9_-]{5,100}$/.test(payload.designId || '') || checkedSlides.length < slide.count) state = 'incomplete';
     else state = 'clean';
     if (state === 'incomplete' && slide) notes.unshift(`Open the other slides so Averill can check them: ${Array.from({ length: slide.count }, (_, i) => i + 1).filter(i => !checkedSlides.includes(i)).join(', ')}.`);
     return {
       ...single, state, findings, notes,
       elementCount: kept ? entries.reduce((sum, [, entry]) => sum + entry.elementCount, 0) : single.elementCount,
+      client: { version: String(payload.clientVersion || 'unknown').slice(0, 20), protocol: payload.protocol === 2 ? 2 : 1, designKnown: Boolean(payload.designId) },
       slides: slide ? { current: slide.index, count: slide.count, checked: checkedSlides } : { current: null, count: null, checked: [] },
     };
   }
@@ -222,7 +217,9 @@ class ContextualReview {
         observedExcerpt: String(item.observedExcerpt || '').slice(0, 600),
         suggestion: String(item.suggestion || '').slice(0, 600),
         source: { id: source.source.id, title: String(source.source.title).slice(0, 160), version: String(source.source.version || ''), quote: item.source.quote },
-        proposal: exactProposal(item, observed),
+        proposal: useAI && state.aiEnabled
+          ? await sentenceRewrite.propose(state.workspace, item, observed, [...sources.values()], { key: state.key, fetcher: this.fetcher })
+          : sentenceRewrite.local(item, observed, [...sources.values()]),
       });
     }
     validate();
@@ -240,7 +237,7 @@ class ContextualReview {
   // FB-07: a typed question from the in-page card. Same answer path as the desktop Ask, but the
   // reply is rebuilt from validated citations only: approved, visible, not restricted, no credentials,
   // and every quote must appear exactly in the stored source text.
-  async ask({ question, fieldId, revision, task, tabId, pageOrigin }) {
+  async ask({ question, fieldId, revision, task, tabId, pageOrigin, consent }) {
     const state = this.getState();
     if (!state?.signedIn || !state.workspace || typeof this.answer !== 'function') throw stale();
     const input = typeof question === 'string' ? question.trim() : '';
@@ -254,9 +251,11 @@ class ContextualReview {
       const value = observed.field.value.slice(0, ASK_CONTEXT_MAX);
       if (!privacy.credentials(value)) context = value;
     }
-    const raw = await this.answer(input, context);
+    const raw = await this.answer(input, context, { task, consent, scope: `${tabId}:${pageOrigin}` });
     const now = this.getState();
     if (!now?.signedIn || now.workspace?.activePersonId !== personId || now.epoch !== epoch) throw stale();
+    if (context && (now.observed?.fieldId !== fieldId || now.observed.revision !== revision)) throw stale();
+    if (raw?.consentRequired) return { consentRequired: true, allInputsRequired: raw.allInputsRequired, service: raw.service, title: raw.title, note: raw.note, items: raw.items };
     const allowed = new Map(approvedSources(now.workspace).filter(source => source.confidentiality !== 'restricted' && !source.containsCredentials).map(source => [source.id, source]));
     const citations = [];
     for (const item of (raw?.sources || []).slice(0, 5)) {
@@ -265,6 +264,11 @@ class ContextualReview {
       let text = ''; try { text = fs.readFileSync(source.textPath, 'utf8'); } catch { continue; }
       if (!text.includes(item.quote)) continue;
       citations.push({ id: source.id, title: String(source.title).slice(0, 160), version: String(source.version || ''), quote: item.quote });
+    }
+    if (raw?.assistant) {
+      const publicCitations = (raw.sources || []).filter(s => s.kind === 'public-help' && require('./work-assistant').official(s.url, raw.assistant.tool) && typeof s.quote === 'string' && s.quote.length <= 600).map(s => ({ id: s.url, title: String(s.title).slice(0, 160), url: s.url, quote: s.quote, kind: 'public-help', retrievedAt: s.retrievedAt }));
+      if (citations.length + publicCitations.length !== (raw.sources || []).length) throw stale();
+      return { id: crypto.randomUUID(), state: 'answered', text: String(raw.text).slice(0, 4000), citations: [...citations, ...publicCitations], mode: raw.mode, usedField: Boolean(context), assistant: raw.assistant };
     }
     const stripped = (raw?.sources || []).length > citations.length;
     // The same draft statements are offered for an online double-check after an answer, never sent from here.

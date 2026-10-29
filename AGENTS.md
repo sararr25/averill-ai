@@ -1,6 +1,25 @@
+Public tutoring correction, 29 October 2026: functional tool help may use the configured Nebius key with company AI off, only after its outbound preview. `nebius.publicToolHelp` constructs a closed generic operation and bounded official public excerpts; it accepts no arbitrary question, draft, role, prompt or company text. Company chat, intake and embeddings retain the owner policy gate. Mixed answers append mandatory company requirements locally. General contrast/inset findings remain distinct from company approval, and lesson ticks describe current measurements and clear on regression. See `docs/CANVA_GENERAL_HELP_2026-10-29.md`.
+
 - Packaged acceptance may use `--averill-qa-profile=<directory>` only with the marked, temporary synthetic workspace prepared by `scripts/prepare-packaged-qa.cjs`. Preserve its fail-closed directory/account checks and normal login. Never point it at the normal profile or infer packaged acceptance from process launch; see `docs/PACKAGED_ACCEPTANCE_2026-10-19.md`.
 
 # Contributor rules for Averill
+
+## Owner correction — general Canva help, 29 October 2026
+
+The owner explicitly requires general design assistance even without company design rules. General contrast/readability and a clearly labelled suggested text inset complement mandatory approved company checks; general guidance is never company approval. Preserve the bounded DOM-only observation surface and outbound consent. Current lesson ticks describe current measurements on this slide, clear on regression and use stricter company thresholds when available; historical practice remains separate. Do not show an overall design all-clear from partial measurements. Public Canva operations, including frames, use official Tavily sources and tool-specific Nemotron instructions without needing company-source text. No new screen capture, Canva write/control or publication permission is implied.
+
+## Approved Pro increment — 29 October 2026
+
+The owner approved `docs/PRO_PLAN_2026-10-28.md` for implementation. `src/work-assistant.js` complements company lookup with functional tool help, grounded draft/checklist proposals and role playbooks. Public tool instructions are distinct from company authority. Preserve the per-request outbound preview, content-bound confirmation, bounded provider calls, cancellation on Stop/logout, exact quote validation and offline fallback. An unknown tool operation may use only a displayed, employee-confirmed public query; drafts and internal files never become Tavily search input.
+
+Functional tutoring is online outside Learn. An employee can explicitly save a tutor activity; `WorkAssistant.takePractice` binds it to that person/current authority and consumes it once. Learn remains offline and records this as employee-confirmed, never automatic mastery. Weekly practice relevance version 3 excludes unrelated filler and generic document-version questions; preserve prior records but require a fresh relevant set before submitting old practice.
+
+The keyless judge demo uses the capped existing server for typed assistance after consent. Only exact bundled demo-source text can supply company evidence on this new route; arbitrary imported sources do not become AI-eligible through `demoAccounts`. Shared text is listed explicitly in the outbound preview. Keep credentials and real private files excluded, global/client/IP caps, and the server's fixed request schema; never add an unrestricted prompt/model proxy.
+
+Sentence edits replace a complete uniquely matched sentence with explicit approved wording, or a validated structured Nemotron proposal when consent/policy allow it. No partial phrase deletion is a fallback. Preserve Preview/Apply/Undo and adapter restrictions. Canva extension version 0.4.0 carries design identity and protocol 2; missing slide/design identity is incomplete and cannot yield an all-clear. These owner-approved behaviours supersede the earlier narrow descriptions below where they conflict; observation, source approval and publication boundaries remain.
+
+Use `scripts/verify-pro-ui.cjs` for the actual renderer/IPC with synthetic provider transport, and `scripts/verify-pro-live.cjs --synthetic-consent` for generated synthetic data on real local-key providers. Neither proves real-platform or human acceptance. Release publication is still separate; see the current handover for deployment and acceptance gates.
+
 
 Read `docs/HANDOVER.md`, `PROJECT.md`, `ARCHITECTURE.md`, and `travel-desktop/design-system/DESIGN_SYSTEM.md` before changing product behavior or UI.
 

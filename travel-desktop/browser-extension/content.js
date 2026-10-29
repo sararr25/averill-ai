@@ -24,22 +24,26 @@
   if(problem){askOut.append(node('p',String(problem).slice(0,300),'error'));return}
   if(!value)return;
   if(value.state==='refused'){askOut.append(node('p',String(value.message||'This question was not accepted.').slice(0,300),'error'));return}
-  if(value.state!=='answered'||!Array.isArray(value.citations)||!value.citations.length){askOut.append(node('p',String(value.message||'No approved source answers this.').slice(0,400)),node('p','Try other words, or ask an administrator to approve the guidance.','hint'));return}
-  askOut.append(node('div',value.mode==='model'?'Nemotron answer':'Checked locally','tag'),node('p',String(value.text||'').slice(0,1500)));
-  for(const c of value.citations.slice(0,3)){const box=node('div',undefined,'cite');box.append(node('b',String(c.title||'').slice(0,160)),node('small',`Approved · Version ${String(c.version||'').slice(0,20)}`),node('div',String(c.quote||'').slice(0,600),'quote'));askOut.append(box)}
+  const localToolHelp=value.mode==='local'&&['tool-help','mixed'].includes(value.assistant?.intent)&&typeof value.text==='string'&&value.text.trim();
+  if(value.state!=='answered'||!Array.isArray(value.citations)||(!value.citations.length&&!localToolHelp)){askOut.append(node('p',String(value.message||'No approved source answers this.').slice(0,400)),node('p','Try other words, or ask an administrator to approve the guidance.','hint'));return}
+  askOut.append(node('div',value.mode==='model'?(value.assistant?.publicOnly?'Nemotron · public tool help':'Nemotron answer'):localToolHelp?'Local tool guidance':'Checked locally','tag'),node('p',String(value.text||'').slice(0,4000)));
+  if(value.assistant?.officialGuide&&!value.citations.some(c=>c.kind==='public-help')){const link=node('a','Open official tool help');link.href=value.assistant.officialGuide;link.target='_blank';link.rel='noopener noreferrer';askOut.append(link)}
+  if(value.assistant?.practiceId)askOut.append(button('I tried this · save to my practice',async()=>{const result=await send({kind:'save-practice',practiceId:value.assistant.practiceId});if(result.error)showAsk(null,result.error,ui);else{askOut.replaceChildren(node('p','Saved as your confirmed practice. Open Learn in Averill for relevant questions.','hint'))}},'secondary'));
+  for(const c of value.citations.slice(0,3)){const publicHelp=c.kind==='public-help',box=node(publicHelp?'details':'div',undefined,'cite');box.append(node(publicHelp?'summary':'b',String(c.title||'').slice(0,160)),node('small',publicHelp?`Official tool help · ${String(c.retrievedAt||'').slice(0,10)}`:`Approved · Version ${String(c.version||'').slice(0,20)}`),node('div',String(c.quote||'').slice(0,600),'quote'));if(publicHelp&&c.url)box.append(sourceLine(c,false));askOut.append(box)}
  }
  async function submitAsk(ui=mainAsk){const askInput=ui.input,askOut=ui.out,askButton=ui.button,live=ui.design&&design?design.status:status;
   if(ui.busy||!alive)return;const question=askInput.value.trim();
   if(!question){showAsk(null,'Type a question first.',ui);return}
-  ui.busy=true;askInput.readOnly=true;askButton.disabled=true;askOut.hidden=false;askOut.replaceChildren(node('p','Looking in approved sources.','hint'));live.textContent='Looking in approved sources.';
+  ui.busy=true;askInput.readOnly=true;askButton.disabled=true;askOut.hidden=false;askOut.replaceChildren(node('p','Preparing help for this task.','hint'));live.textContent='Preparing help for this task.';
   // Syncing the selected field first lets the answer use its current text; a stale revision is simply ignored by Averill.
   const field=selected&&!ui.design?await commit('selection'):null;
-  const value=alive?await send({kind:'ask',question,task,...(field?{fieldId:field.id,revision:field.revision}:{})}):{};
+  let value=alive?await send({kind:'ask',question,task,...(field?{fieldId:field.id,revision:field.revision}:{})}):{};
+  if(value.consentRequired&&alive){const consent=window.confirm(`${value.note||'Confirm external help.'}\n\n${(value.items||[]).map(item=>`${item.label}: ${item.text}`).join('\n\n')}`);value=await send({kind:'ask',question,task,consent,...(field?{fieldId:field.id,revision:field.revision}:{})})}
   ui.busy=false;askInput.readOnly=false;askButton.disabled=false;if(!alive)return;
   if(value.error)showAsk(null,value.error,ui);else showAsk(value,null,ui);
   // FB-10: after an answer the card may offer the draft's public statements for an online double-check. Nothing is sent from here.
   if(!value.error&&field&&selected&&describe(selected)?.revision===field.revision){const next=offerClaims(field,value.publicCheck,claimSet);if(next&&next!==claimSet){claimSet=next;render()}}
-  live.textContent=value.error||(value.state==='answered'?`Answer from ${value.citations?.[0]?.title||'an approved source'}.`:value.message||'No approved source answers this.');
+  live.textContent=value.error||(value.state==='answered'?(value.mode==='local'&&['tool-help','mixed'].includes(value.assistant?.intent)?'Local tool guidance.':`Answer from ${value.citations?.[0]?.title||'an approved source'}.`):value.message||'No approved source answers this.');
   if(selected)position();
  }
  const site=location.hostname.replace(/^(www|app|my)\./,'');
@@ -255,7 +259,7 @@
   if(set.outcome)section.append(imageResults(set.outcome));
   return section;
  }
- function source(finding){const details=node('details',undefined,'source'),summary=node('summary',finding.source.title);summary.append(node('small',`Approved · Version ${finding.source.version}`));details.append(summary,node('div',finding.source.quote,'quote'));return details}
+ function source(finding){const details=node('details',undefined,'source'),summary=node('summary',finding.source.title),general=finding.source.kind==='general-guidance';summary.append(node('small',general?'General design guidance · not company approval':`Approved · Version ${finding.source.version}`));details.append(summary,node('div',finding.source.quote,'quote'));if(general&&finding.source.url){const a=node('a','Read the reference');a.href=finding.source.url;a.target='_blank';a.rel='noopener noreferrer';details.append(a)}return details}
  function render(proposal){if(!alive||!selected)return;const focused=root.activeElement;const focusLabel=focused?.getAttribute('aria-label')||focused?.textContent;host.style.display='block';box.replaceChildren();
   if(uiState==='dismissed'){box.append(button('Ask Averill',()=>{uiState='ready';render()},'chip'));position();return}
   const card=node('section',undefined,'card');card.setAttribute('aria-label','Ask Averill');const head=node('div',undefined,'head'),mark=node('img');mark.src=asset('assets/mark.svg');mark.alt='';const connected=pill('Connected to Averill');connected.title=`Sharing one field on ${site}`;head.append(mark,node('span','Averill','brand'),connected,button('×',()=>{generation++;result=null;uiState='dismissed';render();selected?.focus()},'close'));head.lastChild.setAttribute('aria-label','Dismiss Averill');
@@ -270,7 +274,7 @@
   else if(uiState==='recovery'&&undo){main.append(node('h2','Recover the text yourself.'),node('p','This is the text before the last Averill edit. Copy only what you want to restore.'));const old=node('textarea');old.readOnly=true;old.value=undo.record.before;old.rows=6;old.setAttribute('aria-label','Previous text for manual recovery');old.style.cssText='width:100%;background:var(--rs);color:var(--tx);border:1px solid var(--ct);border-radius:10px;padding:12px;';main.append(old,button('Select previous text',()=>{old.focus();old.select()},'secondary'),button('Review current text',()=>ask(false),'primary'))}
   else if(uiState==='restored')main.append(node('h2','Previous text restored.'),button('Recheck selected text',()=>ask(false),'primary'));
   else if(uiState==='consent'){main.append(node('h2','Review with Nemotron?'),node('p','Your selected field and matching passages from eligible approved sources will be sent to Nebius. Company AI policy and file consent still apply.'),button('Confirm this AI review',()=>ask(true,true),'primary'),button('Keep the check local',()=>ask(false)))}
-  else if(uiState==='preview'&&proposal){main.append(node('div','Preview · one change','tag'),node('h2','Review this change.'));const diff=node('div',undefined,'diff');for(const [label,text,cls]of [['Before',proposal.before,'before'],['After',proposal.after||'(Remove this phrase)','after']]){const d=node('div',undefined,cls);d.append(node('small',label),node('span',text));diff.append(d)}main.append(diff);if(globalThis.AverillEditorAdapter?.supported(selected)){const finding=result.findings.find(f=>f.proposal?.id===proposal.id);main.append(button('Apply change',()=>apply(finding),'primary'))}else main.append(node('p','Direct editing is not available for this editor yet. Make this change in your tool, then recheck.'),button('Recheck selected text',()=>ask(false),'primary'));main.append(button('Back to suggestion',()=>{uiState='findings';render()}))}
+  else if(uiState==='preview'&&proposal){main.append(node('div','Preview · one change','tag'),node('h2','Review this change.'));const diff=node('div',undefined,'diff');for(const [label,text,cls]of [['Before',proposal.before,'before'],['After',proposal.after||'(Remove this phrase)','after']]){const d=node('div',undefined,cls);d.append(node('small',label),node('span',text));diff.append(d)}main.append(diff);for(const ref of proposal.evidence||[])main.append(node('p',`${ref.title} · version ${ref.version||'?'}: “${ref.quote}”`));if(globalThis.AverillEditorAdapter?.supported(selected)){const finding=result.findings.find(f=>f.proposal?.id===proposal.id);main.append(button('Apply change',()=>apply(finding),'primary'))}else main.append(node('p','Direct editing is not available for this editor yet. Make this change in your tool, then recheck.'),button('Recheck selected text',()=>ask(false),'primary'));main.append(button('Back to suggestion',()=>{uiState='findings';render()}))}
   else if(result?.state==='findings'){const list=expanded?result.findings:result.findings.slice(0,1);main.append(node('div',`${result.findings.length} suggestion${result.findings.length===1?'':'s'} · ${result.mode==='local'?'Checked locally':'Nemotron review'}`,'tag'));for(const [index,f]of list.entries()){const section=node('div',undefined,index?'more':'');section.append(node('h2',f.type==='forbidden-claim'?`Remove “${f.observedExcerpt}”.`:f.type==='missing-required-text'?'Add the required text.':f.suggestion),...(f.type==='missing-required-text'?[node('p',f.suggestion)]:[]),...(f.observedExcerpt?[node('div',f.observedExcerpt,'observed')]:[]));if(f.proposal)section.append(button('Preview change',()=>preview(f),'primary'));section.append(source(f),button('Open in Averill ↗',async()=>{const request=generation;const value=await send({kind:'open',reviewId:result.id,findingId:f.id});if(request===generation&&value.error)invalidate(value.error)}));main.append(section)}main.append(button(expanded?'Show less':result.findings.length>1?`View all ${result.findings.length} suggestions`:'What was checked',()=>{expanded=!expanded;render()}));if(expanded)main.append(node('p',`${result.scope.field} · ${result.scope.sourceCount} approved source(s). Other fields, layout and publication were not checked.`))}
   else if(result?.state==='no-conflict')main.append(node('h2','No conflicts found.'),node('p','No conflict was found in the selected text against the approved rules checked. Other fields and visual layout were not reviewed.'),button('Recheck selected text',()=>ask(false),'primary'));
   else if(result?.state==='insufficient-evidence')main.append(node('h2','No approved source yet.'),node('p','There is not enough approved, visible guidance to check this text. Your draft has not changed.'),button('Try again',()=>ask(false),'primary'));
@@ -390,7 +394,7 @@
  }
  function designSummary(d){
   const r=d.result,count=r?.findings?.length||0,plural=count===1?'':'s';
-  let t=!d.on?'Off':d.state==='checking'?'Checking':d.state==='unreadable'?'Cannot read this design':d.state==='error'?'Check failed':d.state==='clean'?'No problems':d.state==='insufficient'?'No approved rules':d.state==='blocking'?(count?`${count} problem${plural}`:'Not every slide checked'):d.state==='overridden'?`${count} known problem${plural}`:'Ready';
+  let t=!d.on?'Off':d.state==='checking'?'Checking':d.state==='unreadable'?'Cannot read this design':d.state==='error'?'Check failed':d.state==='clean'?'Measured checks passed':d.state==='insufficient'?'No approved rules':d.state==='blocking'?(count?`${count} problem${plural}`:'Not every slide checked'):d.state==='overridden'?`${count} known problem${plural}`:'Ready';
   const steps=d.on&&Array.isArray(r?.exercise?.steps)?r.exercise.steps.slice(0,8):null;
   if(steps)t+=` · ${steps.filter(step=>step.done).length} of ${steps.length} steps`;
   return t;
@@ -411,7 +415,7 @@
   document.documentElement.append(dhost);
   // Keys typed in the card are Averill's: Canva's shortcuts must not see them.
   for(const type of ['keydown','keyup','keypress'])dhost.addEventListener(type,e=>e.stopPropagation());
-  design={host:dhost,root:droot,box:dbox,status:dstatus,min:true,pos:loadDesignPos(),howOpen:new Set(),expandedFor:'',focusNext:null,ask:askUi('averill-design-ask','Ask about this design or company rules','For example: How far from the edge must text be?',true),on:false,state:'off',result:null,reason:'',error:'',override:null,timer:null,lastRun:0,busy:false,pending:false,lastSent:'',checkedAt:null,cache:new WeakMap(),abort:new AbortController(),observer:new MutationObserver(()=>{if(design?.on)scheduleDesign()})};
+  design={host:dhost,root:droot,box:dbox,status:dstatus,min:true,pos:loadDesignPos(),howOpen:new Set(),expandedFor:'',focusNext:null,ask:askUi('averill-design-ask','Ask for design or Canva help','For example: How do I add a frame or improve contrast?',true),on:false,state:'off',result:null,reason:'',error:'',override:null,timer:null,lastRun:0,busy:false,pending:false,lastSent:'',checkedAt:null,cache:new WeakMap(),abort:new AbortController(),observer:new MutationObserver(()=>{if(design?.on)scheduleDesign()})};
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&design?.on)scheduleDesign()},{signal:design.abort.signal});
   addEventListener('resize',placeDesign,{signal:design.abort.signal});
   renderDesign();
@@ -426,7 +430,7 @@
   d.busy=true;d.lastRun=Date.now();
   const read=DESIGN.read(document,{imageCache:d.cache});
   if(read.state!=='ok'){d.busy=false;d.result=null;d.lastSent='';d.override=null;d.state='unreadable';d.reason=read.reason;renderDesign();if(d.pending){d.pending=false;scheduleDesign()}return}
-  const payload={design:read.design,elements:read.elements,slide:read.slide},sig=JSON.stringify(payload);
+  const payload={design:read.design,elements:read.elements,slide:read.slide,designId:location.pathname.match(/^\/design\/([A-Za-z0-9_-]{5,100})(?:\/|$)/)?.[1]||null,clientVersion:chrome.runtime.getManifest?.().version||'unknown',protocol:2},sig=JSON.stringify(payload);
   if(!force&&sig===d.lastSent&&d.result){d.busy=false;if(d.pending){d.pending=false;scheduleDesign()}return}
   if(!d.result&&d.state!=='checking'){d.state='checking';renderDesign()}
   const value=await send({kind:'design-check',...payload});
@@ -471,8 +475,8 @@
   else if(d.state==='checking')main.append(node('h2','Checking your design.'),node('p','Reading the texts, colors and positions on this page.','hint'));
   else if(d.state==='unreadable')main.append(node('h2','Averill cannot read this design'),node('p',String(d.reason).slice(0,300)),node('p','Nothing was checked. Check contrast and margins yourself before you export. Canva may have changed its page, or the design uses something Averill does not read yet.','hint'));
   else if(d.state==='error')main.append(node('h2','The design check could not finish.'),node('p',d.error,'error'),button('Check again',()=>runDesign(true),'secondary'));
-  else if(d.state==='clean'){const n=result.elementCount;main.append(node('h2','No design problems found.'),node('p',`Checked ${n} text${n===1?'':'s'} for ${(result.checked||[]).join(', ')}. Last check ${d.checkedAt.toLocaleTimeString()}. Averill keeps watching while you edit.`,'hint'));slideSummary();notes()}
-  else if(d.state==='insufficient'){main.append(node('h2','No approved design rules yet.'),node('p','There are not enough approved design rules to check this design. Ask your lead to approve them. Nothing was changed.'));notes()}
+  else if(d.state==='clean'){const n=result.elementCount;main.append(node('h2','No issues in the measured checks.'),node('p',`Checked ${n} text${n===1?'':'s'} for ${(result.checked||[]).join(', ')}. Last check ${d.checkedAt.toLocaleTimeString()}. This does not approve the overall design. Averill keeps watching while you edit.`,'hint'));slideSummary();notes()}
+  else if(d.state==='insufficient'){main.append(node('h2','Company-specific checks unavailable.'),node('p','Company requirements are not available for this topic. General design guidance and tool help remain available below. Nothing was changed.'));notes()}
   else if(d.state==='blocking'||d.state==='overridden'){
    if(d.state==='blocking')main.append(node('h2','Fix before you export'),node('p',count?`Averill found ${count} problem${plural} in this design. Averill cannot stop Canva’s export, so fix ${count===1?'it':'them'} first.`:'Averill has not checked every slide yet. Flip through all slides with the page bar so Averill can check each one.'));
    else main.append(node('h2','Export anyway recorded.'),node('p',`You chose to export with ${count} known problem${plural}. Averill recorded this for this session only. The problem${plural} ${count===1?'is':'are'} still in the design.`,'hint'));
@@ -481,12 +485,13 @@
    for(const f of result.findings.slice(0,12)){const item=node('li',undefined,'dfind');item.append(node('b',`${carousel&&Number.isInteger(f.slide)?`Slide ${f.slide}: `:''}“${String(f.text).slice(0,120)}”`),node('p',String(f.problem).slice(0,300)));if(f.measured)item.append(node('p',String(f.measured).slice(0,200),'measure'));if(f.source)item.append(source(f));list.append(item)}
    main.append(list);if(d.state==='blocking')main.append(button('Export anyway',exportAnyway,'secondary'));notes();
   }
+  if(d.on&&result)main.append(button('Get help improving contrast and spacing',()=>{d.ask.input.value='How do I improve contrast and spacing in Canva?';submitAsk(d.ask)},'secondary'));
   // D1: an open Canva lesson, with the steps Averill has seen in this design. Grouping cannot be read here: it is confirmed in Averill.
   const ex=result?.exercise;
   if(d.on&&ex&&Array.isArray(ex.steps)){
    const box=node('div',undefined,'dex');box.append(node('h3',`Lesson: ${String(ex.title).slice(0,80)}`));const list=node('ol',undefined,'dexlist');
-   ex.steps.slice(0,8).forEach((step,i)=>{const kind=step.check==='confirm'?'confirm':step.done?'done':'todo';const item=node('li',undefined,kind);item.append(node('span',kind==='done'?'✓':String(i+1)),node('b',String(step.title).slice(0,100)),node('small',kind==='confirm'?'You confirm this in Averill':kind==='done'?'Checked by Averill':'Not in the design yet'));const how=howTo(d,String(step.id),String(step.title).slice(0,100));if(how)item.append(how);list.append(item)});
-   box.append(list,node('p','When every step shows a tick, finish the lesson in Averill with one confirmation.','hint'));main.append(box);
+   ex.steps.slice(0,8).forEach((step,i)=>{const kind=step.check==='confirm'?'confirm':step.done?'done':'todo';const item=node('li',undefined,kind);item.append(node('span',kind==='done'?'✓':String(i+1)),node('b',String(step.title).slice(0,100)),node('small',kind==='confirm'?'You confirm this in Averill':kind==='done'?'Measured on this slide · not overall approval':step.seenBefore?'Previously seen · needs attention now':'Needs attention on this slide'));const how=howTo(d,String(step.id),String(step.title).slice(0,100));if(how)item.append(how);list.append(item)});
+   box.append(node('p','These ticks cover the measured properties on the current slide only. Other slides and the overall composition may still need work.','hint'),list,node('p','When every step shows a tick, finish the lesson in Averill with one confirmation.','hint'));main.append(box);
   }
   if(d.error&&d.state!=='error')main.append(node('p',d.error,'error'));
   const footer=node('div',undefined,'footer');footer.append(button('Stop sharing',async()=>{await send({kind:'stop'});stop('stopped_by_user')}));

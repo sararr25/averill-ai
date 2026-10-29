@@ -36,6 +36,12 @@ function askInput(body) {
   if (!question) throw new RequestError('A question is required.');
   const sources = cleanSources(body.sources);
   if (!sources.length) throw new RequestError('At least one approved source is required.');
+  if (body.mode === 'assist') {
+    const intent = text(body.intent, 20);
+    if (!['draft', 'checklist', 'tool-help'].includes(intent)) throw new RequestError('Unsupported assistance intent.');
+    return { question, sources, draft: text(body.draft, 1500), intent, mode: 'assist' };
+  }
+  if (body.mode !== undefined) throw new RequestError('Unsupported answer mode.');
   return { question, sources };
 }
 
@@ -44,7 +50,10 @@ function searchInput(body) {
   if (kind === 'search') {
     const query = text(body.query, LIMITS.query);
     if (!query) throw new RequestError('Search text is required.');
-    return { kind, path: '/search', body: { query, search_depth: 'basic', max_results: 5, include_answer: false } };
+    const domains = body.includeDomains;
+    const official = new Set(['www.canva.com', 'canva.com', 'help.brevo.com', 'www.linkedin.com', 'linkedin.com', 'help.instagram.com']);
+    if (domains !== undefined && (!Array.isArray(domains) || !domains.length || domains.length > 5 || domains.some(d => !official.has(d)))) throw new RequestError('Unsupported tool-help domains.');
+    return { kind, path: '/search', body: { query, search_depth: 'basic', max_results: 5, include_answer: false, ...(domains ? { include_domains: domains } : {}) } };
   }
   if (kind === 'crawl') {
     let url;
@@ -81,7 +90,8 @@ function createHandlers({ limiter, review = providers.nemotronReview, ask = prov
       }
     }),
     ask: (req, res) => run(req, res, async (who, body) => {
-      const messages = providers.askMessages(askInput(body));
+      const input = askInput(body);
+      const messages = input.mode === 'assist' ? providers.assistMessages(input) : providers.askMessages(input);
       const reservation = await limiter.reserve('nebius', who, providers.estimateTokens(messages));
       try {
         const result = await ask(messages);

@@ -31,7 +31,11 @@
     "verify:canva-design": "electron scripts/verify-canva-design.cjs",
     "verify:accessibility": "electron scripts/verify-accessibility.cjs",
     "verify:guide": "electron scripts/verify-guide.cjs",
-    "verify:demo-ai": "electron scripts/verify-demo-ai.cjs"
+    "verify:demo-ai": "electron scripts/verify-demo-ai.cjs",
+    "verify:pro-ui": "electron scripts/verify-pro-ui.cjs",
+    "verify:pro-live": "node scripts/verify-pro-live.cjs",
+    "verify:pro-demo-live": "node scripts/verify-pro-demo-live.cjs",
+    "verify:pro-sentence-live": "node scripts/verify-pro-sentence-live.cjs"
   },
   "dependencies": {
     "@fontsource/fragment-mono": "^5.3.0",

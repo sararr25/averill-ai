@@ -149,11 +149,17 @@ test('the captured starting post is outside Vamo\'s 108 px margin on all three t
   ]);
 });
 
-test('without approved design lines nothing is called clean', () => {
+test('without company design lines general readability still detects problems', () => {
   const bare = { ...workspace, sources: workspace.sources.filter(source => source.title !== 'social-media-guidelines.md') };
   const result = designCheck.evaluate({ workspace: bare, payload: payload([element({ colors: [PISTACHIO] })]) });
-  assert.equal(result.state, 'insufficient-evidence');
-  assert(result.notes.some(note => /contrast was not checked/.test(note)) && result.notes.some(note => /safe area was not checked/.test(note)));
+  assert.equal(result.state, 'findings');
+  assert.equal(result.findings[0].source.kind, 'general-guidance');
+  assert.match(result.findings[0].source.url, /w3.org/);
+  assert(result.notes.some(note => /general readability/.test(note)));
+  assert(result.checked.includes('general contrast'));
+  const clear = designCheck.evaluate({ workspace: bare, payload: payload([element()]) });
+  assert.equal(clear.state, 'clean');
+  assert(clear.notes.some(note=>/not approval/.test(note)));
 });
 
 function service() {
@@ -174,18 +180,18 @@ test('contextual designCheck: canva.com only, signed in only, and Export anyway 
   const status = review.designStatus(workspace.activePersonId);
   assert.equal(status.overrides.length, 1); assert.deepEqual(status.overrides[0].types, ['contrast']); assert.equal(status.last.findingCount, 1);
   // A clean check cannot be overridden; another person sees nothing; clearing the session forgets it.
-  const clean = review.designCheck({ ...payload(), pageOrigin: CANVA });
+  const clean = review.designCheck({ ...payload(), slide:{ index:1, count:1 }, designId:'SYNTHETIC_DESIGN', pageOrigin: CANVA });
   assert.throws(() => review.designCheck({ action: 'override', checkId: clean.id, pageOrigin: CANVA }), /changed|again/i);
   assert.deepEqual(review.designStatus('someone-else'), { last: null, overrides: [] });
   review.clearDesign(); assert.deepEqual(review.designStatus(workspace.activePersonId), { last: null, overrides: [] });
   state.signedIn = false;
-  assert.throws(() => review.designCheck({ ...payload(), pageOrigin: CANVA }), /changed|again/i);
+  assert.throws(() => review.designCheck({ ...payload(), slide:{ index:1, count:1 }, designId:'SYNTHETIC_DESIGN', pageOrigin: CANVA }), /changed|again/i);
 });
 
 test('carousel (owner decision 28 October 2026): results accumulate per slide; blocking until every slide is read and clean', () => {
   const { state, review } = service();
   const P = { width: 1080, height: 1350, scale: 0.433 };
-  const at = (index, elements = [element({ box: { x: 120, y: 1200, width: 700, height: 40 } })], extra = {}) => review.designCheck({ ...payload(elements, P), slide: index === null ? null : { index, count: 5 }, pageOrigin: CANVA, tabId: 3, kind: 'design-check', ...extra });
+  const at = (index, elements = [element({ box: { x: 120, y: 1200, width: 700, height: 40 } })], extra = {}) => review.designCheck({ ...payload(elements, P), slide: index === null ? null : { index, count: 5 }, designId:'SYNTHETIC_DESIGN', pageOrigin: CANVA, tabId: 3, kind: 'design-check', ...extra });
   const bad = [element({ box: { x: 120, y: 1200, width: 700, height: 40 }, colors: [PISTACHIO] })];
   const one = at(1);
   assert.equal(one.state, 'incomplete', 'slide 1 clean, 4 slides unread');
@@ -228,6 +234,15 @@ test('carousel (owner decision 28 October 2026): results accumulate per slide; b
   assert.throws(() => at(6), /Invalid slide/);
 });
 
+test('legacy readings without slide/design identity never clear the carousel gate; another design starts from zero', () => {
+  const { review } = service(), base = { ...payload(), pageOrigin: CANVA, tabId: 12 };
+  assert.equal(review.designCheck(base).state, 'incomplete');
+  assert.equal(review.designCheck({ ...base, slide: { index: 1, count: 1 } }).state, 'incomplete');
+  assert.equal(review.designCheck({ ...base, slide: { index: 1, count: 1 }, designId: 'DESIGN_FIRST' }).state, 'clean');
+  const next = review.designCheck({ ...base, slide: { index: 2, count: 2 }, designId: 'DESIGN_SECOND' });
+  assert.equal(next.state, 'incomplete'); assert.deepEqual(next.slides.checked, [2]);
+});
+
 test('bridge: a design check is refused without a connection, for another tab or origin, and after Stop', async t => {
   const { review } = service();
   const bridge = new BrowserBridge({ onObservation: () => {}, onStop: () => {}, onRequest: body => body.kind === 'design-check' ? review.designCheck(body) : { reviewId: null } });
@@ -235,7 +250,7 @@ test('bridge: a design check is refused without a connection, for another tab or
   const origin = 'chrome-extension://' + 'a'.repeat(32);
   const pair = await bridge.start(workspace.activePersonId);
   const post = (url, body) => fetch(pair.endpoint.replace('/observation', url), { method: 'POST', headers: { Origin: origin, 'Content-Type': 'application/json', 'X-Averill-Token': pair.token }, body: JSON.stringify({ tabId: 7, pageOrigin: CANVA, ...body }) });
-  const check = { kind: 'design-check', ...payload() };
+  const check = { kind: 'design-check', ...payload(), slide:{ index:1, count:1 }, designId:'SYNTHETIC_DESIGN' };
   assert.equal((await post('/context', check)).status, 400, 'not connected yet: no bound tab');
   assert.equal((await post('/observation', { kind: 'heartbeat', sequence: 1 })).status, 200);
   const ok = await post('/context', check);
@@ -278,7 +293,7 @@ test('worker: the reader is injected before content.js on canva.com only; the re
   assert.equal((await w.fromPage({ kind: 'design-check', ...payload(), screenshot: 'data:image/png;base64,AAAA', token: 'x' })).state, 'clean');
   const sent = w.requests.at(-1);
   assert(sent.url.endsWith('/context'));
-  assert.deepEqual(Object.keys(sent.body).sort(), ['design', 'elements', 'kind', 'pageOrigin', 'tabId']);
+  assert.deepEqual(Object.keys(sent.body).sort(), ['clientVersion', 'design', 'designId', 'elements', 'kind', 'pageOrigin', 'protocol', 'tabId']);
   assert(!JSON.stringify(sent.body).includes('base64'));
   const before = w.requests.length;
   for (const bad of [payload(Array(31).fill(element())), payload([element({ text: 'x'.repeat(501) })]), payload([element({ dataUrl: 'data:image/png;base64,AAAA' })]), { design: payload().design }]) {

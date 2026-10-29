@@ -15,6 +15,8 @@ const FORMAT = 'instagram';
 // This is Averill's documented simplification: WCAG defines the size at viewing size, which a social post does not fix.
 const BASE_WIDTH = 1080, LARGE_PX = 24, LARGE_BOLD_PX = 18.66, BOLD_WEIGHT = 700;
 const EDGE_TOLERANCE = 0.5;
+const GENERAL_CONTRAST = { source: { id: 'general-contrast', title: 'General readability · WCAG contrast', kind: 'general-guidance', url: 'https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html' }, quote: 'General readability guidance: contrast at least 4.5:1 for normal text and 3:1 for large text. Social-image viewing size still needs human review.' };
+const GENERAL_MARGIN = { source: { id: 'general-margin', title: 'General layout · suggested inset', kind: 'general-guidance' }, quote: 'Averill suggests a 60 px text inset on a 1080 px design as a starting point. This is a layout recommendation, not a company or platform requirement.' };
 const clip = (value, max) => String(value ?? '').slice(0, max);
 const floor2 = value => (Math.floor(value * 100) / 100).toFixed(2);
 
@@ -43,7 +45,7 @@ function designRules(sources) {
   }
   return found;
 }
-const citation = entry => ({ id: entry.source.id, title: clip(entry.source.title, 160), version: String(entry.source.version || ''), quote: entry.quote });
+const citation = entry => ({ id: entry.source.id, title: clip(entry.source.title, 160), version: String(entry.source.version || ''), quote: entry.quote, ...(entry.source.kind ? { kind: entry.source.kind, url: entry.source.url } : {}) });
 
 function evaluate({ workspace, payload }) {
   const { design, elements } = canva.validate(payload);
@@ -71,6 +73,17 @@ function evaluate({ workspace, payload }) {
         add('safe-zone', index, element, 'This text sits outside the safe area.', measured, margin);
       }
     }
+    // General design guidance is useful even when the company has supplied no design policy.
+    // A company threshold remains mandatory; only add a distinct baseline warning when it is uncovered.
+    const big = isLarge(element, design), baseline = big ? 3 : 4.5;
+    const companyContrast = normal ? (big && large ? large : normal) : null;
+    if ((!companyContrast || companyContrast.number < baseline) && canva.worstContrast(element.colors, element.background) < baseline) {
+      add('contrast', index, element, 'Increase text/background contrast: try a solid background panel or a more contrasting text color.', `contrast ${floor2(canva.worstContrast(element.colors, element.background))}:1; general readability target ${baseline}:1`, GENERAL_CONTRAST);
+    }
+    if (!margin || margin.number < 60) {
+      const zone = safeZone(element.box, design, 60);
+      if (!zone.inside) add('safe-zone', index, element, 'Move this text inward and check the intended crop. This is a general layout suggestion.', `${Math.round(zone.gap)} px from the ${zone.edge} edge; suggested inset ${Math.round(zone.need)} px`, GENERAL_MARGIN);
+    }
     // The same engine as captions, limited to claims: hashtags and caption-only requirements do not apply to a design.
     for (const f of taskReview.localReview(workspace, FORMAT, element.text, null).findings.filter(item => item.type === 'forbidden-claim')) {
       const entry = byId.get(f.source?.id);
@@ -79,12 +92,15 @@ function evaluate({ workspace, payload }) {
     }
   });
   // Say what was not checked, so a missing rule is never read as a clean result.
-  if (!normal) notes.push('No approved contrast rule applies, so contrast was not checked.');
+  if (!normal) notes.push('Contrast uses general readability guidance. No company-specific contrast requirement is available.');
   else if (!large) notes.push('No approved large-text contrast rule applies, so large text was held to the normal contrast rule.');
-  if (!margin) notes.push('No approved safe-margin rule applies, so the safe area was not checked.');
+  if (!margin) notes.push('The text inset is a general layout suggestion. No company-specific safe-margin requirement is available.');
+  notes.push('These are measured text checks, not approval of the whole composition. Review visual hierarchy, image crop and readability at the final viewing size.');
   const checked = [normal && 'contrast', margin && 'safe area', byId.size && 'approved wording'].filter(Boolean);
-  const state = findings.length ? 'findings' : normal && margin ? 'clean' : 'insufficient-evidence';
-  return { id: crypto.randomUUID(), state, findings: findings.slice(0, 30), checked, notes, elementCount: elements.length, design: { width: design.width, height: design.height } };
+  if (!normal) checked.push('general contrast');
+  if (!margin) checked.push('suggested text inset');
+  const state = findings.length ? 'findings' : 'clean';
+  return { id: crypto.randomUUID(), state, findings: findings.slice(0, 30), checked, notes, lessonConstraints: { margin: Math.max(60, margin?.number || 0), normal: Math.max(4.5, normal?.number || 0), large: Math.max(3, (large || normal)?.number || 0) }, elementCount: elements.length, design: { width: design.width, height: design.height } };
 }
 
 // T6: the open design's own numbers, added to a design question asked in the Canva card. Only what the reader measured

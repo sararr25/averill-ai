@@ -218,7 +218,8 @@ test('the bridge accepts up to 6 MB only for image-check and rejects above it; o
   const over = await post({ ...request, images: Array(4).fill(good({ dataUrl: big })) });
   assert.equal(over.status, 413);
   // Without the header, or for another kind, the old limit applies.
-  assert.equal((await post({ ...request, images: Array(3).fill(good({ dataUrl: big })) }, { 'X-Averill-Kind': '' })).status, 400);
+  const wrongHeader = await post({ ...request, images: Array(3).fill(good({ dataUrl: big })) }, { 'X-Averill-Kind': '' });
+  assert.equal(wrongHeader.status, 400); assert.equal(wrongHeader.headers.get('connection'), 'close', 'an oversized ordinary request cannot poison the next keep-alive request');
   assert.equal((await post({ kind: 'ask', question: 'x'.repeat(24500) })).status, 400, 'a header cannot widen another kind');
   assert.equal((await post({ kind: 'ask', question: 'x' }, { 'X-Averill-Kind': '' })).status, 200);
   // Wrong shape inside the limit is a plain refusal.

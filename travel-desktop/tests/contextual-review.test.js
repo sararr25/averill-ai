@@ -11,7 +11,7 @@ const { ContextualReview } = require('../src/contextual-review');
 function fixture(t, options = {}) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'averill-context-'));
   t.after(() => fs.rmSync(root, { recursive: true, force: true }));
-  const file = path.join(root, 'policy.md'); fs.writeFileSync(file, 'Do not claim "lowest prices guaranteed".');
+  const file = path.join(root, 'policy.md'); fs.writeFileSync(file, 'Do not claim "lowest prices guaranteed".\nApproved lead: "Discover curated winter city breaks".');
   const data = workspace.create(root, 'Synthetic company', 'Owner');
   const source = workspace.importFile(root, data, file, { department: 'Marketing', version: '2' });
   workspace.updateSource(data, source.id, 'approved');
@@ -38,7 +38,7 @@ test('bound browser review returns a minimal cited result and a validated indivi
   const result = await response.json(); assert.equal(result.state, 'findings');
   assert.equal(result.findings[0].source.quote, 'Do not claim "lowest prices guaranteed".');
   const proposal = f.service.proposal({ reviewId: result.id, findingId: result.findings[0].id });
-  assert.deepEqual([proposal.proposal.start, proposal.proposal.end, proposal.proposal.before, proposal.proposal.after], [4, 28, 'lowest prices guaranteed', '']);
+  assert.deepEqual([proposal.proposal.start, proposal.proposal.end, proposal.proposal.before, proposal.proposal.after], [0, 29, 'Our lowest prices guaranteed.', 'Discover curated winter city breaks.']);
   const serialized = JSON.stringify(result);
   for (const secret of [pair.token, f.file, 'textPath', 'ownerId', 'people', 'publicClaims', 'steps']) assert(!serialized.includes(secret));
   assert.equal((await send('/context', { kind: 'review', ...f.request, tabId: 2 })).status, 400);

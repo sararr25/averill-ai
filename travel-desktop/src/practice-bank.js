@@ -33,6 +33,14 @@ function entries(data) {
   const cite = (rule, type) => rule ? { rule: { title: rule.title, version: rule.version, quote: rule.quote }, ruleRef: { type, sourceId: rule.sourceId, version: rule.version, quote: rule.quote } } : {};
   return [
     {
+      bankId: 'email-footer-visible', type: 'text-picture', steps: ['email-footer'],
+      prompt: 'Which footer keeps the reader in control?',
+      picture: pic('task-brevo.svg', 'An email with the footer highlighted. Check whether the unsubscribe control is visible.'),
+      options: [opt('hidden', 'Hide the unsubscribe link in tiny text'), opt('visible', 'Keep a visible unsubscribe link and check the approved sender details'), opt('remove', 'Remove the footer to shorten the email')],
+      correct: 'visible',
+      explanation: 'Keep the unsubscribe control visible. Use approved company guidance for the exact footer and sender details. This question checks the email task you confirmed; it does not verify a real email was sent.',
+    },
+    {
       bankId: 'headline-leads', type: 'picture', steps: ['hierarchy', 'size'], general: true,
       prompt: 'Which Instagram post has a headline that clearly leads?',
       picture: pic('post-headline-b.svg', 'Three Instagram posts to compare, shown below as the answer options.'),
@@ -80,11 +88,11 @@ function entries(data) {
     },
     {
       bankId: 'group-shortcut', type: 'text-picture', steps: ['group'],
-      prompt: 'The headline and supporting line are selected together. Which shortcut groups them on a Mac?',
+      prompt: 'The headline and supporting line are selected together. Which action groups them in Canva?',
       picture: pic('canva-group.svg', 'A headline and a supporting line selected together in a design tool.'),
-      options: [opt('print', 'Command+P'), opt('group', 'Command+G'), opt('save', 'Command+S')],
+      options: [opt('print', 'Print the design'), opt('group', 'Choose Group in the editor toolbar'), opt('save', 'Download the design')],
       correct: 'group',
-      explanation: 'Command+G groups the selection so it moves as one.',
+      explanation: 'Group in the editor toolbar keeps the selected elements together.',
     },
   ];
 }
