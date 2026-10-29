@@ -1,0 +1,18 @@
+{
+  "verifiedAt": "2026-10-29T16:32:01.381Z",
+  "liveProviders": true,
+  "server": "https://averill-judge-ai.vercel.app",
+  "payload": "Bundled fictional Vamo brief/legal guidance and public Canva grouping query",
+  "results": [
+    {
+      "question": "Prepare a checklist of current approved campaign requirements, source versions and decisions that need my review.",
+      "intent": "checklist",
+      "mode": "model",
+      "via": "demo-server",
+      "sourceCount": 4,
+      "characters": 478,
+      "ms": 3597
+    }
+  ],
+  "passed": true
+}

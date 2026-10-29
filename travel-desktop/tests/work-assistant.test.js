@@ -263,3 +263,25 @@ test('public help cannot turn the company chat client into an unrestricted polic
  await assert.rejects(nebius.publicToolHelp({key:'synthetic',tool:'canva',topic:'arbitrary request',sources:[],fetcher}),/Unsupported public help/);
  assert.equal(calls,0);
 });
+
+test('role action prompts route to synthesis even when they ask for approved campaign facts',()=>{
+ const roles=require('../src/role-playbooks');
+ for(const profile of ['content_creator','marketing_strategy','marketing_manager']){
+  for(const entry of roles.forPerson({profile,department:'Marketing'})){
+   const expected=/checklist/.test(entry.prompt)?'checklist':/^(Rewrite|Write|Draft)/.test(entry.prompt)?'draft':/^How/.test(entry.prompt)?'tool-help':'company';
+   assert.equal(classify(entry.prompt).kind,expected,entry.prompt);
+  }
+ }
+ assert.equal(classify('Which current campaign rules should my team check before using this draft?').kind,'company');
+ assert.equal(classify('Prepare a checklist of current approved campaign requirements, source versions and decisions that need my review.').kind,'checklist');
+});
+
+test('the lead checklist uses the capped demo route with company AI off and sends only bundled source text',async t=>{
+ const f=fixture(t); f.data.demoAccounts=true;f.data.privacy={companyAI:false};
+ const file=path.join(path.dirname(f.source.textPath),'bundled-brief.md');fs.copyFileSync(path.join(__dirname,'../demo-company/vamo/Marketing/current-brief.md'),file);
+ const original=workspace.importFile(path.dirname(file),f.data,file,{department:'Marketing',version:'2'});workspace.updateSource(f.data,original.id,'approved');
+ let request;const options={modelTransport:async value=>{request=value;const s=value.sources.find(s=>s.id===original.id);return {content:JSON.stringify({answer:'1. Do not claim lowest prices guaranteed.\n2. Check the campaign requirements against the approved brief.',evidence:[{source_id:s.id,quote:'Do not claim "lowest prices guaranteed" or imply a price guarantee.'}]})};}};
+ const question='Prepare a checklist of current approved campaign requirements, source versions and decisions that need my review.';
+ const preview=await f.assistant.answer(f.data,question,options);assert(preview.consentRequired);assert.equal(request,undefined);assert(!JSON.stringify(preview.items).includes(f.entry.text));
+ const result=await f.assistant.answer(f.data,question,{...options,consent:true});assert.equal(result.assistant.intent,'checklist');assert.equal(result.mode,'model');assert.equal(result.assistant.via,'demo-server');assert(!request.sources.some(s=>s.id===f.source.id));assert.equal(f.data.privacy.companyAI,false);
+});

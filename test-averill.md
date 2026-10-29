@@ -1,3 +1,7 @@
+# Maya checklist regression — 29 October 2026
+
+Open `travel-desktop/dist/Averill.app`, sign in as Maya, Current work → Review the handover → Send question. Confirm the listed fictional demo excerpts. Expected: a short Nemotron priority checklist with source citations, not a literal-source extract or “Nemotron unavailable”. Company AI may stay off for this capped fixed-bundle demo route; private imported sources remain excluded. “Explain the requirements” stays a company lookup. Cancelling the preview makes no provider request. Server outages and unverified responses remain distinct and keep local guidance available.
+
 # Canva general-help regression acceptance — 29 October 2026
 
 - With no approved Design rule, low-contrast text still yields a general design warning; missing rules do not mean a design is good. General suggestions are labelled separately from mandatory company requirements.

@@ -137,7 +137,7 @@ async function assistCompany(question, context = '', options = {}) {
     context, task: options.task || (selectedExternalWindow?.name?.toLowerCase().includes('canva') ? 'canva' : undefined),
     scope: options.scope || 'desktop', consent: options.consent,
     nebiusKey: aiEnabled ? runtimeKeys.nebius : '', publicNebiusKey: runtimeKeys.nebius, tavilyKey: runtimeKeys.tavily,
-    modelTransport: companyWorkspace.demoAccounts && !runtimeKeys.nebius ? (request, fetcher) => judgeServer.assist(companyWorkspace, request, { fetcher }) : undefined,
+    modelTransport: companyWorkspace.demoAccounts && !(aiEnabled && privacy.allowed(companyWorkspace) && runtimeKeys.nebius) ? (request, fetcher) => judgeServer.assist(companyWorkspace, request, { fetcher }) : undefined,
     searchTransportFactory: companyWorkspace.demoAccounts && !runtimeKeys.tavily ? fetcher => judgeServer.searchTransport(companyWorkspace, { fetcher }) : undefined,
     validate: () => { if (!signedIn() || companyWorkspace !== answeringWorkspace || companyWorkspace.activePersonId !== personId || externalEpoch !== epoch || aiEnabled !== answerAI || context && JSON.stringify([externalObservation?.fieldId, externalObservation?.revision, externalObservation?.contentHash]) !== observationKey) throw new Error('The work session changed. Ask again.'); },
   });

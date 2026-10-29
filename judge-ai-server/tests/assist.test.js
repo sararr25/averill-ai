@@ -28,3 +28,26 @@ test('official help search domains are carried to Tavily and arbitrary domains a
   assert.equal((await f.invoke('search', { kind: 'search', query: 'x', includeDomains: ['private.example'] })).code, 400);
   assert.equal(f.calls.length, 1);
 });
+
+test('checklist synthesis has a bounded task-specific prompt instead of email instructions',()=>{
+ const providers=require('../lib/providers');const messages=providers.assistMessages({intent:'checklist',question:'Prepare approved requirements',sources:[{title:'x',text:'Do not claim a price guarantee.'}]});
+ assert.match(messages[0].content,/four priority/);assert.match(messages[0].content,/Each check must have its own/);assert.match(messages[0].content,/never invent/i);assert(!messages[0].content.includes('greeting, approved lead'));
+});
+test('truncated provider JSON is reported as a response-length failure',async()=>{
+ const providers=require('../lib/providers');
+ const fetcher=async url=>({ok:true,json:async()=>url.endsWith('/models')?{data:[{id:'nvidia/Nemotron-test'}]}:{choices:[{finish_reason:'length',message:{content:'{"answer":"unfinished'}}],usage:{total_tokens:1200}}});
+ await assert.rejects(providers.nemotronAsk([{role:'user',content:'synthetic'}],{key:'synthetic',fetcher}),/response length limit/);
+});
+
+test('priority checklists retain four items and reserve their full output budget',async()=>{
+ const providers=require('../lib/providers');const messages=providers.assistMessages({intent:'checklist',question:'Prepare approved checks',sources:[{title:'x',text:'Use approved facts only.'}]});let sent;
+ const fetcher=async(url,options)=>{if(url.endsWith('/models'))return {ok:true,json:async()=>({data:[{id:'nvidia/Nemotron-test'}]})};sent=JSON.parse(options.body);return {ok:true,json:async()=>({choices:[{finish_reason:'stop',message:{content:JSON.stringify({answer:Array.from({length:6},(_,i)=>`☐ Check approved requirement ${i+1}.`).join('\n'),evidence:[{sourceTitle:'x',quote:'Use approved facts only.'}]})}}],usage:{total_tokens:100}})};};
+ const result=await providers.nemotronAsk(messages,{key:'synthetic',fetcher});assert.equal((result.answer.match(/☐/g)||[]).length,4);assert.match(result.answer,/remaining requirements/);assert.equal(sent.max_tokens,1200);assert.equal(sent.response_format.type,'json_schema');assert.equal(sent.response_format.json_schema.schema.properties.items.maxItems,4);assert(providers.estimateTokens(messages)>=1200);
+});
+
+test('checklist aliases and escaped quote punctuation recover exact original evidence only',async()=>{
+ const providers=require('../lib/providers');const text='# Brand guidance\nUse "approved wording". Do not promise a guarantee.';
+ const messages=providers.assistMessages({intent:'checklist',question:'Prepare checks',sources:[{title:'source-0',text}]});
+ const fetcher=async url=>({ok:true,json:async()=>url.endsWith('/models')?{data:[{id:'nvidia/Nemotron-test'}]}:{choices:[{finish_reason:'stop',message:{content:JSON.stringify({items:[{check:'Verify approved wording.',sourceTitle:'Brand guidance',quote:'Use &quot;approved wording&quot;.'},{check:'Check that no guarantee is promised.',sourceTitle:'source-0',quote:'Do not promise a guarantee.'}]})}}]}});
+ const result=await providers.nemotronAsk(messages,{key:'synthetic',fetcher});assert.equal(result.evidence[0].sourceTitle,'source-0');for(const ref of result.evidence)assert(text.includes(ref.quote));
+});
