@@ -9,7 +9,7 @@ const tasks = { email: 'Marketing', linkedin: 'Marketing', instagram: 'Marketing
 function currentSources(data, task) {
   if (!tasks[task]) throw new Error('Choose a supported work type.');
   const excluded = new Set(conflicts(data).flat());
-  return approvedSources(data).filter(source => source.textPath && !excluded.has(source.id) && (source.department === tasks[task] || source.scope === 'company')).map(source => {
+  return approvedSources(data).filter(source => source.purpose !== 'company-reference' && source.textPath && !excluded.has(source.id) && (source.department === tasks[task] || source.scope === 'company')).map(source => {
     try { return { source, text: fs.readFileSync(source.textPath, 'utf8').slice(0, 12000) }; }
     catch { return null; }
   }).filter(Boolean).sort((a, b) => b.source.priority - a.source.priority).slice(0, 8);

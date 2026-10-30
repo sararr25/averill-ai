@@ -47,15 +47,28 @@ function todoGroup(title, empty, items, note) {
   }
   return section;
 }
+function todoStart() {
+  const section=node('section',undefined,'section todo-start');section.setAttribute('aria-label','Start with Averill');
+  section.append(node('h2','Start with Averill'),node('p','Ask about your work, check a shared draft, or learn a tool.','section-note'));
+  const actions=node('ul',undefined,'todo-start-actions');
+  const choices=[
+    ['Ask a question','Get help with company information or the tools you use.',()=>{showWorkView('ask');showTab('review');el('review-chat').open=true;el('question').scrollIntoView({block:'center'});el('question').focus();}],
+    ['Check my work','Connect a draft or review the work you have shared.',()=>{if(current.browserBridge?.connected||current.externalWindow)goToWorkingNow();else showTab('work');}],
+    ['Learn a tool','Resume your current activity or choose an exercise.',()=>{showTab('learn');const title=el('learning-panel').querySelector('h2,h3');if(title){title.tabIndex=-1;title.focus();}}],
+  ];
+  for(const [label,detail,action] of choices){const row=node('li');const button=node('button',label,'secondary-button');button.type='button';button.onclick=action;row.append(button,node('p',detail));actions.append(row);}
+  section.append(actions);return section;
+}
 function renderTodo() {
   const host = el('todo-content'), badge = el('todo-badge'), list = current.auth?.signedIn ? current.todo : null;
   if (!list) { host.replaceChildren(); delete host.dataset.key; badge.hidden = true; return; }
   badge.textContent = String(list.count); badge.hidden = list.count === 0;
-  document.querySelector('[data-tab-button=todo]').setAttribute('aria-label', list.count ? `To do, ${list.count} open` : 'To do');
+  document.querySelector('[data-tab-button=todo]').setAttribute('aria-label', list.count ? `Home, ${list.count} open` : 'Home');
   const key = JSON.stringify(list);
   if (host.dataset.key === key) return;
   host.dataset.key = key;
   host.replaceChildren(
+    todoStart(),
     todoGroup('Needs your review', 'Nothing needs your review right now.', list.review, 'Shared findings, source approval requests and clarification requests waiting for you.'),
     todoGroup('Your tasks', 'You have no open tasks.', list.tasks, 'Work assigned to you. Done tasks leave this list.'),
   );

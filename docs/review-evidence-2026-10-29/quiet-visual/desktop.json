@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "checks": [
+    "Learn 440px: readable text, full workspace, no overflow",
+    "Learn 1440px: readable text, full workspace, no overflow",
+    "Learn 1920px: readable text, full workspace, no overflow",
+    "Exercise selectors remain associated with labels and aligned",
+    "Company library uses wide card columns and includes general policies",
+    "Direct approved policy answer: Quando postiamo di solito?",
+    "Direct approved policy answer: Come chiedo le ferie?",
+    "Company answers fit sidebar"
+  ],
+  "limits": [
+    "synthetic renderer; native VoiceOver separate"
+  ]
+}

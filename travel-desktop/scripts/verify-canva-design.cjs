@@ -71,7 +71,7 @@ app.whenReady().then(async () => { try {
     editor.webContents.sendInputEvent({ type: 'mouseDown', button: 'left', clickCount: 1, ...at }); editor.webContents.sendInputEvent({ type: 'mouseUp', button: 'left', clickCount: 1, ...at }); await pause(60);
   };
   const shot = async name => { if (SHOTS) fs.writeFileSync(path.join(SHOTS, name + '.png'), (await editor.webContents.capturePage()).toPNG()); };
-  const step = async (name, fn) => { try { await fn(); checks.push(name); } catch (error) { error.message = `Step failed: ${name}: ${error.message}`; throw error; } };
+  const step = async (name, fn) => { console.log('CHECK',name);try { await fn(); checks.push(name); } catch (error) { error.message = `Step failed: ${name}: ${error.message}`; throw error; } };
   // T5.2: the card starts minimised while the watch is off, so a test that needs the toggle opens the card first.
   const toggleWatch = async () => { if (await page(`Boolean(${D}.querySelector('.dmin'))`)) await tap({ css: 'button.dpill' }); await tap({ css: 'input[type=checkbox]' }); };
   const hostRect = () => page(`(()=>{const r=${D}.host.getBoundingClientRect();return {left:Math.round(r.left),top:Math.round(r.top),right:Math.round(r.right),bottom:Math.round(r.bottom)}})()`);
@@ -82,7 +82,7 @@ app.whenReady().then(async () => { try {
   const setBodyText = value => page(`document.querySelector('[data-qa-text=body] span').textContent=${JSON.stringify(value)};[...document.querySelectorAll('[data-qa-layer] span')].at(-1).textContent=${JSON.stringify(value)};void 0`);
   const moveBody = x => page(`document.querySelector('[data-qa-text=body]').style.transform='translate(${x}px, 1276.17px)';void 0`);
   const BODY = 'finish this line: what makes the city good before 8?', NEAR_BLACK = 'rgb(16, 15, 13)', PISTACHIO = 'rgb(147, 197, 114)';
-  const clean = `${D}?.querySelector('h2')?.textContent==='No issues in the measured checks.'`, blocking = `${D}?.querySelector('h2')?.textContent==='Fix before you export'`;
+  const clean = `${D}?.querySelector('h2')?.textContent==='No issues in the measured checks.'`, blocking = `/things? to improve|Check the next slide/.test(${D}?.querySelector('h2')?.textContent||'')`;
   const findings = () => page(`[...${D}.querySelectorAll('.dfind')].map(f=>({text:f.querySelector('b').textContent,lines:[...f.querySelectorAll(':scope>p')].map(p=>p.textContent),title:f.querySelector('summary')?.firstChild.textContent,version:f.querySelector('summary small')?.textContent,quote:f.querySelector('.quote')?.textContent}))`);
 
   await load(PAGE);
@@ -118,7 +118,7 @@ app.whenReady().then(async () => { try {
     assert.deepEqual(list, [{ text: `“${BODY}”`, lines: ['This text is hard to read on its background.', 'contrast 1.76:1, needs 4.5:1'], title: 'social-media-guidelines-v2.md', version: 'Approved · Version 2', quote: 'Design rule: instagram | contrast-normal | "4.5".' }]);
     assert.equal(designCalls.length, before + 1, 'one check after the edit pause');
     const sizes = await page(`(()=>{const b=[...${D}.querySelectorAll('button')].find(b=>b.textContent==='Export anyway');const s=${D}.querySelector('.dfind summary');return {button:Math.round(b.getBoundingClientRect().height),radius:getComputedStyle(b).borderRadius,summary:s.getBoundingClientRect().height,border:getComputedStyle(${D}.querySelector('.dcard')).borderTopColor,unsafe:${D}.querySelectorAll('script,iframe,a').length}})()`);
-    assert.equal(sizes.button, 32); assert.equal(sizes.radius, '12px'); assert(sizes.summary >= 24); assert.equal(sizes.unsafe, 0, 'plain text only');
+    assert(sizes.button >= 40, 'Companion action target remains at least 40px'); assert.equal(sizes.radius, '12px'); assert(sizes.summary >= 24); assert.equal(sizes.unsafe, 0, 'plain text only');
   });
   await page(`${D}.querySelector('.dfind details').open=true`); await pause(100);
   await shot('fb14-block-contrast');
@@ -157,7 +157,7 @@ app.whenReady().then(async () => { try {
   // Feedback round 27 October, D1: the Canva lesson runs inside Canva and ticks itself from the same design reading.
   await step('D1 lesson: after Start in Averill, the Canva card lists the six lesson steps with the ticks Averill saved', async () => {
     await run("window.desktop.learningAction('start',{})");
-    await moveBody(121); await until(`Boolean(${D}?.querySelector('.dex'))`, 'lesson in the card');
+    await moveBody(121); await until(`${D}?.querySelectorAll('.dexlist>li').length===6`, 'lesson in the card');
     const listed = await page(`[...${D}.querySelectorAll('.dexlist>li')].map(li=>[li.className,li.querySelector('b').textContent])`);
     const learn = (await run('window.desktop.snapshot()')).learning, lesson = learn.sessions.find(s => s.title === 'Canva layout essentials' && !s.finishedAt);
     const title = Object.fromEntries(learn.steps.map(s => [s.id, s.title]));
@@ -169,7 +169,7 @@ app.whenReady().then(async () => { try {
   });
   await shot('d1-lesson-in-canva');
   await step('T5.3 each lesson step has a "How to do this in Canva" panel: short steps, a local sketch and an official Canva help link', async () => {
-    await page(`${D}.querySelectorAll('details.how').forEach(d=>{d.open=true})`); await pause(150);
+    await page(`${D}.querySelector('.lesson-inventory').open=true;${D}.querySelectorAll('details.how').forEach(d=>{d.open=true})`); await pause(150);
     const panels = await page(`[...${D}.querySelectorAll('.dexlist>li')].map(li=>{const h=li.querySelector('details.how');const img=h?.querySelector('img');const a=h?.querySelector('a');return {step:li.querySelector('b').textContent,summary:h?.querySelector('summary').textContent,steps:h?.querySelectorAll('ol li').length,img:img?.getAttribute('src'),loaded:img?.complete&&img.naturalWidth>0,link:a?.href,target:a?.target,rel:a?.rel}})`);
     assert.equal(panels.length, 6);
     for (const p of panels) { assert.equal(p.summary, 'How to do this in Canva', p.step); assert(p.steps >= 2 && p.steps <= 5, p.step); assert(/\/qa\/assets\/howto-[a-z]+\.svg$/.test(p.img), p.img); assert.equal(p.loaded, true, p.img); assert(/^https:\/\/www\.canva\.com\/help\/article\/[a-z-]+\/$/.test(p.link), p.link); assert.equal(p.target, '_blank'); assert.equal(p.rel, 'noopener noreferrer'); }
@@ -192,6 +192,7 @@ app.whenReady().then(async () => { try {
     await setBodyColor(NEAR_BLACK); await until(clean, 'contrast restored');
   });
   await step('Question box in the design card: a design question is answered from the approved Design rule lines with the measured facts', async () => {
+    await tap({css:'button',label:'Ask Averill'});
     await page(`${D}.querySelector('textarea#averill-design-ask').value='How far from the edge must text be?';void 0`);
     await tap({ css: 'button', label: 'Ask the question' });
     await until(`/Design rule/.test(${D}.querySelector('.out')?.textContent||'')`, 'answer');
@@ -204,7 +205,7 @@ app.whenReady().then(async () => { try {
   await step('Functional Canva help remains visible offline without company citations, with official help and explicit practice', async () => {
     await page(`${D}.querySelector('textarea#averill-design-ask').value='How do I group elements in Canva?';void 0`);
     await tap({ css: 'button', label: 'Ask the question' });
-    await until(`${D}.querySelector('.out')?.textContent.includes('Local tool guidance')`, 'local functional answer');
+    await until(`${D}.querySelector('.out')?.textContent.includes('choose Group in the editor toolbar')`, 'local functional answer');
     const answer = await page(`${D}.querySelector('.out').textContent`);
     assert.match(answer, /choose Group in the editor toolbar/);
     assert(!answer.includes('No approved source answers this.'));
@@ -215,6 +216,7 @@ app.whenReady().then(async () => { try {
     assert.equal(await page(`${D}.querySelector('.out .error')`), null, 'success is not rendered as an error');
   });
   await step('Q3: the card follows the system colour scheme (light by default, dark when the Mac is dark)', async () => {
+    await tap({css:'button',label:'Design checks'});
     const colours = async () => page(`(()=>{const c=${D}.querySelector('.card');const s=getComputedStyle(c);const f=${D}.querySelector('.watch input');return {bg:s.backgroundColor,text:s.color}})()`);
     await page(`${D}.querySelector('.main').scrollTop=0`); await scheme('light'); assert.deepEqual(await colours(), { bg: 'rgb(255, 255, 255)', text: 'rgb(29, 26, 36)' }); await shot('t5-card-light');
     await scheme('dark'); assert.deepEqual(await colours(), { bg: 'rgb(43, 40, 53)', text: 'rgb(243, 241, 248)' }); await shot('t5-card-dark');
@@ -227,11 +229,24 @@ app.whenReady().then(async () => { try {
     assert.ok(done.finishedAt);
     assert.deepEqual(Object.fromEntries(done.confirmed.map(c => [c.id, c.kind])), { hierarchy: 'checked-by-averill', size: 'checked-by-averill', align: 'checked-by-averill', margin: 'checked-by-averill', contrast: 'checked-by-averill', group: 'employee-confirmed' });
   });
-  await step('Unrecognised structure: "Averill cannot read this design", nothing sent', async () => {
+  await step('Unrecognised structure revokes current lesson checks without sending design content', async () => {
+    await run("window.desktop.learningAction('start',{})");
+    await moveBody(122);await pause(2500);
     const before = designCalls.length;
+    const pending = (await run('window.desktop.snapshot()')).learning.sessions.find(s=>!s.finishedAt&&s.title==='Canva layout essentials');
+    assert.ok(pending.live,'fresh reading before invalidation');
     await page("document.querySelectorAll('div[style]').forEach(d=>{if(d.style.width==='1080px'&&d.style.height==='1440px'&&!d.style.transform)d.style.width='1000px'});void 0");
     await until(`${D}.querySelector('h2')?.textContent==='Averill cannot read this design'`, 'unreadable');
-    assert.equal(designCalls.length, before);
+    await pause(200);
+    assert.equal(designCalls.length, before+1);
+    assert.equal(designCalls.at(-1).payload.action,'invalidate');
+    assert.equal(designCalls.at(-1).payload.elements,undefined);
+    const current=(await run('window.desktop.snapshot()')).learning.sessions.find(s=>s.id===pending.id);
+    assert.equal(current.live,undefined);
+    await run(`document.querySelector('[data-tab-button="learn"]').click()`);
+    assert.equal(await run(`document.querySelector('.lesson-finish button[type="submit"]').disabled`),true,'desktop completion stays locked');
+    assert.equal(await run(`document.querySelectorAll('.lesson-step.done').length`),0,'desktop does not present historical ticks as current');
+    await assert.rejects(run(`window.desktop.learningAction('finish',{sessionId:${JSON.stringify(pending.id)}})`),/has not seen/);
   });
   await shot('fb14-unreadable');
   await step('Same design at 100% zoom (page partly off screen): same-site reload re-injects, pistachio blocks with the same numbers, dark text clears', async () => {
@@ -251,9 +266,12 @@ app.whenReady().then(async () => { try {
     for (let i = 0; i < 80 && !designInFlight; i++) await pause(50);
     assert.equal(designInFlight, 1, 'a design check is in flight');
     await toggleWatch(); await pause(2500); designDelay = 0;
+    const pending=(await run('window.desktop.snapshot()')).learning.sessions.find(s=>!s.finishedAt&&s.title==='Canva layout essentials');
+    assert.equal(pending.live,undefined,'Watch off revokes the current lesson reading');
     await toggleWatch();
     await until(blocking, 'blocking card after the watch is turned back on');
     await setBodyColor(NEAR_BLACK); await until(clean, 'clean again');
+    await run(`window.desktop.learningAction('exclude',{sessionId:${JSON.stringify(pending.id)}})`);
   });
   // Owner decision 28 October 2026: a carousel is checked slide by slide; results accumulate for this tab session.
   const openSlide = async (index, bad = false) => {
@@ -273,7 +291,7 @@ app.whenReady().then(async () => { try {
     assert.equal(designCalls.at(-1).value.state, 'incomplete', JSON.stringify(designCalls.at(-1).value.findings.map(f => [f.text, f.measured])));
     await until(blocking, 'blocking for unread slides');
     const t = await text();
-    assert(t.includes('Averill has not checked every slide yet.'), t); assert(t.includes('Checked 1 of 5 slides (now on slide 1).'), t);
+    assert(t.includes('Open each slide once to finish the check.'), t); assert(t.includes('Checked 1 of 5 slides · Slide 1'), t);
     assert(t.includes('Open the other slides so Averill can check them: 2, 3, 4, 5.'), t);
     assert.equal(await page(`${D}.querySelectorAll('.dfind').length`), 0);
   });
@@ -282,7 +300,7 @@ app.whenReady().then(async () => { try {
     await openSlide(2, true); await until(blocking, 'slide 2 blocks');
     const list = await findings();
     assert.deepEqual(list.map(f => [f.text, f.lines[0]]), [['Slide 2: “at 7:30”', 'This text is hard to read on its background.']]);
-    assert((await text()).includes('Checked 2 of 5 slides (now on slide 2).'));
+    assert((await text()).includes('Checked 2 of 5 slides · Slide 2'));
   });
   await shot('carousel-slide2-finding');
   await step('Slide 2 fixed: the finding is gone but the card still blocks until slides 3 to 5 are read', async () => {
@@ -294,7 +312,7 @@ app.whenReady().then(async () => { try {
     for (const index of [3, 4]) { await openSlide(index); assert.equal(designCalls.at(-1).value.state, 'incomplete'); }
     await openSlide(5); await until(clean, 'clean after every slide');
     assert.deepEqual(designCalls.at(-1).value.slides, { current: 5, count: 5, checked: [1, 2, 3, 4, 5] });
-    assert((await text()).includes('Checked 5 of 5 slides (now on slide 5).'));
+    assert((await text()).includes('Checked 5 of 5 slides · Slide 5'));
   });
   await shot('carousel-all-clean');
   await step('T5.2 minimise and restore: the pill shows the status and the step count, restoring returns focus to the minimise button', async () => {
@@ -308,7 +326,7 @@ app.whenReady().then(async () => { try {
   });
   await step('T5.2 drag the card by its handle: it moves, never above the top safe offset and never outside the window', async () => {
     const before = await hostRect(); await drag('[data-act=grip]', -300, 150);
-    const moved = await hostRect(); assert(moved.left < before.left - 250 && moved.top > before.top + 100, JSON.stringify([before, moved]));
+    const moved = await hostRect(); assert(moved.left < before.left - 250 && moved.top > before.top && moved.bottom <= 900 - 12, JSON.stringify([before, moved]));
     await drag('[data-act=grip]', -3000, -3000); const top = await hostRect();
     assert.equal(top.top, 72, 'clamped below Canva\'s top bar'); assert.equal(top.left, 12, 'clamped to the left edge');
     await drag('[data-act=grip]', 6000, 6000); const bottom = await hostRect();
@@ -329,11 +347,10 @@ app.whenReady().then(async () => { try {
     const reloaded = await hostRect(); assert(reloaded.left === placed.left && reloaded.top === placed.top, JSON.stringify([placed, reloaded]));
     assert.equal(await page(`Boolean(${D}.querySelector('.dmin'))`), true, 'the watch is off again after a reload, so the card starts minimised at the remembered place');
   });
-  await step('T5.2 a blocking warning opens a minimised card by itself, and a card minimised by choice stays minimised for the same problems', async () => {
+  await step('T5.2 a minimized panel stays minimized for new and repeated findings', async () => {
     await toggleWatch(); await until(clean, 'watch on'); await tap({ css: 'button', label: 'Minimise the design check' }); await until(`Boolean(${D}.querySelector('.dmin'))`);
-    await setBodyColor(PISTACHIO); await until(blocking, 'blocking card opens by itself');
-    assert.equal(await page(`Boolean(${D}.querySelector('.dmin'))`), false);
-    await tap({ css: 'button', label: 'Minimise the design check' }); await until(`Boolean(${D}.querySelector('.dmin'))`);
+    await setBodyColor(PISTACHIO); await until(`${D}.querySelector('.dpill')?.textContent.includes('1 problem')`, 'minimized finding badge');
+    assert.equal(await page(`Boolean(${D}.querySelector('.dmin'))`), true, 'new findings never reopen the panel');
     assert.equal(await page(`${D}.querySelector('.dpill').textContent`), 'Design check: 1 problem', 'minimised by choice, the same problems do not reopen it');
     await pause(2600); assert.equal(await page(`Boolean(${D}.querySelector('.dmin'))`), true);
     await tap({ css: 'button.dpill' }); await setBodyColor(NEAR_BLACK); await until(clean, 'clean');

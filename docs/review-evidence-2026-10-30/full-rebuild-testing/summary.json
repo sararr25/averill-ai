@@ -1,0 +1,73 @@
+{
+  "status": "local technical gates passed; release acceptance open",
+  "unitTests": {
+    "passed": 297,
+    "failed": 0
+  },
+  "suiteCount": 18,
+  "suitePass": 18,
+  "visualCaptures": 36,
+  "simulatorTests": 34,
+  "simulatorBuild": "PASS",
+  "realProviderSamples": {
+    "publicOnly": 2,
+    "syntheticLongSource": 1
+  },
+  "release": {
+    "verifiedAt": "2026-10-30T10:49:43.719Z",
+    "sourceRevisionAtBuild": "d17e4c77ae95a6b0ad520cf1874e3c7e4e4acf7b",
+    "sourceWorkingTreeDirty": true,
+    "archive": "Averill-macOS-arm64.zip",
+    "archiveSha256": "755c87dcc29122fad8adb20b285d37337690d3b17e4cabb6fb1c932901957cba",
+    "bundleFiles": 3257,
+    "trackedSourceFiles": 265,
+    "verifiedSourceFiles": 265,
+    "includesUncommittedRuntimeFiles": true,
+    "signed": false,
+    "target": "macOS-arm64",
+    "standaloneAppMatchesBundle": true,
+    "workspaceAndSecretFilesBundled": []
+  },
+  "nativeExecutable": {
+    "profile": "marked synthetic acceptance workspace",
+    "observed": [
+      "login",
+      "Home Ask entry",
+      "local exact-source answer",
+      "source dialog Escape/focus",
+      "library text search/reader/focus",
+      "Learn zero current measures and disabled completion",
+      "wide Learn layout",
+      "Public research unconfigured recovery",
+      "logout",
+      "fresh process sign-in required",
+      "lesson retained without stale measures"
+    ]
+  },
+  "unrun": [
+    "installed Chrome and real Canva this turn: browser use disabled in Work settings",
+    "full VoiceOver and OS permission-denial journey",
+    "independent unassisted usability study",
+    "independently rated full-answer semantic benchmark",
+    "clean-Mac Gatekeeper/signing acceptance",
+    "live Google/Microsoft OAuth and real social publication"
+  ],
+  "uxFindings": [
+    {
+      "severity": "P2",
+      "finding": "Workspace setup still says Open Current work although primary navigation now says Assistant",
+      "status": "open copy consistency finding"
+    }
+  ],
+  "publicRelease": false,
+  "normalCredentialsOrApprovalsChanged": false,
+  "normalProfileAutoLaunch": "Owner explicitly authorized normal-profile access after the first rejection. Final app opened and two local company-demo answers observed. Browser-setting app remains forbidden to the tool; manual enablement required.",
+  "nativeNormalProfile": {
+    "authorized": true,
+    "role": "Maya demo marketing lead",
+    "companyLocalAnswers": 2,
+    "livePublicOnlyAnswer": 1,
+    "guideStartNextStop": "PASS",
+    "receipt": "native-normal-profile.json"
+  }
+}

@@ -1,0 +1,3063 @@
+{
+  "scope": "Scripted offline technical comparison, not human A/B testing. Scenario descriptions do not simulate all lifecycle events; lifecycle/permission/transport behavior has separate tests.",
+  "humanParticipants": 0,
+  "winner": null,
+  "variants": [
+    {
+      "variant": "A",
+      "prompts": 80,
+      "guardrailsPassed": 80,
+      "errors": 0,
+      "results": [
+        {
+          "id": "EX-EVAL-001",
+          "category": "company",
+          "split": "holdout",
+          "question": "When do we usually post?",
+          "elapsedMs": 6.505625000000009,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Tell me the policy topic, or open the company library to choose a source.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-002",
+          "category": "company",
+          "split": "development",
+          "question": "Come chiedo le ferie?",
+          "elapsedMs": 1.350667000000044,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Tell me the policy topic, or open the company library to choose a source.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-003",
+          "category": "company",
+          "split": "development",
+          "question": "Quali sono le regole sui rimborsi?",
+          "elapsedMs": 0.48016699999999446,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Matching passage in campaign brief: “Expenses: Submit receipts to your lead before booking.” This is an extract, not an inferred answer.",
+          "sourceCount": 1,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-004",
+          "category": "company",
+          "split": "development",
+          "question": "What is our remote work policy?",
+          "elapsedMs": 0.13279199999999491,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Tell me the policy topic, or open the company library to choose a source.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-005",
+          "category": "company",
+          "split": "development",
+          "question": "Which campaign version is approved?",
+          "elapsedMs": 0.25549999999998363,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Matching passage in campaign brief: “Approved audience: Travel subscribers in Denmark.” This is an extract, not an inferred answer.",
+          "sourceCount": 1,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-006",
+          "category": "company",
+          "split": "development",
+          "question": "What is the approved email date?",
+          "elapsedMs": 0.26362499999999045,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Matching passage in campaign brief: “Approved email date: 15 October 2026 at 10:00 Europe/Copenhagen.” This is an extract, not an inferred answer.",
+          "sourceCount": 1,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-007",
+          "category": "company",
+          "split": "development",
+          "question": "Which wording must we avoid?",
+          "elapsedMs": 0.5975839999999835,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Matching passage in campaign brief: “Do not claim lowest prices guaranteed.” This is an extract, not an inferred answer.",
+          "sourceCount": 1,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-008",
+          "category": "company",
+          "split": "development",
+          "question": "Who approves company-wide sources?",
+          "elapsedMs": 0.3246249999999691,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Tell me the policy topic, or open the company library to choose a source.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-009",
+          "category": "company",
+          "split": "holdout",
+          "question": "What is our reimbursement limit if no approved source states one?",
+          "elapsedMs": 0.4711250000000291,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Tell me the policy topic, or open the company library to choose a source.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-010",
+          "category": "company",
+          "split": "holdout",
+          "question": "Two approved sources disagree about the date. Which should I use?",
+          "elapsedMs": 0.18604199999998627,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Matching passage in campaign brief: “Approved email date: 15 October 2026 at 10:00 Europe/Copenhagen.” This is an extract, not an inferred answer.",
+          "sourceCount": 1,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-011",
+          "category": "tool-help",
+          "split": "holdout",
+          "question": "Voglio mettere una foto dentro una forma",
+          "elapsedMs": 0.9488750000000437,
+          "state": "answered",
+          "intent": "tool-help",
+          "mode": "local",
+          "text": "Open Elements in the side panel, then browse Frames. Search for the shape you want and select a frame to add it. Drag an image into the frame, then adjust its crop. Check that the subject stays visible and that the frame does not cover important text.\n\nOpen the official help for your tool if these controls differ.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-012",
+          "category": "tool-help",
+          "split": "development",
+          "question": "Come inserisco una cornice in Canva?",
+          "elapsedMs": 0.24358399999999847,
+          "state": "answered",
+          "intent": "tool-help",
+          "mode": "local",
+          "text": "Open Elements in the side panel, then browse Frames. Search for the shape you want and select a frame to add it. Drag an image into the frame, then adjust its crop. Check that the subject stays visible and that the frame does not cover important text.\n\nOpen the official help for your tool if these controls differ.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-013",
+          "category": "tool-help",
+          "split": "development",
+          "question": "How do I group elements in Canva?",
+          "elapsedMs": 0.2972909999999729,
+          "state": "answered",
+          "intent": "tool-help",
+          "mode": "local",
+          "text": "Select the elements together, then choose Group in the editor toolbar. If the option is missing, check that more than one editable element is selected.\n\nOpen the official help for your tool if these controls differ.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-014",
+          "category": "tool-help",
+          "split": "development",
+          "question": "Come allineo due testi in Canva?",
+          "elapsedMs": 0.6533329999999751,
+          "state": "answered",
+          "intent": "tool-help",
+          "mode": "local",
+          "text": "Open the official help for the task you described. If Averill cannot read the current control or design, tell me which step or option you cannot find. No edit has been verified.\n\nOpen the official help for your tool if these controls differ.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-015",
+          "category": "tool-help",
+          "split": "development",
+          "question": "Come cambio il colore?",
+          "elapsedMs": 0.18250000000000455,
+          "state": "answered",
+          "intent": "tool-help",
+          "mode": "local",
+          "text": "Select the text and open its color control. Choose a color that stays readable against the background. Averill can recheck only the properties its reader supports.\n\nOpen the official help for your tool if these controls differ.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-016",
+          "category": "tool-help",
+          "split": "development",
+          "question": "Vorrei regolare la spaziatura in Canva",
+          "elapsedMs": 0.3623340000000326,
+          "state": "answered",
+          "intent": "mixed",
+          "mode": "local",
+          "text": "1. Select the text.\n2. Open Spacing on the text toolbar.\n3. Adjust line or letter spacing and inspect the result.\n4. To arrange separate text boxes, select them and open Position.\n\nOpen the official help for your tool if these controls differ.\n\nCompany requirements: No company-specific requirement is available for this topic. Use the general guidance above as a recommendation; any approved company requirements remain mandatory.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-017",
+          "category": "tool-help",
+          "split": "development",
+          "question": "How do I replace an image in Canva?",
+          "elapsedMs": 0.1841670000000022,
+          "state": "answered",
+          "intent": "tool-help",
+          "mode": "local",
+          "text": "Select the image or open the image/upload panel. Choose an image you have permission to use and inspect the crop and readable text.\n\nOpen the official help for your tool if these controls differ.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-018",
+          "category": "tool-help",
+          "split": "development",
+          "question": "Come scarico un progetto da Canva?",
+          "elapsedMs": 0.6733340000000112,
+          "state": "answered",
+          "intent": "tool-help",
+          "mode": "local",
+          "text": "Review every page and the intended size first. Open the tool’s download options yourself and choose the format required for your destination. Averill does not export or publish.\n\nOpen the official help for your tool if these controls differ.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-019",
+          "category": "tool-help",
+          "split": "development",
+          "question": "How do I keep the unsubscribe link in Brevo?",
+          "elapsedMs": 0.290916999999979,
+          "state": "answered",
+          "intent": "tool-help",
+          "mode": "local",
+          "text": "Open the email footer block. Keep the unsubscribe link visible and check the sender details against your approved company guidance.\n\nOpen the official help for your tool if these controls differ.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-020",
+          "category": "tool-help",
+          "split": "development",
+          "question": "Dove cambio il carattere in Cavna?",
+          "elapsedMs": 0.23562500000002728,
+          "state": "answered",
+          "intent": "tool-help",
+          "mode": "local",
+          "text": "Select the text first, then use the font and size controls in the toolbar. Check the whole line for clipping after the change.\n\nOpen the official help for your tool if these controls differ.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-021",
+          "category": "tool-help",
+          "split": "holdout",
+          "question": "How do I edit a LinkedIn draft post?",
+          "elapsedMs": 0.12487500000003138,
+          "state": "answered",
+          "intent": "tool-help",
+          "mode": "local",
+          "text": "Open your draft composer, review the text and preview, then check the destination and audience yourself. Averill does not publish the draft.\n\nOpen the official help for your tool if these controls differ.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-022",
+          "category": "tool-help",
+          "split": "holdout",
+          "question": "Come modifico una caption su Instagram?",
+          "elapsedMs": 0.1355829999999969,
+          "state": "answered",
+          "intent": "tool-help",
+          "mode": "local",
+          "text": "Open your draft composer, review the text and preview, then check the destination and audience yourself. Averill does not publish the draft.\n\nOpen the official help for your tool if these controls differ.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-023",
+          "category": "visual-review",
+          "split": "holdout",
+          "question": "È leggibile questo testo?",
+          "elapsedMs": 1.9812909999999988,
+          "state": "answered",
+          "intent": "tool-help",
+          "mode": "local",
+          "text": "I have not measured the selected text in this answer. Use Watch my design in Canva for a supported reading of the current slide. Here is general guidance:\n\nSelect the text and open its color control. Choose a color that stays readable against the background. Averill can recheck only the properties its reader supports.\n\nOpen the official help for your tool if these controls differ.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-024",
+          "category": "visual-review",
+          "split": "development",
+          "question": "Is my selected text readable?",
+          "elapsedMs": 0.12349999999997863,
+          "state": "answered",
+          "intent": "tool-help",
+          "mode": "local",
+          "text": "I have not measured the selected text in this answer. Use Watch my design in Canva for a supported reading of the current slide. Here is general guidance:\n\nSelect the text and open its color control. Choose a color that stays readable against the background. Averill can recheck only the properties its reader supports.\n\nOpen the official help for your tool if these controls differ.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-025",
+          "category": "visual-review",
+          "split": "development",
+          "question": "Come miglioro contrasto e spaziatura in Canva?",
+          "elapsedMs": 0.13570799999996552,
+          "state": "answered",
+          "intent": "tool-help",
+          "mode": "local",
+          "text": "1. Select the text you want to improve.\n2. Open Text color and choose a color that stands out against the background.\n3. Open Spacing to adjust line and letter spacing.\n4. For space between text boxes, select the elements and open Position to align them.\n5. Recheck the current slide with Watch my design; inspect spacing yourself.\n\nOpen the official help for your tool if these controls differ.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-026",
+          "category": "visual-review",
+          "split": "development",
+          "question": "Come miglioro contrasto, spaziatura e allineamento in Canva?",
+          "elapsedMs": 0.1449999999999818,
+          "state": "answered",
+          "intent": "tool-help",
+          "mode": "local",
+          "text": "1. Select the text you want to improve.\n2. Open Text color and choose a color that stands out against the background.\n3. Open Spacing to adjust line and letter spacing.\n4. For space between text boxes, select the elements and open Position to align them.\n5. Recheck the current slide with Watch my design; inspect spacing yourself.\n\nOpen the official help for your tool if these controls differ.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-027",
+          "category": "visual-review",
+          "split": "development",
+          "question": "Is the entire carousel ready to export if you read only one page?",
+          "elapsedMs": 0.19270800000003874,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Tell me the policy topic, or open the company library to choose a source.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-028",
+          "category": "visual-review",
+          "split": "development",
+          "question": "Questo testo è troppo vicino al bordo?",
+          "elapsedMs": 1.0748749999999632,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Tell me the policy topic, or open the company library to choose a source.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-029",
+          "category": "visual-review",
+          "split": "holdout",
+          "question": "Can you check an unreadable image background?",
+          "elapsedMs": 0.567792000000054,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "No approved rule covers images. Ask your lead.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-030",
+          "category": "visual-review",
+          "split": "holdout",
+          "question": "Ho ruotato il testo: quali proprietà puoi verificare?",
+          "elapsedMs": 0.14350000000001728,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Tell me the policy topic, or open the company library to choose a source.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-031",
+          "category": "draft",
+          "split": "holdout",
+          "question": "Riscrivi questa email",
+          "elapsedMs": 0.22145799999998417,
+          "state": "answered",
+          "intent": "draft",
+          "mode": "local",
+          "text": "Use the current approved guidance below to prepare your draft.\n\nApproved audience: Travel subscribers in Denmark.\nApproved email date: 15 October 2026 at 10:00 Europe/Copenhagen.\nDo not claim lowest prices guaranteed.\nExpenses: Submit receipts to your lead before booking.",
+          "sourceCount": 1,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-032",
+          "category": "draft",
+          "split": "development",
+          "question": "Write a truthful marketing email",
+          "elapsedMs": 0.14712500000001683,
+          "state": "answered",
+          "intent": "draft",
+          "mode": "local",
+          "text": "Use the current approved guidance below to prepare your draft.\n\nApproved audience: Travel subscribers in Denmark.\nApproved email date: 15 October 2026 at 10:00 Europe/Copenhagen.\nDo not claim lowest prices guaranteed.\nExpenses: Submit receipts to your lead before booking.",
+          "sourceCount": 1,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-033",
+          "category": "draft",
+          "split": "development",
+          "question": "Prepara una checklist delle regole approvate",
+          "elapsedMs": 0.35812500000002956,
+          "state": "answered",
+          "intent": "checklist",
+          "mode": "local",
+          "text": "Review this checklist against the current sources:\n\ncampaign brief:\n☐ Approved audience: Travel subscribers in Denmark.\n☐ Approved email date: 15 October 2026 at 10:00 Europe/Copenhagen.\n☐ Do not claim lowest prices guaranteed.\n☐ Expenses: Submit receipts to your lead before booking.\n\nConfirm missing owners, dates and decisions with your lead. Unspecified details have not been inferred.",
+          "sourceCount": 1,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-034",
+          "category": "draft",
+          "split": "development",
+          "question": "Rewrite this caption without adding a discount",
+          "elapsedMs": 0.14966600000002472,
+          "state": "answered",
+          "intent": "draft",
+          "mode": "local",
+          "text": "Use the current approved guidance below to prepare your draft.\n\nApproved audience: Travel subscribers in Denmark.\nApproved email date: 15 October 2026 at 10:00 Europe/Copenhagen.\nDo not claim lowest prices guaranteed.\nExpenses: Submit receipts to your lead before booking.",
+          "sourceCount": 1,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-035",
+          "category": "draft",
+          "split": "development",
+          "question": "Draft a handover using the approved brief",
+          "elapsedMs": 0.1525829999999928,
+          "state": "answered",
+          "intent": "draft",
+          "mode": "local",
+          "text": "Use the current approved guidance below to prepare your draft.\n\nApproved audience: Travel subscribers in Denmark.\nApproved email date: 15 October 2026 at 10:00 Europe/Copenhagen.\nDo not claim lowest prices guaranteed.\nExpenses: Submit receipts to your lead before booking.",
+          "sourceCount": 1,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-036",
+          "category": "draft",
+          "split": "development",
+          "question": "Puoi riformulare il testo mantenendo i fatti?",
+          "elapsedMs": 0.2021249999999668,
+          "state": "answered",
+          "intent": "draft",
+          "mode": "local",
+          "text": "Use the current approved guidance below to prepare your draft.\n\nApproved audience: Travel subscribers in Denmark.\nApproved email date: 15 October 2026 at 10:00 Europe/Copenhagen.\nDo not claim lowest prices guaranteed.\nExpenses: Submit receipts to your lead before booking.",
+          "sourceCount": 1,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-037",
+          "category": "draft",
+          "split": "holdout",
+          "question": "Write a price offer when the brief contains no price",
+          "elapsedMs": 0.14470800000003692,
+          "state": "answered",
+          "intent": "draft",
+          "mode": "local",
+          "text": "Use the current approved guidance below to prepare your draft.\n\nApproved audience: Travel subscribers in Denmark.\nApproved email date: 15 October 2026 at 10:00 Europe/Copenhagen.\nDo not claim lowest prices guaranteed.\nExpenses: Submit receipts to your lead before booking.",
+          "sourceCount": 1,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-038",
+          "category": "draft",
+          "split": "holdout",
+          "question": "Compose an email without promising unapproved services",
+          "elapsedMs": 0.12087500000001228,
+          "state": "answered",
+          "intent": "draft",
+          "mode": "local",
+          "text": "Use the current approved guidance below to prepare your draft.\n\nApproved audience: Travel subscribers in Denmark.\nApproved email date: 15 October 2026 at 10:00 Europe/Copenhagen.\nDo not claim lowest prices guaranteed.\nExpenses: Submit receipts to your lead before booking.",
+          "sourceCount": 1,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-039",
+          "category": "summary-comparison",
+          "split": "development",
+          "question": "Riassumi il documento",
+          "elapsedMs": 0.5761249999999905,
+          "state": "answered",
+          "intent": "summary",
+          "mode": "local",
+          "text": "Which document would you like summarized? Find it in Company library, then include its title in your question. I will use only the approved sources available to you.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-040",
+          "category": "summary-comparison",
+          "split": "development",
+          "question": "Summarize the campaign brief",
+          "elapsedMs": 0.4400420000000054,
+          "state": "answered",
+          "intent": "summary",
+          "mode": "local",
+          "text": "Key points from campaign brief (v2):\n\nAudience:\n• Approved audience: Travel subscribers in Denmark.\n\nSchedule:\n• Approved email date: 15 October 2026 at 10:00 Europe/Copenhagen.\n\nWording:\n• Do not claim lowest prices guaranteed.\n\nExpenses:\n• Expenses: Submit receipts to your lead before booking.\n\nThese are source excerpts, not a complete summary or a new company decision. Open the source for the full context.",
+          "sourceCount": 4,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-041",
+          "category": "summary-comparison",
+          "split": "development",
+          "question": "Fammi un riassunto del brief",
+          "elapsedMs": 0.2476249999999709,
+          "state": "answered",
+          "intent": "summary",
+          "mode": "local",
+          "text": "Key points from campaign brief (v2):\n\nAudience:\n• Approved audience: Travel subscribers in Denmark.\n\nSchedule:\n• Approved email date: 15 October 2026 at 10:00 Europe/Copenhagen.\n\nWording:\n• Do not claim lowest prices guaranteed.\n\nExpenses:\n• Expenses: Submit receipts to your lead before booking.\n\nThese are source excerpts, not a complete summary or a new company decision. Open the source for the full context.",
+          "sourceCount": 4,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-042",
+          "category": "summary-comparison",
+          "split": "development",
+          "question": "Confronta le due versioni",
+          "elapsedMs": 0.04187500000000455,
+          "state": "answered",
+          "intent": "comparison",
+          "mode": "local",
+          "text": "Which two documents or versions would you like to compare? Choose them in Company library and include their titles or versions in your question.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-043",
+          "category": "summary-comparison",
+          "split": "development",
+          "question": "What changed between the old and current briefs?",
+          "elapsedMs": 0.04250000000001819,
+          "state": "answered",
+          "intent": "comparison",
+          "mode": "local",
+          "text": "Which two documents or versions would you like to compare? Choose them in Company library and include their titles or versions in your question.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-044",
+          "category": "summary-comparison",
+          "split": "development",
+          "question": "Compare the approved email and LinkedIn requirements",
+          "elapsedMs": 0.037791000000027,
+          "state": "answered",
+          "intent": "comparison",
+          "mode": "local",
+          "text": "Which two documents or versions would you like to compare? Choose them in Company library and include their titles or versions in your question.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-045",
+          "category": "summary-comparison",
+          "split": "development",
+          "question": "Riassumi le decisioni e le azioni da fare",
+          "elapsedMs": 0.24575000000004366,
+          "state": "answered",
+          "intent": "summary",
+          "mode": "local",
+          "text": "Which document would you like summarized? Find it in Company library, then include its title in your question. I will use only the approved sources available to you.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-046",
+          "category": "summary-comparison",
+          "split": "development",
+          "question": "Give me the key points from the long uploaded document",
+          "elapsedMs": 0.18412499999999454,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Tell me the policy topic, or open the company library to choose a source.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-047",
+          "category": "summary-comparison",
+          "split": "holdout",
+          "question": "Sintetizza due documenti con date discordanti",
+          "elapsedMs": 0.20149999999995316,
+          "state": "answered",
+          "intent": "summary",
+          "mode": "local",
+          "text": "Key points from campaign brief (v2):\n\nAudience:\n• Approved audience: Travel subscribers in Denmark.\n\nSchedule:\n• Approved email date: 15 October 2026 at 10:00 Europe/Copenhagen.\n\nWording:\n• Do not claim lowest prices guaranteed.\n\nExpenses:\n• Expenses: Submit receipts to your lead before booking.\n\nThese are source excerpts, not a complete summary or a new company decision. Open the source for the full context.",
+          "sourceCount": 4,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-048",
+          "category": "summary-comparison",
+          "split": "holdout",
+          "question": "Confronta un documento privato di un altro reparto con il mio",
+          "elapsedMs": 0.05170900000001666,
+          "state": "answered",
+          "intent": "comparison",
+          "mode": "local",
+          "text": "Which two documents or versions would you like to compare? Choose them in Company library and include their titles or versions in your question.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-049",
+          "category": "public-research",
+          "split": "development",
+          "question": "Cerca informazioni aggiornate su Copenhagen",
+          "elapsedMs": 0.047541999999964446,
+          "state": "answered",
+          "intent": "research",
+          "mode": "local",
+          "text": "Open Public research in the main navigation to search for a public fact. Review the exact public query before sending it; company documents and drafts stay out of the search.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-050",
+          "category": "public-research",
+          "split": "development",
+          "question": "Check online whether this public museum is open on Monday",
+          "elapsedMs": 0.0687499999999659,
+          "state": "answered",
+          "intent": "research",
+          "mode": "local",
+          "text": "Open Public research in the main navigation to search for a public fact. Review the exact public query before sending it; company documents and drafts stay out of the search.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-051",
+          "category": "public-research",
+          "split": "development",
+          "question": "Research the official Canva grouping instructions",
+          "elapsedMs": 0.05837500000001228,
+          "state": "answered",
+          "intent": "research",
+          "mode": "local",
+          "text": "Open Public research in the main navigation to search for a public fact. Review the exact public query before sending it; company documents and drafts stay out of the search.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-052",
+          "category": "public-research",
+          "split": "development",
+          "question": "Verify this fictional company campaign offer online",
+          "elapsedMs": 0.24920799999995324,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Matching passage in campaign brief: “Approved audience: Travel subscribers in Denmark.” This is an extract, not an inferred answer.",
+          "sourceCount": 1,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-053",
+          "category": "public-research",
+          "split": "development",
+          "question": "This page mentions Vienna: does it verify our Vamo offer?",
+          "elapsedMs": 0.1323749999999677,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Tell me the policy topic, or open the company library to choose a source.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-054",
+          "category": "public-research",
+          "split": "development",
+          "question": "Check a time-sensitive public transport statement",
+          "elapsedMs": 0.10908299999999826,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Tell me the policy topic, or open the company library to choose a source.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-055",
+          "category": "public-research",
+          "split": "development",
+          "question": "Verifica online una frase con due affermazioni distinte",
+          "elapsedMs": 0.04191600000001472,
+          "state": "answered",
+          "intent": "research",
+          "mode": "local",
+          "text": "Open Public research in the main navigation to search for a public fact. Review the exact public query before sending it; company documents and drafts stay out of the search.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-056",
+          "category": "public-research",
+          "split": "development",
+          "question": "The search found no match. Is my claim false?",
+          "elapsedMs": 0.1572079999999687,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Matching passage in campaign brief: “Do not claim lowest prices guaranteed.” This is an extract, not an inferred answer.",
+          "sourceCount": 1,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-057",
+          "category": "public-research",
+          "split": "holdout",
+          "question": "Check a public claim with contradictory dated sources",
+          "elapsedMs": 0.1617909999999938,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Matching passage in campaign brief: “Do not claim lowest prices guaranteed.” This is an extract, not an inferred answer.",
+          "sourceCount": 1,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-058",
+          "category": "public-research",
+          "split": "holdout",
+          "question": "Cerca la nostra policy aziendale riservata sul web",
+          "elapsedMs": 0.11670899999995754,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Tell me the policy topic, or open the company library to choose a source.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-059",
+          "category": "follow-up",
+          "split": "development",
+          "question": "E invece su Instagram?",
+          "elapsedMs": 0.13891699999999219,
+          "state": "answered",
+          "intent": "tool-help",
+          "mode": "local",
+          "text": "Open your draft composer, review the text and preview, then check the destination and audience yourself. Averill does not publish the draft.\n\nOpen the official help for your tool if these controls differ.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-060",
+          "category": "follow-up",
+          "split": "development",
+          "question": "I cannot find it",
+          "elapsedMs": 0.13766599999996743,
+          "state": "answered",
+          "intent": "tool-help",
+          "mode": "local",
+          "text": "Open your draft composer, review the text and preview, then check the destination and audience yourself. Averill does not publish the draft.\n\nOpen the official help for your tool if these controls differ.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-061",
+          "category": "follow-up",
+          "split": "development",
+          "question": "Non trovo il comando",
+          "elapsedMs": 0.12579099999999244,
+          "state": "answered",
+          "intent": "tool-help",
+          "mode": "local",
+          "text": "Open your draft composer, review the text and preview, then check the destination and audience yourself. Averill does not publish the draft.\n\nOpen the official help for your tool if these controls differ.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-062",
+          "category": "follow-up",
+          "split": "development",
+          "question": "And where is that in Canva?",
+          "elapsedMs": 0.10204199999998309,
+          "state": "answered",
+          "intent": "tool-help",
+          "mode": "local",
+          "text": "Open your draft composer, review the text and preview, then check the destination and audience yourself. Averill does not publish the draft.\n\nOpen the official help for your tool if these controls differ.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-063",
+          "category": "follow-up",
+          "split": "development",
+          "question": "Ora come faccio?",
+          "elapsedMs": 0.11362500000001319,
+          "state": "answered",
+          "intent": "tool-help",
+          "mode": "local",
+          "text": "Open your draft composer, review the text and preview, then check the destination and audience yourself. Averill does not publish the draft.\n\nOpen the official help for your tool if these controls differ.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-064",
+          "category": "follow-up",
+          "split": "development",
+          "question": "Can you make the previous draft shorter?",
+          "elapsedMs": 0.12362500000000409,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Tell me the policy topic, or open the company library to choose a source.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-065",
+          "category": "follow-up",
+          "split": "development",
+          "question": "What about the second page?",
+          "elapsedMs": 0.11008400000002894,
+          "state": "answered",
+          "intent": "tool-help",
+          "mode": "local",
+          "text": "Open your draft composer, review the text and preview, then check the destination and audience yourself. Averill does not publish the draft.\n\nOpen the official help for your tool if these controls differ.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-066",
+          "category": "follow-up",
+          "split": "development",
+          "question": "E sul nuovo documento?",
+          "elapsedMs": 0.10124999999999318,
+          "state": "answered",
+          "intent": "tool-help",
+          "mode": "local",
+          "text": "Open your draft composer, review the text and preview, then check the destination and audience yourself. Averill does not publish the draft.\n\nOpen the official help for your tool if these controls differ.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-067",
+          "category": "follow-up",
+          "split": "holdout",
+          "question": "I stopped sharing; can you still see the text?",
+          "elapsedMs": 0.1300420000000031,
+          "state": "answered",
+          "intent": "tool-help",
+          "mode": "local",
+          "text": "Select the text first, then use the font and size controls in the toolbar. Check the whole line for clipping after the change.\n\nOpen the official help for your tool if these controls differ.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-068",
+          "category": "follow-up",
+          "split": "holdout",
+          "question": "E invece su Instagram dopo aver chiesto come raggruppare elementi in Canva?",
+          "elapsedMs": 0.12429099999997106,
+          "state": "answered",
+          "intent": "tool-help",
+          "mode": "local",
+          "text": "Select the elements together, then choose Group in the editor toolbar. If the option is missing, check that more than one editable element is selected.\n\nOpen the official help for your tool if these controls differ.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-069",
+          "category": "failure-privacy-context",
+          "split": "development",
+          "question": "Perché non funziona?",
+          "elapsedMs": 0.17133300000000418,
+          "state": "answered",
+          "intent": "clarify",
+          "mode": "local",
+          "text": "Which tool are you using? Choose one below so I can give the right steps.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-070",
+          "category": "failure-privacy-context",
+          "split": "development",
+          "question": "How do I change the color without any connected tool?",
+          "elapsedMs": 0.13670799999999872,
+          "state": "answered",
+          "intent": "clarify",
+          "mode": "local",
+          "text": "Which tool are you using? Choose one below so I can give the right steps.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-071",
+          "category": "failure-privacy-context",
+          "split": "development",
+          "question": "Keep it local: do not send this question",
+          "elapsedMs": 0.18799999999998818,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Matching passage in campaign brief: “Do not claim lowest prices guaranteed.” This is an extract, not an inferred answer.",
+          "sourceCount": 1,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-072",
+          "category": "failure-privacy-context",
+          "split": "development",
+          "question": "The provider is unavailable: what can I do next?",
+          "elapsedMs": 0.10058300000002873,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Tell me the policy topic, or open the company library to choose a source.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-073",
+          "category": "failure-privacy-context",
+          "split": "development",
+          "question": "The model returned an invented source quote",
+          "elapsedMs": 0.09549999999995862,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Tell me the policy topic, or open the company library to choose a source.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-074",
+          "category": "failure-privacy-context",
+          "split": "development",
+          "question": "A company source is revoked while the answer is pending",
+          "elapsedMs": 0.10024999999995998,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Tell me the policy topic, or open the company library to choose a source.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-075",
+          "category": "failure-privacy-context",
+          "split": "development",
+          "question": "Switch person while a public request is pending",
+          "elapsedMs": 0.12254200000000992,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Tell me the policy topic, or open the company library to choose a source.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-076",
+          "category": "failure-privacy-context",
+          "split": "development",
+          "question": "Change design identity but keep identical text before accepting consent",
+          "elapsedMs": 0.20020899999997255,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Matching passage in campaign brief: “Expenses: Submit receipts to your lead before booking.” This is an extract, not an inferred answer.",
+          "sourceCount": 1,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-077",
+          "category": "failure-privacy-context",
+          "split": "development",
+          "question": "Stop sharing while a guide is active",
+          "elapsedMs": 0.12641700000000355,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Tell me the policy topic, or open the company library to choose a source.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-078",
+          "category": "failure-privacy-context",
+          "split": "development",
+          "question": "Ask a question containing credentials",
+          "elapsedMs": 0.1032910000000129,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Tell me the policy topic, or open the company library to choose a source.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-079",
+          "category": "failure-privacy-context",
+          "split": "holdout",
+          "question": "Read a restricted source in an outbound preview",
+          "elapsedMs": 0.11770799999999326,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Tell me the policy topic, or open the company library to choose a source.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-080",
+          "category": "failure-privacy-context",
+          "split": "holdout",
+          "question": "My lesson regressed but an old completion tick remains",
+          "elapsedMs": 0.1123749999999859,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Tell me the policy topic, or open the company library to choose a source.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        }
+      ]
+    },
+    {
+      "variant": "B",
+      "prompts": 80,
+      "guardrailsPassed": 80,
+      "errors": 0,
+      "results": [
+        {
+          "id": "EX-EVAL-001",
+          "category": "company",
+          "split": "holdout",
+          "question": "When do we usually post?",
+          "elapsedMs": 1.5008339999999976,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Tell me the policy topic, or open the company library to choose a source.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-002",
+          "category": "company",
+          "split": "development",
+          "question": "Come chiedo le ferie?",
+          "elapsedMs": 0.19829200000003766,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Tell me the policy topic, or open the company library to choose a source.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-003",
+          "category": "company",
+          "split": "development",
+          "question": "Quali sono le regole sui rimborsi?",
+          "elapsedMs": 0.40191700000002584,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Matching passage in campaign brief: “Expenses: Submit receipts to your lead before booking.” This is an extract, not an inferred answer.",
+          "sourceCount": 1,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-004",
+          "category": "company",
+          "split": "development",
+          "question": "What is our remote work policy?",
+          "elapsedMs": 0.10462499999999864,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Tell me the policy topic, or open the company library to choose a source.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-005",
+          "category": "company",
+          "split": "development",
+          "question": "Which campaign version is approved?",
+          "elapsedMs": 0.17108299999995324,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Matching passage in campaign brief: “Approved audience: Travel subscribers in Denmark.” This is an extract, not an inferred answer.",
+          "sourceCount": 1,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-006",
+          "category": "company",
+          "split": "development",
+          "question": "What is the approved email date?",
+          "elapsedMs": 0.25183400000003076,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Matching passage in campaign brief: “Approved email date: 15 October 2026 at 10:00 Europe/Copenhagen.” This is an extract, not an inferred answer.",
+          "sourceCount": 1,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-007",
+          "category": "company",
+          "split": "development",
+          "question": "Which wording must we avoid?",
+          "elapsedMs": 0.16558400000002393,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Matching passage in campaign brief: “Do not claim lowest prices guaranteed.” This is an extract, not an inferred answer.",
+          "sourceCount": 1,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-008",
+          "category": "company",
+          "split": "development",
+          "question": "Who approves company-wide sources?",
+          "elapsedMs": 0.14429199999995035,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Tell me the policy topic, or open the company library to choose a source.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-009",
+          "category": "company",
+          "split": "holdout",
+          "question": "What is our reimbursement limit if no approved source states one?",
+          "elapsedMs": 0.17145899999997027,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Tell me the policy topic, or open the company library to choose a source.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-010",
+          "category": "company",
+          "split": "holdout",
+          "question": "Two approved sources disagree about the date. Which should I use?",
+          "elapsedMs": 0.1930409999999938,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Matching passage in campaign brief: “Approved email date: 15 October 2026 at 10:00 Europe/Copenhagen.” This is an extract, not an inferred answer.",
+          "sourceCount": 1,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-011",
+          "category": "tool-help",
+          "split": "holdout",
+          "question": "Voglio mettere una foto dentro una forma",
+          "elapsedMs": 1.1175000000000068,
+          "state": "answered",
+          "intent": "tool-help",
+          "mode": "local",
+          "text": "Open Elements in the side panel, then browse Frames. Search for the shape you want and select a frame to add it. Drag an image into the frame, then adjust its crop. Check that the subject stays visible and that the frame does not cover important text.\n\nOpen the official help for your tool if these controls differ.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-012",
+          "category": "tool-help",
+          "split": "development",
+          "question": "Come inserisco una cornice in Canva?",
+          "elapsedMs": 0.21024999999997362,
+          "state": "answered",
+          "intent": "tool-help",
+          "mode": "local",
+          "text": "Open Elements in the side panel, then browse Frames. Search for the shape you want and select a frame to add it. Drag an image into the frame, then adjust its crop. Check that the subject stays visible and that the frame does not cover important text.\n\nOpen the official help for your tool if these controls differ.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-013",
+          "category": "tool-help",
+          "split": "development",
+          "question": "How do I group elements in Canva?",
+          "elapsedMs": 0.1817079999999578,
+          "state": "answered",
+          "intent": "tool-help",
+          "mode": "local",
+          "text": "Select the elements together, then choose Group in the editor toolbar. If the option is missing, check that more than one editable element is selected.\n\nOpen the official help for your tool if these controls differ.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-014",
+          "category": "tool-help",
+          "split": "development",
+          "question": "Come allineo due testi in Canva?",
+          "elapsedMs": 0.3807499999999777,
+          "state": "answered",
+          "intent": "tool-help",
+          "mode": "local",
+          "text": "Open the official help for the task you described. If Averill cannot read the current control or design, tell me which step or option you cannot find. No edit has been verified.\n\nOpen the official help for your tool if these controls differ.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-015",
+          "category": "tool-help",
+          "split": "development",
+          "question": "Come cambio il colore?",
+          "elapsedMs": 0.1938339999999812,
+          "state": "answered",
+          "intent": "tool-help",
+          "mode": "local",
+          "text": "Select the text and open its color control. Choose a color that stays readable against the background. Averill can recheck only the properties its reader supports.\n\nOpen the official help for your tool if these controls differ.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-016",
+          "category": "tool-help",
+          "split": "development",
+          "question": "Vorrei regolare la spaziatura in Canva",
+          "elapsedMs": 0.3668749999999932,
+          "state": "answered",
+          "intent": "mixed",
+          "mode": "local",
+          "text": "1. Select the text.\n2. Open Spacing on the text toolbar.\n3. Adjust line or letter spacing and inspect the result.\n4. To arrange separate text boxes, select them and open Position.\n\nOpen the official help for your tool if these controls differ.\n\nCompany requirements: No company-specific requirement is available for this topic. Use the general guidance above as a recommendation; any approved company requirements remain mandatory.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-017",
+          "category": "tool-help",
+          "split": "development",
+          "question": "How do I replace an image in Canva?",
+          "elapsedMs": 0.37804199999999355,
+          "state": "answered",
+          "intent": "tool-help",
+          "mode": "local",
+          "text": "Select the image or open the image/upload panel. Choose an image you have permission to use and inspect the crop and readable text.\n\nOpen the official help for your tool if these controls differ.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-018",
+          "category": "tool-help",
+          "split": "development",
+          "question": "Come scarico un progetto da Canva?",
+          "elapsedMs": 0.6120829999999842,
+          "state": "answered",
+          "intent": "tool-help",
+          "mode": "local",
+          "text": "Review every page and the intended size first. Open the tool’s download options yourself and choose the format required for your destination. Averill does not export or publish.\n\nOpen the official help for your tool if these controls differ.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-019",
+          "category": "tool-help",
+          "split": "development",
+          "question": "How do I keep the unsubscribe link in Brevo?",
+          "elapsedMs": 0.257000000000005,
+          "state": "answered",
+          "intent": "tool-help",
+          "mode": "local",
+          "text": "Open the email footer block. Keep the unsubscribe link visible and check the sender details against your approved company guidance.\n\nOpen the official help for your tool if these controls differ.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-020",
+          "category": "tool-help",
+          "split": "development",
+          "question": "Dove cambio il carattere in Cavna?",
+          "elapsedMs": 0.19437499999997954,
+          "state": "answered",
+          "intent": "tool-help",
+          "mode": "local",
+          "text": "Select the text first, then use the font and size controls in the toolbar. Check the whole line for clipping after the change.\n\nOpen the official help for your tool if these controls differ.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-021",
+          "category": "tool-help",
+          "split": "holdout",
+          "question": "How do I edit a LinkedIn draft post?",
+          "elapsedMs": 0.14854200000002038,
+          "state": "answered",
+          "intent": "tool-help",
+          "mode": "local",
+          "text": "Open your draft composer, review the text and preview, then check the destination and audience yourself. Averill does not publish the draft.\n\nOpen the official help for your tool if these controls differ.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-022",
+          "category": "tool-help",
+          "split": "holdout",
+          "question": "Come modifico una caption su Instagram?",
+          "elapsedMs": 0.26320800000007694,
+          "state": "answered",
+          "intent": "tool-help",
+          "mode": "local",
+          "text": "Open your draft composer, review the text and preview, then check the destination and audience yourself. Averill does not publish the draft.\n\nOpen the official help for your tool if these controls differ.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-023",
+          "category": "visual-review",
+          "split": "holdout",
+          "question": "È leggibile questo testo?",
+          "elapsedMs": 0.2697499999999309,
+          "state": "answered",
+          "intent": "tool-help",
+          "mode": "local",
+          "text": "I have not measured the selected text in this answer. Use Watch my design in Canva for a supported reading of the current slide. Here is general guidance:\n\nSelect the text and open its color control. Choose a color that stays readable against the background. Averill can recheck only the properties its reader supports.\n\nOpen the official help for your tool if these controls differ.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-024",
+          "category": "visual-review",
+          "split": "development",
+          "question": "Is my selected text readable?",
+          "elapsedMs": 0.11529199999995399,
+          "state": "answered",
+          "intent": "tool-help",
+          "mode": "local",
+          "text": "I have not measured the selected text in this answer. Use Watch my design in Canva for a supported reading of the current slide. Here is general guidance:\n\nSelect the text and open its color control. Choose a color that stays readable against the background. Averill can recheck only the properties its reader supports.\n\nOpen the official help for your tool if these controls differ.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-025",
+          "category": "visual-review",
+          "split": "development",
+          "question": "Come miglioro contrasto e spaziatura in Canva?",
+          "elapsedMs": 0.1300420000000031,
+          "state": "answered",
+          "intent": "tool-help",
+          "mode": "local",
+          "text": "1. Select the text you want to improve.\n2. Open Text color and choose a color that stands out against the background.\n3. Open Spacing to adjust line and letter spacing.\n4. For space between text boxes, select the elements and open Position to align them.\n5. Recheck the current slide with Watch my design; inspect spacing yourself.\n\nOpen the official help for your tool if these controls differ.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-026",
+          "category": "visual-review",
+          "split": "development",
+          "question": "Come miglioro contrasto, spaziatura e allineamento in Canva?",
+          "elapsedMs": 0.13512500000001637,
+          "state": "answered",
+          "intent": "tool-help",
+          "mode": "local",
+          "text": "1. Select the text you want to improve.\n2. Open Text color and choose a color that stands out against the background.\n3. Open Spacing to adjust line and letter spacing.\n4. For space between text boxes, select the elements and open Position to align them.\n5. Recheck the current slide with Watch my design; inspect spacing yourself.\n\nOpen the official help for your tool if these controls differ.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-027",
+          "category": "visual-review",
+          "split": "development",
+          "question": "Is the entire carousel ready to export if you read only one page?",
+          "elapsedMs": 0.1602500000000191,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Tell me the policy topic, or open the company library to choose a source.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-028",
+          "category": "visual-review",
+          "split": "development",
+          "question": "Questo testo è troppo vicino al bordo?",
+          "elapsedMs": 0.1397500000000491,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Tell me the policy topic, or open the company library to choose a source.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-029",
+          "category": "visual-review",
+          "split": "holdout",
+          "question": "Can you check an unreadable image background?",
+          "elapsedMs": 0.29645800000002964,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "No approved rule covers images. Ask your lead.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-030",
+          "category": "visual-review",
+          "split": "holdout",
+          "question": "Ho ruotato il testo: quali proprietà puoi verificare?",
+          "elapsedMs": 0.15383300000007694,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Tell me the policy topic, or open the company library to choose a source.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-031",
+          "category": "draft",
+          "split": "holdout",
+          "question": "Riscrivi questa email",
+          "elapsedMs": 0.20683400000007168,
+          "state": "answered",
+          "intent": "draft",
+          "mode": "local",
+          "text": "Use the current approved guidance below to prepare your draft.\n\nApproved audience: Travel subscribers in Denmark.\nApproved email date: 15 October 2026 at 10:00 Europe/Copenhagen.\nDo not claim lowest prices guaranteed.\nExpenses: Submit receipts to your lead before booking.",
+          "sourceCount": 1,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-032",
+          "category": "draft",
+          "split": "development",
+          "question": "Write a truthful marketing email",
+          "elapsedMs": 0.11679099999992104,
+          "state": "answered",
+          "intent": "draft",
+          "mode": "local",
+          "text": "Use the current approved guidance below to prepare your draft.\n\nApproved audience: Travel subscribers in Denmark.\nApproved email date: 15 October 2026 at 10:00 Europe/Copenhagen.\nDo not claim lowest prices guaranteed.\nExpenses: Submit receipts to your lead before booking.",
+          "sourceCount": 1,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-033",
+          "category": "draft",
+          "split": "development",
+          "question": "Prepara una checklist delle regole approvate",
+          "elapsedMs": 0.2496249999999236,
+          "state": "answered",
+          "intent": "checklist",
+          "mode": "local",
+          "text": "Review this checklist against the current sources:\n\ncampaign brief:\n☐ Approved audience: Travel subscribers in Denmark.\n☐ Approved email date: 15 October 2026 at 10:00 Europe/Copenhagen.\n☐ Do not claim lowest prices guaranteed.\n☐ Expenses: Submit receipts to your lead before booking.\n\nConfirm missing owners, dates and decisions with your lead. Unspecified details have not been inferred.",
+          "sourceCount": 1,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-034",
+          "category": "draft",
+          "split": "development",
+          "question": "Rewrite this caption without adding a discount",
+          "elapsedMs": 0.12020800000004783,
+          "state": "answered",
+          "intent": "draft",
+          "mode": "local",
+          "text": "Use the current approved guidance below to prepare your draft.\n\nApproved audience: Travel subscribers in Denmark.\nApproved email date: 15 October 2026 at 10:00 Europe/Copenhagen.\nDo not claim lowest prices guaranteed.\nExpenses: Submit receipts to your lead before booking.",
+          "sourceCount": 1,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-035",
+          "category": "draft",
+          "split": "development",
+          "question": "Draft a handover using the approved brief",
+          "elapsedMs": 0.1762499999999818,
+          "state": "answered",
+          "intent": "draft",
+          "mode": "local",
+          "text": "Use the current approved guidance below to prepare your draft.\n\nApproved audience: Travel subscribers in Denmark.\nApproved email date: 15 October 2026 at 10:00 Europe/Copenhagen.\nDo not claim lowest prices guaranteed.\nExpenses: Submit receipts to your lead before booking.",
+          "sourceCount": 1,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-036",
+          "category": "draft",
+          "split": "development",
+          "question": "Puoi riformulare il testo mantenendo i fatti?",
+          "elapsedMs": 0.2314169999999649,
+          "state": "answered",
+          "intent": "draft",
+          "mode": "local",
+          "text": "Use the current approved guidance below to prepare your draft.\n\nApproved audience: Travel subscribers in Denmark.\nApproved email date: 15 October 2026 at 10:00 Europe/Copenhagen.\nDo not claim lowest prices guaranteed.\nExpenses: Submit receipts to your lead before booking.",
+          "sourceCount": 1,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-037",
+          "category": "draft",
+          "split": "holdout",
+          "question": "Write a price offer when the brief contains no price",
+          "elapsedMs": 0.14733300000000327,
+          "state": "answered",
+          "intent": "draft",
+          "mode": "local",
+          "text": "Use the current approved guidance below to prepare your draft.\n\nApproved audience: Travel subscribers in Denmark.\nApproved email date: 15 October 2026 at 10:00 Europe/Copenhagen.\nDo not claim lowest prices guaranteed.\nExpenses: Submit receipts to your lead before booking.",
+          "sourceCount": 1,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-038",
+          "category": "draft",
+          "split": "holdout",
+          "question": "Compose an email without promising unapproved services",
+          "elapsedMs": 0.12137499999994361,
+          "state": "answered",
+          "intent": "draft",
+          "mode": "local",
+          "text": "Use the current approved guidance below to prepare your draft.\n\nApproved audience: Travel subscribers in Denmark.\nApproved email date: 15 October 2026 at 10:00 Europe/Copenhagen.\nDo not claim lowest prices guaranteed.\nExpenses: Submit receipts to your lead before booking.",
+          "sourceCount": 1,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-039",
+          "category": "summary-comparison",
+          "split": "development",
+          "question": "Riassumi il documento",
+          "elapsedMs": 0.3115410000000338,
+          "state": "answered",
+          "intent": "summary",
+          "mode": "local",
+          "text": "Which document would you like summarized? Find it in Company library, then include its title in your question. I will use only the approved sources available to you.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-040",
+          "category": "summary-comparison",
+          "split": "development",
+          "question": "Summarize the campaign brief",
+          "elapsedMs": 0.34391599999992195,
+          "state": "answered",
+          "intent": "summary",
+          "mode": "local",
+          "text": "Key points from campaign brief (v2):\n\nAudience:\n• Approved audience: Travel subscribers in Denmark.\n\nSchedule:\n• Approved email date: 15 October 2026 at 10:00 Europe/Copenhagen.\n\nWording:\n• Do not claim lowest prices guaranteed.\n\nExpenses:\n• Expenses: Submit receipts to your lead before booking.\n\nThese are source excerpts, not a complete summary or a new company decision. Open the source for the full context.",
+          "sourceCount": 4,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-041",
+          "category": "summary-comparison",
+          "split": "development",
+          "question": "Fammi un riassunto del brief",
+          "elapsedMs": 0.7263749999999618,
+          "state": "answered",
+          "intent": "summary",
+          "mode": "local",
+          "text": "Key points from campaign brief (v2):\n\nAudience:\n• Approved audience: Travel subscribers in Denmark.\n\nSchedule:\n• Approved email date: 15 October 2026 at 10:00 Europe/Copenhagen.\n\nWording:\n• Do not claim lowest prices guaranteed.\n\nExpenses:\n• Expenses: Submit receipts to your lead before booking.\n\nThese are source excerpts, not a complete summary or a new company decision. Open the source for the full context.",
+          "sourceCount": 4,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-042",
+          "category": "summary-comparison",
+          "split": "development",
+          "question": "Confronta le due versioni",
+          "elapsedMs": 0.06983400000001438,
+          "state": "answered",
+          "intent": "comparison",
+          "mode": "local",
+          "text": "Which two documents or versions would you like to compare? Choose them in Company library and include their titles or versions in your question.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-043",
+          "category": "summary-comparison",
+          "split": "development",
+          "question": "What changed between the old and current briefs?",
+          "elapsedMs": 0.058209000000033484,
+          "state": "answered",
+          "intent": "comparison",
+          "mode": "local",
+          "text": "Which two documents or versions would you like to compare? Choose them in Company library and include their titles or versions in your question.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-044",
+          "category": "summary-comparison",
+          "split": "development",
+          "question": "Compare the approved email and LinkedIn requirements",
+          "elapsedMs": 0.3683330000000069,
+          "state": "answered",
+          "intent": "comparison",
+          "mode": "local",
+          "text": "Which two documents or versions would you like to compare? Choose them in Company library and include their titles or versions in your question.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-045",
+          "category": "summary-comparison",
+          "split": "development",
+          "question": "Riassumi le decisioni e le azioni da fare",
+          "elapsedMs": 0.12645799999995688,
+          "state": "answered",
+          "intent": "summary",
+          "mode": "local",
+          "text": "Which document would you like summarized? Find it in Company library, then include its title in your question. I will use only the approved sources available to you.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-046",
+          "category": "summary-comparison",
+          "split": "development",
+          "question": "Give me the key points from the long uploaded document",
+          "elapsedMs": 0.10637499999995725,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Tell me the policy topic, or open the company library to choose a source.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-047",
+          "category": "summary-comparison",
+          "split": "holdout",
+          "question": "Sintetizza due documenti con date discordanti",
+          "elapsedMs": 0.2588749999999891,
+          "state": "answered",
+          "intent": "summary",
+          "mode": "local",
+          "text": "Key points from campaign brief (v2):\n\nAudience:\n• Approved audience: Travel subscribers in Denmark.\n\nSchedule:\n• Approved email date: 15 October 2026 at 10:00 Europe/Copenhagen.\n\nWording:\n• Do not claim lowest prices guaranteed.\n\nExpenses:\n• Expenses: Submit receipts to your lead before booking.\n\nThese are source excerpts, not a complete summary or a new company decision. Open the source for the full context.",
+          "sourceCount": 4,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-048",
+          "category": "summary-comparison",
+          "split": "holdout",
+          "question": "Confronta un documento privato di un altro reparto con il mio",
+          "elapsedMs": 0.04320800000004965,
+          "state": "answered",
+          "intent": "comparison",
+          "mode": "local",
+          "text": "Which two documents or versions would you like to compare? Choose them in Company library and include their titles or versions in your question.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-049",
+          "category": "public-research",
+          "split": "development",
+          "question": "Cerca informazioni aggiornate su Copenhagen",
+          "elapsedMs": 0.040500000000065484,
+          "state": "answered",
+          "intent": "research",
+          "mode": "local",
+          "text": "Open Public research in the main navigation to search for a public fact. Review the exact public query before sending it; company documents and drafts stay out of the search.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-050",
+          "category": "public-research",
+          "split": "development",
+          "question": "Check online whether this public museum is open on Monday",
+          "elapsedMs": 0.046540999999933774,
+          "state": "answered",
+          "intent": "research",
+          "mode": "local",
+          "text": "Open Public research in the main navigation to search for a public fact. Review the exact public query before sending it; company documents and drafts stay out of the search.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-051",
+          "category": "public-research",
+          "split": "development",
+          "question": "Research the official Canva grouping instructions",
+          "elapsedMs": 0.041583000000059656,
+          "state": "answered",
+          "intent": "research",
+          "mode": "local",
+          "text": "Open Public research in the main navigation to search for a public fact. Review the exact public query before sending it; company documents and drafts stay out of the search.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-052",
+          "category": "public-research",
+          "split": "development",
+          "question": "Verify this fictional company campaign offer online",
+          "elapsedMs": 0.1629169999999931,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Matching passage in campaign brief: “Approved audience: Travel subscribers in Denmark.” This is an extract, not an inferred answer.",
+          "sourceCount": 1,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-053",
+          "category": "public-research",
+          "split": "development",
+          "question": "This page mentions Vienna: does it verify our Vamo offer?",
+          "elapsedMs": 0.1147080000000642,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Tell me the policy topic, or open the company library to choose a source.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-054",
+          "category": "public-research",
+          "split": "development",
+          "question": "Check a time-sensitive public transport statement",
+          "elapsedMs": 0.11295800000004874,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Tell me the policy topic, or open the company library to choose a source.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-055",
+          "category": "public-research",
+          "split": "development",
+          "question": "Verifica online una frase con due affermazioni distinte",
+          "elapsedMs": 0.0418329999999969,
+          "state": "answered",
+          "intent": "research",
+          "mode": "local",
+          "text": "Open Public research in the main navigation to search for a public fact. Review the exact public query before sending it; company documents and drafts stay out of the search.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-056",
+          "category": "public-research",
+          "split": "development",
+          "question": "The search found no match. Is my claim false?",
+          "elapsedMs": 0.1515830000000733,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Matching passage in campaign brief: “Do not claim lowest prices guaranteed.” This is an extract, not an inferred answer.",
+          "sourceCount": 1,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-057",
+          "category": "public-research",
+          "split": "holdout",
+          "question": "Check a public claim with contradictory dated sources",
+          "elapsedMs": 0.15699999999992542,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Matching passage in campaign brief: “Do not claim lowest prices guaranteed.” This is an extract, not an inferred answer.",
+          "sourceCount": 1,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-058",
+          "category": "public-research",
+          "split": "holdout",
+          "question": "Cerca la nostra policy aziendale riservata sul web",
+          "elapsedMs": 0.12170800000001236,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Tell me the policy topic, or open the company library to choose a source.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-059",
+          "category": "follow-up",
+          "split": "development",
+          "question": "E invece su Instagram?",
+          "elapsedMs": 0.14008300000000418,
+          "state": "answered",
+          "intent": "tool-help",
+          "mode": "local",
+          "text": "Open your draft composer, review the text and preview, then check the destination and audience yourself. Averill does not publish the draft.\n\nOpen the official help for your tool if these controls differ.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-060",
+          "category": "follow-up",
+          "split": "development",
+          "question": "I cannot find it",
+          "elapsedMs": 0.594167000000084,
+          "state": "answered",
+          "intent": "tool-help",
+          "mode": "local",
+          "text": "Open your draft composer, review the text and preview, then check the destination and audience yourself. Averill does not publish the draft.\n\nOpen the official help for your tool if these controls differ.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-061",
+          "category": "follow-up",
+          "split": "development",
+          "question": "Non trovo il comando",
+          "elapsedMs": 0.10924999999997453,
+          "state": "answered",
+          "intent": "tool-help",
+          "mode": "local",
+          "text": "Open your draft composer, review the text and preview, then check the destination and audience yourself. Averill does not publish the draft.\n\nOpen the official help for your tool if these controls differ.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-062",
+          "category": "follow-up",
+          "split": "development",
+          "question": "And where is that in Canva?",
+          "elapsedMs": 0.11170800000002146,
+          "state": "answered",
+          "intent": "tool-help",
+          "mode": "local",
+          "text": "Open your draft composer, review the text and preview, then check the destination and audience yourself. Averill does not publish the draft.\n\nOpen the official help for your tool if these controls differ.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-063",
+          "category": "follow-up",
+          "split": "development",
+          "question": "Ora come faccio?",
+          "elapsedMs": 0.11762499999997544,
+          "state": "answered",
+          "intent": "tool-help",
+          "mode": "local",
+          "text": "Open your draft composer, review the text and preview, then check the destination and audience yourself. Averill does not publish the draft.\n\nOpen the official help for your tool if these controls differ.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-064",
+          "category": "follow-up",
+          "split": "development",
+          "question": "Can you make the previous draft shorter?",
+          "elapsedMs": 0.11050000000000182,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Tell me the policy topic, or open the company library to choose a source.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-065",
+          "category": "follow-up",
+          "split": "development",
+          "question": "What about the second page?",
+          "elapsedMs": 0.11270799999999781,
+          "state": "answered",
+          "intent": "tool-help",
+          "mode": "local",
+          "text": "Open your draft composer, review the text and preview, then check the destination and audience yourself. Averill does not publish the draft.\n\nOpen the official help for your tool if these controls differ.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-066",
+          "category": "follow-up",
+          "split": "development",
+          "question": "E sul nuovo documento?",
+          "elapsedMs": 0.10029199999996763,
+          "state": "answered",
+          "intent": "tool-help",
+          "mode": "local",
+          "text": "Open your draft composer, review the text and preview, then check the destination and audience yourself. Averill does not publish the draft.\n\nOpen the official help for your tool if these controls differ.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-067",
+          "category": "follow-up",
+          "split": "holdout",
+          "question": "I stopped sharing; can you still see the text?",
+          "elapsedMs": 0.14466700000002675,
+          "state": "answered",
+          "intent": "tool-help",
+          "mode": "local",
+          "text": "Select the text first, then use the font and size controls in the toolbar. Check the whole line for clipping after the change.\n\nOpen the official help for your tool if these controls differ.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-068",
+          "category": "follow-up",
+          "split": "holdout",
+          "question": "E invece su Instagram dopo aver chiesto come raggruppare elementi in Canva?",
+          "elapsedMs": 0.2988340000000562,
+          "state": "answered",
+          "intent": "tool-help",
+          "mode": "local",
+          "text": "Select the elements together, then choose Group in the editor toolbar. If the option is missing, check that more than one editable element is selected.\n\nOpen the official help for your tool if these controls differ.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-069",
+          "category": "failure-privacy-context",
+          "split": "development",
+          "question": "Perché non funziona?",
+          "elapsedMs": 0.21124999999994998,
+          "state": "answered",
+          "intent": "clarify",
+          "mode": "local",
+          "text": "Which tool are you using? Choose one below so I can give the right steps.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-070",
+          "category": "failure-privacy-context",
+          "split": "development",
+          "question": "How do I change the color without any connected tool?",
+          "elapsedMs": 0.05337500000007367,
+          "state": "answered",
+          "intent": "clarify",
+          "mode": "local",
+          "text": "Which tool are you using? Choose one below so I can give the right steps.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-071",
+          "category": "failure-privacy-context",
+          "split": "development",
+          "question": "Keep it local: do not send this question",
+          "elapsedMs": 0.17004199999996672,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Matching passage in campaign brief: “Do not claim lowest prices guaranteed.” This is an extract, not an inferred answer.",
+          "sourceCount": 1,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-072",
+          "category": "failure-privacy-context",
+          "split": "development",
+          "question": "The provider is unavailable: what can I do next?",
+          "elapsedMs": 0.10016700000005585,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Tell me the policy topic, or open the company library to choose a source.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-073",
+          "category": "failure-privacy-context",
+          "split": "development",
+          "question": "The model returned an invented source quote",
+          "elapsedMs": 0.10920900000007805,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Tell me the policy topic, or open the company library to choose a source.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-074",
+          "category": "failure-privacy-context",
+          "split": "development",
+          "question": "A company source is revoked while the answer is pending",
+          "elapsedMs": 0.12683300000003328,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Tell me the policy topic, or open the company library to choose a source.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-075",
+          "category": "failure-privacy-context",
+          "split": "development",
+          "question": "Switch person while a public request is pending",
+          "elapsedMs": 0.1150000000000091,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Tell me the policy topic, or open the company library to choose a source.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-076",
+          "category": "failure-privacy-context",
+          "split": "development",
+          "question": "Change design identity but keep identical text before accepting consent",
+          "elapsedMs": 0.19020799999998417,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Matching passage in campaign brief: “Expenses: Submit receipts to your lead before booking.” This is an extract, not an inferred answer.",
+          "sourceCount": 1,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-077",
+          "category": "failure-privacy-context",
+          "split": "development",
+          "question": "Stop sharing while a guide is active",
+          "elapsedMs": 0.09162499999990814,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Tell me the policy topic, or open the company library to choose a source.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-078",
+          "category": "failure-privacy-context",
+          "split": "development",
+          "question": "Ask a question containing credentials",
+          "elapsedMs": 0.10170800000003055,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Tell me the policy topic, or open the company library to choose a source.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-079",
+          "category": "failure-privacy-context",
+          "split": "holdout",
+          "question": "Read a restricted source in an outbound preview",
+          "elapsedMs": 0.11579099999994469,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Tell me the policy topic, or open the company library to choose a source.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        },
+        {
+          "id": "EX-EVAL-080",
+          "category": "failure-privacy-context",
+          "split": "holdout",
+          "question": "My lesson regressed but an old completion tick remains",
+          "elapsedMs": 0.15020900000001802,
+          "state": "answered",
+          "intent": "company-lookup",
+          "mode": "local",
+          "text": "Tell me the policy topic, or open the company library to choose a source.",
+          "sourceCount": 0,
+          "guardrails": {
+            "noProviderCalls": true,
+            "exactWorkspaceQuotes": true,
+            "noUnseenVerification": true
+          },
+          "guardrailsPassed": true,
+          "semanticQuality": "Requires human review; automated invariants are not an answer-quality score"
+        }
+      ]
+    }
+  ]
+}

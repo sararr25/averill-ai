@@ -1,0 +1,91 @@
+{
+  "at": "2026-10-29T22:54:05.889Z",
+  "companyAI": false,
+  "companySources": 0,
+  "scope": "Three generic public Canva operations; actual providers; no user profile or private content",
+  "results": [
+    {
+      "question": "How do I improve contrast and spacing in Canva?",
+      "ms": 7283,
+      "mode": "model",
+      "status": "answered",
+      "text": "1. Select the text.\n2. On the toolbar, select Advanced Settings.\n3. Under Spacing, adjust the line spacing slider.\n4. Under Spacing, adjust the letter spacing slider.\n5. To improve text contrast, select the text and then on the toolbar, select Text color and choose a color that provides sufficient contrast against the background.",
+      "sources": [
+        {
+          "id": "https://www.canva.com/help/add-and-edit-text",
+          "title": "Add and edit text - Canva Help Center",
+          "kind": "public-help",
+          "url": "https://www.canva.com/help/add-and-edit-text",
+          "quote": "Select the text. On the toolbar, select Advanced Settings . Under Spacing , adjust the line spacing and letter spacing sliders.",
+          "retrievedAt": "2026-10-29T22:53:57.124Z"
+        },
+        {
+          "id": "https://www.canva.com/help/format-text",
+          "title": "Format text - Canva Help Center",
+          "kind": "public-help",
+          "url": "https://www.canva.com/help/format-text",
+          "quote": "1. Select the text.\n2. On the toolbar, select Text color.\n3. Choose a color to apply to your text.",
+          "retrievedAt": "2026-10-29T22:53:57.122Z"
+        }
+      ]
+    },
+    {
+      "question": "How do I group elements in Canva?",
+      "ms": 3458,
+      "mode": "model",
+      "status": "answered",
+      "text": "1. Select multiple elements.\n2. Press Command+G (Mac) or Ctrl+G (Windows) to group selected elements.\n3. To ungroup, select the grouped element and click 'Ungroup' in the toolbar.\n4. For third-party app content, right-click → Download selection → Save as PNG/JPG → Re-upload before grouping.",
+      "sources": [
+        {
+          "id": "https://www.canva.com/en_au/help/layer-group-align-variantb",
+          "title": "Group, layer, and align elements - Canva Help Centre",
+          "kind": "public-help",
+          "url": "https://www.canva.com/en_au/help/layer-group-align-variantb",
+          "quote": "Keyboard shortcut: After selecting the elements, press Command + G (Mac) or Ctrl + G (Windows) to group them.",
+          "retrievedAt": "2026-10-29T22:54:01.565Z"
+        },
+        {
+          "id": "https://www.canva.com/en_au/help/layer-group-align-variantb",
+          "title": "Group, layer, and align elements - Canva Help Centre",
+          "kind": "public-help",
+          "url": "https://www.canva.com/en_au/help/layer-group-align-variantb",
+          "quote": "You can’t group content created by third-party apps from the Apps tab with other elements in your design. To make it groupable, right-click the content, select Download selection, and save it as a PNG or JPG. Re-upload the file to Canva and add it to your design.",
+          "retrievedAt": "2026-10-29T22:54:01.565Z"
+        },
+        {
+          "id": "https://www.canva.com/help/moving-elements",
+          "title": "Move elements in your design - Canva Help Center",
+          "kind": "public-help",
+          "url": "https://www.canva.com/help/moving-elements",
+          "quote": "group, choose one element to remove, then tap Ungroup .",
+          "retrievedAt": "2026-10-29T22:54:01.567Z"
+        }
+      ]
+    },
+    {
+      "question": "How do I add a frame in Canva?",
+      "ms": 2927,
+      "mode": "model",
+      "status": "answered",
+      "text": "1. From the editor side panel, select Elements.\n2. Under Browse categories, select Frames.\n3. In the Search elements field, describe what you're looking for. Press Enter.\n4. Under Search results, select a frame to add it to your design.\n5. Add the image or video you want to fit into the shape.",
+      "sources": [
+        {
+          "id": "https://www.canva.com/help/using-frames",
+          "title": "Use frames and crop images into a shape - Canva Help Center",
+          "kind": "public-help",
+          "url": "https://www.canva.com/help/using-frames",
+          "quote": "1. From the editor side panel, select Elements.\n2. Under Browse categories, select Frames.\n3. In the Search elements field, describe what you're looking for. Press Enter.\n4. Under Search results, select a frame to add it to your design.",
+          "retrievedAt": "2026-10-29T22:54:04.717Z"
+        },
+        {
+          "id": "https://www.canva.com/help/using-frames",
+          "title": "Use frames and crop images into a shape - Canva Help Center",
+          "kind": "public-help",
+          "url": "https://www.canva.com/help/using-frames",
+          "quote": "Add the image or video you want to fit into the shape.",
+          "retrievedAt": "2026-10-29T22:54:04.717Z"
+        }
+      ]
+    }
+  ]
+}

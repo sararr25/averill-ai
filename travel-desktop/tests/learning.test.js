@@ -177,3 +177,40 @@ test('current lesson uses stricter company constraints as well as the general ba
  assert.equal(stricter.steps.find(s=>s.id==='margin').done,false);
  assert.equal(stricter.steps.find(s=>s.id==='margin').seenBefore,true);
 });
+
+
+test('pending checks clear on regression and manual completion preserves attribution',t=>{
+ const {data,quiz}=weekly(t);
+ const lesson=learning.start(data,null,now),project=learning.startProject(data,'composition',null,now);
+ const good={design,elements:[text(96,120,800,700,120),text(40,120,1000,600,50)]};
+ learning.tickPractice(data,good,now);learning.checkDesign(data,good,now);
+ assert.ok(project.project.checks.align);assert.ok(Object.keys(quiz.taskChecks).length);
+ learning.tickPractice(data,{design,elements:[]},now);
+ assert.deepEqual(project.project.checks,{});assert.deepEqual(quiz.taskChecks,{});
+ assert.throws(()=>learning.finishProject(data,project.id,{},now),/has not seen/);
+ learning.tickPractice(data,good,now);
+ learning.finishProject(data,project.id,{selfConfirmAll:true},now);
+ learning.finish(data,lesson.id,{selfConfirmAll:true},now);
+ assert.ok(project.confirmed.every(c=>c.kind==='employee-confirmed'));
+ assert.ok(lesson.confirmed.every(c=>c.kind==='employee-confirmed'));
+ const history=JSON.stringify(project.confirmed);
+ learning.tickPractice(data,{design,elements:[]},now);
+ assert.equal(JSON.stringify(project.confirmed),history);
+});
+
+test('revoking a design reading blocks pending completion, preserves seen history and allows a fresh retry',t=>{
+ const {data,quiz}=weekly(t),lesson=learning.start(data,null,now),project=learning.startProject(data,'composition',null,now);
+ const good={design,elements:[text(96,120,800,700,120),text(40,120,1000,600,50)]};
+ learning.checkDesign(data,good,now);learning.tickPractice(data,good,now);
+ const seen=JSON.stringify(lesson.checks);
+ assert.equal(learning.invalidateDesign(data),true);
+ assert.equal(lesson.live,undefined);assert.equal(JSON.stringify(lesson.checks),seen);
+ assert.deepEqual(project.project.checks,{});assert.deepEqual(quiz.taskChecks,{});
+ assert.throws(()=>learning.finish(data,lesson.id,{},now),/has not seen/);
+ assert.throws(()=>learning.finishProject(data,project.id,{},now),/has not seen/);
+ assert.equal(learning.invalidateDesign(data),false,'repeated Stop is harmless');
+ learning.checkDesign(data,good,now);learning.tickPractice(data,good,now);
+ learning.finish(data,lesson.id,{},now);learning.finishProject(data,project.id,{},now);
+ const history=JSON.stringify([lesson,project]);learning.invalidateDesign(data);
+ assert.equal(JSON.stringify([lesson,project]),history,'completed records remain intact');
+});

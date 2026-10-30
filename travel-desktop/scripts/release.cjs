@@ -20,7 +20,7 @@ function verify() {
   const resource = path.join(bundle, 'Contents', 'Resources', 'app');
   // Electron Packager prunes the development lockfile and rewrites package.json.
   const tracked = execFileSync('git', ['ls-files', '-z', '.'], { cwd: root }).toString().split('\0').filter(relative => relative && !['package.json', 'package-lock.json'].includes(relative));
-  for (const directory of ['src', 'browser-extension', 'scripts']) for (const [relative] of inventory(path.join(root, directory))) { const name = path.join(directory, relative); if (directory === 'scripts' && !relative.endsWith('.cjs')) continue; if (!tracked.includes(name)) tracked.push(name); }
+  for (const directory of ['src', 'browser-extension', 'scripts', 'demo-company']) for (const [relative] of inventory(path.join(root, directory))) { const name = path.join(directory, relative); if (path.basename(relative) === '.DS_Store') continue; if (directory === 'scripts' && !relative.endsWith('.cjs')) continue; if (!tracked.includes(name)) tracked.push(name); }
   const originalPackage = JSON.parse(fs.readFileSync(path.join(root, 'package.json')));
   const packaged = JSON.parse(fs.readFileSync(path.join(resource, 'package.json')));
   for (const field of ['name', 'version', 'main', 'dependencies']) {

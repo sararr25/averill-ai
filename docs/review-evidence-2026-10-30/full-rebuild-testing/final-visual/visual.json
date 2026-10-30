@@ -1,0 +1,478 @@
+{
+  "captures": 36,
+  "externalCalls": 0,
+  "results": [
+    {
+      "theme": "light",
+      "width": 440,
+      "tab": "todo",
+      "file": "light-440-todo.png",
+      "metrics": {
+        "width": 440,
+        "scroll": 440,
+        "area": "todo",
+        "unnamed": 0,
+        "overlay": false
+      }
+    },
+    {
+      "theme": "light",
+      "width": 440,
+      "tab": "review",
+      "file": "light-440-review.png",
+      "metrics": {
+        "width": 440,
+        "scroll": 440,
+        "area": "review",
+        "unnamed": 0,
+        "overlay": false
+      }
+    },
+    {
+      "theme": "light",
+      "width": 440,
+      "tab": "knowledge",
+      "file": "light-440-knowledge.png",
+      "metrics": {
+        "width": 440,
+        "scroll": 440,
+        "area": "knowledge",
+        "unnamed": 0,
+        "overlay": false
+      }
+    },
+    {
+      "theme": "light",
+      "width": 440,
+      "tab": "learn",
+      "file": "light-440-learn.png",
+      "metrics": {
+        "width": 440,
+        "scroll": 440,
+        "area": "learn",
+        "unnamed": 0,
+        "overlay": false
+      }
+    },
+    {
+      "theme": "light",
+      "width": 440,
+      "tab": "research",
+      "file": "light-440-research.png",
+      "metrics": {
+        "width": 440,
+        "scroll": 440,
+        "area": "research",
+        "unnamed": 0,
+        "overlay": false
+      }
+    },
+    {
+      "theme": "light",
+      "width": 440,
+      "tab": "setup",
+      "file": "light-440-setup.png",
+      "metrics": {
+        "width": 440,
+        "scroll": 440,
+        "area": "setup",
+        "unnamed": 0,
+        "overlay": false
+      }
+    },
+    {
+      "theme": "light",
+      "width": 768,
+      "tab": "todo",
+      "file": "light-768-todo.png",
+      "metrics": {
+        "width": 768,
+        "scroll": 768,
+        "area": "todo",
+        "unnamed": 0,
+        "overlay": false
+      }
+    },
+    {
+      "theme": "light",
+      "width": 768,
+      "tab": "review",
+      "file": "light-768-review.png",
+      "metrics": {
+        "width": 768,
+        "scroll": 768,
+        "area": "review",
+        "unnamed": 0,
+        "overlay": false
+      }
+    },
+    {
+      "theme": "light",
+      "width": 768,
+      "tab": "knowledge",
+      "file": "light-768-knowledge.png",
+      "metrics": {
+        "width": 768,
+        "scroll": 768,
+        "area": "knowledge",
+        "unnamed": 0,
+        "overlay": false
+      }
+    },
+    {
+      "theme": "light",
+      "width": 768,
+      "tab": "learn",
+      "file": "light-768-learn.png",
+      "metrics": {
+        "width": 768,
+        "scroll": 768,
+        "area": "learn",
+        "unnamed": 0,
+        "overlay": false
+      }
+    },
+    {
+      "theme": "light",
+      "width": 768,
+      "tab": "research",
+      "file": "light-768-research.png",
+      "metrics": {
+        "width": 768,
+        "scroll": 768,
+        "area": "research",
+        "unnamed": 0,
+        "overlay": false
+      }
+    },
+    {
+      "theme": "light",
+      "width": 768,
+      "tab": "setup",
+      "file": "light-768-setup.png",
+      "metrics": {
+        "width": 768,
+        "scroll": 768,
+        "area": "setup",
+        "unnamed": 0,
+        "overlay": false
+      }
+    },
+    {
+      "theme": "light",
+      "width": 1440,
+      "tab": "todo",
+      "file": "light-1440-todo.png",
+      "metrics": {
+        "width": 1440,
+        "scroll": 1440,
+        "area": "todo",
+        "unnamed": 0,
+        "overlay": false
+      }
+    },
+    {
+      "theme": "light",
+      "width": 1440,
+      "tab": "review",
+      "file": "light-1440-review.png",
+      "metrics": {
+        "width": 1440,
+        "scroll": 1440,
+        "area": "review",
+        "unnamed": 0,
+        "overlay": false
+      }
+    },
+    {
+      "theme": "light",
+      "width": 1440,
+      "tab": "knowledge",
+      "file": "light-1440-knowledge.png",
+      "metrics": {
+        "width": 1440,
+        "scroll": 1440,
+        "area": "knowledge",
+        "unnamed": 0,
+        "overlay": false
+      }
+    },
+    {
+      "theme": "light",
+      "width": 1440,
+      "tab": "learn",
+      "file": "light-1440-learn.png",
+      "metrics": {
+        "width": 1440,
+        "scroll": 1440,
+        "area": "learn",
+        "unnamed": 0,
+        "overlay": false
+      }
+    },
+    {
+      "theme": "light",
+      "width": 1440,
+      "tab": "research",
+      "file": "light-1440-research.png",
+      "metrics": {
+        "width": 1440,
+        "scroll": 1440,
+        "area": "research",
+        "unnamed": 0,
+        "overlay": false
+      }
+    },
+    {
+      "theme": "light",
+      "width": 1440,
+      "tab": "setup",
+      "file": "light-1440-setup.png",
+      "metrics": {
+        "width": 1440,
+        "scroll": 1440,
+        "area": "setup",
+        "unnamed": 0,
+        "overlay": false
+      }
+    },
+    {
+      "theme": "dark",
+      "width": 440,
+      "tab": "todo",
+      "file": "dark-440-todo.png",
+      "metrics": {
+        "width": 440,
+        "scroll": 440,
+        "area": "todo",
+        "unnamed": 0,
+        "overlay": false
+      }
+    },
+    {
+      "theme": "dark",
+      "width": 440,
+      "tab": "review",
+      "file": "dark-440-review.png",
+      "metrics": {
+        "width": 440,
+        "scroll": 440,
+        "area": "review",
+        "unnamed": 0,
+        "overlay": false
+      }
+    },
+    {
+      "theme": "dark",
+      "width": 440,
+      "tab": "knowledge",
+      "file": "dark-440-knowledge.png",
+      "metrics": {
+        "width": 440,
+        "scroll": 440,
+        "area": "knowledge",
+        "unnamed": 0,
+        "overlay": false
+      }
+    },
+    {
+      "theme": "dark",
+      "width": 440,
+      "tab": "learn",
+      "file": "dark-440-learn.png",
+      "metrics": {
+        "width": 440,
+        "scroll": 440,
+        "area": "learn",
+        "unnamed": 0,
+        "overlay": false
+      }
+    },
+    {
+      "theme": "dark",
+      "width": 440,
+      "tab": "research",
+      "file": "dark-440-research.png",
+      "metrics": {
+        "width": 440,
+        "scroll": 440,
+        "area": "research",
+        "unnamed": 0,
+        "overlay": false
+      }
+    },
+    {
+      "theme": "dark",
+      "width": 440,
+      "tab": "setup",
+      "file": "dark-440-setup.png",
+      "metrics": {
+        "width": 440,
+        "scroll": 440,
+        "area": "setup",
+        "unnamed": 0,
+        "overlay": false
+      }
+    },
+    {
+      "theme": "dark",
+      "width": 768,
+      "tab": "todo",
+      "file": "dark-768-todo.png",
+      "metrics": {
+        "width": 768,
+        "scroll": 768,
+        "area": "todo",
+        "unnamed": 0,
+        "overlay": false
+      }
+    },
+    {
+      "theme": "dark",
+      "width": 768,
+      "tab": "review",
+      "file": "dark-768-review.png",
+      "metrics": {
+        "width": 768,
+        "scroll": 768,
+        "area": "review",
+        "unnamed": 0,
+        "overlay": false
+      }
+    },
+    {
+      "theme": "dark",
+      "width": 768,
+      "tab": "knowledge",
+      "file": "dark-768-knowledge.png",
+      "metrics": {
+        "width": 768,
+        "scroll": 768,
+        "area": "knowledge",
+        "unnamed": 0,
+        "overlay": false
+      }
+    },
+    {
+      "theme": "dark",
+      "width": 768,
+      "tab": "learn",
+      "file": "dark-768-learn.png",
+      "metrics": {
+        "width": 768,
+        "scroll": 768,
+        "area": "learn",
+        "unnamed": 0,
+        "overlay": false
+      }
+    },
+    {
+      "theme": "dark",
+      "width": 768,
+      "tab": "research",
+      "file": "dark-768-research.png",
+      "metrics": {
+        "width": 768,
+        "scroll": 768,
+        "area": "research",
+        "unnamed": 0,
+        "overlay": false
+      }
+    },
+    {
+      "theme": "dark",
+      "width": 768,
+      "tab": "setup",
+      "file": "dark-768-setup.png",
+      "metrics": {
+        "width": 768,
+        "scroll": 768,
+        "area": "setup",
+        "unnamed": 0,
+        "overlay": false
+      }
+    },
+    {
+      "theme": "dark",
+      "width": 1440,
+      "tab": "todo",
+      "file": "dark-1440-todo.png",
+      "metrics": {
+        "width": 1440,
+        "scroll": 1440,
+        "area": "todo",
+        "unnamed": 0,
+        "overlay": false
+      }
+    },
+    {
+      "theme": "dark",
+      "width": 1440,
+      "tab": "review",
+      "file": "dark-1440-review.png",
+      "metrics": {
+        "width": 1440,
+        "scroll": 1440,
+        "area": "review",
+        "unnamed": 0,
+        "overlay": false
+      }
+    },
+    {
+      "theme": "dark",
+      "width": 1440,
+      "tab": "knowledge",
+      "file": "dark-1440-knowledge.png",
+      "metrics": {
+        "width": 1440,
+        "scroll": 1440,
+        "area": "knowledge",
+        "unnamed": 0,
+        "overlay": false
+      }
+    },
+    {
+      "theme": "dark",
+      "width": 1440,
+      "tab": "learn",
+      "file": "dark-1440-learn.png",
+      "metrics": {
+        "width": 1440,
+        "scroll": 1440,
+        "area": "learn",
+        "unnamed": 0,
+        "overlay": false
+      }
+    },
+    {
+      "theme": "dark",
+      "width": 1440,
+      "tab": "research",
+      "file": "dark-1440-research.png",
+      "metrics": {
+        "width": 1440,
+        "scroll": 1440,
+        "area": "research",
+        "unnamed": 0,
+        "overlay": false
+      }
+    },
+    {
+      "theme": "dark",
+      "width": 1440,
+      "tab": "setup",
+      "file": "dark-1440-setup.png",
+      "metrics": {
+        "width": 1440,
+        "scroll": 1440,
+        "area": "setup",
+        "unnamed": 0,
+        "overlay": false
+      }
+    }
+  ],
+  "limits": [
+    "Synthetic seeded employee; not independent usability or VoiceOver",
+    "Layout/labels and manual visual inspection, not an independent pixel-baseline regression score"
+  ]
+}

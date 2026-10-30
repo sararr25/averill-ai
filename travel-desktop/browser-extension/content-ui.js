@@ -1,0 +1,520 @@
+(() => {
+ if(window.__averillStop)window.__averillStop();
+ // Reloading an unpacked extension replaces its isolated world but can leave its old DOM behind.
+ for(const stale of document.querySelectorAll('[data-averill-companion],[data-averill-design],[data-averill-guide]'))stale.remove();
+ let selected=null,selectedSig=null,refinding=null,timer=null,heartbeat=null,alive=true,composing=false,sequence=0,generation=0,result=null,claimSet=null,imageSet=null,reviewValue='',expanded=false,uiState='ready',error='',undo=null,mutationPending=false;
+ const FS=globalThis.AverillFieldSelect;if(!FS)throw new Error('Averill field-select.js was not loaded.');
+ const identities=new WeakMap(),abort=new AbortController();
+ const host=document.createElement('div');host.setAttribute('data-averill-companion','');host.tabIndex=0;host.setAttribute('aria-label','Averill review controls');
+ host.style.cssText='position:fixed;z-index:2147483646;display:none;pointer-events:auto;margin:0;padding:0;border:0;background:transparent;inset:auto;width:360px;max-width:calc(100vw - 24px);';
+ const root=host.attachShadow({mode:'closed'});document.documentElement.append(host);
+ const asset=file=>chrome.runtime.getURL?chrome.runtime.getURL(file):'';
+ const style=document.createElement('style');style.textContent=`
+ @font-face{font-family:AverillJakarta;src:url('${asset('assets/plus-jakarta-sans.ttf')}');font-weight:200 800;font-display:swap}
+ :host{all:initial;color-scheme:light dark;--tx:#1d1a24;--mu:#4a4556;--sf:#fff;--rs:#f0eef4;--ln:#dedae5;--ed:#b4aec1;--ct:#7d7789;--ac:var(--at);--oa:var(--oa);--at:#3f4e0b;--fc:#3f4e0b;--wn:#7a3c0c;--ws:#fdf0e3;--os:#eef6d6;--er:#a01c2c;--sh:#1d1a2429;--sh2:#1d1a2414}@media(prefers-color-scheme:dark){:host{--tx:#f3f1f8;--mu:#b8b2c6;--sf:#2b2835;--rs:#35313f;--ln:#484351;--ed:#57505f;--ct:#8e879b;--at:#d6ef91;--fc:#d6ef91;--wn:#ffc794;--ws:#44362e;--os:#363e2d;--er:#ffb8bf;--sh:#100f192b;--sh2:#100f1920}}*{box-sizing:border-box}.card{font:14px/1.6 AverillJakarta,system-ui,sans-serif;color:var(--tx);background:var(--sf);border:1px solid var(--ed);border-radius:22px;box-shadow:0 16px 50px var(--sh);max-height:calc(100vh - 24px);display:flex;flex-direction:column;overflow:hidden;text-align:left}.head{display:flex;align-items:center;gap:8px;padding:14px 12px 10px 20px;flex:none;position:relative;z-index:1;background:var(--sf);border-bottom:1px solid var(--ln)}.head img{width:24px;height:24px}.brand{font-size:20px;letter-spacing:-.045em;font-weight:600}.pill{margin-left:auto;display:inline-flex;align-items:center;gap:6px;font:600 11px/16px AverillJakarta,system-ui,sans-serif;color:var(--at);background:var(--os);border-radius:999px;padding:3px 10px;white-space:nowrap}.pill::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor}.pill.off{color:var(--wn);background:var(--ws)}.hint{font-size:13px}.main{padding:16px 20px 18px;overflow:auto;min-height:0}.footer{padding:0 20px 14px;flex:none}h2{font-size:24px;line-height:1.3;letter-spacing:-.035em;font-weight:600;margin:0 0 12px}p{font-size:14px;color:var(--mu);margin:0 0 14px;line-height:1.6}.tag{font-size:11px;color:var(--mu);margin-bottom:9px}.observed{background:var(--ws);color:var(--wn);border-radius:9px;padding:12px;font-size:13px;white-space:pre-wrap;overflow-wrap:anywhere;margin:12px 0}.primary{display:block;background:var(--ac);color:var(--oa);border:0;border-radius:12px;padding:0 16px;font:600 13px/20px AverillJakarta,system-ui,sans-serif;min-height:36px;width:100%;text-align:center}.more .primary{display:inline-block;width:auto}.secondary{background:transparent;border:1px solid var(--ct);color:var(--tx);border-radius:12px;padding:0 12px;min-height:32px;font:600 13px/20px AverillJakarta,system-ui,sans-serif}.primary+.text,.primary+.secondary{margin-top:8px}.text{border:0;background:transparent;color:var(--mu);padding:0;text-decoration:underline;text-underline-offset:3px;min-height:24px;font:600 13px/20px AverillJakarta,system-ui,sans-serif}.text+.text{display:table;margin-top:8px}.close{border:0;background:transparent;color:var(--mu);font-size:20px;line-height:1;min-width:32px;min-height:32px;border-radius:12px}.row{display:flex;gap:15px;justify-content:space-between;align-items:center}.source{background:var(--rs);border-radius:12px;padding:12px;font-size:13px;color:var(--tx);margin-bottom:4px}.source summary{cursor:pointer}.source small{display:block;font-size:12px;color:var(--mu)}.quote{margin-top:12px;border-top:1px solid var(--ln);padding-top:12px;white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px;max-height:130px;overflow:auto}.diff{border:1px solid var(--ln);border-radius:12px;overflow:hidden;margin:12px 0}.diff div{padding:12px;white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px}.before{background:var(--ws);color:var(--wn)}.after{background:var(--os);color:var(--at)}.diff small{display:block;font-size:11px;margin-bottom:5px}.notice{color:var(--at)}.error{color:var(--er)}.more{border-top:1px solid var(--ln);margin-top:14px;padding-top:14px}button,select{font:inherit;cursor:pointer}button:disabled{opacity:.6;cursor:default}button:focus-visible,summary:focus-visible,select:focus-visible{outline:3px solid var(--fc);outline-offset:3px}select{width:100%;padding:10px;background:var(--rs);color:var(--tx);border:1px solid var(--ct);border-radius:10px;margin-bottom:12px}.ask{border-top:1px solid var(--ln);padding:14px 20px;flex:none}.ask label{display:block;font-size:12px;font-weight:600;color:var(--mu);margin-bottom:6px}.ask textarea{display:block;width:100%;min-height:56px;resize:none;background:var(--rs);color:var(--tx);border:1px solid var(--ct);border-radius:12px;padding:8px 12px;font:13px/1.5 AverillJakarta,system-ui,sans-serif}.ask textarea:focus-visible{outline:3px solid var(--fc);outline-offset:2px}.askrow{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:8px}.askrow small{font-size:12px;color:var(--mu);line-height:1.4}.out{margin-top:16px;overflow-wrap:anywhere}.main>.ask{padding:16px 0 0}.dtabs{display:flex;gap:8px;padding:12px 20px;border-bottom:1px solid var(--ln)}.dtabs button{flex:1}.dtabs button[aria-pressed=true]{background:var(--rs);border-color:var(--at);color:var(--at)}.ask-examples{display:grid;gap:8px;margin-top:16px}.ask-examples button{text-align:left;height:auto;padding:8px 12px}.out p{font-size:13px;margin:0 0 8px}.cite{background:var(--rs);border-radius:12px;padding:12px;font-size:13px;margin-bottom:8px}.cite b{display:block;font-weight:600}.cite small{display:block;font-size:12px;color:var(--mu)}.cite .quote{margin-top:8px;padding-top:8px;max-height:96px}.check{border-top:1px solid var(--ln);margin-top:14px;padding-top:14px}.check h3,.results h3{font-size:14px;line-height:1.4;font-weight:600;margin:0 0 6px;color:var(--tx)}.check .hint,.results .hint{font-size:13px;color:var(--mu);margin:0 0 10px;line-height:1.5}.claim{display:flex;gap:8px;align-items:flex-start;margin-bottom:8px}.claim input{flex:none;width:24px;height:24px;margin:4px 0 0;accent-color:var(--at);cursor:pointer}.claim textarea{flex:1;min-width:0;display:block;min-height:52px;resize:none;background:var(--rs);color:var(--tx);border:1px solid var(--ct);border-radius:12px;padding:6px 10px;font:13px/1.5 AverillJakarta,system-ui,sans-serif}.claim.off textarea{opacity:.6}.claim input:focus-visible{outline:2px solid var(--fc);outline-offset:2px}.claim textarea:focus-visible{outline:3px solid var(--fc);outline-offset:2px}.checkrow{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:4px}.checkrow small{font-size:12px;color:var(--mu);line-height:1.4}.checknote{font-size:12px;color:var(--mu);margin:8px 0 0;line-height:1.5}.results{margin-top:14px}.verdict{border-left:3px solid var(--ct);background:var(--rs);border-radius:0 12px 12px 0;padding:10px 12px;margin-bottom:8px;font-size:13px}.verdict.supported{border-color:var(--at)}.verdict.contradicted{border-color:var(--er)}.verdict b{display:block;font-weight:600}.verdict.supported b{color:var(--at)}.verdict.contradicted b{color:var(--er)}.verdict p{font-size:13px;margin:4px 0 0;overflow-wrap:anywhere}.src{margin-top:8px;border-top:1px solid var(--ln);padding-top:8px}.src a{display:inline-block;min-height:24px;color:var(--tx);font-weight:600;text-decoration:underline;text-underline-offset:3px;overflow-wrap:anywhere}.src a:focus-visible{outline:3px solid var(--fc);outline-offset:2px}.src small{display:block;font-size:12px;color:var(--mu);overflow-wrap:anywhere}.src .snip{font-size:12px;margin-top:4px;overflow-wrap:anywhere}.chip{border:1px solid var(--ed);background:var(--sf);color:var(--tx);border-radius:12px;min-height:36px;padding:0 16px;font:600 13px AverillJakarta,system-ui,sans-serif;box-shadow:0 4px 18px var(--sh2)}h3{scroll-margin-top:16px}.images{border-top:1px solid var(--ln);margin-top:14px;padding-top:14px}.images h3{font-size:14px;line-height:1.4;font-weight:600;margin:0 0 6px;color:var(--tx)}.images .hint{font-size:13px;color:var(--mu);margin:0 0 10px;line-height:1.5}.images .source summary{min-height:24px}.images>.imgitem{margin-top:14px}.imgitem{margin-bottom:10px;font-size:13px;overflow-wrap:anywhere}.imgitem p{font-size:13px;color:var(--tx);margin:0 0 6px}.imgitem p.checknote{color:var(--mu);font-size:12px}.imgfacts{margin:8px 0 0;padding:0;list-style:none}.imgfacts li{font-size:12px;color:var(--mu);line-height:1.5;margin:0 0 2px;overflow-wrap:anywhere}button{transition:background-color 140ms cubic-bezier(.16,1,.3,1)}button:hover{filter:brightness(1.06)}@media(prefers-reduced-motion:reduce){button{transition:none}}
+ `;root.append(style);const box=document.createElement('div');root.append(box);
+ const status=node('div');status.setAttribute('role','status');status.setAttribute('aria-live','polite');status.setAttribute('aria-atomic','true');status.style.cssText='position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);';root.append(status);
+ // FB-07: one question box per card (field card, Canva design card). Plain text only. The design card's box never sends a field.
+ function askUi(id,label,placeholder,design){const ui={id,label,design,busy:false,input:node('textarea'),out:node('div',undefined,'out')};ui.input.id=id;ui.input.rows=2;ui.input.maxLength=500;ui.input.setAttribute('aria-label',label);ui.input.placeholder=placeholder;ui.out.hidden=true;
+  ui.button=button('Ask',()=>submitAsk(ui),'secondary');ui.button.setAttribute('aria-label','Ask the question');
+  ui.input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();submitAsk(ui)}});return ui}
+ const mainAsk=askUi('averill-ask','Ask about this draft or company rules','For example: Can we say this?',false),askInput=mainAsk.input;
+ for(const type of ['keydown','keyup','keypress'])host.addEventListener(type,e=>{const t=e.composedPath()[0];if(t===askInput||t?.classList?.contains('claimtext'))e.stopPropagation()});
+ function askSection(ui=mainAsk){const wrap=node('div',undefined,'ask'),label=node('label',ui.label);label.htmlFor=ui.id;const row=node('div',undefined,'askrow');row.append(node('small','Enter to ask. Shift+Enter for a new line.'),ui.button);wrap.append(label,ui.input,row,ui.out);return wrap}
+ function showAsk(value,problem,ui=mainAsk){const askOut=ui.out;
+  ui.view?.stop();askOut.replaceChildren();askOut.hidden=!value&&!problem;
+  if(problem){askOut.append(node('p',String(problem).slice(0,300),'error'));return}
+  if(!value)return;
+  ui.out.closest('.main')?.querySelector('.ask-examples')?.remove();
+  if(value.state==='refused'){askOut.append(node('p',String(value.message||'This question was not accepted.').slice(0,300),'error'));return}
+  const localToolHelp=value.mode==='local'&&['tool-help','mixed'].includes(value.assistant?.intent)&&typeof value.text==='string'&&value.text.trim();
+  if(value.state!=='answered'||!Array.isArray(value.citations)||(!value.citations.length&&!localToolHelp&&value.assistant?.intent!=='clarify')){askOut.append(node('p',String(value.message||'No approved source answers this.').slice(0,400)),node('p','Try other words, or ask an administrator to approve the guidance.','hint'));return}
+  if(!value.assistant?.guide)askOut.append(node('div',value.mode==='model'?'Nemotron guidance':localToolHelp?'Local tool guidance':'Checked locally','tag'));
+  if(globalThis.AverillAssistantView)ui.view=AverillAssistantView.render(askOut,value,{asset,onQuestion:question=>{ui.input.value=question;submitAsk(ui)},onLocate:ui.design?globalThis.AverillCanvaGuide?.locate:undefined});else askOut.append(node('p',String(value.text||'').slice(0,4000)));
+  if(value.assistant?.officialGuide&&!value.citations.some(c=>c.kind==='public-help')){const link=node('a','Open official tool help');link.href=value.assistant.officialGuide;link.target='_blank';link.rel='noopener noreferrer';askOut.append(link)}
+  if(value.assistant?.practiceId)askOut.append(button('I tried this · save to my practice',async()=>{const result=await send({kind:'save-practice',practiceId:value.assistant.practiceId});if(result.error)showAsk(null,result.error,ui);else{askOut.replaceChildren(node('p','Saved as your confirmed practice. Open Learn in Averill for relevant questions.','hint'))}},'secondary'));
+  for(const c of value.citations.slice(0,3)){const publicHelp=c.kind==='public-help',box=node('details',undefined,'cite');box.append(node('summary',String(c.title||'').slice(0,160)),node('small',publicHelp?`Official tool help · ${String(c.retrievedAt||'').slice(0,10)}`:`Approved · Version ${String(c.version||'').slice(0,20)}`),node('div',String(c.quote||'').slice(0,600),'quote'));if(publicHelp&&c.url)box.append(sourceLine(c,false));askOut.append(box)}
+ }
+ function requestAskConsent(value,ui){
+  return new Promise(resolve=>{
+   ui.consentFinish=answer=>{ui.consentFinish=null;resolve(answer)};
+   const panel=node('section',undefined,'ask-consent');panel.append(node('h3','Get up-to-date help?'),node('p',`Service: ${value.service||'Nebius / Tavily'}. Only the listed inputs will be sent. Open an item to inspect it. Choose Keep it local to continue offline.`));
+   for(const item of value.items||[]){const detail=node('details',undefined,'cite');detail.append(node('summary',item.label),node('p',String(item.text),'quote'));panel.append(detail)}
+   const explanation=node('details',undefined,'cite');explanation.append(node('summary','How this request works'),node('p',value.note||'Review the listed inputs before continuing.'));panel.append(explanation);
+   panel.append(button('Get Nemotron help',()=>ui.consentFinish?.(true),'primary'),button('Keep it local',()=>ui.consentFinish?.(false),'secondary'));ui.out.replaceChildren(panel);panel.querySelector('button').focus({preventScroll:true});
+   const main=ui.out.closest('.main');if(main)main.scrollTop=ui.out.offsetTop-main.offsetTop;
+  });
+ }
+ async function submitAsk(ui=mainAsk){const askInput=ui.input,askOut=ui.out,askButton=ui.button,live=ui.design&&design?design.status:status;
+  if(ui.busy||!alive)return;const question=askInput.value.trim();
+  if(!question){showAsk(null,'Type a question first.',ui);return}
+  ui.view?.stop();ui.busy=true;askInput.readOnly=true;askButton.disabled=true;askOut.hidden=false;askOut.replaceChildren(node('p','Preparing help for this task.','hint'));live.textContent='Preparing help for this task.';
+  // Syncing the selected field first lets the answer use its current text; a stale revision is simply ignored by Averill.
+  const field=selected&&!ui.design?await commit('selection'):null;
+  let value=alive?await send({kind:'ask',question,task,...(field?{fieldId:field.id,revision:field.revision}:{})}):{};
+  if(value.consentRequired&&alive){const consent=await requestAskConsent(value,ui);if(!alive)return;value=await send({kind:'ask',question,task,consent,...(field?{fieldId:field.id,revision:field.revision}:{})})}
+  ui.busy=false;askInput.readOnly=false;askButton.disabled=false;if(!alive)return;
+  if(value.error)showAsk(null,value.error,ui);else showAsk(value,null,ui);const answerMain=askOut.closest('.main');if(answerMain)answerMain.scrollTop=askOut.offsetTop-answerMain.offsetTop;
+  // FB-10: after an answer the card may offer the draft's public statements for an online double-check. Nothing is sent from here.
+  if(!value.error&&field&&selected&&describe(selected)?.revision===field.revision){const next=offerClaims(field,value.publicCheck,claimSet);if(next&&next!==claimSet){claimSet=next;render()}}
+  live.textContent=value.error||(value.state==='answered'?(value.mode==='local'&&['tool-help','mixed'].includes(value.assistant?.intent)?'Local tool guidance.':`Answer from ${value.citations?.[0]?.title||'an approved source'}.`):value.message||'No approved source answers this.');
+  if(selected)position();
+ }
+ const site=location.hostname.replace(/^(www|app|my)\./,'');
+ const detected=/(^|\.)linkedin\.com$/.test(site)?'linkedin':/(^|\.)brevo\.com$/.test(site)?'email':/(^|\.)instagram\.com$/.test(site)?'instagram':/(^|\.)canva\.com$/.test(site)?'canva':null;
+ let task=detected;
+ function node(tag,text,cls){const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n;}
+ function button(label,action,cls='text'){const b=node('button',label,cls);b.type='button';b.addEventListener('click',action);return b;}
+ function describe(element){
+  if(!element||!element.isConnected||element.getClientRects().length===0)return null;
+  const kind=element.matches('select')?'select':FS.isEditableText(element)&&!element.matches('input,textarea')?'contenteditable':element.tagName==='TEXTAREA'?'textarea':element.type;
+  if(!['text','textarea','contenteditable','select','date','time','checkbox'].includes(kind))return null;
+  const label=FS.labelOf(element);
+  if(FS.isSensitive([label,element.name,element.id,element.autocomplete]))return null;
+  const value=kind==='contenteditable'?element.innerText:kind==='checkbox'?String(element.checked):element.value;
+  if(String(value||'').length>6000)return null;
+  let identity=identities.get(element);if(!identity){identity={id:`field_${Date.now().toString(36)}_${++sequence}`,revision:0,value:String(value||'')};identities.set(element,identity)}
+  if(identity.value!==String(value||'')){identity.revision++;identity.value=String(value||'')}
+  return {id:identity.id,revision:identity.revision,kind,label:label.slice(0,100),value:String(value||'')};
+ }
+ function teardown(){if(!alive)return false;mainAsk.consentFinish?.(false);design?.ask.consentFinish?.(false);mainAsk.view?.stop();globalThis.AverillCanvaGuide?.stop();alive=false;designTeardown();clearTimeout(timer);clearTimeout(refinding?.timer);refinding=null;selectedSig=null;observer.disconnect();clearInterval(heartbeat);abort.abort();selected=null;result=null;undo=null;return true}
+ function remove(){teardown();chrome.runtime.onMessage.removeListener?.(onMessage);root.replaceChildren();host.remove()}
+ // Sharing ended: keep a short card that says why and how to reconnect, instead of disappearing.
+ function stop(reason){if(!teardown())return;showEnded(reason)}
+ window.__averillStop=remove;
+ function onMessage(message,sender,reply){if(message.kind==='ping'){reply?.({alive});return}if(message.kind==='ended')stop(message.reason);else if(message.kind==='stop')stop('stopped_by_user')}
+ chrome.runtime.onMessage.addListener(onMessage);
+ // A missing extension context means the extension was reloaded or removed while this page stayed open.
+ async function send(payload){if(!alive)return {};try{const value=await chrome.runtime.sendMessage(payload)||{};if(value.stopped)stop(value.reason||'lost_contact');return value}catch{stop('lost_contact');return {stopped:true}}}
+ function pill(text,off){const p=node('span',text,off?'pill off':'pill');return p}
+ function showEnded(reason){
+  const reasons=globalThis.AverillEndReasons;const message=reasons.message(reasons.isReason(reason)?reason:'lost_contact');
+  if(host.matches?.(':popover-open'))host.hidePopover();host.removeAttribute('popover');
+  if(host.parentElement!==document.documentElement)document.documentElement.append(host);
+  host.style.cssText+='display:block;left:auto;top:auto;right:12px;bottom:12px;width:360px;';
+  const card=node('section',undefined,'card');card.setAttribute('aria-label','Averill sharing ended');
+  const head=node('div',undefined,'head'),mark=node('img');mark.src=asset('assets/mark.svg');mark.alt='';
+  const close=button('×',remove,'close');close.setAttribute('aria-label','Close');
+  head.append(mark,node('span','Averill','brand'),pill('Not connected',true),close);
+  const main=node('div',undefined,'main');main.append(node('h2','Sharing ended.'),node('p',message),node('p',reasons.RECONNECT,'hint'),button('Close',remove,'secondary'));
+  card.append(head,main);box.replaceChildren(card);status.textContent=`Sharing ended. ${message}`;
+ }
+ function invalidate(message=''){generation++;result=null;claimSet=null;imageSet=null;uiState='ready';error=message;expanded=false;render()}
+ async function commit(reason){const request=generation;timer=null;if(!alive||composing||document.visibilityState!=='visible')return;if(reason==='pause'&&selected?.isConnected)selectedSig=sign(selected);const field=describe(selected);const value=await send(field?{kind:'field',field,reason}:{kind:'editing'});if(request===generation&&result&&Object.hasOwn(value,'reviewId')&&value.reviewId!==result.id)invalidate('The draft or approved guidance changed. Check again.');return field}
+ function position(){if(!selected||!selected.isConnected)return;const container=selected.closest('[role=dialog],dialog[open]')||document.documentElement;if(host.parentElement!==container)container.append(host);host.style.right='';host.style.bottom='';const r=selected.getBoundingClientRect(),width=Math.min(expanded?420:360,innerWidth-24);host.style.width=width+'px';const height=host.getBoundingClientRect().height;let left,top;
+  if(r.right+width+24<=innerWidth){left=r.right+12;top=Math.max(12,Math.min(r.top,innerHeight-height-12))}
+  else if(r.left-width-12>=12){left=r.left-width-12;top=Math.max(12,Math.min(r.top,innerHeight-height-12))}
+  else{left=Math.max(12,innerWidth-width-12);top=Math.max(12,innerHeight-height-12)}
+  left=Math.min(left,innerWidth-width-12);host.style.left=left+'px';host.style.top=top+'px';
+  // A transformed modal establishes its own fixed-position containing block.
+  if(container!==document.documentElement&&typeof host.showPopover==='function'){host.setAttribute('popover','manual');if(!host.matches(':popover-open'))host.showPopover();}
+  const actual=host.getBoundingClientRect();host.style.left=(left+left-actual.left)+'px';host.style.top=(top+top-actual.top)+'px';
+ }
+ async function ask(useAI=false,consent=false){if(mutationPending)return;if(!task){render();return}const request=++generation;result=null;claimSet=null;error='';if(useAI&&!consent){uiState='consent';render();return}uiState='checking';render();const field=await commit('selection');if(!field||!alive||request!==generation)return;reviewValue=field.value;
+  const value=await send({kind:'review',task,fieldId:field.id,revision:field.revision,useAI,consent});
+  if(!alive||request!==generation||describe(selected)?.id!==field.id||describe(selected)?.revision!==field.revision)return;
+  if(value.error){uiState='error';error=value.error}else{claimSet=offerClaims(field,value.publicCheck,null);result=value;uiState=value.state||'error'}render();
+ }
+ async function preview(finding){if(!result)return;const request=++generation,value=await send({kind:'proposal',reviewId:result.id,findingId:finding.id});if(!alive||request!==generation)return;if(value.error){invalidate(value.error);return}uiState='preview';render(value.proposal)}
+ async function apply(finding){
+  if(!result||!finding||mutationPending)return;
+  const review=result,field=selected,restoreControlFocus=Boolean(root.activeElement),request=++generation;uiState='applying';render();
+  const authorized=await send({kind:'proposal',reviewId:review.id,findingId:finding.id});
+  if(!alive||request!==generation||field!==selected)return;
+  if(authorized.error){invalidate(authorized.error);return}
+  mutationPending=true;try{const adapter=globalThis.AverillEditorAdapter.create(field,()=>describe(field));const record=await adapter.apply(authorized.proposal,{id:review.fieldId,revision:review.revision,value:reviewValue});mutationPending=false;if(!alive||field!==selected)return;undo={adapter,record};result=null;uiState='applied';error='';await commit('selection');render();if(restoreControlFocus)[...box.querySelectorAll('button')].find(b=>b.textContent==='Undo change')?.focus({preventScroll:true})}catch(e){mutationPending=false;if(!alive||field!==selected)return;result=null;if(e.recovery){undo={record:e.recovery};uiState='undo-conflict'}else uiState='error';error=e.message;render()}
+ }
+ async function undoChange(){if(mutationPending||!undo?.adapter)return;const target=selected,previous=undo;mutationPending=true;uiState='undoing';render();try{await previous.adapter.undo(previous.record);mutationPending=false;if(!alive||target!==selected)return;undo=null;result=null;uiState='restored';error='';commit('selection');render()}catch(e){mutationPending=false;if(!alive||target!==selected)return;error=e.message;uiState='undo-conflict';render()}}
+ // FB-10: double-check public statements online. The employee ticks or edits the exact text; only that text is sent, after the button press.
+ const CLAIM_BLOCKED=['checking','consent','preview','applying','undoing','applied','undo-conflict','recovery','restored'];
+ function offerClaims(field,offer,keep){
+  if(!field||!offer||!Array.isArray(offer.claims)||!offer.claims.length)return null;
+  if(keep&&keep.fieldId===field.id&&keep.revision===field.revision)return keep;
+  return {fieldId:field.id,revision:field.revision,task,items:offer.claims.slice(0,5).map(text=>({text:String(text).slice(0,300),on:true})),nemotron:offer.nemotron===true,quota:offer.quota==='demo'?'demo':null,busy:false,outcome:null,message:'',focusResults:false};
+ }
+ function chosenClaims(set){return set.items.filter(item=>item.on&&item.text.trim()).map(item=>item.text.trim())}
+ async function runCheck(set){
+  if(set.busy||!alive||claimSet!==set)return;const chosen=chosenClaims(set);if(!chosen.length)return;
+  set.busy=true;set.outcome=null;set.message='';render();status.textContent='Searching public sources.';
+  const value=await send({kind:'public-check',task:set.task,fieldId:set.fieldId,revision:set.revision,claims:chosen});
+  if(!alive||claimSet!==set)return;
+  set.busy=false;set.focusResults=true;
+  if(value.error)set.message=String(value.error).slice(0,300);else if(value.state==='checked'&&Array.isArray(value.claims))set.outcome=value;else set.message=String(value.message||'The online check could not finish. Try again.').slice(0,300);
+  render();status.textContent=set.outcome?`Public check finished for ${set.outcome.claims.length} statement${set.outcome.claims.length===1?'':'s'}.`:set.message;
+ }
+ function sourceLine(entry,withSnippet){
+  const box=node('div',undefined,'src');let ok=false;try{ok=new URL(entry.url).protocol==='https:'}catch{}
+  if(ok){const a=node('a',String(entry.title||entry.url).slice(0,160));a.href=entry.url;a.target='_blank';a.rel='noopener noreferrer';box.append(a)}else box.append(node('b',String(entry.title||'Source').slice(0,160)));
+  box.append(node('small',String(entry.url).slice(0,200)));
+  if(withSnippet&&entry.snippet)box.append(node('div',`“${String(entry.snippet).slice(0,240)}”`,'snip'));
+  return box;
+ }
+ function checkResults(out){
+  const wrap=node('div',undefined,'results'),title=node('h3','Public source check');title.tabIndex=-1;wrap.append(title,node('p','Not company approval','hint'));
+  const labels={supported:'Supported',contradicted:'Contradicted',unclear:'Unclear'};
+  for(const c of out.claims.slice(0,5)){
+   const verdict=labels[c.verdict]?c.verdict:'unclear',card=node('div',undefined,`verdict ${verdict}`);card.append(node('b',labels[verdict]),node('p',`“${String(c.claim).slice(0,300)}”`));
+   const details=node('details',undefined,'public-evidence');details.append(node('summary','Why and sources'));if(c.explanation)details.append(node('p',String(c.explanation).slice(0,300)));
+   if(c.evidence)details.append(sourceLine(c.evidence,true));else for(const entry of (c.sources||[]).slice(0,2))details.append(sourceLine(entry,true));card.append(details);
+   wrap.append(card);
+  }
+  const method=node('details');method.append(node('summary','About this check'),node('p',String(out.method||'Tavily search'),'checknote'));wrap.append(method);
+  return wrap;
+ }
+ function checkSection(){
+  const set=claimSet,field=selected?describe(selected):null;
+  if(!set||!field||field.id!==set.fieldId||field.revision!==set.revision||CLAIM_BLOCKED.includes(uiState))return null;
+  const section=node('section',undefined,'check');section.setAttribute('aria-label','Double-check online');
+  section.append(node('h3','Double-check online'),node('p','Tick the public statements to search with Tavily. Nothing is sent until you press the button.','hint'));
+  const go=button('Check with Tavily',()=>runCheck(set),'secondary'),count=node('small');
+  const refresh=()=>{const n=chosenClaims(set).length;count.textContent=`${n} of ${set.items.length} will be sent`;go.disabled=set.busy||!n};
+  set.items.forEach((item,index)=>{
+   const row=node('div',undefined,item.on?'claim':'claim off'),box=node('input');box.type='checkbox';box.checked=item.on;box.setAttribute('aria-label',`Search statement ${index+1}`);
+   const text=node('textarea',undefined,'claimtext');text.value=item.text;text.rows=2;text.maxLength=300;text.setAttribute('aria-label',`Statement ${index+1}. This exact text is sent.`);text.readOnly=set.busy;box.disabled=set.busy;
+   box.addEventListener('change',()=>{item.on=box.checked;row.className=item.on?'claim':'claim off';refresh()});text.addEventListener('input',()=>{item.text=text.value;refresh()});
+   row.append(box,text);section.append(row);
+  });
+  const row=node('div',undefined,'checkrow');row.append(count,go);section.append(row);refresh();
+  if(set.busy)go.textContent='Searching';
+  section.append(node('p',`Only the ticked text above leaves this device. ${set.nemotron?'Averill then asks NVIDIA Nemotron to compare the results with each statement. ':''}${set.quota==='demo'?'Each statement uses one of the demo server’s 10 daily online searches.':''}`.trim(),'checknote'));
+  if(set.message)section.append(node('p',set.message,'error'));
+  if(set.outcome)section.append(checkResults(set.outcome));
+  return section;
+ }
+ // FB-08: "Check images too". Nothing is collected before the employee presses the button; pixels are read in a canvas here and go
+ // only to Averill on this device. A page image the browser will not let us read sends no pixels at all.
+ const IMAGE_MAX=4,IMAGE_SIDES=[1600,1200,900,600],IMAGE_URL_BUDGET=1.4*1024*1024,IMAGE_MIN_RENDERED=64,IMAGE_TASKS=['instagram','linkedin'];
+ const COMPOSER='[role=dialog],dialog,form,[class*="compose" i],[class*="composer" i],[class*="share-box" i]';
+ function imageCandidates(box){
+  const found=[];
+  for(const el of box.querySelectorAll('img')){
+   if(found.length>=IMAGE_MAX)break;const r=el.getBoundingClientRect();
+   if(el.complete&&el.naturalWidth>0&&el.naturalHeight>0&&r.width>=IMAGE_MIN_RENDERED&&r.height>=IMAGE_MIN_RENDERED)found.push({kind:'img',el});
+  }
+  let seen=0;
+  for(const el of box.querySelectorAll('*')){
+   if(found.length>=IMAGE_MAX||++seen>600)break;if(el.tagName==='IMG')continue;
+   const bg=getComputedStyle(el).backgroundImage,match=/^url\((["']?)(.+)\1\)$/.exec(bg||'');
+   if(!match)continue;const r=el.getBoundingClientRect();
+   if(r.width>=IMAGE_MIN_RENDERED&&r.height>=IMAGE_MIN_RENDERED)found.push({kind:'bg',el,url:match[2]});
+  }
+  return found;
+ }
+ // The post editor around the shared field: its dialog, form or composer, never the whole page.
+ function composerOf(field){
+  const modal=field.closest('[role=dialog],dialog');if(modal)return modal;
+  for(let node=field.parentElement,steps=0;node&&node!==document.body&&node!==document.documentElement&&steps<12;node=node.parentElement,steps++){
+   if(node.matches(COMPOSER)&&imageCandidates(node).length)return node;
+  }
+  for(let node=field.parentElement,steps=0;node&&node!==document.body&&node!==document.documentElement&&steps<6;node=node.parentElement,steps++)if(imageCandidates(node).length)return node;
+  return null;
+ }
+ function loadImage(url,cors){return new Promise((resolve,reject)=>{const img=new Image();if(cors)img.crossOrigin='anonymous';img.onload=()=>resolve(img);img.onerror=()=>reject(new Error('load'));img.src=url})}
+ // Downscaled PNG, long side at most 1600 pixels (smaller if the file would be too big). Throws if the canvas is tainted.
+ function pngOf(source,width,height){
+  for(const side of IMAGE_SIDES){
+   const scale=Math.min(1,side/Math.max(width,height)),canvas=document.createElement('canvas');
+   canvas.width=Math.max(1,Math.round(width*scale));canvas.height=Math.max(1,Math.round(height*scale));
+   const ctx=canvas.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.drawImage(source,0,0,canvas.width,canvas.height);
+   const url=canvas.toDataURL('image/png');if(url.length<=IMAGE_URL_BUDGET)return url;
+  }
+  return null;
+ }
+ async function readImage(candidate){
+  if(candidate.kind==='img'){
+   const el=candidate.el,out={width:el.naturalWidth,height:el.naturalHeight,alt:(el.getAttribute('alt')||'').trim().slice(0,300)};
+   try{const url=pngOf(el,out.width,out.height);if(url)out.dataUrl=url}catch{}
+   return out;
+  }
+  const label=(candidate.el.getAttribute('aria-label')||'').trim().slice(0,300);
+  try{
+   const plain=await loadImage(candidate.url,false),out={width:plain.naturalWidth,height:plain.naturalHeight,alt:candidate.el.getAttribute('role')==='img'?label:''};
+   if(!out.width||!out.height)return null;
+   try{const url=pngOf(await loadImage(candidate.url,true),out.width,out.height);if(url)out.dataUrl=url}catch{}
+   return out;
+  }catch{return null}
+ }
+ async function collectImages(field){
+  const box=composerOf(field);if(!box)return [];
+  const images=[];for(const candidate of imageCandidates(box).slice(0,IMAGE_MAX)){const image=await readImage(candidate);if(image)images.push(image)}
+  return images;
+ }
+ async function runImageCheck(set){
+  if(set.busy||!alive||imageSet!==set)return;
+  set.busy=true;set.outcome=null;set.message='';render();status.textContent='Checking the images on this device.';
+  const field=selected?await commit('selection'):null;
+  if(!alive||imageSet!==set)return;
+  if(!field||field.id!==set.fieldId||field.revision!==set.revision){set.busy=false;set.message='The draft changed. Check the images again.';render();return}
+  let images;try{images=await collectImages(selected)}catch{set.busy=false;set.message='The images on this page could not be collected.';render();return}
+  const value=await send({kind:'image-check',task:set.task,fieldId:set.fieldId,revision:set.revision,images});
+  if(!alive||imageSet!==set)return;
+  set.busy=false;set.focusResults=true;
+  if(value.error)set.message=String(value.error).slice(0,300);else if(['findings','no-conflict','insufficient-evidence'].includes(value.state)&&Array.isArray(value.findings))set.outcome=value;else set.message='The image check could not finish. Try again.';
+  render();status.textContent=set.outcome?(set.outcome.findings.length?`${set.outcome.findings.length} image suggestion${set.outcome.findings.length===1?'':'s'}.`:'No image conflicts found.'):set.message;
+ }
+ function imageResults(out){
+  const wrap=node('div',undefined,'imgitem'),title=node('h3',out.findings.length?`${out.findings.length} image suggestion${out.findings.length===1?'':'s'}`:out.state==='insufficient-evidence'?'No approved image guidance yet':'No image conflicts found');title.tabIndex=-1;wrap.append(title);
+  for(const f of out.findings.slice(0,12)){const item=node('div',undefined,'imgitem');item.append(node('p',String(f.suggestion||'').slice(0,400)));if(f.source)item.append(source(f));wrap.append(item)}
+  const facts=node('ul',undefined,'imgfacts');
+  for(const image of (out.images||[]).slice(0,IMAGE_MAX))facts.append(node('li',`Image ${image.index}: ${image.width} by ${image.height} pixels, ${image.altPresent?'alt text present':'no alt text'}, ${String(image.reading||'').slice(0,40)}.`));
+  for(const note of (out.notes||[]).slice(0,8))facts.append(node('li',String(note).slice(0,240)));
+  if(facts.children.length)wrap.append(facts);
+  wrap.append(node('p',`Checked${out.scope?.checked?.length?': '+out.scope.checked.join(', '):''}. Only the images inside this post editor were looked at. Pictures and any text read from them stayed on this device.`,'checknote'));
+  return wrap;
+ }
+ function imageSection(){
+  const field=selected?describe(selected):null;
+  if(!field||!IMAGE_TASKS.includes(task)||CLAIM_BLOCKED.includes(uiState))return null;
+  if(!imageSet||imageSet.fieldId!==field.id||imageSet.revision!==field.revision||imageSet.task!==task)imageSet={fieldId:field.id,revision:field.revision,task,busy:false,outcome:null,message:'',focusResults:false};
+  const set=imageSet,section=node('section',undefined,'images');section.setAttribute('aria-label','Images');
+  section.append(node('h3','Images'),node('p','Check the images attached to this post: size, alt text and any text printed on them. This happens on this device only. Nothing is collected until you press the button.','hint'));
+  const go=button(set.busy?'Checking images':'Check images too',()=>runImageCheck(set),'secondary');go.disabled=set.busy;section.append(go);
+  if(set.message)section.append(node('p',set.message,'error'));
+  if(set.outcome)section.append(imageResults(set.outcome));
+  return section;
+ }
+ function source(finding){const details=node('details',undefined,'source'),summary=node('summary',finding.source.title),general=finding.source.kind==='general-guidance';summary.append(node('small',general?'General design guidance · not company approval':`Approved · Version ${finding.source.version}`));details.append(summary,node('div',finding.source.quote,'quote'));if(general&&finding.source.url){const a=node('a','Read the reference');a.href=finding.source.url;a.target='_blank';a.rel='noopener noreferrer';details.append(a)}return details}
+ function render(proposal){if(!alive||!selected)return;if(design){host.style.display='none';return;}const focused=root.activeElement;const focusLabel=focused?.getAttribute('aria-label')||focused?.textContent;host.style.display='block';box.replaceChildren();
+  if(uiState==='dismissed'){box.append(button('Ask Averill',()=>{uiState='ready';render()},'chip'));position();return}
+  const card=node('section',undefined,'card');card.setAttribute('aria-label','Ask Averill');const head=node('div',undefined,'head'),mark=node('img');mark.src=asset('assets/mark.svg');mark.alt='';const connected=pill('Connected to Averill');connected.title=`Sharing one field on ${site}`;head.append(mark,node('span','Averill','brand'),connected,button('×',()=>{generation++;result=null;uiState='dismissed';render();selected?.focus()},'close'));head.lastChild.setAttribute('aria-label','Dismiss Averill');
+  const main=node('div',undefined,'main');main.setAttribute('aria-label','Review guidance');
+  if(error)main.append(node('p',error,'error'));
+  if(!task){main.append(node('h2','What are you working on?'),node('p','Choose the guidance for this selected field.'));const select=node('select');select.setAttribute('aria-label','Work type');const empty=node('option','Choose work type');empty.value='';select.append(empty);for(const [id,label]of [['email','Marketing email'],['linkedin','Organic LinkedIn post'],['instagram','Instagram caption'],['canva','Canva text'],['operations','Operations'],['people','People guidance']]){const o=node('option',label);o.value=id;select.append(o)}select.onchange=()=>{task=select.value||null;render()};main.append(select)}
+  else if(uiState==='checking')main.append(node('div','Checking · selected text','tag'),node('h2','Checking your draft.'),node('p','Comparing this field with approved company guidance.'));
+  else if(uiState==='undoing')main.append(node('h2','Restoring previous text.'),node('p','Waiting for the selected editor to confirm Undo.'));
+  else if(uiState==='applying')main.append(node('h2','Applying this change.'),node('p','Waiting for the selected editor to confirm the update.'));
+  else if(uiState==='applied'){main.append(node('h2','Change applied.'),node('p','Nothing was sent or published.','notice'),button('Undo change',undoChange,'primary'),button('Recheck selected text',()=>ask(false)))}
+  else if(uiState==='undo-conflict'){main.append(node('h2','Your draft changed.'),node('p','Undo will not overwrite your newer work.'),button('Review current text',()=>ask(false),'primary'),button('Show previous text for manual recovery',()=>{uiState='recovery';render()}))}
+  else if(uiState==='recovery'&&undo){main.append(node('h2','Recover the text yourself.'),node('p','This is the text before the last Averill edit. Copy only what you want to restore.'));const old=node('textarea');old.readOnly=true;old.value=undo.record.before;old.rows=6;old.setAttribute('aria-label','Previous text for manual recovery');old.style.cssText='width:100%;background:var(--rs);color:var(--tx);border:1px solid var(--ct);border-radius:10px;padding:12px;';main.append(old,button('Select previous text',()=>{old.focus();old.select()},'secondary'),button('Review current text',()=>ask(false),'primary'))}
+  else if(uiState==='restored')main.append(node('h2','Previous text restored.'),button('Recheck selected text',()=>ask(false),'primary'));
+  else if(uiState==='consent'){main.append(node('h2','Review with Nemotron?'),node('p','Your selected field and matching passages from eligible approved sources will be sent to Nebius. Company AI policy and file consent still apply.'),button('Confirm this AI review',()=>ask(true,true),'primary'),button('Keep the check local',()=>ask(false)))}
+  else if(uiState==='preview'&&proposal){main.append(node('div','Preview · one change','tag'),node('h2','Review this change.'));const diff=node('div',undefined,'diff');for(const [label,text,cls]of [['Before',proposal.before,'before'],['After',proposal.after||'(Remove this phrase)','after']]){const d=node('div',undefined,cls);d.append(node('small',label),node('span',text));diff.append(d)}main.append(diff);for(const ref of proposal.evidence||[])main.append(node('p',`${ref.title} · version ${ref.version||'?'}: “${ref.quote}”`));if(globalThis.AverillEditorAdapter?.supported(selected)){const finding=result.findings.find(f=>f.proposal?.id===proposal.id);main.append(button('Apply change',()=>apply(finding),'primary'))}else main.append(node('p','Direct editing is not available for this editor yet. Make this change in your tool, then recheck.'),button('Recheck selected text',()=>ask(false),'primary'));main.append(button('Back to suggestion',()=>{uiState='findings';render()}))}
+  else if(result?.state==='findings'){const list=expanded?result.findings:result.findings.slice(0,1);main.append(node('div',`${result.findings.length} suggestion${result.findings.length===1?'':'s'} · ${result.mode==='local'?'Checked locally':'Nemotron review'}`,'tag'));for(const [index,f]of list.entries()){const section=node('div',undefined,index?'more':'');section.append(node('h2',f.type==='forbidden-claim'?`Remove “${f.observedExcerpt}”.`:f.type==='missing-required-text'?'Add the required text.':f.suggestion),...(f.type==='missing-required-text'?[node('p',f.suggestion)]:[]),...(f.observedExcerpt?[node('div',f.observedExcerpt,'observed')]:[]));if(f.proposal)section.append(button('Preview change',()=>preview(f),'primary'));section.append(source(f),button('Open in Averill ↗',async()=>{const request=generation;const value=await send({kind:'open',reviewId:result.id,findingId:f.id});if(request===generation&&value.error)invalidate(value.error)}));main.append(section)}main.append(button(expanded?'Show less':result.findings.length>1?`View all ${result.findings.length} suggestions`:'What was checked',()=>{expanded=!expanded;render()}));if(expanded)main.append(node('p',`${result.scope.field} · ${result.scope.sourceCount} approved source(s). Other fields, layout and publication were not checked.`))}
+  else if(result?.state==='no-conflict')main.append(node('h2','No conflicts found.'),node('p','No conflict was found in the selected text against the approved rules checked. Other fields and visual layout were not reviewed.'),button('Recheck selected text',()=>ask(false),'primary'));
+  else if(result?.state==='insufficient-evidence')main.append(node('h2','No approved source yet.'),node('p','There is not enough approved, visible guidance to check this text. Your draft has not changed.'),button('Try again',()=>ask(false),'primary'));
+  else{main.append(node('h2',uiState==='error'?'The check could not finish.':'Help, right where you work.'),node('p','Check this selected field against approved company guidance.'));if(task)main.append(button(uiState==='error'?'Try again':'Ask Averill',()=>ask(false),'primary'))}
+  if(task){const check=checkSection();if(check)main.append(check);const pictures=imageSection();if(pictures)main.append(pictures)}
+  if(task&&uiState!=='checking'&&uiState!=='consent'&&uiState!=='preview'&&uiState!=='applying'&&uiState!=='undoing'&&uiState!=='applied')main.append(button('Use Nemotron for this review',()=>ask(true)));
+  const footer=node('div',undefined,'footer');footer.append(button('Stop sharing',async()=>{await send({kind:'stop'});stop('stopped_by_user')}));main.append(askSection());card.append(head,main,footer);box.append(card);position();if(focused===askInput){askInput.focus({preventScroll:true})}
+  status.textContent=main.querySelector('h2')?.textContent||error;
+  const resultsFocus=Boolean(claimSet?.focusResults||imageSet?.focusResults);if(claimSet)claimSet.focusResults=false;if(imageSet)imageSet.focusResults=false;
+  if(focused&&focused!==askInput&&!resultsFocus){const controls=[...box.querySelectorAll('button,select,summary,a[href],input')];const next=controls.find(e=>(e.getAttribute('aria-label')||e.textContent)===focusLabel)||main.querySelector('.primary')||main.querySelector('h2');if(next){if(next.tagName==='H2')next.tabIndex=-1;next.focus({preventScroll:true})}}
+  if(resultsFocus){const heading=box.querySelector('.results h3')||box.querySelector('.imgitem h3')||box.querySelector('.check .error')||box.querySelector('.images .error');if(heading){heading.tabIndex=-1;heading.focus()}}
+ }
+  const visible=element=>Boolean(describe(element));
+  function sign(element){return FS.signature(element,document,visible)}
+  function cancelRefind(){clearTimeout(refinding?.timer);refinding=null}
+  // An editor that re-renders its field ends the old node, not the selection: look for the same field
+  // (tag, role, name, label, stable id, position) for a few seconds, then give the selection up.
+  function lose(){
+   if(!selected||selected.isConnected||refinding)return;const signature=selectedSig;generation++;selected=null;result=null;undo=null;host.style.display='none';send({kind:'editing'});
+   if(!signature)return;refinding={signature,step:0,timer:null};tryRefind();
+  }
+  function tryRefind(){
+   if(!alive||!refinding)return;const state=refinding,found=FS.refind(state.signature,document,visible);
+   if(found){refinding=null;selected=found;selectedSig=sign(found);undo=null;invalidate();commit('selection');render();return}
+   const delays=[100,300,800,2000];if(state.step>=delays.length){refinding=null;return}
+   state.timer=setTimeout(tryRefind,delays[state.step++]);
+  }
+  const observer=new MutationObserver(()=>{if(selected&&!selected.isConnected)lose()});observer.observe(document.documentElement,{childList:true,subtree:true});
+ function chooseField(event){if(design){host.style.display='none';if(!event.isTrusted||event.composedPath().includes(design.host))return;const candidate=FS.fieldFromEvent(event);if(describe(candidate)){if(selected!==candidate){generation++;result=null;undo=null;}selected=candidate;selectedSig=sign(candidate);clearTimeout(timer);commit('selection');}else if(selected){generation++;selected=null;selectedSig=null;result=null;undo=null;send({kind:'editing'});}return;}if(!event.isTrusted||event.composedPath().includes(host))return;const candidate=FS.fieldFromEvent(event);if(candidate&&!describe(candidate)){generation++;selected=null;selectedSig=null;cancelRefind();result=null;undo=null;send({kind:'editing'});host.style.cssText+='display:block;left:auto;top:auto;right:12px;bottom:12px;';box.replaceChildren();const card=node('section',undefined,'card'),main=node('div',undefined,'main');main.append(node('h2','This field cannot be shared.'),node('p','Choose a supported draft text field. Sensitive fields and oversized content are excluded.'),button('Dismiss',()=>{host.style.display='none'},'secondary'),button('Stop sharing',async()=>{await send({kind:'stop'});stop('stopped_by_user')}));card.append(main,askSection());box.append(card);return}if(describe(candidate)){cancelRefind();if(candidate!==selected){selected=candidate;undo=null;invalidate()}selectedSig=sign(candidate);clearTimeout(timer);commit('selection');render()}}
+ document.addEventListener('click',chooseField,{signal:abort.signal,capture:true});
+ document.addEventListener('focusin',event=>{if(event.target!==selected)chooseField(event)},{signal:abort.signal,capture:true});
+ document.addEventListener('input',event=>{if(event.target!==selected)return;clearTimeout(timer);describe(selected);if(mutationPending){send({kind:'editing'});return}invalidate();if(undo){uiState='undo-conflict';render()}send({kind:'editing'});timer=setTimeout(()=>commit('pause'),1200)},{signal:abort.signal});
+ document.addEventListener('change',event=>{if(event.target===selected){describe(selected);invalidate();commit('selection')}},{signal:abort.signal});
+ document.addEventListener('focusout',event=>{if(event.target===selected){clearTimeout(timer);commit('blur')}},{signal:abort.signal});
+ document.addEventListener('compositionstart',()=>{composing=true;clearTimeout(timer);invalidate();send({kind:'editing'})},{signal:abort.signal});
+ document.addEventListener('compositionend',()=>{composing=false;timer=setTimeout(()=>commit('pause'),1200)},{signal:abort.signal});
+ // A hidden tab pauses sharing and resumes when visible again (owner decision D1). Reload and
+ // navigation are handled by the extension worker, which re-injects on the same site.
+ document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){send({kind:'heartbeat'});if(selected&&!timer&&!composing)commit('read')}else{clearTimeout(timer);timer=null;send({kind:'heartbeat',paused:true})}},{signal:abort.signal});
+ root.addEventListener('toggle',position,true);
+ window.addEventListener('resize',position,{signal:abort.signal});window.addEventListener('scroll',position,{signal:abort.signal,capture:true});
+ host.addEventListener('focus',()=>{if(!root.activeElement)box.querySelector('button,select,summary')?.focus()},{signal:abort.signal});
+ window.addEventListener('keydown',event=>{if(!event.composedPath().includes(host))return;if(event.key==='Escape'){event.preventDefault();event.stopPropagation();generation++;result=null;uiState='dismissed';render();selected?.focus()}else if(event.key==='Tab'){
+  // Host modal focus scopes cannot enumerate controls inside a closed shadow root.
+  event.stopPropagation();const controls=[...box.querySelectorAll('button:not(:disabled),select,summary,textarea:not([readonly]),input:not(:disabled),a[href]')].filter(e=>e.getClientRects().length);const index=controls.indexOf(root.activeElement);if((event.shiftKey&&index===0)||(!event.shiftKey&&index===controls.length-1)){event.preventDefault();selected?.focus()}
+ }},{signal:abort.signal,capture:true});
+ heartbeat=setInterval(()=>{if(document.visibilityState!=='visible'){send({kind:'heartbeat',paused:true});return}
+  // An editor that re-renders its field ends the selection, not the connection.
+  if(selected&&!selected.isConnected){lose();return}{const request=generation;send({kind:'heartbeat'}).then(value=>{if(request===generation&&result&&Object.hasOwn(value,'reviewId')&&value.reviewId!==result.id)invalidate('The draft or company guidance changed. Check again.')});if(selected&&!timer&&!composing)commit('read')}},4000);
+ // FB-14: Canva design check. Off by default. When "Watch my design" is on, the design is read in this page after an edit
+ // pause (1 s, at most once every 2 s, only while connected and visible) by canva-design.js; only texts and numbers go to Averill.
+ // A finding shows a blocking card until the next check is clean or the employee presses "Export anyway". Averill never edits,
+ // exports or shares the design and never touches Canva's own controls.
+ const DESIGN=globalThis.AverillCanvaDesign;let design=null;
+ const DESIGN_CSS='.dex{margin-top:14px;padding-top:12px;border-top:1px solid var(--ln)}.dex h3{font-size:15px;margin:0 0 8px}.dexlist{list-style:none;margin:0 0 8px;padding:0;display:grid;gap:8px}.dexlist>li{display:grid;grid-template-columns:24px 1fr;column-gap:8px}.dexlist>li>span{grid-row:span 2;font-weight:700;color:var(--mu)}.dexlist>li.done>span{color:var(--at)}.dexlist b{font-size:14px}.dexlist>li>small{color:var(--mu);font-size:13px}.how{grid-column:2;margin-top:6px}.how summary{cursor:pointer;min-height:24px;font-size:13px;font-weight:600;color:var(--tx)}.how ol{margin:6px 0 8px 18px;padding:0;font-size:13px;color:var(--tx);display:grid;gap:4px}.how img{display:block;width:100%;max-width:240px;height:auto;border-radius:10px;margin:8px 0 4px}.how .hnote{font-size:12px;color:var(--mu);margin:0 0 8px;line-height:1.5}.how a{display:inline-block;min-height:24px;font-size:13px;font-weight:600;color:var(--tx);text-decoration:underline;text-underline-offset:3px}.how a:focus-visible{outline:2px solid var(--fc);outline-offset:2px}.how summary:focus-visible{outline:2px solid var(--fc);outline-offset:2px}.dmin{display:flex;align-items:center;gap:2px;background:var(--sf);color:var(--tx);border:1px solid var(--ed);border-radius:14px;box-shadow:0 8px 24px var(--sh2);padding:2px 4px;font:600 13px/20px AverillJakarta,system-ui,sans-serif;text-align:left}.dmin.block{border:2px solid var(--er)}.dmin img{width:20px;height:20px;flex:none}.dpill{border:0;background:transparent;color:var(--tx);font:inherit;min-height:32px;padding:0 10px 0 6px;text-align:left;max-width:300px}.dgrip{cursor:grab;touch-action:none;font-size:18px}.dgrip:active{cursor:grabbing}.head .dgrip{margin-left:-8px}.dcard{max-height:calc(100vh - 84px)}.dcard .main{flex:1;overflow-y:auto;min-height:0;overscroll-behavior:contain}.dcard :is(.primary,.secondary){font-size:15px;min-height:40px}.dcard .dfind b{font-size:16px}.dcard .main p{font-size:16px;line-height:1.55}.dcard .main .tag,.dcard .main small{font-size:14px}.dcard .ask textarea{font-size:16px;line-height:1.5}.dcard .dnote{font-size:14px}.dcard .ask label{font-size:15px}.dcard .dtabs button{font-size:14px}.slide-track{display:flex;gap:8px;margin:12px 0 18px}.slide-track span{display:grid;place-items:center;width:32px;height:32px;border-radius:9px;border:1px solid var(--ct);font-weight:700}.slide-track .seen{background:var(--os);color:var(--at)}.slide-track .current{outline:2px solid var(--at);outline-offset:2px}.scope-details{margin:14px 0}.scope-details summary{font-size:14px;min-height:28px;cursor:pointer}.coach-launch{margin:16px 0}.coach-launch h3{font-size:18px;margin:0 0 8px}.dcard.block{border:2px solid var(--er)}.dcard.block h2{color:var(--er)}.dlabel{margin-left:auto;font-size:13px;font-weight:600;color:var(--mu)}.watch{display:flex;align-items:center;gap:10px;min-height:32px;margin:0 0 12px;font-weight:600;font-size:14px;cursor:pointer}.watch input{flex:none;width:24px;height:24px;margin:0;accent-color:var(--at);cursor:pointer}.watch input:focus-visible{outline:2px solid var(--fc);outline-offset:2px}.dlist{list-style:none;margin:0 0 12px;padding:0}.dfind{background:var(--rs);border-radius:12px;padding:12px;margin:0 0 8px}.dfind b{display:block;font-size:13px;font-weight:600;color:var(--tx);overflow-wrap:anywhere}.dfind p{font-size:13px;color:var(--tx);margin:6px 0 0}.dfind p.measure{color:var(--wn);font-weight:600}.dfind .source{background:var(--sf);margin:8px 0 0}.dfind .source summary{min-height:24px}.dnote{font-size:12px;color:var(--mu);margin:8px 0 0;line-height:1.5}';
+
+ // T5.3: "How to do this in Canva". Steps and links come from Canva's own Help Center answers (28 October 2026); Averill only shows them
+ // and never clicks Canva's controls. The sketches are Averill's own schematic drawings, not Canva's screens.
+ const HELP='https://www.canva.com/help/article/';
+ const HOWTO={
+  hierarchy:{img:'text',alt:'Sketch: a Text tab in a side panel with a heading, a subheading and body text.',steps:['In the side panel, select the Text tab.','Choose a heading, a subheading or body text.','Click the text box on your design and type.'],text:'Canva Help: Add text to your design',url:HELP+'add-text-to-design/'},
+  size:{img:'size',alt:'Sketch: a toolbar Font size slider that makes a letter larger.',steps:['Select the text.','On the toolbar, select Font size.','Drag the slider, or enter a value in the field.'],text:'Canva Help: Change font size',url:HELP+'change-font-size/'},
+  align:{img:'align',alt:'Sketch: a Position button on the toolbar and three text blocks lined up on their left edge.',steps:['Select the element. To select more than one, hold Shift and click each element.','On the editor toolbar, click Position.','Choose Left, Center, Right, Top, Middle or Bottom.'],text:'Canva Help: Align and position elements',url:HELP+'align-position-elements/'},
+  margin:{img:'margin',alt:'Sketch: a page with a dashed border inside it and a text block kept within that border.',steps:['Open your design.','From the menu bar, select the More icon.','Select Settings.','Select Show margins. A border of broken lines appears on your design pages.','Keep important elements inside the margin.'],note:'Averill measures the lesson margin (60 px on a 1080 px post) from the design itself.',text:'Canva Help: Show margins',url:HELP+'margins/'},
+  contrast:{img:'contrast',alt:'Sketch: pale text that is hard to read next to dark text that is easy to read.',steps:['Select the text.','On the toolbar, select Color.','Choose a color that stands out against your background.'],text:'Canva Help: Change text color',url:HELP+'change-text-color/'},
+  group:{img:'group',alt:'Sketch: two text boxes inside one dashed group frame.',steps:['Drag your cursor over the elements you want to group, or hold Shift and select each element.','Select Group on the toolbar.','To undo it, select the group and choose Ungroup.'],text:'Canva Help: Group, ungroup and layer elements',url:HELP+'group-ungroup-layer-elements/'}
+ };
+ function howTo(d,id,title){
+  const h=HOWTO[id];if(!h)return null;
+  const det=node('details',undefined,'how');det.open=d.howOpen.has(id);det.dataset.how=id;
+  const sum=node('summary','How to do this in Canva');sum.setAttribute('aria-label',`How to do this in Canva: ${title}`);
+  det.addEventListener('toggle',()=>{if(det.open)d.howOpen.add(id);else d.howOpen.delete(id)});
+  const steps=node('ol');for(const text of h.steps)steps.append(node('li',text));
+  const img=node('img');img.src=asset(`assets/howto-${h.img}.svg`);img.alt=h.alt;
+  const link=node('a',`${h.text} (opens in a new tab)`);link.href=h.url;link.target='_blank';link.rel='noopener noreferrer';
+  det.append(sum,steps,img,node('p','A sketch, not Canva’s exact screen. Averill never clicks Canva for you.','hnote'));
+  if(h.note)det.append(node('p',h.note,'hnote'));
+  det.append(link);return det;
+ }
+ function designTeardown(){globalThis.AverillCanvaGuide?.stop();design?.ask.view?.stop();if(!design)return;clearTimeout(design.timer);design.observer.disconnect();design.abort.abort();design.host.remove();design=null}
+
+ // T5.2: the card can be minimised, dragged (or moved with the arrow keys on its handle) and remembers its place for this tab session.
+ // It never goes above DESIGN_TOP (Canva's top bar with Share and Download) and stays inside the window.
+ const DESIGN_TOP=72,DESIGN_POS_KEY='averill-design-card-position';
+ function loadDesignPos(){
+  let raw=null;try{raw=sessionStorage.getItem(DESIGN_POS_KEY)}catch(e){console.error('Averill cannot read the saved card position.',e);return null}
+  if(raw===null)return null;
+  try{const v=JSON.parse(raw);if(Number.isFinite(v?.x)&&Number.isFinite(v?.y))return {x:v.x,y:v.y}}catch{}
+  console.error('Averill ignored an unreadable saved card position.');return null;
+ }
+ function saveDesignPos(){const d=design;if(!d?.pos)return;try{sessionStorage.setItem(DESIGN_POS_KEY,JSON.stringify({x:Math.round(d.pos.x),y:Math.round(d.pos.y)}))}catch(e){console.error('Averill cannot remember the card position in this tab.',e)}}
+ function placeDesign(){
+  const d=design;if(!d)return;const h=d.host;h.style.width=d.min?'auto':'380px';
+  if(!d.pos){h.style.left='auto';h.style.right='12px';h.style.top=DESIGN_TOP+'px';return}
+  const r=h.getBoundingClientRect();
+  const x=Math.min(Math.max(12,d.pos.x),Math.max(12,innerWidth-r.width-12)),y=Math.min(Math.max(DESIGN_TOP,d.pos.y),Math.max(DESIGN_TOP,innerHeight-r.height-12));
+  // d.pos stays what the person chose; only the display is clamped, so a card that grew taller returns to its place when it shrinks.
+  h.style.right='auto';h.style.left=x+'px';h.style.top=y+'px';
+ }
+ function setMin(value,focus){const d=design;if(!d)return;if(value)globalThis.AverillCanvaGuide?.stop();d.min=value;d.focusNext=focus;renderDesign()}
+ // After a move the chosen place is what is on screen (already kept inside the window).
+ function shown(d){const r=d.host.getBoundingClientRect();d.pos={x:r.left,y:r.top}}
+ function gripButton(d){
+  const g=button('≡',()=>{},'close dgrip');g.dataset.act='grip';g.setAttribute('aria-label','Move the design check. Drag it, or use the arrow keys.');
+  g.addEventListener('pointerdown',e=>{
+   if(e.button!==0)return;e.preventDefault();const r=d.host.getBoundingClientRect(),dx=e.clientX-r.left,dy=e.clientY-r.top;
+   // Document-level listeners: the card is rebuilt after every check, which would drop a pointer capture on this button.
+   const move=ev=>{d.pos={x:ev.clientX-dx,y:ev.clientY-dy};placeDesign();shown(d)};
+   const up=()=>{document.removeEventListener('pointermove',move,true);document.removeEventListener('pointerup',up,true);document.removeEventListener('pointercancel',up,true);saveDesignPos()};
+   document.addEventListener('pointermove',move,true);document.addEventListener('pointerup',up,true);document.addEventListener('pointercancel',up,true);
+  });
+  g.addEventListener('keydown',e=>{
+   const n=e.shiftKey?64:16,delta={ArrowLeft:[-n,0],ArrowRight:[n,0],ArrowUp:[0,-n],ArrowDown:[0,n]}[e.key];if(!delta)return;
+   e.preventDefault();const r=d.host.getBoundingClientRect();d.pos={x:r.left+delta[0],y:r.top+delta[1]};placeDesign();shown(d);saveDesignPos();
+  });
+  return g;
+ }
+ function designSummary(d){
+  const r=d.result,count=r?.findings?.length||0,plural=count===1?'':'s';
+  let t=!d.on?'Off':d.state==='checking'?'Checking':d.state==='unreadable'?'Cannot read this design':d.state==='error'?'Check failed':d.state==='clean'?'Measured checks passed':d.state==='insufficient'?'No approved rules':d.state==='blocking'?(count?`${count} problem${plural}`:'Not every slide checked'):d.state==='overridden'?`${count} known problem${plural}`:'Ready';
+  const steps=d.on&&Array.isArray(r?.exercise?.steps)?r.exercise.steps.slice(0,8):null;
+  if(steps)t+=` · ${steps.filter(step=>step.done).length} of ${steps.length} steps`;
+  return t;
+ }
+ function renderMin(d,focusLabel){
+  const text=designSummary(d),bar=node('div',undefined,d.state==='blocking'?'dmin block':'dmin');bar.setAttribute('role','group');bar.setAttribute('aria-label','Averill design check, minimised');
+  const mark=node('img');mark.src=asset('assets/mark.svg');mark.alt='';
+  const open=button(`Design check: ${text}`,()=>setMin(false,'min'),'dpill');open.dataset.act='restore';open.setAttribute('aria-label',`Averill design check: ${text}. Expand the card.`);
+  bar.append(gripButton(d),mark,open);d.box.replaceChildren(bar);
+  const count=d.result?.findings?.length||0;d.status.textContent=d.state==='blocking'?`Fix before you export. ${count} problem${count===1?'':'s'}.`:`Design check: ${text}.`;
+ }
+ function findingSignature(value){return value.findings.map(f=>`${f.type}|${f.element}|${f.text}`).sort().join('\n')}
+ function designPanel(){
+  const dhost=document.createElement('div');dhost.setAttribute('data-averill-design','');dhost.setAttribute('aria-label','Averill design check');
+  dhost.style.cssText='position:fixed;z-index:2147483646;display:block;right:12px;top:72px;left:auto;bottom:auto;width:340px;max-width:calc(100vw - 24px);margin:0;padding:0;border:0;background:transparent;';
+  const droot=dhost.attachShadow({mode:'closed'}),dstyle=style.cloneNode(true);dstyle.textContent+=DESIGN_CSS;droot.append(dstyle);
+  const dbox=node('div'),dstatus=node('div');dstatus.setAttribute('role','status');dstatus.setAttribute('aria-live','polite');dstatus.setAttribute('aria-atomic','true');dstatus.style.cssText='position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);';droot.append(dbox,dstatus);
+  document.documentElement.append(dhost);
+  // Keys typed in the card are Averill's: Canva's shortcuts must not see them.
+  for(const type of ['keydown','keyup','keypress'])dhost.addEventListener(type,e=>e.stopPropagation());
+  design={host:dhost,root:droot,box:dbox,status:dstatus,min:true,view:'review',pos:loadDesignPos(),howOpen:new Set(),expandedFor:'',focusNext:null,ask:askUi('averill-design-ask','Ask for design or Canva help','For example: How do I add a frame or improve contrast?',true),on:false,state:'off',result:null,reason:'',error:'',override:null,timer:null,lastRun:0,busy:false,pending:false,lastSent:'',checkedAt:null,cache:new WeakMap(),abort:new AbortController(),observer:new MutationObserver(()=>{if(design?.on)scheduleDesign()})};
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&design?.on)scheduleDesign()},{signal:design.abort.signal});
+  addEventListener('resize',placeDesign,{signal:design.abort.signal});
+  renderDesign();
+ }
+ function scheduleDesign(){const d=design;if(!d?.on||!alive)return;clearTimeout(d.timer);d.timer=setTimeout(()=>runDesign(false),Math.max(1000,d.lastRun+2000-Date.now()))}
+ function setWatch(on){const d=design;if(!d)return;d.on=on;clearTimeout(d.timer);d.result=null;d.override=null;d.lastSent='';d.error='';d.reason='';
+  if(on){d.observer.observe(document.body,{subtree:true,childList:true,attributes:true,characterData:true});d.state='checking';renderDesign();runDesign(true)}
+  else{d.observer.disconnect();void send({kind:'design-check',action:'invalidate'});d.state='off';renderDesign()}}
+ async function runDesign(force){
+  const d=design;if(!d||!d.on||!alive||document.visibilityState!=='visible')return;
+  if(d.busy){d.pending=true;return}
+  d.busy=true;d.lastRun=Date.now();
+  const read=DESIGN.read(document,{imageCache:d.cache});
+  if(read.state!=='ok'){await send({kind:'design-check',action:'invalidate'});if(design!==d||!alive)return;d.busy=false;d.result=null;d.lastSent='';d.override=null;d.state='unreadable';d.reason=read.reason;renderDesign();if(d.pending){d.pending=false;scheduleDesign()}return}
+  const payload={design:read.design,elements:read.elements,slide:read.slide,designId:location.pathname.match(/^\/design\/([A-Za-z0-9_-]{5,100})(?:\/|$)/)?.[1]||null,clientVersion:chrome.runtime.getManifest?.().version||'unknown',protocol:2},sig=JSON.stringify(payload);
+  if(!force&&sig===d.lastSent&&d.result){d.busy=false;if(d.pending){d.pending=false;scheduleDesign()}return}
+  if(!d.result&&d.state!=='checking'){d.state='checking';renderDesign()}
+  const value=await send({kind:'design-check',...payload});
+  if(design!==d||!alive)return;
+  d.busy=false;
+  if(!d.on){d.pending=false;return}
+  if(value.stopped)return;
+  if(value.error){d.state='error';d.error=String(value.error).slice(0,300);d.result=null;d.lastSent=''}
+  else if(['findings','clean','insufficient-evidence','incomplete'].includes(value.state)&&Array.isArray(value.findings)){
+   d.result=value;d.lastSent=sig;d.checkedAt=new Date();d.error='';
+   if(value.state==='findings'||value.state==='incomplete')d.state=d.override&&d.override.signature===findingSignature(value)?'overridden':'blocking';
+   else{d.override=null;d.state=value.state==='clean'?'clean':'insufficient'}
+   // The blocking warning is approved behaviour, so it opens a minimised card once per new set of problems.
+   if(d.state==='blocking'){const key=`${findingSignature(value)}|${(value.slides?.checked||[]).join(',')}|${value.state}`;/* Owner: minimized stays minimized, including a new finding. */d.expandedFor=key}else d.expandedFor='';
+  }else{d.state='error';d.error='The design check could not finish. Try again.';d.result=null;d.lastSent=''}
+  renderDesign();
+  if(d.pending){d.pending=false;scheduleDesign()}
+ }
+ async function exportAnyway(){
+  const d=design;if(!d?.result||d.state!=='blocking')return;const checked=d.result;
+  const value=await send({kind:'design-check',action:'override',checkId:checked.id});
+  if(design!==d||d.result!==checked)return;
+  if(value.state==='override-recorded'){d.override={signature:findingSignature(checked),at:value.at};d.state='overridden';d.error=''}
+  else d.error=String(value.error||'Averill could not record this. Check the design again.').slice(0,300);
+  renderDesign();
+ }
+ function renderDesign(){
+  const d=design;if(!d||!alive)return;
+  const previousMain=d.box.querySelector('.main');if(previousMain&&d.lastView===d.view)d.scroll=previousMain.scrollTop;d.lastView=d.view;
+  const focused=d.root.activeElement,focusLabel=focused?.getAttribute('aria-label')||focused?.textContent;
+  const refocus=()=>{const next=d.focusNext;d.focusNext=null;if(next){d.box.querySelector(`[data-act=${next}]`)?.focus({preventScroll:true});return}if(focused){const found=[...d.box.querySelectorAll('button,input,summary,textarea')].find(e=>(e.getAttribute('aria-label')||e.textContent)===focusLabel);found?.focus({preventScroll:true})}};
+  if(d.min){renderMin(d,focusLabel);placeDesign();refocus();return}
+  const card=node('section',undefined,d.state==='blocking'&&d.result?.findings?.length?'card dcard block':'card dcard');card.setAttribute('aria-label','Averill design check');
+  const head=node('div',undefined,'head'),mark=node('img');mark.src=asset('assets/mark.svg');mark.alt='';const minimise=button('–',()=>setMin(true,'restore'),'close');minimise.dataset.act='min';minimise.setAttribute('aria-label','Minimise the design check');head.append(gripButton(d),mark,node('span','Averill','brand'),node('span','Design check','dlabel'),minimise);
+  const main=node('div',undefined,'main');
+  const tabs=node('div',undefined,'dtabs');tabs.setAttribute('role','group');tabs.setAttribute('aria-label','Averill design tools');for(const [id,label] of [['review','Design checks'],['ask','Ask Averill'],['guide','Guide']]){const tab=button(label,()=>{d.view=id;d.scroll=0;globalThis.AverillCanvaGuide?.stop();renderDesign()},'secondary');tab.setAttribute('aria-pressed',String(d.view===id));tabs.append(tab)}
+  const watch=node('label',undefined,'watch'),toggle=node('input');toggle.type='checkbox';toggle.checked=d.on;toggle.setAttribute('aria-label','Watch my design');toggle.addEventListener('change',()=>setWatch(toggle.checked));watch.append(toggle,node('span','Watch my design'));main.append(watch);
+  const result=d.result,count=result?.findings?.length||0,plural=count===1?'':'s';
+  // Carousel (28 October 2026): which slides this tab session has read so far.
+  const carousel=Number.isInteger(result?.slides?.count)&&result.slides.count>1;
+  const slideSummary=()=>{const s=result?.slides;if(carousel){main.append(node('p',`Checked ${s.checked.length} of ${s.count} slides · Slide ${s.current}`,'hint'));const track=node('div',undefined,'slide-track');track.setAttribute('aria-label','Slide check progress');for(let n=1;n<=Math.min(s.count,12);n++){const dot=node('span',String(n),`${s.checked.includes(n)?'seen ':''}${s.current===n?'current':''}`);dot.setAttribute('aria-label',`Slide ${n}: ${s.checked.includes(n)?'checked':'not checked'}`);track.append(dot)}main.append(track)}};
+  const notes=()=>{const details=node('details',undefined,'scope-details');details.append(node('summary','What was checked'));for(const note of (result?.notes||[]).slice(0,4))details.append(node('p',String(note).slice(0,240),'dnote'));if(details.children.length>1)main.append(details)};
+  if(!d.on)main.append(node('p','When this is on, Averill reads the texts, colors and positions of this design after you pause editing, and checks contrast, the safe area and approved wording. Only text and numbers go to Averill on this device. Averill never edits, exports or shares your design.','hint'));
+  else if(d.state==='checking')main.append(node('h2','Checking your design.'),node('p','Reading the texts, colors and positions on this page.','hint'));
+  else if(d.state==='unreadable')main.append(node('h2','Averill cannot read this design'),node('p',String(d.reason).slice(0,300)),node('p','Nothing was checked. Check contrast and margins yourself before you export. Canva may have changed its page, or the design uses something Averill does not read yet.','hint'));
+  else if(d.state==='error')main.append(node('h2','The design check could not finish.'),node('p',d.error,'error'),button('Check again',()=>runDesign(true),'secondary'));
+  else if(d.state==='clean'){const n=result.elementCount;main.append(node('h2','No issues in the measured checks.'),node('p',`Checked ${n} text${n===1?'':'s'} for ${(result.checked||[]).join(', ')}. Last check ${d.checkedAt.toLocaleTimeString()}. This does not approve the overall design. Averill keeps watching while you edit.`,'hint'));slideSummary();notes()}
+  else if(d.state==='insufficient'){main.append(node('h2','Company-specific checks unavailable.'),node('p','Company requirements are not available for this topic. General design guidance and tool help remain available below. Nothing was changed.'));notes()}
+  else if(d.state==='blocking'||d.state==='overridden'){
+   if(d.state==='blocking')main.append(node('h2',count?`${count} thing${plural} to improve`:'Check the next slide'),node('p',count?'Choose a suggestion below.':'Open each slide once to finish the check.'));
+   else main.append(node('h2','Export anyway recorded.'),node('p',`You chose to export with ${count} known problem${plural}. Averill recorded this for this session only. The problem${plural} ${count===1?'is':'are'} still in the design.`,'hint'));
+   const list=node('ol',undefined,'dlist');
+   slideSummary();
+   for(const f of result.findings.slice(0,12)){const item=node('li',undefined,'dfind');item.append(node('b',`${carousel&&Number.isInteger(f.slide)?`Slide ${f.slide}: `:''}“${String(f.text).slice(0,120)}”`),node('p',String(f.problem).slice(0,300)));if(f.measured)item.append(node('p',String(f.measured).slice(0,200),'measure'));if(f.source)item.append(source(f));list.append(item)}
+   main.append(list);if(d.state==='blocking')main.append(button('Export anyway',exportAnyway,'secondary'));notes();
+  }
+  if(d.on&&result)main.append(button('Get help improving contrast and spacing',()=>{d.view='ask';renderDesign();d.ask.input.value='How do I improve contrast and spacing in Canva?';submitAsk(d.ask)},'secondary'));
+  const ex=result?.exercise;
+  if(d.on){const coach=node('section',undefined,'dex coach-launch');coach.append(node('h3',ex?.title||'Improve this design'));const image=node('img');image.src=asset('assets/howto-contrast.svg');image.alt='Readable text: before and after';image.style.cssText='width:100%;height:100px;object-fit:contain';coach.append(image,button('Start Canva tutorial',()=>{d.view='ask';renderDesign();showAsk({state:'answered',mode:'local',text:'Make your text clear and give it room.',citations:[],assistant:{intent:'tool-help',tool:'canva',guide:ex?.steps?.find(s=>!s.done&&['size','align','margin','contrast','group'].includes(s.id))?.id||'contrast-spacing'}},null,d.ask);d.ask.out.querySelector('.av-start')?.click()},'primary'));if(ex?.steps){const details=node('details',undefined,'scope-details lesson-inventory');details.append(node('summary',`${ex.steps.filter(s=>s.done).length} of ${ex.steps.length} lesson checks`));const list=node('ol',undefined,'dexlist');ex.steps.forEach((step,i)=>{const kind=step.check==='confirm'?'confirm':step.done?'done':'todo';const item=node('li',undefined,kind);item.append(node('span',step.done?'✓':String(i+1)),node('b',String(step.title)),node('small',kind==='confirm'?'You confirm this':step.done?'Measured on this slide':step.seenBefore?'Previously seen · needs attention now':'Needs attention'));const how=howTo(d,String(step.id),String(step.title));if(how)item.append(how);list.append(item)});details.append(list);coach.append(details)}main.append(coach)}
+  if(d.error&&d.state!=='error')main.append(node('p',d.error,'error'));
+  const footer=node('div',undefined,'footer');footer.append(button('Stop sharing',async()=>{await send({kind:'stop'});stop('stopped_by_user')}));
+  if(d.view==='ask'){main.replaceChildren(watch,askSection(d.ask));if(!d.ask.out.textContent){const examples=node('div',undefined,'ask-examples');for(const question of ['How do I improve contrast and spacing in Canva?','How do I group elements in Canva?','How do I add a frame in Canva?'])examples.append(button(question,()=>{d.ask.input.value=question;submitAsk(d.ask)},'secondary'));main.append(examples)}}
+  if(d.view==='guide'){
+   main.replaceChildren(node('h2','Canva guides'),node('p','Choose a task. Each guide shows one step at a time.','hint'));
+   for(const [id,label] of [['contrast-spacing','Improve contrast and spacing'],['frame','Put an image in a frame'],['group','Group elements'],['align','Align elements']])main.append(button(label,()=>{d.view='ask';renderDesign();showAsk({state:'answered',mode:'local',text:'Follow the steps in Canva. You make every change.',citations:[],assistant:{intent:'tool-help',tool:'canva',guide:id}},null,d.ask);d.ask.out.querySelector('.av-start')?.click()},'secondary'));
+  }
+  card.append(head,tabs,main,footer);d.box.replaceChildren(card);main.scrollTop=d.scroll||0;
+  const heading=main.querySelector('h2')?.textContent;d.status.textContent=d.state==='blocking'?`Fix before you export. ${count} problem${plural}.`:heading||'';
+  placeDesign();refocus();
+ }
+ if(detected==='canva'&&DESIGN)designPanel();
+ send(document.visibilityState==='visible'?{kind:'heartbeat'}:{kind:'heartbeat',paused:true});
+})();

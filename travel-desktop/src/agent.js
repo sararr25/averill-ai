@@ -69,6 +69,8 @@ function sourceButton(source) {
 }
 
 function render() {
+  const nextPerson=current.auth?.signedIn?current.workspace?.activePersonId:null;
+  if(nextPerson!==indexedPerson){indexedPerson=nextPerson;currentQuestionTurn=0;el('conversation-links').replaceChildren();el('conversation-search').value='';el('conversation-index').hidden=true;}
   renderSharingStatus();
   const tasks = el('role-playbooks');
   if (tasks) { tasks.replaceChildren(); for (const item of current.playbooks || []) { const b = node('button', item.title, 'secondary-button'); b.type = 'button'; b.addEventListener('click', () => { el('question').value = item.prompt; updateSend(); el('question').focus(); }); tasks.append(b); } }
@@ -130,16 +132,17 @@ function render() {
     el('external-result').textContent = 'Captured text cleared. Read the selected window again to use its current content.';
     el('external-task-result').replaceChildren();
   }
-  el('answer-mode').textContent = current.aiEnabled ? 'Nebius AI enabled' : 'Local source answers';
   const admin=current.workspace?.people?.find(person=>person.id===current.workspace.activePersonId)?.role==='admin';
-  // No local key: the demo workspace sends Check now through the judge server (consent in checkWork); an admin can add a key; everyone else is told who can.
-  const noKey=!current.services?.nebius&&!current.aiEnabled,demoJudge=noKey&&Boolean(current.auth?.demo),addKey=noKey&&!demoJudge&&admin;
-  el('ai-toggle').textContent = current.aiEnabled ? 'Nemotron AI: on' : current.services?.nebius ? 'Nemotron AI: off' : demoJudge ? 'Nemotron AI: on, via demo server' : admin ? 'Nemotron AI: add a key' : 'Nemotron AI: off (ask your admin)';
-  el('ai-toggle').dataset.action=addKey?'add-key':'toggle';
-  el('ai-toggle').setAttribute('aria-pressed',String(Boolean(current.aiEnabled)));
-  el('ai-toggle').nextElementSibling.textContent = current.aiEnabled ? 'NVIDIA Nemotron via Nebius. Your question and relevant approved text sources are sent to Nebius.' : demoJudge ? 'In this demo, Check now and your questions also ask NVIDIA Nemotron through the Averill demo server, only after you confirm what is sent. Measured design checks stay on this Mac. Public tool help can use official online guides after confirmation.' : addKey ? 'Add a Nebius key in More › Workspace settings › AI and services to use NVIDIA Nemotron. Until then answers stay local.' : noKey ? 'No Nebius key is set, so answers stay local. Ask your admin to add one.' : current.auth?.demo ? 'Optional NVIDIA Nemotron via your own Nebius key. Off: Check now and your questions still use the Averill demo server after you confirm what is sent; measured design checks stay local. Public tool help can use official guides after confirmation.' : 'Company AI is off. Public tool help can still ask Nemotron using only a generic operation and official public excerpts, after your confirmation.';
-  if (current.services?.nebius && !current.aiEnabled) el('ai-toggle').nextElementSibling.textContent = 'Company AI is off for this session. Public tool help can still ask Nemotron using only a generic operation and official public excerpts, after your confirmation. Private company files remain local. The judge demo can also explain its bundled fictional sources through the capped demo server after a separate preview.';
-  el('ai-toggle').disabled = noKey&&!addKey;
+  const connection=current.services?.connection || {status:current.services?.nebius?'connecting':current.auth?.demo?'available':'not-configured'};
+  const labels={'starting':'Nemotron · connecting…','connecting':'Nemotron · connecting…','connected':'Nemotron · connected','available':'Nemotron · available via demo','unavailable':'Nemotron · connection unavailable','not-configured':'Nemotron · not configured'};
+  el('ai-status').textContent=labels[connection.status] || labels.starting;
+  el('answer-mode').textContent=el('ai-status').textContent;
+  const addKey=connection.status==='not-configured'&&admin;
+  el('ai-toggle').hidden=!(connection.status==='unavailable'||addKey);
+  el('ai-toggle').textContent=addKey?'Set up Nemotron':'Reconnect Nemotron';
+  el('ai-toggle').dataset.action=addKey?'add-key':'reconnect';
+  el('ai-toggle').disabled=connection.status==='connecting';
+  el('ai-connection-note').textContent=connection.status==='unavailable'?'Averill could not reach Nebius or find Nemotron. Check the connection or retry. Local help remains available.':connection.status==='not-configured'?'Ask your administrator to configure Nebius. Local help remains available.':'Connects automatically when Averill opens. Content is sent only after the request preview. Company file permissions still apply.';
   el('web-form').querySelector('button').disabled = !current.services?.tavily;
   el('web-unavailable').hidden=Boolean(current.services?.tavily);
   el('web-unavailable').textContent=admin?'Public research is not configured. Add a Tavily key in More › Workspace settings › AI and services to search.':'Public research is not configured. Ask your administrator to add a Tavily key.';
@@ -187,7 +190,7 @@ function render() {
     const body = document.createElement('p'); body.textContent = item.body;
     const source = sourceButton(item.source);
     const review = node('button', 'Review this finding', 'secondary-button');review.type='button';
-    review.addEventListener('click',()=>{selectedFindingId=`${item.kind}:${item.id}`;showTab('review');renderHero();el('hero-title').focus();});
+    review.addEventListener('click',()=>{selectedFindingId=`${item.kind}:${item.id}`;showWorkView('ask');showTab('review');renderHero();el('hero-title').focus();});
     card.append(context, title, body, source, review);appendFindingActions(card,item);findings.append(card);
   }
 }
@@ -293,7 +296,7 @@ function renderHero() {
 function appendFindingActions(parent,item){
   const controls=node('div',undefined,'finding-actions');
   const explain=node('button','Explain this correction','secondary-button');explain.type='button';
-  explain.addEventListener('click',()=>{selectedFindingId=`${item.kind}:${item.id}`;showTab('review');renderHero();el('question').value=`How do I correct ${item.title.toLowerCase()} in the shared ${kinds.find(kind=>kind.id===item.kind)?.title||'work'}?`;updateSend();el('question').focus();});
+  explain.addEventListener('click',()=>{selectedFindingId=`${item.kind}:${item.id}`;showWorkView('ask');showTab('review');renderHero();el('question').value=`How do I correct ${item.title.toLowerCase()} in the shared ${kinds.find(kind=>kind.id===item.kind)?.title||'work'}?`;updateSend();el('question').focus();});
   const copy=node('button','Copy suggested correction','secondary-button');copy.type='button';
   copy.addEventListener('click',async()=>{try{await window.desktop.copyFinding(item.kind,item.id);}catch(error){el('answer-status').textContent=error.message;}});
   const practice=node('button','Practise this correction','secondary-button');practice.type='button';
@@ -477,20 +480,47 @@ async function showSource(id, trigger = document.activeElement) {
   openSourceDialog(trigger);
 }
 
-function addMessage(text, role, sources = [], tag = null) {
+let currentQuestionTurn=0,indexedPerson=null;
+function selectQuestion(turn){
+ for(const message of el('conversation').children)message.hidden=message.dataset.turn?message.dataset.turn!==String(turn):Number(turn)>0;
+ for(const button of el('conversation-links').querySelectorAll('button'))button.setAttribute('aria-pressed',String(button.dataset.turn===String(turn)));
+}
+function indexQuestions(){
+ const host=el('conversation-links');host.replaceChildren();
+ const query=el('conversation-search').value.trim().toLowerCase();
+ for(const message of el('conversation').querySelectorAll('.user-message')){
+  if(!message.textContent.toLowerCase().includes(query))continue;
+  const button=node('button',message.textContent.slice(0,100),'secondary-button');button.type='button';button.dataset.turn=message.dataset.turn;
+  button.onclick=()=>{selectQuestion(message.dataset.turn);const answer=[...el('conversation').children].find(m=>m.dataset.turn===message.dataset.turn&&m.classList.contains('assistant-message'))||message;answer.scrollIntoView({block:'start'});answer.focus({preventScroll:true});};host.append(button);
+ }
+ el('conversation-index').hidden=!el('conversation').querySelector('.user-message');
+}
+el('conversation-search').addEventListener('input',indexQuestions);
+function showWorkView(view){
+ if(!['ask','checks','history'].includes(view))return;
+ document.body.dataset.workView=view;
+ el('review-chat').open=true;
+ for(const button of document.querySelectorAll('button[data-work-view]'))button.setAttribute('aria-pressed',String(button.dataset.workView===view));
+}
+for(const button of document.querySelectorAll('button[data-work-view]'))button.onclick=()=>showWorkView(button.dataset.workView);
+showWorkView('ask');
+const chatComposer=document.querySelector('.review-composer');el('review-chat').insertBefore(chatComposer,el('conversation-index'));
+function addMessage(text, role, sources = [], tag = null, assistant = null) {
   const message = document.createElement('div');
   message.className = role === 'user' ? 'user-message' : 'assistant-message';
+  if(role==='user')currentQuestionTurn++;message.dataset.turn=String(currentQuestionTurn);message.tabIndex=-1;
   if (tag) { const chip = node('span', tag.label, tag.title ? 'ai-chip' : 'knowledge-meta'); if (tag.title) chip.title = tag.title; message.append(chip); }
   const paragraph = document.createElement('p'); paragraph.textContent = text; paragraph.style.whiteSpace = 'pre-wrap';
-  message.append(paragraph);
+  if(role==='assistant'&&window.AverillAssistantView)AverillAssistantView.render(message,{text,assistant},{asset:file=>'../browser-extension/'+file,onQuestion:question=>{el('question').value=question;updateSend();el('ask-form').requestSubmit()}});else message.append(paragraph);
   for (const source of sources) {
     if (source.kind === 'public-help') { const link = node('button', source.title, 'source-link'); link.type = 'button'; link.addEventListener('click', () => window.desktop.openWeb(source.url)); message.append(link, node('small', `Official tool help · retrieved ${String(source.retrievedAt || '').slice(0, 10)}`)); if (source.quote) { const details=node('details'); details.append(node('summary','Official source excerpt'),node('blockquote',source.quote,'answer-evidence'));message.append(details); } continue; }
     message.append(sourceButton(source));
-    if(source.quote)message.append(node('blockquote',`“${source.quote}” · v${source.version||'?'}${source.page?` · page ${source.page}`:` · line ${source.line||'?'}`} · Approved ${source.approvedAt?new Date(source.approvedAt).toLocaleDateString():'date unknown'} by ${source.approvedBy||'unknown'} · ${source.reason||'Relevant passage'}`,'answer-evidence'));
+    if(source.quote){const details=node('details');details.append(node('summary','Approved source excerpt'),node('blockquote',`“${source.quote}” · v${source.version||'?'}${source.page?` · page ${source.page}`:` · line ${source.line||'?'}`} · Approved ${source.approvedAt?new Date(source.approvedAt).toLocaleDateString():'date unknown'} by ${source.approvedBy||'unknown'} · ${source.reason||'Relevant passage'}`,'answer-evidence'));message.append(details);}
   }
-  el('conversation').append(message);
+  el('conversation').append(message);indexQuestions();selectQuestion(currentQuestionTurn);
   el('conversation').scrollTop = el('conversation').scrollHeight;
   const feed=document.querySelector('.review-feed');feed.scrollTop=feed.scrollHeight;
+  if(role==='assistant')message.scrollIntoView({block:'start'});
 }
 
 let asking = false;
@@ -499,6 +529,7 @@ el('question').addEventListener('input', updateSend);
 updateSend();
 el('ask-form').addEventListener('submit', async (event) => {
   event.preventDefault();
+  showWorkView('ask');
   const question = el('question').value.trim();
   if (!question || asking) return;
   asking = true; updateSend();
@@ -510,10 +541,10 @@ el('ask-form').addEventListener('submit', async (event) => {
       const sent = await confirmOutbound({ service: response.service || 'Averill demo server', title: response.title || 'Also ask NVIDIA Nemotron', note: response.note || 'The approved-source answer is found on this Mac first. The items below then go to averill-judge-ai.vercel.app, which asks NVIDIA Nemotron on Nebius with the demo owner’s key. Daily limits apply. The Nemotron answer is shown only when its quotes match an approved source. Design questions never leave this Mac.', items: response.items });
       response = await window.desktop.ask(question, response.allInputsRequired ? sent?.length === response.items.length : Boolean(sent?.length));
     }
-    if (response.assistant) { const follow = response.assistant.followUp; if (follow) response.text += `\n\n${follow}`; }
+
     if (response.ai?.status === 'suggestion') addMessage(response.ai.text, 'assistant', response.ai.sources, { label: 'Nemotron suggestion · quotes validated against approved sources', title: `NVIDIA Nemotron via ${response.ai.provider}${response.ai.model ? ` (${response.ai.model})` : ''}` });
     else if (response.ai) addMessage(response.ai.notice, 'assistant', [], { label: response.ai.status === 'declined' ? 'Nemotron not asked' : response.ai.status === 'unverified' ? 'Nemotron answer not verified' : response.ai.status === 'limit' ? 'Nemotron daily limit reached' : 'Nemotron unavailable' });
-    addMessage(response.text, 'assistant', response.sources, response.ai ? { label: 'Local approved-source answer' } : response.assistant?.publicOnly && response.mode === 'model' ? { label: 'Nemotron · public tool help · no company content sent' } : undefined);
+    addMessage(response.text, 'assistant', response.sources, response.ai ? { label: 'Local approved-source answer' } : response.assistant?.publicOnly && response.mode === 'model' ? { label: 'Nemotron · public tool help' } : undefined, response.assistant);
     if (response.assistant?.officialGuide && !response.sources?.some(s => s.kind === 'public-help')) { const guide = node('button', 'Open official tool help', 'source-link'); guide.type = 'button'; guide.addEventListener('click', () => window.desktop.openWeb(response.assistant.officialGuide)); el('conversation').lastElementChild.append(guide); }
     if (response.assistant?.practiceId) { const b = node('button', 'I tried this · save to my practice', 'secondary-button'); b.type = 'button'; b.addEventListener('click', async () => { b.disabled = true; try { await window.desktop.saveAssistantPractice(response.assistant.practiceId); b.textContent = 'Saved as your confirmed practice'; } catch (error) { b.textContent = error.message; } }); el('conversation').lastElementChild.append(b); }
     if(!response.assistant&&!current.shared?.length&&!response.sources?.length&&current.workspace?.configured){const message=el('conversation').lastElementChild;const request=node('button','Ask a reviewer privately','secondary-button');request.type='button';request.addEventListener('click',async()=>{request.disabled=true;try{current=await window.desktop.requestClarification(question);render();message.append(node('p','Private clarification requested. Track it in Knowledge.'));}catch(error){request.disabled=false;el('answer-status').textContent=error.message;}});message.append(request);}
@@ -535,7 +566,7 @@ el('web-form').addEventListener('submit', async (event) => {
     for (const item of items) {
       const row = node('div'); row.className = 'workspace-source';
       const link = node('button', item.title, 'source-link'); link.type = 'button'; link.addEventListener('click', () => window.desktop.openWeb(item.url));
-      row.append(link, node('small', item.content)); results.append(row);
+      const heading=node('h3');heading.append(link);const snippet=String(item.content||'').replace(/#{1,6}\s*/g,'').replace(/\s+/g,' ').trim();const summary=snippet.length>160?snippet.slice(0,157)+'…':snippet;row.className='public-result-card';row.append(heading,node('p',summary));try{row.append(node('span',new URL(item.url).hostname,'knowledge-meta'))}catch{}if(snippet.length>160){const details=node('details');details.append(node('summary','Read source excerpt'),node('p',snippet));row.append(details)}results.append(row);
     }
   } catch (error) { results.replaceChildren(node('p', error.message)); }
 });
@@ -643,14 +674,14 @@ function publicVerdict(item){
   card.append(node('strong',labels[item.verdict]||labels.unclear),node('p',`“${item.claim}”`));
   if(item.explanation)card.append(node('p',item.explanation));
   if(item.snippet)card.append(node('small',`${item.title||item.url}: “${item.snippet}”`));
-  for(const link of item.results||[]){const open=node('button',link.title||link.url,'source-link');open.type='button';open.addEventListener('click',()=>window.desktop.openWeb(link.url).catch(()=>{}));card.append(open);}
+   for(const link of item.results||[]){const open=node('button',link.title||link.url,'source-link');open.type='button';open.addEventListener('click',()=>window.desktop.openWeb(link.url).catch(()=>{}));card.append(open);}
   return card;
 }
 function renderTaskReview(result){
   const output=el('external-task-result');
   if(result.contentHash!==current.externalObservation?.contentHash){output.textContent='The visible work changed. Check the current text again.';return;}
   el('work-controls').open=false;
-  externalReview={identity:workIdentity(),result,checkedAt:Date.now()};rememberRecentWork(externalReview);drawTaskReview(output,result);renderHero();renderWorkingNow();showTab('review');el('hero-title').focus();
+  externalReview={identity:workIdentity(),result,checkedAt:Date.now()};rememberRecentWork(externalReview);drawTaskReview(output,result);renderHero();renderWorkingNow();showWorkView('checks');showTab('review');el('hero-title').focus();
 }
 async function checkWork(fresh){
   if(reviewPending)return;
@@ -708,6 +739,7 @@ function renderOnlineChecks(){
   const list=node('ul','','online-check-list');
   for(const item of last.claims){
    const line=node('li');line.append(node('strong',{supported:'Supported',contradicted:'Contradicted'}[item.verdict]||'Unclear'),document.createTextNode(` · “${item.claim}” `));
+   if(item.explanation)line.append(node('p',item.explanation));if(item.snippet)line.append(node('blockquote',item.snippet));
    for(const link of item.results||[]){const open=node('button',link.title||link.url,'source-link');open.type='button';open.addEventListener('click',()=>window.desktop.openWeb(link.url).catch(()=>{}));line.append(open);}
    list.append(line);
   }
@@ -773,8 +805,7 @@ el('source-dialog').addEventListener('close', () => {
 });
 el('ai-toggle').addEventListener('click', async () => {
   if (el('ai-toggle').dataset.action === 'add-key') { openAiServices(); return; }
-  if (!current.aiEnabled && !window.confirm('Enable Nebius for this session? Your questions and relevant approved company text sources will be sent to Nebius. Images and window captures are not sent by this control.')) return;
-  current = await window.desktop.aiMode(!current.aiEnabled); render();
+  current = await window.desktop.aiMode(true); render();
 });
 // Workspace settings › AI and services holds the key forms (admins only). Fail loudly if the group is missing instead of leaving a dead click.
 function openAiServices(service='Nebius'){
@@ -799,6 +830,7 @@ let inferredTaskHost=null,extensionPanelNote='';
 function workingTool(){
  const host=current.browserBridge?.connected?current.browserBridge.pageHost||'':'';const match=WORK_TOOLS.find(([pattern])=>pattern.test(host));
  if(match)return{name:match[1],icon:match[2],task:match[3]};
+ const label=current.externalWindow?.name||'';if(host&&/\bEmail content\b/i.test(label))return{name:'Email draft',icon:'envelope',task:'email'};
  if(current.externalWindow&&current.externalWindow.adapter!=='browser-dom')return{name:'App window',icon:'desktop'};
  return host?{name:host,icon:'globe'}:null;
 }
@@ -823,7 +855,7 @@ function connectedDraftName(){
  return open?current.externalWindow?.name||workingTool()?.name||'Connected draft':null;
 }
 function goToWorkingNow(){
- showTab('review');
+ showWorkView('checks');showTab('review');
  const card=el('working-now');card.scrollIntoView({block:'start'});
  const target=[el('working-check'),el('working-ask'),card.querySelector('#extension-panel button')].find(button=>button&&button.offsetParent&&!button.disabled);
  if(!target)throw new Error('The Working on now card has no control to focus.');
@@ -840,7 +872,9 @@ function renderWorkingNow(){
  const name=open?current.externalWindow?.name||tool?.name||'Connected draft':'Nothing open yet';
  el('working-now-title').textContent=name;
  // The kind of check follows the site you connected, once per site; you can still change it.
- if(open&&tool?.task&&bridge.pageHost!==inferredTaskHost){inferredTaskHost=bridge.pageHost;if(el('external-task').value!==tool.task){el('external-task').value=tool.task;el('external-task').dispatchEvent(new Event('change'));}}
+ const taskIdentity=JSON.stringify([current.workspace?.activePersonId,bridge.pageHost,current.externalWindow?.id,current.externalWindow?.name]);
+ if(!open)inferredTaskHost=null;
+ if(open&&tool?.task&&taskIdentity!==inferredTaskHost){inferredTaskHost=taskIdentity;if(el('external-task').value!==tool.task){el('external-task').value=tool.task;el('external-task').dispatchEvent(new Event('change'));}}
  const meta=[];if(open&&tool&&!name.includes(tool.name))meta.push(tool.name);
  if(open&&externalReview){const count=externalReview.result.findings.length;meta.push(count?`${count} thing${count===1?'':'s'} to fix`:'No text-rule conflicts',`checked at ${clock(externalReview.checkedAt)}`);}
  else if(open)meta.push('Not checked yet');
@@ -902,10 +936,10 @@ function renderRecentWork(){
   row.append(details);return row;}));
 }
 el('working-check').addEventListener('click',()=>checkWork(false));
-el('working-ask').addEventListener('click',()=>{el('review-chat').open=true;el('question').focus();});
+el('working-ask').addEventListener('click',()=>{showWorkView('ask');el('review-chat').open=true;el('question').focus();});
 {const stop=node('button',undefined,'secondary-button');stop.type='button';stop.id='working-disconnect';stop.innerHTML=icon('x');stop.append(document.createTextNode('Disconnect'));stop.addEventListener('click',()=>el('stop-external').click());document.querySelector('.working-actions').append(stop);}
 window.desktop.onSnapshot((value) => { current = value; render(); });
-window.desktop.onOpenContext(value => { if (value?.sourceId) { showTab('knowledge'); showSource(value.sourceId); return; } showTab('review'); const next = !el('working-check').disabled ? el('working-check') : el('extension-panel').querySelector('button'); if (next) { next.focus(); return; } el(current.externalObservation?'external-task-review':current.externalWindow?'review-external':'browser-pair').focus(); });
+window.desktop.onOpenContext(value => { if (value?.sourceId) { showTab('knowledge'); showSource(value.sourceId); return; } showWorkView('checks');showTab('review'); const next = !el('working-check').disabled ? el('working-check') : el('extension-panel').querySelector('button'); if (next) { next.focus(); return; } el(current.externalObservation?'external-task-review':current.externalWindow?'review-external':'browser-pair').focus(); });
 window.desktop.snapshot().then((value) => { current = value; render(); showTab(preferredArea()); });
 
 for (const target of document.querySelectorAll('[data-icon]')) target.innerHTML = icon(target.dataset.icon);

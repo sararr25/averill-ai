@@ -1,3 +1,17 @@
+# Current-reading revocation — 30 October 2026 (EX-12 continuation)
+
+Pending lesson measurements, project checks and weekly task checks are revoked on Stop sharing, Watch off, unreadable Canva readings and fresh account login. Completed records and previously seen lesson history are preserved. Learn now derives visible ticks and the Finish button from the current result; prior observations are labelled as historical when a current check is missing. An unreadable/off notification contains only a fixed invalidation action over the existing authenticated, tab/origin-bound bridge; it sends no design text or image. No provider call or new permission is introduced.
+
+Verification: **297/297 Node tests PASS** and **31/31 synthetic Canva renderer/bridge stages PASS**, including the unreadable-reading rejection, Learn disabled completion, Watch off while a request is in flight, Stop and logout. **38 relays, zero provider requests.** Initial full-suite execution was sandbox-blocked on loopback; the authorized run passed. Initial renderer attempts exposed stale size/heading assertions and temporary-lesson test contamination; the final run passed after correcting the harness. This is synthetic source evidence, not real Canva, packaged executable or VoiceOver acceptance. `git diff --check` passed.
+
+Source-only continuation over the existing dirty worktree. The local app/ZIP have not been rebuilt, and EX-12 (#70) remains open for current-design identity, broader stale/in-flight lifecycle and real-platform acceptance. Normal profiles, credentials, encrypted keys and source approvals were not changed. Verification receipts: `docs/review-evidence-2026-10-30/ex12-current-reading/`.
+
+# Current practice checks and manual attribution — 30 October 2026
+
+Source continuation for EX-12: pending Canva project and weekly-practice automatic checks now follow the latest validated reading, clearing on regression instead of accumulating successful checks across readings/slides. Completed learning records remain unchanged. Explicit self-confirmation records new lesson/project confirmations as employee-confirmed even if an earlier reading succeeded; normal measured lesson completion uses the current result.
+
+Verification: full desktop Node suite **296/296 PASS**, including regression, retry, manual attribution and completed-history preservation. The first sandbox run could not bind loopback/start required renderer fixtures; the final run with local test access passed. No live Canva, authenticated renderer or native accessibility acceptance was repeated. This is a source-only increment: the existing app/ZIP still precedes these changes. Stop/unreadable-reading invalidation and end-to-end current-design identity acceptance remain open; EX-12 is not complete. Normal profiles, keys and source approvals were not changed.
+
 Public tutoring correction, 29 October 2026: functional tool help may use the configured Nebius key with company AI off, only after its outbound preview. `nebius.publicToolHelp` constructs a closed generic operation and bounded official public excerpts; it accepts no arbitrary question, draft, role, prompt or company text. Company chat, intake and embeddings retain the owner policy gate. Mixed answers append mandatory company requirements locally. General contrast/inset findings remain distinct from company approval, and lesson ticks describe current measurements and clear on regression. See `docs/CANVA_GENERAL_HELP_2026-10-29.md`.
 
 # Pro relevance increment — 29 October 2026

@@ -90,7 +90,7 @@ test('denied external consent and unavailable providers keep functional help use
   assert.equal(calls, 0); assert.match(denied.text, /Select the elements/); assert.equal(denied.mode, 'local');
   await f.assistant.answer(f.data, 'How do I group?', options);
   const unavailable = await f.assistant.answer(f.data, 'How do I group?', { ...options, consent: true });
-  assert.match(unavailable.text, /Live help is unavailable/); assert.equal(unavailable.assistant.checked, false);
+  assert.match(unavailable.assistant.notice, /Live help is unavailable/); assert(!unavailable.text.includes("Live help is unavailable")); assert.equal(unavailable.assistant.checked, false);
 });
 
 test('work synthesis returns a reviewed proposal with exact evidence and rejects fabricated citations', async t => {
@@ -284,4 +284,195 @@ test('the lead checklist uses the capped demo route with company AI off and send
  const question='Prepare a checklist of current approved campaign requirements, source versions and decisions that need my review.';
  const preview=await f.assistant.answer(f.data,question,options);assert(preview.consentRequired);assert.equal(request,undefined);assert(!JSON.stringify(preview.items).includes(f.entry.text));
  const result=await f.assistant.answer(f.data,question,{...options,consent:true});assert.equal(result.assistant.intent,'checklist');assert.equal(result.mode,'model');assert.equal(result.assistant.via,'demo-server');assert(!request.sources.some(s=>s.id===f.source.id));assert.equal(f.data.privacy.companyAI,false);
+});
+
+test('automatically available company answering still previews content before any model call',async t=>{
+ const f=fixture(t);let calls=0;
+ const quote='Our campaign covers Copenhagen, Vienna and Prague.';
+ const fetcher=async url=>{calls++;return {ok:true,json:async()=>url.endsWith('/models')?{data:[{id:'nvidia/Nemotron-company'}]}:{choices:[{message:{content:JSON.stringify({answer:quote,evidence:[{source_id:f.source.id,quote}]})}}]}};};
+ const options={nebiusKey:'synthetic-auto-company',fetcher};const question='Which cities does our campaign cover?';
+ const preview=await f.assistant.answer(f.data,question,options);assert(preview.consentRequired);assert.equal(calls,0);assert(JSON.stringify(preview.items).includes(quote));
+ const result=await f.assistant.answer(f.data,question,{...options,consent:true});assert.equal(result.mode,'model');assert.equal(result.assistant.intent,'company-answer');assert.equal(result.text,quote);
+});
+
+test('compound contrast and spacing gets a closed public operation, readable local steps and matching guide', async t => {
+ const f=fixture(t);f.data.privacy={companyAI:false};
+ const question='How do I improve contrast and spacing in Canva?';
+ assert.equal(classify(question,'canva').topic,'contrast-spacing');
+ const value=await f.assistant.answer(f.data,question,{task:'canva',consent:false});
+ assert.match(value.text,/Text color/);assert.match(value.text,/Spacing/);assert.match(value.text,/Position/);
+ assert.equal(value.assistant.guide,'contrast-spacing');assert(!value.text.includes('Nemotron'));
+ const {guides,splitBlocks}=require('../browser-extension/assistant-view');
+ assert.equal(guides[value.assistant.guide].steps.length,6);
+ assert(splitBlocks(value.text).filter(b=>b.type==='ol').length>=4);
+});
+
+test('public Nemotron has a bounded schema budget and accepts inline step numbers without treating them as facts', async t => {
+ const f=fixture(t);f.data.privacy={companyAI:false};let body;
+ const quote='Select the text. Select Text color. Open Spacing to change line and letter spacing.';
+ const fetcher=async(url,options)=>{
+  if(url.includes('tavily'))return {ok:true,json:async()=>({results:[{url:'https://www.canva.com/help/text-spacing/',title:'Text spacing',content:quote}]})};
+  if(url.endsWith('/models'))return {ok:true,json:async()=>({data:[{id:'nvidia/Nemotron-schema'}]})};
+  body=JSON.parse(options.body);return {ok:true,json:async()=>({choices:[{message:{content:JSON.stringify({answer:'1. Select the text. 2. Select Text color. 3. Open Spacing.',evidence:[{source_id:'https://www.canva.com/help/text-spacing/',quote}]})}}]})};
+ };
+ const options={task:'canva',publicNebiusKey:'synthetic-schema',tavilyKey:'synthetic',fetcher};const question='How do I improve contrast and spacing in Canva?';
+ await f.assistant.answer(f.data,question,options);const value=await f.assistant.answer(f.data,question,{...options,consent:true});
+ assert.equal(value.mode,'model');assert.equal(body.max_tokens,1800);assert.equal(body.response_format.type,'json_schema');assert.equal(body.response_format.json_schema.strict,true);
+ assert.match(body.messages[1].content,/contrast.*spacing/);assert.equal(body.response_format.json_schema.schema.additionalProperties,false);
+});
+
+test('invalid model evidence keeps structured local guidance instead of exposing raw search excerpts', async t => {
+ const f=fixture(t);const snippet='NAVIGATION HEADER ACCOUNT SETTINGS Select the text color control.';
+ const fetcher=async(url)=>({ok:true,json:async()=>url.includes('tavily')?{results:[{url:'https://www.canva.com/help/text-color/',title:'Color',content:snippet}]}:url.endsWith('/models')?{data:[{id:'nvidia/Nemotron-invalid'}]}:{choices:[{message:{content:JSON.stringify({answer:'Invented!',evidence:[{source_id:'fake',quote:'fabricated evidence'}]})}}]}});
+ const options={task:'canva',publicNebiusKey:'synthetic-invalid-help',tavilyKey:'synthetic',fetcher},q='How do I improve contrast and spacing in Canva?';
+ await f.assistant.answer(f.data,q,options);const value=await f.assistant.answer(f.data,q,{...options,consent:true});
+ assert.equal(value.mode,'local');assert.equal(value.assistant.providerStatus,'unverified');assert.match(value.assistant.notice,/did not pass/);assert(!value.text.includes('NAVIGATION'));assert(!value.text.includes('did not pass'));assert.match(value.text,/Spacing/);
+});
+
+test('compound public help never accepts a spacing-only model answer as complete', async t => {
+ const f=fixture(t);const quote='Select the text. Open Text color. Open Spacing on the toolbar.';
+ const fetcher=async(url)=>({ok:true,json:async()=>url.includes('tavily')?{results:[{url:'https://www.canva.com/help/format-text',title:'Text',content:quote}]}:url.endsWith('/models')?{data:[{id:'nvidia/Nemotron-compound'}]}:{choices:[{message:{content:JSON.stringify({answer:'Open Spacing on the toolbar.',evidence:[{source_id:'https://www.canva.com/help/format-text',quote}]})}}]}});
+ const options={task:'canva',publicNebiusKey:'synthetic-coverage',tavilyKey:'synthetic',fetcher},q='How do I improve contrast and spacing in Canva?';await f.assistant.answer(f.data,q,options);const value=await f.assistant.answer(f.data,q,{...options,consent:true});
+ assert.equal(value.mode,'local');assert.equal(value.assistant.providerStatus,'unverified');assert.match(value.text,/Text color/);assert.match(value.text,/Spacing/);
+});
+
+test('natural Italian tool goals return actionable local help without company rules or provider use', async t => {
+ const f=fixture(t);f.source.status='superseded';let calls=0;
+ for(const [question,expected] of [['Voglio mettere una foto dentro una forma',/Drag an image into the frame/],['È leggibile questo testo?',/color control/],['Come cambio il colore?',/color control/]]){
+  const value=await f.assistant.answer(f.data,question,{task:'canva',consent:false,fetcher:async()=>{calls++;throw new Error('Unexpected provider')}});
+  assert.equal(value.assistant.intent,'tool-help');assert.match(value.text,expected);assert.equal(value.assistant.checked,false);assert.equal(value.sources.length,0);
+ }
+ const review=await f.assistant.answer(f.data,'È leggibile questo testo?',{task:'canva',consent:false});
+ assert.match(review.text,/I have not measured/);assert.equal(review.assistant.assessmentRequested,true);
+ assert.equal(calls,0);
+});
+
+test('missing tool asks a specific clarification instead of using company lookup or sending a question', async t => {
+ const f=fixture(t);let calls=0;
+ const value=await f.assistant.answer(f.data,'Come cambio il colore?',{publicNebiusKey:'synthetic',tavilyKey:'synthetic',fetcher:async()=>{calls++;}});
+ assert.equal(value.assistant.intent,'clarify');assert.match(value.text,/Which tool/);assert(value.assistant.suggestions.some(s=>s.label==='Canva'));assert.equal(calls,0);
+ const continued=await f.assistant.answer(f.data,value.assistant.suggestions.find(s=>s.label==='Canva').question,{consent:false});assert.match(continued.text,/color control/);
+});
+
+test('a same-task follow-up changes platform while retaining an applicable operation', async t => {
+ const f=fixture(t),options={contextIdentity:'field-one',consent:false};
+ await f.assistant.answer(f.data,'How do I edit a post in LinkedIn?',options);
+ const value=await f.assistant.answer(f.data,'E invece su Instagram?',options);
+ assert.equal(value.assistant.intent,'tool-help');assert.equal(value.assistant.tool,'instagram');assert.equal(value.assistant.topic,'post');assert.match(value.text,/draft composer/);
+});
+
+test('a design-only operation is not transplanted into another platform by a short follow-up', async t => {
+ const f=fixture(t);await f.assistant.answer(f.data,'How do I group in Canva?',{consent:false});
+ const value=await f.assistant.answer(f.data,'E invece su Instagram?',{consent:false});
+ assert.equal(value.assistant.intent,'clarify');assert.match(value.text,/What would you like to do in Instagram/);assert(!/choose Group/.test(value.text));
+});
+
+test('source changes, work revisions, expiry and Stop each remove implicit tool continuation', async t => {
+ for(const reason of ['authority','revision','expiry','stop']){
+  const f=fixture(t);const options={contextIdentity:'revision-one',consent:false};
+  await f.assistant.answer(f.data,'How do I group in Canva?',options);
+  if(reason==='authority')f.source.status='superseded';
+  if(reason==='expiry')for(const value of f.assistant.turns.values())value.at=Date.now()-900001;
+  if(reason==='stop')f.assistant.cancelAll();
+  const result=await f.assistant.answer(f.data,'Come cambio il colore?',{...options,contextIdentity:reason==='revision'?'revision-two':'revision-one'});
+  assert.equal(result.assistant.intent,'clarify',reason);assert.match(result.text,/Which tool/);
+ }
+});
+
+test('an unrelated company question cannot inherit a previous Canva topic', async t => {
+ const f=fixture(t);await f.assistant.answer(f.data,'How do I group in Canva?',{consent:false});
+ assert.equal(await f.assistant.answer(f.data,'Come chiedo le ferie?',{consent:false}),null);
+ const value=await f.assistant.answer(f.data,'Come cambio il colore?',{consent:false});assert.equal(value.assistant.intent,'clarify');
+});
+
+test('summary requests return exact source points or a source choice, never a draft or an invented synthesis', async t => {
+ const f=fixture(t);
+ const question=await f.assistant.answer(f.data,'Riassumi il documento',{nebiusKey:'synthetic',tavilyKey:'synthetic',fetcher:async()=>assert.fail('local source choice must not call providers')});
+ assert.equal(question.assistant.intent,'summary');assert.match(question.text,/Which document/);
+ const value=await f.assistant.answer(f.data,'Summarize Copenhagen',{consent:false});
+ assert.equal(value.assistant.intent,'summary');assert.match(value.text,/Key points/);assert.match(value.text,/not a complete summary/);assert(value.sources.length);
+ for(const ref of value.sources)assert(f.entry.text.includes(ref.quote));
+ f.source.status='superseded';const unavailable=await f.assistant.answer(f.data,'Summarize Copenhagen',{consent:false});assert.equal(unavailable.sources.length,0);
+});
+
+test('public research and troubleshooting have specific recovery without silently searching private content', async t => {
+ const f=fixture(t);let calls=0;
+ for(const [question,intent,copy] of [['Cerca informazioni aggiornate su Copenhagen','research',/Public research/],['Perché non funziona?','clarify',/Which tool/],['Confronta le due versioni','comparison',/Which two documents/]]){
+  const value=await f.assistant.answer(f.data,question,{nebiusKey:'synthetic',tavilyKey:'synthetic',fetcher:async()=>{calls++;}});
+  assert.equal(value.assistant.intent,intent);assert.match(value.text,copy);
+ }
+ assert.equal(calls,0);
+});
+
+test('outbound consent expires when the work identity changes even if the shared text is identical', async t => {
+ const f=fixture(t),options={publicNebiusKey:'synthetic',task:'canva',contextIdentity:'design-one'};
+ await f.assistant.answer(f.data,'How do I group in Canva?',options);
+ await assert.rejects(f.assistant.answer(f.data,'How do I group in Canva?',{...options,contextIdentity:'design-two',consent:true}),/preview changed or expired/);
+});
+
+test('a company answer previews and sends the relevant passage beyond the old prefix limit with exact PDF coordinates', async t => {
+ const f=fixture(t),quote='Reimbursement deadline: Submit receipts within seven business days.';
+ const body='# Employee handbook\n\n'+('Neutral reference material for the employee.\n'.repeat(500))+'\n[PDF page 7]\n## Expenses\n'+quote+'\n';
+ fs.writeFileSync(f.source.textPath,body);let sent;
+ const fetcher=async(url,options)=>({ok:true,json:async()=>{
+  if(url.endsWith('/models'))return {data:[{id:'nvidia/Nemotron-retrieval'}]};
+  sent=JSON.parse(JSON.parse(options.body).messages.at(-1).content);
+  return {choices:[{message:{content:JSON.stringify({answer:quote,evidence:[{source_id:f.source.id,quote}]})}}]};
+ }});
+ const options={nebiusKey:'synthetic-retrieval',fetcher};
+ const preview=await f.assistant.answer(f.data,'What is the reimbursement deadline?',options);
+ const sourceItem=preview.items.find(i=>i.label.includes(f.source.title));assert(sourceItem.text.includes(quote));assert(sourceItem.text.length<=3000);
+ assert(!sourceItem.text.includes('Neutral reference material'));
+ const value=await f.assistant.answer(f.data,'What is the reimbursement deadline?',{...options,consent:true});
+ assert.equal(value.mode,'model');assert.equal(value.text,quote);assert(sent.sources[0].text.includes(quote));
+ const local=require('../src/workspace-answer').localWorkspaceAnswer(f.data,'What is the reimbursement deadline?');
+ assert.equal(local.sources[0].quote,quote);assert.equal(local.sources[0].page,7);
+ assert.equal(body.split('\n')[local.sources[0].line-1],quote);
+});
+
+test('Italian expense questions find English source passages without substring-only matches', t => {
+ const f=fixture(t),quote='Expenses: Submit the receipt with your expense report.';fs.writeFileSync(f.source.textPath,'# Operations\n\n'+quote);
+ const {localWorkspaceAnswer,relevantSources}=require('../src/workspace-answer');
+ assert.equal(localWorkspaceAnswer(f.data,'Qual è il processo per il rimborso spese?').sources[0].quote,quote);
+ assert.equal(relevantSources(f.data,'port').length,0,'port must not match report');
+});
+
+test('complete-document retrieval excludes restricted, credential-bearing and inaccessible department sources before the outbound preview', async t => {
+ const f=fixture(t),root=path.dirname(f.source.textPath),quote='Reimbursement deadline: the secret deadline is tomorrow.';
+ const create=(name,department)=>{const file=path.join(root,name);fs.writeFileSync(file,quote);const source=workspace.importFile(root,f.data,file,{department});workspace.updateSource(f.data,source.id,'approved');source.aiAllowed=true;return source;};
+ const restricted=create('restricted.md','Marketing');restricted.confidentiality='restricted';
+ const credential=create('credential.md','Marketing');fs.writeFileSync(credential.textPath,quote+'\napi_key: synthetic-sensitive-value');
+ if(!f.data.departments.includes('People'))f.data.departments.push('People');
+ create('other-department.md','People');
+ const worker=workspace.addPerson(f.data,'Synthetic worker','employee','Marketing');workspace.switchPerson(f.data,worker.id);
+ const value=await f.assistant.answer(f.data,'What is the reimbursement deadline?',{nebiusKey:'synthetic',fetcher:async()=>assert.fail('No eligible source can be transmitted')});
+ assert(!value.consentRequired);assert.equal(value.sources.length,0);assert(!value.text.includes('secret deadline'));
+});
+
+test('summary asks which equally relevant document to use and the choice produces a sectioned source overview', async t => {
+ const f=fixture(t),root=path.dirname(f.source.textPath);
+ for(const [name,title] of [['operations-a.md','Operations handbook A'],['operations-b.md','Operations handbook B']]){
+  const file=path.join(root,name);fs.writeFileSync(file,'# Operations\n\n## Introduction\nTeam reference information.\n\n## Decisions\nApproved decision: Ask the lead before booking.\n\n## Actions\nSubmit the receipts after travel.\n\n## Deadlines\nFollow the dates in the approved calendar.');
+  const source=workspace.importFile(root,f.data,file,{title,department:'Marketing'});workspace.updateSource(f.data,source.id,'approved');
+ }
+ const choice=await f.assistant.answer(f.data,'Summarize Operations',{consent:false});
+ assert.match(choice.text,/Which one/);assert.equal(choice.sources.length,0);assert.equal(choice.assistant.suggestions.length,2);
+ const value=await f.assistant.answer(f.data,choice.assistant.suggestions[0].question,{consent:false});
+ assert.equal(value.assistant.presentation,'summary');assert.match(value.text,/Decisions:/);assert.match(value.text,/Actions:/);assert.match(value.text,/Deadlines:/);
+ for(const citation of value.sources){const source=f.data.sources.find(s=>s.id===citation.id),content=fs.readFileSync(source.textPath,'utf8');assert(content.includes(citation.quote));assert(content.split('\n')[citation.line-1].startsWith(citation.quote.split('\n')[0]));}
+});
+
+test('named approved documents produce an exact local comparison without provider calls', async t=>{
+ const f=fixture(t),root=path.dirname(f.source.textPath),file=path.join(root,'alternative.md');
+ fs.writeFileSync(file,'Approved lead: Explore the current winter collection.\nOur campaign covers Copenhagen, Vienna and Prague.');
+ const other=workspace.importFile(root,f.data,file,{title:'alternative.md',department:'Marketing',version:'3'});workspace.updateSource(f.data,other.id,'approved');
+ const value=await f.assistant.answer(f.data,`Compare ${f.source.title} and alternative.md`,{nebiusKey:'synthetic',fetcher:async()=>assert.fail('Local comparison must not call providers')});
+ assert.equal(value.assistant.presentation,'comparison');assert(value.sources.length);assert.match(value.text,/text comparison does not decide/i);
+ for(const ref of value.sources)assert(fs.readFileSync(f.data.sources.find(s=>s.id===ref.id).textPath,'utf8').includes(ref.quote));
+});
+
+test('compound requests expose remaining goals rather than silently dropping a requested operation',async t=>{
+ const f=fixture(t);const value=await f.assistant.answer(f.data,'How do I group elements and add a frame in Canva?',{consent:false});
+ assert(value.assistant.goals.includes('frame'));assert(value.assistant.goals.includes('group'));
+ assert(value.assistant.remainingGoals.includes('group'));assert(value.assistant.suggestions.some(s=>/group/i.test(s.question)));
 });

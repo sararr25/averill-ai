@@ -22,10 +22,10 @@ test('judge demo creates approved Marketing sources and a signed-in-ready employ
     const marketing = judgeDemo.marketingSources.length + judgeDemo.conflictingVersions.length;
     const others = Object.values(judgeDemo.otherSources).flat().length;
     // Plus Emma's proposed note and guidelines version 3, which waits for Maya (T6).
-    assert.equal(data.sources.length, marketing + others + 2);
+    assert.equal(data.sources.length, marketing + others + 2 + require('../src/demo-general').files.length);
     assert.equal(accounts.publicAccounts(data).length, 3);
-    assert.equal(workspace.approvedSources(data).length, marketing);
-    assert.ok(workspace.approvedSources(data).every(source => source.department === 'Marketing'));
+    assert.equal(workspace.approvedSources(data).length, marketing + require('../src/demo-general').files.length);
+    assert.ok(workspace.approvedSources(data).every(source => ['Marketing','Company'].includes(source.department)));
     const saved = workspace.load(root);
     assert.equal(saved.activePersonId, personId);
     assert.equal(fs.readdirSync(path.join(root, 'Averill-login-documents')).length, 3);
@@ -79,7 +79,7 @@ test('judge demo gives each role real work: Emma a pending note, Maya a review q
     assert.ok(workspace.visibleSources(data).some(source => source.id === note.id && source.status === 'pending'));
     const [conflict] = workspace.conflicts(data);
     assert.deepEqual(conflict.map(id => data.sources.find(source => source.id === id).version).sort(), ['1', '2']);
-    assert.ok(workspace.visibleSources(data).every(source => source.department === 'Marketing'));
+    assert.ok(workspace.visibleSources(data).every(source => ['Marketing','Company'].includes(source.department)));
 
     workspace.switchPerson(data, byName('Alex Holm').id);
     assert.deepEqual([...data.departments].sort(), ['Marketing', 'Operations', 'People']);

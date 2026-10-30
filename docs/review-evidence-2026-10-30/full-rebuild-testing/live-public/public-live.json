@@ -1,0 +1,78 @@
+{
+  "at": "2026-10-30T10:39:09.347Z",
+  "companyAI": false,
+  "companySources": 0,
+  "scope": "Generic public operations/official excerpts only; not real Canva visual assessment",
+  "results": [
+    {
+      "question": "Voglio mettere una foto dentro una forma",
+      "ms": 3803,
+      "mode": "model",
+      "intent": "tool-help",
+      "status": "answered",
+      "checked": false,
+      "text": "1. From the editor side panel, select Elements.\n2. Under Browse categories, select Frames.\n3. In the Search elements field, describe what you're looking for. Press Enter.\n4. Under Search results, select a frame to add it to your design.\n5. Add the image or video you want to fit into the shape.",
+      "sources": [
+        {
+          "id": "https://www.canva.com/help/using-frames",
+          "title": "Use frames and crop images into a shape - Canva Help Center",
+          "kind": "public-help",
+          "url": "https://www.canva.com/help/using-frames",
+          "quote": "From the editor side panel, select Elements.",
+          "retrievedAt": "2026-10-30T10:39:05.926Z"
+        },
+        {
+          "id": "https://www.canva.com/help/using-frames",
+          "title": "Use frames and crop images into a shape - Canva Help Center",
+          "kind": "public-help",
+          "url": "https://www.canva.com/help/using-frames",
+          "quote": "Under Browse categories, select Frames.",
+          "retrievedAt": "2026-10-30T10:39:05.926Z"
+        },
+        {
+          "id": "https://www.canva.com/help/using-frames",
+          "title": "Use frames and crop images into a shape - Canva Help Center",
+          "kind": "public-help",
+          "url": "https://www.canva.com/help/using-frames",
+          "quote": "In the Search elements field, describe what you're looking for. Press Enter.",
+          "retrievedAt": "2026-10-30T10:39:05.926Z"
+        },
+        {
+          "id": "https://www.canva.com/help/using-frames",
+          "title": "Use frames and crop images into a shape - Canva Help Center",
+          "kind": "public-help",
+          "url": "https://www.canva.com/help/using-frames",
+          "quote": "Under Search results, select a frame to add it to your design.",
+          "retrievedAt": "2026-10-30T10:39:05.926Z"
+        }
+      ]
+    },
+    {
+      "question": "È leggibile questo testo?",
+      "ms": 2092,
+      "mode": "model",
+      "intent": "tool-help",
+      "status": "answered",
+      "checked": false,
+      "text": "I have not measured the selected text in this answer. Use Watch my design in Canva for a supported reading of the current slide. Here is general guidance:\n\n1. Select the text.\n2. On the toolbar, select Text color.\n3. Choose a high-contrast color relative to the background.",
+      "sources": [
+        {
+          "id": "https://www.canva.com/help/format-text",
+          "title": "Format text - Canva Help Center",
+          "kind": "public-help",
+          "url": "https://www.canva.com/help/format-text",
+          "quote": "1. Select the text.\n2. On the toolbar, select Text color.\n3. Choose a color to apply to your text.",
+          "retrievedAt": "2026-10-30T10:39:08.624Z"
+        },
+        {
+          "id": "https://www.canva.com/help/add-and-edit-text",
+          "title": "Add and edit text - Canva Help Center",
+          "kind": "public-help",
+          "url": "https://www.canva.com/help/add-and-edit-text",
+          "quote": "Select the text . On the toolbar, select Text color . Choose a color to apply to your text.",
+          "retrievedAt": "2026-10-30T10:39:08.624Z"
+        }
+      ]
+    }
+  ]
+}

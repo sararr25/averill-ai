@@ -1,3 +1,13 @@
+## Quiet visual coach 0.6.0 — 29 October 2026
+
+Canva has one panel. Selecting text does not create a separate field card; minimizing stays in place even for new findings. Tool help leads with a single illustrated step. A numbered pointer marks a uniquely resolved visible control; the employee’s actual click advances the guide. No synthetic click or automatic mastery. All instructions, sources and measurement scope remain inspectable in details. Public check results show a verdict and statement; explanations/sources expand.
+
+`content.js` is generated from `assistant-view.js`, `canva-guide.js`, and `content-ui.js` by `npm run build:extension`. It contains the complete visual reader, including when an older worker injects only content.js. Edit the source modules and rebuild, not the generated entry. This build runs before test, start and package. Extension version 0.6.0, unchanged manifest permissions.
+
+## Assistance UI 0.5.0 — 29 October 2026
+
+The Canva panel has **Design checks** and **Ask Averill** views. Answers render lists and relevant bundled illustrations. **Show me in Canva** opens one local guide step at a time and outlines only a visible uniquely matched supported control. Back/Next are manual navigation, not inferred mastery. Missing/ambiguous controls show recovery text. The online preview lists inspectable exact inputs with Get Nemotron help / Keep it local. Stop/ending the connection removes the outline. No new manifest permissions, automatic clicks or screen transmission. Reload this existing extension after updating; reconnect through its toolbar action.
+
 # Averill in-page browser companion
 
 Version 0.3.0. Opt-in Chrome Manifest V3 extension, distributed as source for the hackathon prototype. The content script shows Companion guidance beside one chosen top-frame draft field. It uses the desktop app's real local review engine, exact approved source passages and optional consented Nemotron review. A complete synthetic flow is verified; actual-platform acceptance is still open.

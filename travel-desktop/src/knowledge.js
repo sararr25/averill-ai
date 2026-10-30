@@ -7,8 +7,10 @@ function list(data,query='',status='all',filters={}){
  const draft=data.onboarding;
  const uploaded=active.role==='admin'&&draft?.ownerId===active.id&&!draft.applied?draft.files.map(file=>({...file,kind:'uploaded',name:file.name,status:'uploaded',text:file.text||'',scope:'private',included:file.included!==false})):[];
  const all=[...uploaded,...saved];const search=String(query).trim().toLowerCase().slice(0,200);const conflicted=new Set(workspace.conflicts(data).flat());
+ const groups=(search.match(/[a-z0-9à-ž]{3,}/g)||[]).map(word=>require('./evidence').terms(word)).filter(g=>g.length);
+ const matches=text=>{const body=String(text).toLowerCase();return body.includes(search)||(groups.length>0&&groups.every(group=>group.some(term=>body.includes(term))))};
  const department=String(filters?.department||'all'),kind=String(filters?.kind||'all'),conflict=filters?.conflict===true;
- const documents=all.filter(file=>(status==='all'||(status==='private'?file.kind==='saved'&&file.scope==='private':file.status===status))&&(department==='all'||file.department===department)&&(kind==='all'||file.kind===kind)&&(!conflict||conflicted.has(file.id))&&(!search||`${file.name}\n${file.text}`.toLowerCase().includes(search))).map(file=>{
+ const documents=all.filter(file=>(status==='all'||(status==='private'?file.kind==='saved'&&file.scope==='private':file.status===status))&&(department==='all'||file.department===department)&&(kind==='all'||file.kind===kind)&&(!conflict||conflicted.has(file.id))&&(!search||matches(`${file.name}\n${file.text}`))).map(file=>{
   const offset=search?file.text.toLowerCase().indexOf(search):-1;
   const start=offset<0?0:Math.max(0,offset-80,file.text.lastIndexOf('\n',offset-1)+1);
   const canReview=file.kind==='saved'&&file.scope!=='private'&&(active.role==='admin'||active.role==='lead'&&file.scope==='department'&&active.department===file.department);

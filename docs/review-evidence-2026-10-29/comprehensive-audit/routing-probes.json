@@ -1,0 +1,265 @@
+{
+  "date": "2026-10-29",
+  "type": "deterministic classification probes, not model answers",
+  "probes": [
+    {
+      "question": "Come inserisco una cornice in Canva?",
+      "withoutContext": {
+        "kind": "tool-help",
+        "tool": "canva",
+        "topic": "frame"
+      },
+      "withCanvaTask": {
+        "kind": "tool-help",
+        "tool": "canva",
+        "topic": "frame"
+      },
+      "withPreviousCanvaTopic": {
+        "kind": "tool-help",
+        "tool": "canva",
+        "topic": "frame"
+      }
+    },
+    {
+      "question": "Voglio mettere una foto dentro una forma",
+      "withoutContext": {
+        "kind": "company"
+      },
+      "withCanvaTask": {
+        "kind": "company",
+        "tool": "canva"
+      },
+      "withPreviousCanvaTopic": {
+        "kind": "company",
+        "tool": "canva"
+      }
+    },
+    {
+      "question": "Come cambio il colore?",
+      "withoutContext": {
+        "kind": "company"
+      },
+      "withCanvaTask": {
+        "kind": "tool-help",
+        "tool": "canva",
+        "topic": "contrast"
+      },
+      "withPreviousCanvaTopic": {
+        "kind": "tool-help",
+        "tool": "canva",
+        "topic": "contrast"
+      }
+    },
+    {
+      "question": "È leggibile questo testo?",
+      "withoutContext": {
+        "kind": "company"
+      },
+      "withCanvaTask": {
+        "kind": "company",
+        "tool": "canva"
+      },
+      "withPreviousCanvaTopic": {
+        "kind": "company",
+        "tool": "canva"
+      }
+    },
+    {
+      "question": "Come miglioro contrasto e spaziatura in Canva?",
+      "withoutContext": {
+        "kind": "tool-help",
+        "tool": "canva",
+        "topic": "contrast-spacing"
+      },
+      "withCanvaTask": {
+        "kind": "tool-help",
+        "tool": "canva",
+        "topic": "contrast-spacing"
+      },
+      "withPreviousCanvaTopic": {
+        "kind": "tool-help",
+        "tool": "canva",
+        "topic": "contrast-spacing"
+      }
+    },
+    {
+      "question": "Come miglioro contrasto, spaziatura e allineamento in Canva?",
+      "withoutContext": {
+        "kind": "tool-help",
+        "tool": "canva",
+        "topic": "contrast-spacing"
+      },
+      "withCanvaTask": {
+        "kind": "tool-help",
+        "tool": "canva",
+        "topic": "contrast-spacing"
+      },
+      "withPreviousCanvaTopic": {
+        "kind": "tool-help",
+        "tool": "canva",
+        "topic": "contrast-spacing"
+      }
+    },
+    {
+      "question": "Aiutami a creare un post LinkedIn",
+      "withoutContext": {
+        "kind": "tool-help",
+        "tool": "linkedin",
+        "topic": "post"
+      },
+      "withCanvaTask": {
+        "kind": "tool-help",
+        "tool": "linkedin",
+        "topic": "post"
+      },
+      "withPreviousCanvaTopic": {
+        "kind": "tool-help",
+        "tool": "linkedin",
+        "topic": "post"
+      }
+    },
+    {
+      "question": "Fammi un riassunto del brief",
+      "withoutContext": {
+        "kind": "company"
+      },
+      "withCanvaTask": {
+        "kind": "company",
+        "tool": "canva"
+      },
+      "withPreviousCanvaTopic": {
+        "kind": "company",
+        "tool": "canva"
+      }
+    },
+    {
+      "question": "Riassumi il documento",
+      "withoutContext": {
+        "kind": "company"
+      },
+      "withCanvaTask": {
+        "kind": "company",
+        "tool": "canva"
+      },
+      "withPreviousCanvaTopic": {
+        "kind": "company",
+        "tool": "canva"
+      }
+    },
+    {
+      "question": "E invece su Instagram?",
+      "withoutContext": {
+        "kind": "company",
+        "tool": "instagram"
+      },
+      "withCanvaTask": {
+        "kind": "company",
+        "tool": "instagram"
+      },
+      "withPreviousCanvaTopic": {
+        "kind": "company",
+        "tool": "instagram"
+      }
+    },
+    {
+      "question": "Cerca informazioni aggiornate su Copenhagen",
+      "withoutContext": {
+        "kind": "company"
+      },
+      "withCanvaTask": {
+        "kind": "company",
+        "tool": "canva"
+      },
+      "withPreviousCanvaTopic": {
+        "kind": "company",
+        "tool": "canva"
+      }
+    },
+    {
+      "question": "Quali sono le regole aziendali sui rimborsi?",
+      "withoutContext": {
+        "kind": "company"
+      },
+      "withCanvaTask": {
+        "kind": "company",
+        "tool": "canva"
+      },
+      "withPreviousCanvaTopic": {
+        "kind": "company",
+        "tool": "canva"
+      }
+    },
+    {
+      "question": "Perché non funziona?",
+      "withoutContext": {
+        "kind": "company"
+      },
+      "withCanvaTask": {
+        "kind": "company",
+        "tool": "canva"
+      },
+      "withPreviousCanvaTopic": {
+        "kind": "company",
+        "tool": "canva"
+      }
+    },
+    {
+      "question": "Puoi riscrivere questa email?",
+      "withoutContext": {
+        "kind": "draft"
+      },
+      "withCanvaTask": {
+        "kind": "draft",
+        "tool": "canva"
+      },
+      "withPreviousCanvaTopic": {
+        "kind": "draft",
+        "tool": "canva"
+      }
+    },
+    {
+      "question": "What is our expense policy?",
+      "withoutContext": {
+        "kind": "company"
+      },
+      "withCanvaTask": {
+        "kind": "company",
+        "tool": "canva"
+      },
+      "withPreviousCanvaTopic": {
+        "kind": "company",
+        "tool": "canva"
+      }
+    },
+    {
+      "question": "Summarize the brief",
+      "withoutContext": {
+        "kind": "company"
+      },
+      "withCanvaTask": {
+        "kind": "company",
+        "tool": "canva"
+      },
+      "withPreviousCanvaTopic": {
+        "kind": "company",
+        "tool": "canva"
+      }
+    },
+    {
+      "question": "How do I make this more readable?",
+      "withoutContext": {
+        "kind": "company"
+      },
+      "withCanvaTask": {
+        "kind": "tool-help",
+        "tool": "canva",
+        "topic": "general"
+      },
+      "withPreviousCanvaTopic": {
+        "kind": "tool-help",
+        "tool": "canva",
+        "topic": "general"
+      }
+    }
+  ]
+}

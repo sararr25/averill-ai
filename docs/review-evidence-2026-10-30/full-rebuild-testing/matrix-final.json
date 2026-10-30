@@ -1,0 +1,220 @@
+[
+  {
+    "name": "unit",
+    "status": "PASS",
+    "exitCode": 0,
+    "seconds": 5.12,
+    "packagedResources": false,
+    "command": [
+      "npm",
+      "test"
+    ],
+    "log": "final-unit.log"
+  },
+  {
+    "name": "packaged-pro-ui",
+    "status": "PASS",
+    "exitCode": 0,
+    "seconds": 3.96,
+    "packagedResources": true,
+    "command": [
+      "/Users/sararuffini/Documents/Hackatons/Nvidia/averill-ai/travel-desktop/node_modules/.bin/electron",
+      "scripts/verify-pro-ui.cjs"
+    ],
+    "log": "final-pro-ui.log"
+  },
+  {
+    "name": "accessibility",
+    "status": "PASS",
+    "exitCode": 0,
+    "seconds": 14.25,
+    "packagedResources": false,
+    "command": [
+      "/Users/sararuffini/Documents/Hackatons/Nvidia/averill-ai/travel-desktop/node_modules/.bin/electron",
+      "scripts/verify-accessibility.cjs"
+    ],
+    "log": "accessibility.log"
+  },
+  {
+    "name": "packaged-extension-ui",
+    "status": "PASS",
+    "exitCode": 0,
+    "seconds": 2.22,
+    "packagedResources": true,
+    "command": [
+      "/Users/sararuffini/Documents/Hackatons/Nvidia/averill-ai/travel-desktop/node_modules/.bin/electron",
+      "scripts/verify-assistant-extension.cjs"
+    ],
+    "log": "packaged-extension-ui.log"
+  },
+  {
+    "name": "packaged-shared-guide",
+    "status": "PASS",
+    "exitCode": 0,
+    "seconds": 0.62,
+    "packagedResources": true,
+    "command": [
+      "/Users/sararuffini/Documents/Hackatons/Nvidia/averill-ai/travel-desktop/node_modules/.bin/electron",
+      "scripts/verify-assistant-view.cjs"
+    ],
+    "log": "packaged-shared-guide.log"
+  },
+  {
+    "name": "packaged-feedback",
+    "status": "PASS",
+    "exitCode": 0,
+    "seconds": 3.7,
+    "packagedResources": true,
+    "command": [
+      "/Users/sararuffini/Documents/Hackatons/Nvidia/averill-ai/travel-desktop/node_modules/.bin/electron",
+      "scripts/verify-feedback.cjs"
+    ],
+    "log": "packaged-feedback.log"
+  },
+  {
+    "name": "packaged-intake",
+    "status": "PASS",
+    "exitCode": 0,
+    "seconds": 4.02,
+    "packagedResources": true,
+    "command": [
+      "/Users/sararuffini/Documents/Hackatons/Nvidia/averill-ai/travel-desktop/node_modules/.bin/electron",
+      "scripts/verify-multisource.cjs"
+    ],
+    "log": "packaged-intake.log"
+  },
+  {
+    "name": "browser",
+    "status": "PASS",
+    "exitCode": 0,
+    "seconds": 10.7,
+    "packagedResources": false,
+    "command": [
+      "/Users/sararuffini/Documents/Hackatons/Nvidia/averill-ai/travel-desktop/node_modules/.bin/electron",
+      "scripts/verify-browser.cjs"
+    ],
+    "log": "browser.log"
+  },
+  {
+    "name": "contextual",
+    "status": "PASS",
+    "exitCode": 0,
+    "seconds": 2.87,
+    "packagedResources": false,
+    "command": [
+      "/Users/sararuffini/Documents/Hackatons/Nvidia/averill-ai/travel-desktop/node_modules/.bin/electron",
+      "scripts/verify-contextual.cjs"
+    ],
+    "log": "contextual-fixed.log",
+    "note": "Initial run was a false success from app.quit; fixed selectors and failure exit propagation, then 20 checks passed"
+  },
+  {
+    "name": "canva-adapter",
+    "status": "PASS",
+    "exitCode": 0,
+    "seconds": 1.24,
+    "packagedResources": false,
+    "command": [
+      "/Users/sararuffini/Documents/Hackatons/Nvidia/averill-ai/travel-desktop/node_modules/.bin/electron",
+      "scripts/verify-canva-adapter.cjs"
+    ],
+    "log": "canva-adapter.log"
+  },
+  {
+    "name": "canva-design",
+    "status": "PASS",
+    "exitCode": 0,
+    "seconds": 59.3,
+    "packagedResources": false,
+    "command": [
+      "/Users/sararuffini/Documents/Hackatons/Nvidia/averill-ai/travel-desktop/node_modules/.bin/electron",
+      "scripts/verify-canva-design.cjs"
+    ],
+    "log": "canva-design.log"
+  },
+  {
+    "name": "packaged-rehearsal",
+    "status": "PASS",
+    "exitCode": 0,
+    "seconds": 4.47,
+    "packagedResources": true,
+    "command": [
+      "node",
+      "scripts/verify-rehearsal.cjs"
+    ],
+    "log": "packaged-rehearsal.log"
+  },
+  {
+    "name": "task-review",
+    "status": "PASS",
+    "exitCode": 0,
+    "seconds": 12.94,
+    "packagedResources": false,
+    "command": [
+      "/Users/sararuffini/Documents/Hackatons/Nvidia/averill-ai/travel-desktop/node_modules/.bin/electron",
+      "scripts/verify-task-review.cjs"
+    ],
+    "log": "task-review.log"
+  },
+  {
+    "name": "cloud-ui",
+    "status": "PASS",
+    "exitCode": 1,
+    "seconds": 10.0,
+    "packagedResources": true,
+    "command": [
+      "/Users/sararuffini/Documents/Hackatons/Nvidia/averill-ai/travel-desktop/node_modules/.bin/electron",
+      "scripts/verify-cloud-ui.cjs"
+    ],
+    "log": "final-cloud-ui.log",
+    "note": "Initial failure reproduced real undefined-variable bug in publicVerdict; fixed and rechecked packaged renderer with explanation/snippet assertions"
+  },
+  {
+    "name": "packaged-external",
+    "status": "PASS",
+    "exitCode": 0,
+    "seconds": 8.96,
+    "packagedResources": true,
+    "command": [
+      "/Users/sararuffini/Documents/Hackatons/Nvidia/averill-ai/travel-desktop/node_modules/.bin/electron",
+      "scripts/verify-external.cjs"
+    ],
+    "log": "packaged-external.log"
+  },
+  {
+    "name": "packaged-autoconnect",
+    "status": "PASS",
+    "exitCode": 0,
+    "seconds": 4.61,
+    "packagedResources": true,
+    "command": [
+      "node",
+      "scripts/verify-auto-connect.cjs"
+    ],
+    "log": "packaged-autoconnect.log"
+  },
+  {
+    "name": "demo-outage",
+    "status": "PASS",
+    "exitCode": 0,
+    "seconds": 10.18,
+    "packagedResources": false,
+    "command": [
+      "/Users/sararuffini/Documents/Hackatons/Nvidia/averill-ai/travel-desktop/node_modules/.bin/electron",
+      "scripts/verify-demo-ai.cjs"
+    ],
+    "log": "demo-outage.log"
+  },
+  {
+    "name": "contrast-themes",
+    "status": "PASS",
+    "exitCode": 0,
+    "seconds": 8.13,
+    "packagedResources": false,
+    "command": [
+      "/Users/sararuffini/Documents/Hackatons/Nvidia/averill-ai/travel-desktop/node_modules/.bin/electron",
+      "scripts/verify-phase-b.cjs"
+    ],
+    "log": "contrast-themes.log"
+  }
+]

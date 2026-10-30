@@ -1,0 +1,48 @@
+{
+  "at": "2026-10-29T18:21:34.208410+01:00",
+  "release": {
+    "verifiedAt": "2026-10-29T17:18:39.460Z",
+    "sourceRevisionAtBuild": "d17e4c77ae95a6b0ad520cf1874e3c7e4e4acf7b",
+    "sourceWorkingTreeDirty": true,
+    "archive": "Averill-macOS-arm64.zip",
+    "archiveSha256": "8e6b203589c0d6ef7b7eb9ac6b145a2ed0f0863a7e12fee07c8cdcbcfa3b84a4",
+    "bundleFiles": 3242,
+    "trackedSourceFiles": 251,
+    "verifiedSourceFiles": 251,
+    "includesUncommittedRuntimeFiles": true,
+    "signed": false,
+    "target": "macOS-arm64"
+  },
+  "installedAppMatchesVerifiedBundle": true,
+  "nativeFinalExecutable": {
+    "profile": "marked temporary synthetic QA",
+    "checked": [
+      "sign in",
+      "original compound question",
+      "structured local response",
+      "loaded illustration",
+      "keyboard guide start",
+      "Stop guide and quit"
+    ]
+  },
+  "normalWorkspaceLive": {
+    "profile": "existing fictional Maya demo restored",
+    "question": "How do I improve contrast and spacing in Canva?",
+    "checked": [
+      "Nemotron connected",
+      "two generic public queries previewed",
+      "explicit Send selected",
+      "real Nemotron answer with five steps",
+      "two official Canva sources and loaded illustration"
+    ],
+    "companyContentSent": false,
+    "accountKeysOrSourceApprovalChanged": false,
+    "leftOpen": "Current work with real Nemotron answer"
+  },
+  "remaining": [
+    "manual Chrome extension reload to 0.5.0 and reconnect",
+    "real Canva highlight and fix/recheck acceptance",
+    "native VoiceOver and employee usability review"
+  ],
+  "publication": "local app and ZIP only; no deployment/push/release by this task"
+}

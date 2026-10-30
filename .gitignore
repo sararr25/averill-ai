@@ -14,3 +14,4 @@ coverage/
 demo-login-documents/
 travel-desktop/scripts/extract-text-macos-arm64
 travel-desktop/scripts/window-context-macos-arm64
+/Averill.app

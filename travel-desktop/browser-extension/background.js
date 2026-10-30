@@ -187,7 +187,9 @@ async function relayDesign(message, sender) {
   if (!validPair(pair) || sender.tab?.id !== pair.tabId || sender.frameId !== 0 || sender.origin !== pair.pageOrigin) return { stopped: true, reason: endedFor(sender.tab?.id) };
   if (!isCanva(pair.pageOrigin)) return { error: 'Design checks work on canva.com only.' };
   let payload;
-  if (message.action === 'override') {
+  if (message.action === 'invalidate') {
+    payload = { kind: 'design-check', action: 'invalidate' };
+  } else if (message.action === 'override') {
     if (!CanvaDesign.validCheckId(message.checkId)) return { error: 'Check the design again first.' };
     payload = { kind: 'design-check', action: 'override', checkId: message.checkId };
   } else {

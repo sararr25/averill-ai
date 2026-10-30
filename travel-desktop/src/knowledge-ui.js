@@ -2,7 +2,7 @@ let knowledgeRequest=0;
 let knowledgeRenderKey=null;
 function knowledgeExcerpt(text,query){
  const preview=node('p',undefined,'knowledge-preview');
- const value=(text||'No text could be extracted. Open the original file or upload a readable export.').replace(/^#{1,6}\s+/gm,'').replace(/`([^`]+)`/g,'$1');
+ const full=(text||'No text could be extracted. Open the original file or upload a readable export.').replace(/^#{1,6}\s+/gm,'').replace(/`([^`]+)`/g,'$1');const value=full.length>240?full.slice(0,237)+'…':full;
  const term=String(query||'').trim();const match=term?value.toLowerCase().indexOf(term.toLowerCase()):-1;
  if(match<0){preview.textContent=value;return preview;}
  preview.append(document.createTextNode(value.slice(0,match)),node('mark',value.slice(match,match+term.length)),document.createTextNode(value.slice(match+term.length)));
@@ -39,14 +39,18 @@ async function renderKnowledge(){
   const awaitingDecision=result.documents.filter(file=>file.canReview&&['pending','clarification_requested'].includes(file.status)).length;
   summary.replaceChildren(node('span',`Showing ${result.documents.length} of ${result.total}`),node('span',`${result.approved} approved`,'count-chip'),node('span',`${awaitingDecision} to review`,awaitingDecision?'count-chip attention':'count-chip'),...(result.uploaded?[node('span',`${result.uploaded} uploaded`,'count-chip')]:[]));
   // A refresh replaces the cards; keep keyboard focus on the same control when it still exists.
+  const openFamilies=new Set([...host.querySelectorAll('.version-family[open]')].map(f=>f.dataset.family));
   const focusKey=(host.contains(document.activeElement)||decisions.contains(document.activeElement))?document.activeElement.dataset.focusKey:null;
   host.replaceChildren();decisions.replaceChildren();queue.hidden=awaitingDecision===0;
-  if(!result.documents.length){host.append(node('p',result.total?'No documents match this search or status.':'No company documents yet. Add files in More › Workspace settings; they appear here immediately for review.'));return;}
+  if(!result.documents.length){host.append(node('p',result.total?'Try another topic or clear the filters.':'Add your first company document in Workspace settings.'));if(result.total){const clear=node('button','Show all documents','secondary-button');clear.type='button';clear.onclick=()=>{el('knowledge-search').value='';el('knowledge-filter').value='all';el('knowledge-department').value='all';el('knowledge-kind').value='all';el('knowledge-conflicts').checked=false;renderKnowledge()};host.append(clear)}return;}
   for(const file of result.documents){
-   const card=node('article',undefined,'knowledge-card');
+   const card=node('article',undefined,'knowledge-card');card.dataset.family=`${file.name}:${file.department}:${file.scope}`;
    const status=node('strong',file.kind==='uploaded'?'Uploaded · review needed':file.scope==='private'?`Private · ${file.status}`:file.status==='approved'?`Approved ${file.scope==='company'?'company-wide':'department'} knowledge`:`${file.status} · not used for answers`,'knowledge-state');
    status.dataset.state=file.kind==='uploaded'?'uploaded':file.status;
-   card.append(node('h3',file.name),status);
+   card.append(node('h3',`${file.name} · v${file.version||'1'}`),status);
+   if(file.conflict)card.append(node('p','Conflicting approved versions · excluded from answers until reviewed.','knowledge-meta'));
+   if(file.status==='approved'&&/Private draft: not approved campaign policy/i.test(file.excerpt||'')){status.textContent='Approved in workspace · personal practice note';card.append(node('p','This document describes personal practice, not campaign policy. Ask a reviewer to confirm its use.','knowledge-meta'));}
+   card.classList.toggle('search-match',Boolean(el('knowledge-search').value.trim()));
    const technical=node('details',undefined,'knowledge-details');technical.append(node('summary','Source details and tools'));
    technical.append(node('p',`${file.kind==='uploaded'?'Upload proposal':file.scope==='company'?'Company-wide':file.scope==='private'?'Only you':file.department} · v${file.version||'1'} · ${file.readable?'Text extracted':'No readable text'} · ${file.confidentiality} · ${file.aiAllowed?'AI permission recorded':'Local only'}`,'knowledge-meta'));
    if(file.kind==='uploaded')card.append(node('p','This file has been received. Confirm the onboarding proposal in Workspace settings to save it as a source; approval is a separate step.'));
@@ -56,7 +60,7 @@ async function renderKnowledge(){
     if(file.latestDecision)metadata.append(node('p',`Latest decision: ${file.latestDecision.action} · ${file.latestDecision.reason} · ${new Date(file.latestDecision.at).toLocaleString()}`,'knowledge-decision'));
    }
    if(file.kind==='saved')technical.append(metadata);
-   card.append(knowledgeExcerpt(file.excerpt,el('knowledge-search').value));
+   const preview=node('details',undefined,'source-preview');preview.append(node('summary','Preview'),knowledgeExcerpt(file.excerpt,el('knowledge-search').value));if(el('knowledge-search').value.trim())preview.open=true;card.append(preview);
    const read=node('button','Read extracted text','secondary-button');read.type='button';read.dataset.focusKey=`library:${file.id}:read`;read.disabled=!file.readable;
    const showFile=async(trigger)=>{read.disabled=true;try{const content=await(file.kind==='uploaded'?window.desktop.readOnboardingFile(file.id):window.desktop.readWorkspaceFile(file.id));activeSourceId=null;el('open-source').hidden=true;el('source-title').textContent=content.title;el('source-content').textContent=content.text||'No readable text.';openSourceDialog(trigger);}catch{}finally{read.disabled=!file.readable;}};read.addEventListener('click',()=>showFile(read));card.append(read,technical);
    if(file.kind==='saved'){
@@ -82,6 +86,8 @@ async function renderKnowledge(){
    }else{const review=node('button','Review this file in Workspace settings','secondary-button');review.type='button';review.addEventListener('click',()=>{showTab('setup');const target=[...document.querySelectorAll('[data-file-id]')].find(element=>element.dataset.fileId===file.id);if(target){target.open=true;target.scrollIntoView({block:'center'});target.querySelector('summary')?.focus();}});card.append(review);}
    host.append(card);
   }
+ const families=new Map();for(const card of host.querySelectorAll(':scope>.knowledge-card')){const key=card.dataset.family;const group=families.get(key)||[];group.push(card);families.set(key,group);}
+ for(const [key,cards] of families){if(cards.length<2)continue;const family=node('details',undefined,'version-family');family.dataset.family=key;family.open=openFamilies.has(key);family.append(node('summary',`${cards[0].querySelector('h3').textContent.split(' · v')[0]} · ${cards.length} versions · inspect authority`));cards[0].before(family);for(const card of cards)family.append(card);}
  if(focusKey)[...document.querySelectorAll('[data-focus-key]')].find(element=>element.dataset.focusKey===focusKey&&!element.disabled)?.focus();
  }catch(error){if(request===knowledgeRequest){knowledgeRenderKey=null;summary.textContent=`Could not load knowledge: ${error.message}`;host.replaceChildren();decisions.replaceChildren();queue.hidden=true;}}
 }

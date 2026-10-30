@@ -47,8 +47,8 @@ app.whenReady().then(async()=>{try{
  all=(await bubbles()).slice(mid);
  if(live)step('Question answered by Nemotron through the demo server, or its limit shown verbatim, next to the local answer',(all.some(b=>/^Nemotron suggestion/.test(b.chip))||all.some(b=>/Daily AI limit reached/.test(b.text)))&&all.at(-1).chip==='Local approved-source answer',JSON.stringify(all));
  else step('Outage is stated explicitly next to the local answer',all.length===2&&all[0].chip==='Nemotron unavailable'&&all[0].text==='The demo AI server could not be reached. The local approved-source answer below still applies.'&&all[1].chip==='Local approved-source answer'&&/Matching passage/.test(all[1].text),JSON.stringify(all));
- const pill=await run("({pill:document.getElementById('ai-toggle').textContent,note:document.getElementById('ai-toggle').nextElementSibling.textContent})");
- step('AI pill says questions also use Nemotron through the demo server',pill.pill==='Nemotron AI: on, via demo server'&&/questions also ask NVIDIA Nemotron through the Averill demo server/.test(pill.note),JSON.stringify(pill));
+ const pill=await run("({pill:document.getElementById('ai-status').textContent,hidden:document.getElementById('ai-toggle').hidden,note:document.getElementById('ai-connection-note').textContent})");
+ step('Demo Nemotron is available automatically without an enable toggle',pill.pill==='Nemotron · available via demo'&&pill.hidden&&/automatically/.test(pill.note),JSON.stringify(pill));
  step('No renderer errors',errors.length===0,JSON.stringify(errors));
 }catch(e){step('Run completed',false,e.stack);}
 for(const s of log)console.log(`${s.ok?'ok  ':'FAIL'} ${s.name}${s.ok?'':` — ${s.detail}`}`);const passed=log.filter(s=>s.ok).length;console.log(`${passed}/${log.length} pass (${live?'live server':'unreachable server'})`);

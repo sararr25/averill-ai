@@ -83,12 +83,23 @@ function finishProject(data,id,{note='',selfConfirmAll=false}={},now=new Date())
  const missing=pending.filter(step=>step.auto&&!checks[step.auto]);
  if(missing.length&&!selfConfirmAll)throw new Error(`Averill has not seen these steps in your Canva design yet: ${missing.map(step=>step.text).join(' ')}`);
  const text=String(note||'').trim().slice(0,1000),at=new Date(now).toISOString();
- for(const step of pending)session.confirmed.push({id:`project:${step.index}`,week:weekKey(now),at,kind:step.auto&&checks[step.auto]?'checked-by-averill':'employee-confirmed'});
+ for(const step of pending)session.confirmed.push({id:`project:${step.index}`,week:weekKey(now),at,kind:!selfConfirmAll&&step.auto&&checks[step.auto]?'checked-by-averill':'employee-confirmed'});
  if(text){session.note=text;session.project.notes.push(text);}
  session.finishedAt=at;return session;
 }
 function activeLesson(data){const s=state(data).sessions.find(s=>s.ownerId===owner(data)&&!s.finishedAt&&!s.excluded&&isLesson(s));return s?adopt(s):null;}
 // A design reading from the Canva card: tick the steps it shows. A ticked step stays ticked; "now" says what the design shows today.
+// Current measurements are revocable; previously seen steps and completed history remain intact.
+function invalidateDesign(data,now=new Date()){
+ if(!data||!workspace.person(data))return false;
+ const id=owner(data),store=state(data);let changed=false;
+ for(const session of store.sessions)if(session.ownerId===id&&!session.finishedAt&&!session.excluded){
+  if(session.live){delete session.live;changed=true;}
+  if(session.project&&Object.keys(session.project.checks||{}).length){session.project.checks={};changed=true;}
+ }
+ for(const quiz of store.quizzes)if(quiz.ownerId===id&&!quiz.finishedAt&&Object.keys(quiz.taskChecks||{}).length){quiz.taskChecks={};changed=true;}
+ return changed;
+}
 function checkDesign(data,reading,now=new Date()){
  const session=activeLesson(data);if(!session)return null;
  const result=canvaExercise.evaluate(reading);session.checks||={};
@@ -103,7 +114,7 @@ function finish(data,id,{selfConfirmAll=false}={},now=new Date()){
  const checks=s.checks||{};const missing=steps.filter(step=>step.check==='auto'&&!(s.live?.result?.[step.id]));
  if(missing.length&&!selfConfirmAll)throw new Error(`Averill has not seen these steps in your Canva design yet: ${missing.map(step=>step.title).join('; ')}.`);
  const at=new Date(now).toISOString(),done=new Set(s.confirmed.map(c=>c.id));
- for(const step of steps)if(!done.has(step.id))s.confirmed.push({id:step.id,at,week:weekKey(now),kind:step.check==='auto'&&checks[step.id]?'checked-by-averill':'employee-confirmed'});
+ for(const step of steps)if(!done.has(step.id))s.confirmed.push({id:step.id,at,week:weekKey(now),kind:!selfConfirmAll&&step.check==='auto'&&s.live?.result?.[step.id]?'checked-by-averill':'employee-confirmed'});
  s.finishedAt=at;return s;
 }
 function exclude(data,id){sessionFor(data,id).excluded=true;}
@@ -189,8 +200,13 @@ function saveQuizNote(data,quizId,text,now=new Date()) {
 function tickPractice(data,reading,now=new Date()) {
  const id=owner(data),store=state(data),week=weekKey(now),result=canvaExercise.evaluate(reading),at=new Date(now).toISOString();let changed=false;
  const quiz=[...store.quizzes].reverse().find(q=>q.version===2&&q.ownerId===id&&q.week===week&&!q.finishedAt);
- if(quiz)for(const q of quiz.questions)if(q.type==='task'&&q.task.check==='auto'&&!quiz.results[q.id]&&result[q.task.step]&&!quiz.taskChecks[q.task.step]){quiz.taskChecks[q.task.step]=at;changed=true;}
- for(const s of store.sessions)if(s.ownerId===id&&s.project&&!s.finishedAt&&!s.excluded){adopt(s);for(const auto of projects[s.project.id]?.auto||[])if(auto&&result[auto]&&!s.project.checks[auto]){s.project.checks[auto]=at;changed=true;}}
+ // Pending checks describe the latest reading; completed records remain historical.
+ const update=(checks,step)=>{
+  if(result[step]&&!checks[step]){checks[step]=at;changed=true;}
+  else if(!result[step]&&checks[step]){delete checks[step];changed=true;}
+ };
+ if(quiz)for(const q of quiz.questions)if(q.type==='task'&&q.task.check==='auto'&&!quiz.results[q.id])update(quiz.taskChecks,q.task.step);
+ for(const s of store.sessions)if(s.ownerId===id&&s.project&&!s.finishedAt&&!s.excluded){adopt(s);for(const auto of projects[s.project.id]?.auto||[])if(auto)update(s.project.checks,auto);}
  return changed;
 }
 const label=(list,id)=>list.find(x=>x.id===id)?.label||'';
@@ -214,4 +230,4 @@ function snapshot(data,now=new Date()) {
  if(quiz){const scored=quiz.questions.filter(q=>q.type!=='task'&&quiz.results[q.id]);view2={id:quiz.id,week:quiz.week,attempt:quiz.attempt,finishedAt:quiz.finishedAt||null,note:quiz.note||'',confirmation:quiz.confirmation||null,outdated:quiz.relevanceVersion!==3||quiz.fingerprint!==fingerprint(data,now),score:quiz.finishedAt?{right:scored.filter(q=>quiz.results[q.id].correct).length,total:scored.length}:null,questions:quiz.questions.map(q=>view(data,quiz,q,now))};}
  return {configured:true,week:weekKey(now),guide,steps:steps.map(({question,options,correct,explanation,...s})=>s),projects:Object.entries(projects).map(([id,item])=>({id,title:item.title,tool:item.tool})),sessions,quiz:view2,earlierPractice:earlier};
 }
-module.exports={start,record,startFinding,completeFinding,startProject,finishProject,checkDesign,tickPractice,finish,exclude,deleteHistory,beginQuiz,submitQuiz,retryQuiz,saveQuizNote,snapshot,weekKey};
+module.exports={invalidateDesign,start,record,startFinding,completeFinding,startProject,finishProject,checkDesign,tickPractice,finish,exclude,deleteHistory,beginQuiz,submitQuiz,retryQuiz,saveQuizNote,snapshot,weekKey};

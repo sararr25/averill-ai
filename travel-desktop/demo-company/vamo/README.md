@@ -1,3 +1,9 @@
+## Company-wide demo knowledge — 29 October 2026
+
+`Company/` contains six fictional general policies: weekly posting rhythm; leave and absence; expenses and work travel; remote work and meetings; security and access; handover and escalation. They are consultation sources, separate from marketing task-check rules. On the named Vamo judge demo only, `src/demo-general.js` adds missing bundled references as approved company-wide fixtures; it never changes an existing title, file, source approval or person. It refuses real company workspaces. For a non-demo workspace, import company-wide documents as an admin and review/approve them normally; this fixture seeding is not authorization to approve imported real files.
+
+Demo questions: “When do we usually post?”, “Quando postiamo di solito?”, “How do I request time off?”, “Come chiedo le ferie?”, “What is our expenses process?”, “What is the remote work policy?”. Campaign-specific dated briefs override the recurring posting rhythm.
+
 # Vamo company onboarding pack
 
 All people and documents are fictional. This is a manually reviewable pack, not automatically imported or approved. Product/demo content is English.

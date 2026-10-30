@@ -100,6 +100,7 @@ async function create(userData, packRoot) {
   // Emma's own note: imported privately, then proposed, so it waits for Maya's review.
   const note = workspace.importFile(userData, data, path.join(packRoot, 'vamo', privateNote), { scope: 'private', version: '1' });
   workspace.proposeSource(data, note.id);
+  require('./demo-general').ensure(userData,data,packRoot);
   workspace.save(userData, data);
   return { data, personId: emma.id };
 }

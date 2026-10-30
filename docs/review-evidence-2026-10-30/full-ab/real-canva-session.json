@@ -1,0 +1,24 @@
+{
+  "at": "2026-10-30",
+  "type": "Observed native Chrome accessibility interaction, not simulated",
+  "extensionVersion": "0.7.1",
+  "checks": {
+    "reconnectSinglePanel": true,
+    "guideCatalogueVisible": true,
+    "currentTextColorResolved": true,
+    "trustedUserClickAdvancesGuide": true,
+    "stopGuideClearsPointer": true,
+    "minimizedAcrossSlideChanges": true,
+    "readSlides": 5,
+    "totalSlides": 5,
+    "contrastFindings": 2,
+    "stopSharingConfirmed": true,
+    "restoredPage": 1
+  },
+  "boundaries": {
+    "noContentEdits": true,
+    "noExportOrPublish": true,
+    "noPrivateDesignSentToModel": true
+  },
+  "limitation": "View zoom remained at 39% rather than initial 43%; native combo-box input did not change it. Local checks are not company approval or a human usability study."
+}

@@ -7,7 +7,7 @@ async function learnAction(kind,payload={}) {
   const next=kind==='finish'?el('learning-panel').querySelector('.learning-card h4')||el('learning-panel').querySelector('.learning-card h3'):['quiz','answer'].includes(kind)?el('learning-panel').querySelector('.learning-question form')?.closest('.learning-question')?.querySelector('h4')||el('learning-panel').querySelector('.learning-question h4'):['project-start','project-confirm'].includes(kind)?el('learning-panel').querySelector('.project-exercise h4')||el('learning-panel').querySelector('.project-exercise h3'):null;
   if(next){next.tabIndex=-1;next.focus();}
  }
- catch(error){learningLead=null;status.textContent=error.message;}
+ catch(error){learningLead=null;status.textContent=String(error.message).replace(/^Error invoking remote method '[^']+': Error: /,'');}
 }
 function learningButton(label,kind,payload){const b=node('button',label,'secondary-button');b.type='button';b.addEventListener('click',()=>learnAction(kind,payload));return b;}
 function guideLink(guide){const b=node('button','Open official Canva guide','source-link');b.type='button';b.addEventListener('click',()=>window.desktop.openWeb(guide.url));return b;}
@@ -21,26 +21,26 @@ function renderLearning(){
  const data=current.learning||{configured:false};const key=JSON.stringify([data,current.workspace?.sources,current.workspace?.activePersonId]);if(key===learningRenderKey)return;learningRenderKey=key;
  const panel=el('learning-panel');panel.replaceChildren();
  if(!data.configured){panel.append(node('p','Create a company workspace and select a person in Workspace settings to save learning.'));return;}
- panel.append(node('p',`${current.workspace.people.find(p=>p.id===current.workspace.activePersonId)?.name}, here is your learning for this week.`,'section-note'));
+ panel.append(node('p','Your next activity','section-note'));
  const active=data.sessions.find(s=>!s.finishedAt&&!s.excluded&&!s.exercise&&!s.project&&!s.note);
  const lesson=node('article',undefined,'learning-card');lesson.append(node('h3','Canva layout essentials'));
  if(!active){
-  lesson.append(node('p','Six steps inside Canva: headline and supporting line, size, alignment, margins, contrast and grouping. Averill ticks the steps it can see in your design; you confirm the rest once, at the end.'));
+  lesson.append(node('p','Build a clear layout in Canva.'));const illustration=node('img');illustration.src='../browser-extension/assets/howto-align.svg';illustration.alt='Aligned text blocks';illustration.className='learning-illustration';lesson.append(illustration);
   const label=node('label','Optional company context');label.htmlFor='learning-source';const select=node('select');select.id='learning-source';select.append(new Option('Tool practice only',''));
   const conflicts=new Set((current.workspace.conflicts||[]).flat());for(const source of current.workspace.sources.filter(s=>s.status==='approved'&&!conflicts.has(s.id)))select.append(new Option(`${source.title} · v${source.version}`,source.id));
-  const start=node('button','Start Canva lesson','agent-primary');start.type='button';start.addEventListener('click',()=>learnAction('start',{sourceId:select.value||null}));lesson.append(label,select,start);
+  const start=node('button','Start Canva lesson','agent-primary');start.type='button';start.addEventListener('click',()=>learnAction('start',{sourceId:select.value||null}));label.append(select);const context=node('details');context.append(node('summary','Link company context (optional)'),label);lesson.append(start,context);
  }else{
   // D1: the whole page at once. Steps tick themselves from the Canva card's design reading; one confirmation finishes the page.
-  const checks=active.checks||{},autoSteps=data.steps.filter(step=>step.check==='auto'),seen=autoSteps.filter(step=>checks[step.id]).length;
-  lesson.append(node('p',`${seen} of ${autoSteps.length} steps seen in your Canva design${active.live?` · last reading at ${new Date(active.live.at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}`:''}.`,'section-note'));
+  const checks=active.live?.result||{},autoSteps=data.steps.filter(step=>step.check==='auto'),seen=autoSteps.filter(step=>checks[step.id]).length;
+  lesson.append(node('p',`${seen} of ${autoSteps.length} steps currently measured in your Canva design${active.live?` · last reading at ${new Date(active.live.at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}`:''}.`,'section-note'));
   const list=node('ol',undefined,'lesson-steps');
   for(const step of data.steps){
    const done=step.check==='auto'&&Boolean(checks[step.id]),kind=step.check==='confirm'?'confirm':done?'done':'todo';
    const item=node('li',undefined,`lesson-step ${kind}`);const mark=node('span',undefined,'lesson-mark');mark.innerHTML=icon(kind==='done'?'check-circle':kind==='confirm'?'pencil-simple-line':'seal-check');
-   const text=node('div');text.append(node('h4',step.title),node('p',step.instruction),node('small',kind==='done'?'Checked by Averill in your design':kind==='confirm'?'Averill cannot see this. You confirm it below.':'Not seen in your design yet'));
+   const text=node('div');text.append(node('h4',step.title),node('p',step.instruction),node('small',kind==='done'?'Measured in the latest design reading':kind==='confirm'?'Averill cannot see this. You confirm it below.':active.checks?.[step.id]?'Previously seen; not measured in the current reading':'Not measured in the current reading'));
    const help=node('details');help.append(node('summary','Help'),node('p',step.help));text.append(help);item.append(mark,text);list.append(item);
   }
-  if(active.migrated)lesson.append(node('p','This lesson was started before the Canva page. Your earlier confirmations are kept as yours; Averill now ticks the steps it can see in your design.','field-hint'));lesson.append(list);
+  const nextStep=data.steps.find(s=>s.check==='auto'&&!checks[s.id])||data.steps.find(s=>s.check==='confirm');if(nextStep&&window.AverillAssistantView)AverillAssistantView.render(lesson,{text:nextStep.instruction,assistant:{intent:'tool-help',guide:nextStep.id}},{asset:file=>'../browser-extension/'+file});const inventory=node('details');inventory.append(node('summary','View all lesson checks'),list);lesson.append(inventory);
   const open=node('button',undefined,'secondary-button');open.type='button';open.innerHTML=icon('arrow-up-right');open.append(document.createTextNode('Open Canva'));open.addEventListener('click',()=>window.desktop.openWeb('https://www.canva.com/'));
   lesson.append(node('p','In Canva, open an Instagram post design, click the Averill icon in Chrome, Connect this tab, then turn on Watch my design.','field-hint'),open,guideLink(data.guide));
   if(active.source){lesson.append(node('p',`${active.source.title} · v${active.source.version}${active.sourceAvailable?'':' · no longer available for practice'}`));if(active.sourceAvailable){const b=node('button','Read company context','source-link');b.type='button';b.addEventListener('click',()=>showSource(active.source.id,b));lesson.append(b);}}
@@ -48,7 +48,7 @@ function renderLearning(){
   const finish=node('form',undefined,'lesson-finish');const agree=node('label');const box=node('input');box.type='checkbox';box.required=true;agree.append(box,document.createTextNode(` I did the step Averill cannot see: ${confirmSteps}.`));
   const submit=node('button','Finish lesson','agent-primary');submit.type='submit';submit.disabled=seen<autoSteps.length;
   finish.append(agree,submit);finish.addEventListener('submit',event=>{event.preventDefault();learnAction('finish',{sessionId:active.id});});
-  if(seen<autoSteps.length)finish.append(node('p','Finish unlocks when Averill has seen every other step in your design.','field-hint'));
+  if(seen<autoSteps.length)finish.append(node('p','Finish unlocks when the current reading meets every automatic check.','field-hint'));
   const self=node('details');self.append(node('summary','I cannot connect Canva'));const selfForm=node('form');const selfAgree=node('label');const selfBox=node('input');selfBox.type='checkbox';selfBox.required=true;selfAgree.append(selfBox,document.createTextNode(' I did every step myself. Record them as confirmed by me, not checked by Averill.'));
   const selfSubmit=node('button','Finish with my own confirmation','secondary-button');selfSubmit.type='submit';selfForm.append(selfAgree,selfSubmit);selfForm.addEventListener('submit',event=>{event.preventDefault();learnAction('finish',{sessionId:active.id,selfConfirmAll:true});});self.append(selfForm);
   lesson.append(finish,self);
@@ -64,10 +64,10 @@ function renderLearning(){
   const confirm=node('label');const check=node('input');check.type='checkbox';check.required=true;confirm.append(check,document.createTextNode(' I made and reviewed this edit myself.'));
   const submit=node('button','Recheck supported field and save practice','agent-primary');submit.type='submit';form.append(label,confirm,submit);form.addEventListener('submit',e=>{e.preventDefault();learnAction('finding-complete',{sessionId:session.id,reflection:response.value});});exercise.append(form);panel.append(exercise);
  }
- const projectStart=node('details',undefined,'learning-card');projectStart.append(node('summary','Start a task-based exercise'),node('p','Choose a concrete result. You perform the work and confirm each step; Averill does not inspect Canva geometry or verify an exported file.'));
+ const projectStart=node('details',undefined,'learning-card');projectStart.append(node('summary','Start a task-based exercise'),node('p','Choose a result, then follow the visual steps in Canva.'));
  const projectForm=node('form',undefined,'workspace-form');const projectLabel=node('label','Exercise');const projectSelect=node('select');for(const project of data.projects||[])projectSelect.append(new Option(project.title,project.id));projectLabel.append(projectSelect);
  const projectSourceLabel=node('label','Optional approved company source');const projectSource=node('select');projectSource.append(new Option('Use supplied demo guidance only',''));const projectBlocked=new Set((current.workspace.conflicts||[]).flat());for(const source of current.workspace.sources.filter(source=>source.status==='approved'&&!projectBlocked.has(source.id)))projectSource.append(new Option(`${source.title} · v${source.version}`,source.id));projectSourceLabel.append(projectSource);
- const projectButton=node('button','Start exercise','agent-primary');projectButton.type='submit';projectForm.append(projectLabel,projectSelect,projectSourceLabel,projectSource,projectButton);projectForm.addEventListener('submit',e=>{e.preventDefault();learnAction('project-start',{projectId:projectSelect.value,sourceId:projectSource.value||null});});projectStart.append(projectForm);panel.append(projectStart);
+ const projectButton=node('button','Start exercise','agent-primary');projectButton.type='submit';projectForm.append(projectLabel,projectSourceLabel,projectButton);projectForm.addEventListener('submit',e=>{e.preventDefault();learnAction('project-start',{projectId:projectSelect.value,sourceId:projectSource.value||null});});projectStart.append(projectForm);panel.append(projectStart);
  for(const session of data.sessions.filter(s=>s.project&&!s.finishedAt&&!s.excluded))panel.append(renderProjectPage(session,data));
  const helpCard=node('details',undefined,'learning-card');helpCard.append(node('summary','Ask about a lesson step'));
  helpCard.append(node('p','Type a question about selection, Position, alignment or grouping. Averill answers from this offline lesson. A selected Canva window can be captured once on request; OCR does not verify layout.'));

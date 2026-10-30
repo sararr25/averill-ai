@@ -1,0 +1,17 @@
+{
+  "checks": [
+    "Authenticated admin/company: private source visibility and approval queue scope",
+    "Role 0: four destinations at 520/960px and 200% zoom; named buttons, 24px minimum targets, no page overflow, reduced motion",
+    "Authenticated lead/Marketing: private source visibility and approval queue scope",
+    "Role 1: four destinations at 520/960px and 200% zoom; named buttons, 24px minimum targets, no page overflow, reduced motion",
+    "Authenticated employee/Marketing: private source visibility and approval queue scope",
+    "Role 2: four destinations at 520/960px and 200% zoom; named buttons, 24px minimum targets, no page overflow, reduced motion",
+    "Authenticated employee/Operations: private source visibility and approval queue scope",
+    "Role 3: four destinations at 520/960px and 200% zoom; named buttons, 24px minimum targets, no page overflow, reduced motion",
+    "Logout clears library material",
+    "Weekly practice: all four question types and the task answered by keyboard (arrows, Space, Enter); fieldset legends, named radios, alt text, Move up/down names, announced errors and result"
+  ],
+  "limits": [
+    "Renderer/authenticated role matrix; native VoiceOver and physical displays are separate"
+  ]
+}

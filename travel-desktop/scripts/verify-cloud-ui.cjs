@@ -5,12 +5,13 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const workspace = require('../src/workspace');
-const remote = require('../src/remote-import');
+const root = process.env.AVERILL_NATIVE_APP || path.resolve(__dirname, '..');
+const workspace = require(path.join(root, 'src/workspace'));
+const remote = require(path.join(root, 'src/remote-import'));
 
 const out = process.env.AVERILL_SCREENSHOTS || '';
 const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'averill-cloud-ui-'));
-const sources = path.join(__dirname, '..', 'sources');
+const sources = path.join(root, 'sources');
 const company = workspace.create(profile, 'Vamo', 'Demo Owner');
 const imported = {};
 for (const [name, version] of [['old-brief.md', '1'], ['current-brief.md', '2'], ['brand-and-legal.md', '1'], ['content-calendar.md', '1'], ['linkedin-campaign.md', '1']]) {
@@ -48,7 +49,7 @@ globalThis.fetch = async (url, options = {}) => {
 };
 
 app.setPath('userData', profile);
-require('../main.js');
+require(path.join(root, 'main.js'));
 const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 app.whenReady().then(async () => {
@@ -123,6 +124,12 @@ app.whenReady().then(async () => {
     await run(`el('${target}').querySelector('.public-check button').click()`);
     for (let i = 0; i < 40 && !(await run(`el('${target}').textContent.includes('Public sources contradict this')`)); i++) await pause(100);
     assert.ok(await run(`el('${target}').textContent.includes('Public sources contradict this')`));
+    const publicCard = await run(`el('${target}').querySelector('.public-verdict').textContent`);
+    assert(publicCard.includes('The public page gives 15 November.'), publicCard);
+    assert(publicCard.includes('opens on 15 November 2026'), publicCard);
+    assert(!publicCard.includes('line is not defined'), publicCard);
+    assert.ok(await run(`document.querySelector('.online-check-list').textContent.includes('The public page gives 15 November.')`), 'last public check retains the same explanation');
+
     await pause(800);
     await shot('review-public-check');
 

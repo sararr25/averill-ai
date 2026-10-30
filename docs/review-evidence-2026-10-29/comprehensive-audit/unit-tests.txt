@@ -1,0 +1,1690 @@
+TAP version 13
+# Subtest: four login documents survive restart without leaking credentials into workspace snapshots
+ok 1 - four login documents survive restart without leaking credentials into workspace snapshots
+  ---
+  duration_ms: 390.925375
+  type: 'test'
+  ...
+# Subtest: administrator can disable and recover another local account while employees cannot recover themselves
+ok 2 - administrator can disable and recover another local account while employees cannot recover themselves
+  ---
+  duration_ms: 368.30525
+  type: 'test'
+  ...
+# Subtest: service connection sends only the configured key and is independent of company permission
+ok 3 - service connection sends only the configured key and is independent of company permission
+  ---
+  duration_ms: 3.225833
+  type: 'test'
+  ...
+# Subtest: an unavailable provider keeps an explicit retryable connection state without enabling company access
+ok 4 - an unavailable provider keeps an explicit retryable connection state without enabling company access
+  ---
+  duration_ms: 0.479
+  type: 'test'
+  ...
+# Subtest: a stale model discovery cannot overwrite newer connection configuration
+ok 5 - a stale model discovery cannot overwrite newer connection configuration
+  ---
+  duration_ms: 0.97275
+  type: 'test'
+  ...
+# Subtest: ask is answered locally with a validated citation: title, version and exact quote
+ok 6 - ask is answered locally with a validated citation: title, version and exact quote
+  ---
+  duration_ms: 12.399917
+  type: 'test'
+  ...
+# Subtest: ask without a selected field, or with a stale revision, still answers but sends no field text
+ok 7 - ask without a selected field, or with a stale revision, still answers but sends no field text
+  ---
+  duration_ms: 3.547917
+  type: 'test'
+  ...
+# Subtest: a credential in the question is refused before any answer path runs
+ok 8 - a credential in the question is refused before any answer path runs
+  ---
+  duration_ms: 6.564875
+  type: 'test'
+  ...
+# Subtest: credential-looking selected text is never passed as context
+ok 9 - credential-looking selected text is never passed as context
+  ---
+  duration_ms: 3.352
+  type: 'test'
+  ...
+# Subtest: questions must be 1 to 500 characters
+ok 10 - questions must be 1 to 500 characters
+  ---
+  duration_ms: 4.294583
+  type: 'test'
+  ...
+# Subtest: exact-quote validation: invented, altered or empty quotes are never cited
+ok 11 - exact-quote validation: invented, altered or empty quotes are never cited
+  ---
+  duration_ms: 22.835083
+  type: 'test'
+  ...
+# Subtest: restricted and credential-bearing sources are never cited and their prose never leaks
+ok 12 - restricted and credential-bearing sources are never cited and their prose never leaks
+  ---
+  duration_ms: 12.489208
+  type: 'test'
+  ...
+# Subtest: a revoked source is not cited and a changed session discards the answer
+ok 13 - a revoked source is not cited and a changed session discards the answer
+  ---
+  duration_ms: 6.969625
+  type: 'test'
+  ...
+# Subtest: the answer exposes no workspace snapshot, paths, people or token
+ok 14 - the answer exposes no workspace snapshot, paths, people or token
+  ---
+  duration_ms: 2.47675
+  type: 'test'
+  ...
+# Subtest: over the authenticated bridge: allowed when paired; refused for wrong origin, tab, token or size
+ok 15 - over the authenticated bridge: allowed when paired; refused for wrong origin, tab, token or size
+  ---
+  duration_ms: 70.974833
+  type: 'test'
+  ...
+# Subtest: ask is refused when the bridge is not paired to an extension and tab
+ok 16 - ask is refused when the bridge is not paired to an extension and tab
+  ---
+  duration_ms: 14.557959
+  type: 'test'
+  ...
+# Subtest: the extension worker whitelists ask and forwards only the question and optional field identity
+ok 17 - the extension worker whitelists ask and forwards only the question and optional field identity
+  ---
+  duration_ms: 4.328583
+  type: 'test'
+  ...
+# Subtest: browser bridge binds the extension/tab, excludes sensitive fields, rejects stale events and revokes its token
+ok 18 - browser bridge binds the extension/tab, excludes sensitive fields, rejects stale events and revokes its token
+  ---
+  duration_ms: 101.127584
+  type: 'test'
+  ...
+# Subtest: lost extension heartbeat clears observation and a new person gets a new pairing secret
+ok 19 - lost extension heartbeat clears observation and a new person gets a new pairing secret
+  ---
+  duration_ms: 71.417375
+  type: 'test'
+  ...
+# Subtest: a hidden tab pauses with a longer liveness window and resumes without a new pairing
+ok 20 - a hidden tab pauses with a longer liveness window and resumes without a new pairing
+  ---
+  duration_ms: 360.794458
+  type: 'test'
+  ...
+# Subtest: regular heartbeats keep an idle connection alive; silence ends it as lost contact
+ok 21 - regular heartbeats keep an idle connection alive; silence ends it as lost contact
+  ---
+  duration_ms: 416.980333
+  type: 'test'
+  ...
+# Subtest: an ended bridge answers its own token with the end reason, never with data
+ok 22 - an ended bridge answers its own token with the end reason, never with data
+  ---
+  duration_ms: 18.347375
+  type: 'test'
+  ...
+# Subtest: extension end reasons are recorded and a stop is accepted even behind a retried sequence
+ok 23 - extension end reasons are recorded and a stop is accepted even behind a retried sequence
+  ---
+  duration_ms: 38.437167
+  type: 'test'
+  ...
+# Subtest: every end reason has its own plain-English message without dashes
+ok 24 - every end reason has its own plain-English message without dashes
+  ---
+  duration_ms: 6.749667
+  type: 'test'
+  ...
+# Subtest: the bridge applies the extension sensitive-field policy: post composers named "personal" pass, personal data does not
+ok 25 - the bridge applies the extension sensitive-field policy: post composers named "personal" pass, personal data does not
+  ---
+  duration_ms: 45.353041
+  type: 'test'
+  ...
+# Subtest: loopback connection requires extension origin and one first-session approval; reconnect stays tab-bound
+ok 26 - loopback connection requires extension origin and one first-session approval; reconnect stays tab-bound
+  ---
+  duration_ms: 111.037583
+  type: 'test'
+  ...
+# Subtest: cancelled approval and logout while a prompt is open issue no pairing secret
+ok 27 - cancelled approval and logout while a prompt is open issue no pairing secret
+  ---
+  duration_ms: 28.808542
+  type: 'test'
+  ...
+# Subtest: a new process requires fresh approval and an occupied rendezvous port fails without taking over
+ok 28 - a new process requires fresh approval and an occupied rendezvous port fails without taking over
+  ---
+  duration_ms: 10.187583
+  type: 'test'
+  ...
+# Subtest: hello marks the extension as installed without sign-in, trust or a connection; other origins are refused
+ok 29 - hello marks the extension as installed without sign-in, trust or a connection; other origins are refused
+  ---
+  duration_ms: 5.5865
+  type: 'test'
+  ...
+# Subtest: connect sets the ON badge and the popup reads connected state; stop clears it with a reason
+ok 30 - connect sets the ON badge and the popup reads connected state; stop clears it with a reason
+  ---
+  duration_ms: 51.535416
+  type: 'test'
+  ...
+# Subtest: a transient relay failure is retried with fresh sequence numbers, then succeeds
+ok 31 - a transient relay failure is retried with fresh sequence numbers, then succeeds
+  ---
+  duration_ms: 2016.334375
+  type: 'test'
+  ...
+# Subtest: retry exhaustion ends with app_closed and tells the page why
+ok 32 - retry exhaustion ends with app_closed and tells the page why
+  ---
+  duration_ms: 2012.158959
+  type: 'test'
+  ...
+# Subtest: a rejected token ends immediately without retry; a 410 carries the desktop reason
+ok 33 - a rejected token ends immediately without retry; a 410 carries the desktop reason
+  ---
+  duration_ms: 11.298125
+  type: 'test'
+  ...
+# Subtest: a paused heartbeat is relayed as paused; resuming needs no new approval
+ok 34 - a paused heartbeat is relayed as paused; resuming needs no new approval
+  ---
+  duration_ms: 3.072083
+  type: 'test'
+  ...
+# Subtest: same-site reload re-injects and keeps the sequence; another site ends with other_site
+ok 35 - same-site reload re-injects and keeps the sequence; another site ends with other_site
+  ---
+  duration_ms: 1.522834
+  type: 'test'
+  ...
+# Subtest: closing the shared tab ends with tab_closed
+ok 36 - closing the shared tab ends with tab_closed
+  ---
+  duration_ms: 1.067541
+  type: 'test'
+  ...
+# Subtest: image-check is whitelisted, sends only sizes, alt text and PNG data, and marks the request kind
+ok 37 - image-check is whitelisted, sends only sizes, alt text and PNG data, and marks the request kind
+  ---
+  duration_ms: 1.719125
+  type: 'test'
+  ...
+# Subtest: image-check rejects too many images, non-PNG data, and bodies above 6 MB before anything is sent
+ok 38 - image-check rejects too many images, non-PNG data, and bodies above 6 MB before anything is sent
+  ---
+  duration_ms: 27.179958
+  type: 'test'
+  ...
+# Subtest: the captured page at 40% zoom: 3 texts, design boxes within 1 px of the captured translate values, scale 0.4007
+ok 39 - the captured page at 40% zoom: 3 texts, design boxes within 1 px of the captured translate values, scale 0.4007
+  ---
+  duration_ms: 1.934583
+  type: 'test'
+  ...
+# Subtest: the same design at 100% zoom with the page partly off screen reads the same numbers
+ok 40 - the same design at 100% zoom with the page partly off screen reads the same numbers
+  ---
+  duration_ms: 0.231041
+  type: 'test'
+  ...
+# Subtest: 28 October capture: a soft line break in the visual headline matches the text layer (real canva.com structure)
+ok 41 - 28 October capture: a soft line break in the visual headline matches the text layer (real canva.com structure)
+  ---
+  duration_ms: 0.251292
+  type: 'test'
+  ...
+# Subtest: unrecognised structures fail closed with a reason, never a guess
+ok 42 - unrecognised structures fail closed with a reason, never a guess
+  ---
+  duration_ms: 0.201292
+  type: 'test'
+  ...
+# Subtest: pistachio body text and a moved body box are measured from the page
+ok 43 - pistachio body text and a moved body box are measured from the page
+  ---
+  duration_ms: 0.087833
+  type: 'test'
+  ...
+# Subtest: a rotated text is read with the real corners of its rotated box (owner decision, 28 October 2026)
+ok 44 - a rotated text is read with the real corners of its rotated box (owner decision, 28 October 2026)
+  ---
+  duration_ms: 0.217333
+  type: 'test'
+  ...
+# Subtest: carousel slide 2 of 5 (real capture): rotated title, grouped caption and straight time, slide index and count
+ok 45 - carousel slide 2 of 5 (real capture): rotated title, grouped caption and straight time, slide index and count
+  ---
+  duration_ms: 0.31225
+  type: 'test'
+  ...
+# Subtest: carousel at 100% zoom reads the same numbers
+ok 46 - carousel at 100% zoom reads the same numbers
+  ---
+  duration_ms: 0.414084
+  type: 'test'
+  ...
+# Subtest: carousel: the turned polaroid moved off the page leaves the texts on the cream page (and the turned underline)
+ok 47 - carousel: the turned polaroid moved off the page leaves the texts on the cream page (and the turned underline)
+  ---
+  duration_ms: 0.304917
+  type: 'test'
+  ...
+# Subtest: carousel: page markers that disagree or are missing still read the slide, with slide null
+ok 48 - carousel: page markers that disagree or are missing still read the slide, with slide null
+  ---
+  duration_ms: 0.359625
+  type: 'test'
+  ...
+# Subtest: the slide field is validated strictly
+ok 49 - the slide field is validated strictly
+  ---
+  duration_ms: 0.766125
+  type: 'test'
+  ...
+# Subtest: carousel: a shape cut by an SVG clipPath of plain paths (Canva polaroid frames) is sampled inside the path only
+ok 50 - carousel: a shape cut by an SVG clipPath of plain paths (Canva polaroid frames) is sampled inside the path only
+  ---
+  duration_ms: 0.067583
+  type: 'test'
+  ...
+# Subtest: carousel: a text highlight drawn as an SVG path before the text is the text background (isPointInFill)
+ok 51 - carousel: a text highlight drawn as an SVG path before the text is the text background (isPointInFill)
+  ---
+  duration_ms: 0.041792
+  type: 'test'
+  ...
+# Subtest: Nebius chat refuses when company AI is off or text contains credentials
+ok 52 - Nebius chat refuses when company AI is off or text contains credentials
+  ---
+  duration_ms: 5.046917
+  type: 'test'
+  ...
+# Subtest: Nebius chat picks Nemotron Super, retries once on 5xx and reports calls without payloads
+ok 53 - Nebius chat picks Nemotron Super, retries once on 5xx and reports calls without payloads
+  ---
+  duration_ms: 3.259667
+  type: 'test'
+  ...
+# Subtest: Nebius embeddings keep input order and reject mismatched responses
+ok 54 - Nebius embeddings keep input order and reject mismatched responses
+  ---
+  duration_ms: 1.908792
+  type: 'test'
+  ...
+# Subtest: Tavily outbound guard blocks credentials and repeated internal source text
+ok 55 - Tavily outbound guard blocks credentials and repeated internal source text
+  ---
+  duration_ms: 6.0355
+  type: 'test'
+  ...
+# Subtest: Tavily search keeps only HTTPS results and the requested depth
+ok 56 - Tavily search keeps only HTTPS results and the requested depth
+  ---
+  duration_ms: 1.209666
+  type: 'test'
+  ...
+# Subtest: Tavily extract and crawl refuse private hosts and keep same-host pages
+ok 57 - Tavily extract and crawl refuse private hosts and keep same-host pages
+  ---
+  duration_ms: 8.315125
+  type: 'test'
+  ...
+# Subtest: cloud activity stays per person, keeps no payload and gives admins totals only
+ok 58 - cloud activity stays per person, keeps no payload and gives admins totals only
+  ---
+  duration_ms: 4.57275
+  type: 'test'
+  ...
+# Subtest: companion keeps a position on a second monitor
+ok 59 - companion keeps a position on a second monitor
+  ---
+  duration_ms: 1.228958
+  type: 'test'
+  ...
+# Subtest: companion returns to visible work area after a monitor is removed
+ok 60 - companion returns to visible work area after a monitor is removed
+  ---
+  duration_ms: 0.120875
+  type: 'test'
+  ...
+# Subtest: bound browser review returns a minimal cited result and a validated individual proposal
+ok 61 - bound browser review returns a minimal cited result and a validated individual proposal
+  ---
+  duration_ms: 58.97575
+  type: 'test'
+  ...
+# Subtest: guidance/role/session/field changes revoke status, deep links and proposals; rereading unchanged text does not
+ok 62 - guidance/role/session/field changes revoke status, deep links and proposals; rereading unchanged text does not
+  ---
+  duration_ms: 41.86525
+  type: 'test'
+  ...
+# Subtest: source absence, source visibility, ambiguous phrases and redaction never create an unsafe edit
+ok 63 - source absence, source visibility, ambiguous phrases and redaction never create an unsafe edit
+  ---
+  duration_ms: 3.251792
+  type: 'test'
+  ...
+# Subtest: AI uses the shared client only after consent; source changes in flight invalidate the entire reply
+ok 64 - AI uses the shared client only after consent; source changes in flight invalidate the entire reply
+  ---
+  duration_ms: 3.664625
+  type: 'test'
+  ...
+# Subtest: local review remains offline even when the provider is configured
+ok 65 - local review remains offline even when the provider is configured
+  ---
+  duration_ms: 3.482875
+  type: 'test'
+  ...
+# Subtest: a late model reply cannot replace a newer local review on the same field
+ok 66 - a late model reply cannot replace a newer local review on the same field
+  ---
+  duration_ms: 4.705292
+  type: 'test'
+  ...
+# Subtest: fictional company policies answer English and Italian questions for an employee without exposing People-only files
+ok 67 - fictional company policies answer English and Italian questions for an employee without exposing People-only files
+  ---
+  duration_ms: 165.48075
+  type: 'test'
+  ...
+# Subtest: general demo fixture seeding refuses real workspaces and imported company sources
+ok 68 - general demo fixture seeding refuses real workspaces and imported company sources
+  ---
+  duration_ms: 1.082375
+  type: 'test'
+  ...
+# Subtest: contrast maths matches WCAG on known pairs, including the FB-13 spike values
+ok 69 - contrast maths matches WCAG on known pairs, including the FB-13 spike values
+  ---
+  duration_ms: 136.010584
+  type: 'test'
+  ...
+# Subtest: large text: 24 px design-equivalent at 1080 width, or 18.66 px bold
+ok 70 - large text: 24 px design-equivalent at 1080 width, or 18.66 px bold
+  ---
+  duration_ms: 0.169875
+  type: 'test'
+  ...
+# Subtest: safe zone: inside, exactly touching the line, and outside on each edge
+ok 71 - safe zone: inside, exactly touching the line, and outside on each edge
+  ---
+  duration_ms: 0.337791
+  type: 'test'
+  ...
+# Subtest: design rule lines parse; malformed ones are ignored; the Vamo guideline carries them with no em or en dash
+ok 72 - design rule lines parse; malformed ones are ignored; the Vamo guideline carries them with no em or en dash
+  ---
+  duration_ms: 0.770708
+  type: 'test'
+  ...
+# Subtest: payload validation: only texts and bounded numbers, no image data, at most 30 texts of 500 characters
+ok 73 - payload validation: only texts and bounded numbers, no image data, at most 30 texts of 500 characters
+  ---
+  duration_ms: 1.980167
+  type: 'test'
+  ...
+# Subtest: evaluate: dark text passes; pistachio, the moved box and the forbidden claim each cite the exact approved line
+ok 74 - evaluate: dark text passes; pistachio, the moved box and the forbidden claim each cite the exact approved line
+  ---
+  duration_ms: 19.800333
+  type: 'test'
+  ...
+# Subtest: the captured starting post is outside Vamo's 108 px margin on all three texts
+ok 75 - the captured starting post is outside Vamo's 108 px margin on all three texts
+  ---
+  duration_ms: 2.430416
+  type: 'test'
+  ...
+# Subtest: without company design lines general readability still detects problems
+ok 76 - without company design lines general readability still detects problems
+  ---
+  duration_ms: 2.216083
+  type: 'test'
+  ...
+# Subtest: contextual designCheck: canva.com only, signed in only, and Export anyway records an override for the last check
+ok 77 - contextual designCheck: canva.com only, signed in only, and Export anyway records an override for the last check
+  ---
+  duration_ms: 2.750583
+  type: 'test'
+  ...
+# Subtest: carousel (owner decision 28 October 2026): results accumulate per slide; blocking until every slide is read and clean
+ok 78 - carousel (owner decision 28 October 2026): results accumulate per slide; blocking until every slide is read and clean
+  ---
+  duration_ms: 36.597542
+  type: 'test'
+  ...
+# Subtest: legacy readings without slide/design identity never clear the carousel gate; another design starts from zero
+ok 79 - legacy readings without slide/design identity never clear the carousel gate; another design starts from zero
+  ---
+  duration_ms: 9.362333
+  type: 'test'
+  ...
+# Subtest: bridge: a design check is refused without a connection, for another tab or origin, and after Stop
+ok 80 - bridge: a design check is refused without a connection, for another tab or origin, and after Stop
+  ---
+  duration_ms: 57.453292
+  type: 'test'
+  ...
+# Subtest: worker: the reader is injected before content.js on canva.com only; the relay sends only validated texts and numbers
+ok 81 - worker: the reader is injected before content.js on canva.com only; the relay sends only validated texts and numbers
+  ---
+  duration_ms: 7.883167
+  type: 'test'
+  ...
+# Subtest: v3 parses its typography lines and keeps every v2 line; old numeric design lines parse exactly as before
+ok 82 - v3 parses its typography lines and keeps every v2 line; old numeric design lines parse exactly as before
+  ---
+  duration_ms: 3.406583
+  type: 'test'
+  ...
+# Subtest: design questions are recognised; wording questions are not, even when they name an image
+ok 83 - design questions are recognised; wording questions are not, even when they name an image
+  ---
+  duration_ms: 1.106834
+  type: 'test'
+  ...
+# Subtest: app question box: v3 pending gives "No approved rule covers fonts"; after Maya approves it the answer cites the Fraunces/DM Sans lines
+ok 84 - app question box: v3 pending gives "No approved rule covers fonts"; after Maya approves it the answer cites the Fraunces/DM Sans lines
+  ---
+  duration_ms: 165.932917
+  type: 'test'
+  ...
+# Subtest: a design question never cites a wording or claim rule; a wording question still gets its wording passage
+ok 85 - a design question never cites a wording or claim rule; a wording question still gets its wording passage
+  ---
+  duration_ms: 139.336167
+  type: 'test'
+  ...
+# Subtest: with Nemotron on, design questions never reach the model and still cite only design rules
+ok 86 - with Nemotron on, design questions never reach the model and still cite only design rules
+  ---
+  duration_ms: 187.87725
+  type: 'test'
+  ...
+# Subtest: browser card: the answer carries the citation and, for this tab, the measured headline size but never a font family
+ok 87 - browser card: the answer carries the citation and, for this tab, the measured headline size but never a font family
+  ---
+  duration_ms: 388.775583
+  type: 'test'
+  ...
+# Subtest: design facts: contrast and margin questions use the reader numbers; the existing design check is unchanged by v3
+ok 88 - design facts: contrast and margin questions use the reader numbers; the existing design check is unchanged by v3
+  ---
+  duration_ms: 179.411916
+  type: 'test'
+  ...
+# Subtest: a single exact edit preserves whitespace, line breaks and every unrelated character
+ok 89 - a single exact edit preserves whitespace, line breaks and every unrelated character
+  ---
+  duration_ms: 0.906458
+  type: 'test'
+  ...
+# Subtest: stale, ambiguous, invalid-range and invented-text patches never rewrite a draft
+ok 90 - stale, ambiguous, invalid-range and invented-text patches never rewrite a draft
+  ---
+  duration_ms: 0.200709
+  type: 'test'
+  ...
+# Subtest: email findings appear for an incoming draft and disappear after correction
+ok 91 - email findings appear for an incoming draft and disappear after correction
+  ---
+  duration_ms: 1.923083
+  type: 'test'
+  ...
+# Subtest: social findings cover asset, disclosure and date and disappear after correction
+ok 92 - social findings cover asset, disclosure and date and disappear after correction
+  ---
+  duration_ms: 0.381875
+  type: 'test'
+  ...
+# Subtest: handover identifies the superseded brief and cites the current one
+ok 93 - handover identifies the superseded brief and cites the current one
+  ---
+  duration_ms: 0.802041
+  type: 'test'
+  ...
+# Subtest: file question returns existing approved source files
+ok 94 - file question returns existing approved source files
+  ---
+  duration_ms: 0.396167
+  type: 'test'
+  ...
+# Subtest: unknown questions do not fabricate a source-backed answer
+ok 95 - unknown questions do not fabricate a source-backed answer
+  ---
+  duration_ms: 0.447791
+  type: 'test'
+  ...
+# Subtest: model output must cite a connected source
+ok 96 - model output must cite a connected source
+  ---
+  duration_ms: 0.37725
+  type: 'test'
+  ...
+# Subtest: LinkedIn uses its own organic campaign rules and all corrections clear findings
+ok 97 - LinkedIn uses its own organic campaign rules and all corrections clear findings
+  ---
+  duration_ms: 0.393583
+  type: 'test'
+  ...
+# Subtest: external window IDs are accepted only in desktop capture format
+ok 98 - external window IDs are accepted only in desktop capture format
+  ---
+  duration_ms: 1.322291
+  type: 'test'
+  ...
+# Subtest: observation is bounded, attributed and distinguishes accessibility from OCR
+ok 99 - observation is bounded, attributed and distinguishes accessibility from OCR
+  ---
+  duration_ms: 1.586875
+  type: 'test'
+  ...
+# Subtest: observation redacts credential-shaped text and payment numbers before display
+ok 100 - observation redacts credential-shaped text and payment numbers before display
+  ---
+  duration_ms: 0.217042
+  type: 'test'
+  ...
+# Subtest: role=textbox and contenteditable plaintext-only are shareable; a read-only textbox is not
+ok 101 - role=textbox and contenteditable plaintext-only are shareable; a read-only textbox is not
+  ---
+  duration_ms: 0.90125
+  type: 'test'
+  ...
+# Subtest: a field inside an open shadow root is found through the event path
+ok 102 - a field inside an open shadow root is found through the event path
+  ---
+  duration_ms: 0.137042
+  type: 'test'
+  ...
+# Subtest: post and caption composers are not excluded, even with the word personal
+ok 103 - post and caption composers are not excluded, even with the word personal
+  ---
+  duration_ms: 0.303416
+  type: 'test'
+  ...
+# Subtest: password, token, card, payment, recipient email and phone fields stay excluded
+ok 104 - password, token, card, payment, recipient email and phone fields stay excluded
+  ---
+  duration_ms: 0.069375
+  type: 'test'
+  ...
+# Subtest: a replaced field is found again by label, role and position
+ok 105 - a replaced field is found again by label, role and position
+  ---
+  duration_ms: 1.3695
+  type: 'test'
+  ...
+# Subtest: generated ids are ignored, stable ids are kept
+ok 106 - generated ids are ignored, stable ids are kept
+  ---
+  duration_ms: 0.235
+  type: 'test'
+  ...
+# Subtest: among identical fields the same position is picked; a changed count or a different label is not guessed
+ok 107 - among identical fields the same position is picked; a changed count or a different label is not guessed
+  ---
+  duration_ms: 0.485458
+  type: 'test'
+  ...
+# Subtest: a field that is hidden or refused by the caller is not re-found
+ok 108 - a field that is hidden or refused by the caller is not re-found
+  ---
+  duration_ms: 0.208542
+  type: 'test'
+  ...
+# Subtest: a composer inside a dialog is not matched by a similar field outside it
+ok 109 - a composer inside a dialog is not matched by a similar field outside it
+  ---
+  duration_ms: 0.574
+  type: 'test'
+  ...
+# Subtest: flaw matrix: Brevo launch · subject
+ok 110 - flaw matrix: Brevo launch · subject
+  ---
+  duration_ms: 190.320792
+  type: 'test'
+  ...
+# Subtest: flaw matrix: Brevo launch · audience
+ok 111 - flaw matrix: Brevo launch · audience
+  ---
+  duration_ms: 4.939
+  type: 'test'
+  ...
+# Subtest: flaw matrix: Brevo launch · body
+ok 112 - flaw matrix: Brevo launch · body
+  ---
+  duration_ms: 7.035542
+  type: 'test'
+  ...
+# Subtest: flaw matrix: Brevo reminder · body
+ok 113 - flaw matrix: Brevo reminder · body
+  ---
+  duration_ms: 4.536583
+  type: 'test'
+  ...
+# Subtest: flaw matrix: Brevo Vienna teaser · body
+ok 114 - flaw matrix: Brevo Vienna teaser · body
+  ---
+  duration_ms: 8.631959
+  type: 'test'
+  ...
+# Subtest: flaw matrix: LinkedIn winter draft
+ok 115 - flaw matrix: LinkedIn winter draft
+  ---
+  duration_ms: 5.629625
+  type: 'test'
+  ...
+# Subtest: flaw matrix: Instagram paid Reel
+ok 116 - flaw matrix: Instagram paid Reel
+  ---
+  duration_ms: 3.190292
+  type: 'test'
+  ...
+# Subtest: flaw matrix: Instagram paid Reel without \#ad
+ok 117 - flaw matrix: Instagram paid Reel without \#ad
+  ---
+  duration_ms: 3.489209
+  type: 'test'
+  ...
+# Subtest: flaw matrix: Instagram caption without the brand tag
+ok 118 - flaw matrix: Instagram caption without the brand tag
+  ---
+  duration_ms: 2.095834
+  type: 'test'
+  ...
+# Subtest: flaw matrix: the unresolved v1/v2 guidelines conflict keeps hashtag rules off until Maya decides
+ok 119 - flaw matrix: the unresolved v1/v2 guidelines conflict keeps hashtag rules off until Maya decides
+  ---
+  duration_ms: 354.490834
+  type: 'test'
+  ...
+# Subtest: flaw matrix: published simulator posts raise no hashtag finding
+ok 120 - flaw matrix: published simulator posts raise no hashtag finding
+  ---
+  duration_ms: 19.544917
+  type: 'test'
+  ...
+# Subtest: flaw matrix: the draft photos have the sizes the image rules expect
+ok 121 - flaw matrix: the draft photos have the sizes the image rules expect
+  ---
+  duration_ms: 2.181
+  type: 'test'
+  ...
+# Subtest: flaw matrix: the Instagram Reel draft uses the planted image and the image check catches "lowest prices guaranteed" with its citation
+ok 122 - flaw matrix: the Instagram Reel draft uses the planted image and the image check catches "lowest prices guaranteed" with its citation
+  ---
+  duration_ms: 9.350583
+  type: 'test'
+  ...
+# Subtest: flaw matrix: the LinkedIn draft image meets the approved image rules
+ok 123 - flaw matrix: the LinkedIn draft image meets the approved image rules
+  ---
+  duration_ms: 3.190583
+  type: 'test'
+  ...
+# Subtest: flaw matrix: the macOS OCR helper reads the planted phrase out of the real photo
+ok 124 - flaw matrix: the macOS OCR helper reads the planted phrase out of the real photo
+  ---
+  duration_ms: 2526.794583
+  type: 'test'
+  ...
+# Subtest: guide progress is kept per person and cleared only for that person
+ok 125 - guide progress is kept per person and cleared only for that person
+  ---
+  duration_ms: 4.7825
+  type: 'test'
+  ...
+# Subtest: briefing lists changed, added and removed rules with quotes from both versions
+ok 126 - briefing lists changed, added and removed rules with quotes from both versions
+  ---
+  duration_ms: 2.291041
+  type: 'test'
+  ...
+# Subtest: Nemotron briefing points are kept only when their quotes are exact
+ok 127 - Nemotron briefing points are kept only when their quotes are exact
+  ---
+  duration_ms: 1.123791
+  type: 'test'
+  ...
+# Subtest: practice drafts need lead approval, work offline and follow the current rule
+ok 128 - practice drafts need lead approval, work offline and follow the current rule
+  ---
+  duration_ms: 4.949917
+  type: 'test'
+  ...
+# Subtest: model practice drafts must keep the rule value only in the correct option
+ok 129 - model practice drafts must keep the rule value only in the correct option
+  ---
+  duration_ms: 0.239833
+  type: 'test'
+  ...
+# Subtest: image rule lines and aspect ranges parse; malformed lines are ignored
+ok 130 - image rule lines and aspect ranges parse; malformed lines are ignored
+  ---
+  duration_ms: 344.270916
+  type: 'test'
+  ...
+# Subtest: the approved Vamo guideline carries the image specs and no em or en dash was added
+ok 131 - the approved Vamo guideline carries the image specs and no em or en dash was added
+  ---
+  duration_ms: 2.685416
+  type: 'test'
+  ...
+# Subtest: a conforming Instagram and LinkedIn image produces no finding
+ok 132 - a conforming Instagram and LinkedIn image produces no finding
+  ---
+  duration_ms: 9.461875
+  type: 'test'
+  ...
+# Subtest: missing image, missing alt text, wrong ratio and small width are findings that cite the exact approved line
+ok 133 - missing image, missing alt text, wrong ratio and small width are findings that cite the exact approved line
+  ---
+  duration_ms: 11.077167
+  type: 'test'
+  ...
+# Subtest: text read from an image is checked with the caption rules: a forbidden claim cites its source, hashtags and caption-only rules do not apply
+ok 134 - text read from an image is checked with the caption rules: a forbidden claim cites its source, hashtags and caption-only rules do not apply
+  ---
+  duration_ms: 14.072333
+  type: 'test'
+  ...
+# Subtest: OCR text is never returned: only the matched phrase appears in a finding
+ok 135 - OCR text is never returned: only the matched phrase appears in a finding
+  ---
+  duration_ms: 3.588416
+  type: 'test'
+  ...
+# Subtest: each image goes to a private temp file that is deleted right after OCR, also when OCR fails
+ok 136 - each image goes to a private temp file that is deleted right after OCR, also when OCR fails
+  ---
+  duration_ms: 5.021292
+  type: 'test'
+  ...
+# Subtest: an image the page would not let us read sends no pixels: size and alt text are still checked and the message says so
+ok 137 - an image the page would not let us read sends no pixels: size and alt text are still checked and the message says so
+  ---
+  duration_ms: 4.36825
+  type: 'test'
+  ...
+# Subtest: input is validated: count, PNG data, signature, size, alt text
+ok 138 - input is validated: count, PNG data, signature, size, alt text
+  ---
+  duration_ms: 23.090375
+  type: 'test'
+  ...
+# Subtest: work types other than Instagram and LinkedIn are refused
+ok 139 - work types other than Instagram and LinkedIn are refused
+  ---
+  duration_ms: 0.529292
+  type: 'test'
+  ...
+# Subtest: imageCheck is bound to the selected field and revision and returns no image data
+ok 140 - imageCheck is bound to the selected field and revision and returns no image data
+  ---
+  duration_ms: 5.395292
+  type: 'test'
+  ...
+# Subtest: the field changing while images are read makes the result stale
+ok 141 - the field changing while images are read makes the result stale
+  ---
+  duration_ms: 24.550042
+  type: 'test'
+  ...
+# Subtest: the bridge accepts up to 6 MB only for image-check and rejects above it; other requests keep the 24 KB cap
+ok 142 - the bridge accepts up to 6 MB only for image-check and rejects above it; other requests keep the 24 KB cap
+  ---
+  duration_ms: 207.887875
+  type: 'test'
+  ...
+# Subtest: judge demo creates approved Marketing sources and a signed-in-ready employee
+ok 143 - judge demo creates approved Marketing sources and a signed-in-ready employee
+  ---
+  duration_ms: 351.382708
+  type: 'test'
+  ...
+# Subtest: judge demo refuses to touch an existing workspace
+ok 144 - judge demo refuses to touch an existing workspace
+  ---
+  duration_ms: 1.500542
+  type: 'test'
+  ...
+# Subtest: judge demo accounts sign in without a password
+ok 145 - judge demo accounts sign in without a password
+  ---
+  duration_ms: 192.041375
+  type: 'test'
+  ...
+# Subtest: passwordless sign-in is refused outside the demo workspace
+ok 146 - passwordless sign-in is refused outside the demo workspace
+  ---
+  duration_ms: 49.953167
+  type: 'test'
+  ...
+# Subtest: judge demo gives each role real work: Emma a pending note, Maya a review queue and a version conflict, Alex the roster
+ok 147 - judge demo gives each role real work: Emma a pending note, Maya a review queue and a version conflict, Alex the roster
+  ---
+  duration_ms: 157.382625
+  type: 'test'
+  ...
+# Subtest: judge demo seeds at least two open tasks for each of Emma, Maya and Alex, visible only to them
+ok 148 - judge demo seeds at least two open tasks for each of Emma, Maya and Alex, visible only to them
+  ---
+  duration_ms: 220.716833
+  type: 'test'
+  ...
+# Subtest: only the judge demo workspace may use the demo server
+ok 149 - only the judge demo workspace may use the demo server
+  ---
+  duration_ms: 179.767709
+  type: 'test'
+  ...
+# Subtest: sends a capped request with an install id and keeps only findings whose quotes are verbatim
+ok 150 - sends a capped request with an install id and keeps only findings whose quotes are verbatim
+  ---
+  duration_ms: 8.75475
+  type: 'test'
+  ...
+# Subtest: a daily limit shows the server message verbatim and keeps the local check
+ok 151 - a daily limit shows the server message verbatim and keeps the local check
+  ---
+  duration_ms: 2.857875
+  type: 'test'
+  ...
+# Subtest: an outage says so explicitly and keeps the local check
+ok 152 - an outage says so explicitly and keeps the local check
+  ---
+  duration_ms: 4.843084
+  type: 'test'
+  ...
+# Subtest: askPlan lists what leaves the Mac, and design or unmatched questions stay local
+ok 153 - askPlan lists what leaves the Mac, and design or unmatched questions stay local
+  ---
+  duration_ms: 6.398792
+  type: 'test'
+  ...
+# Subtest: a design question never calls the server
+ok 154 - a design question never calls the server
+  ---
+  duration_ms: 4.119542
+  type: 'test'
+  ...
+# Subtest: ask sends a capped request and keeps a Nemotron answer only when its quotes are verbatim
+ok 155 - ask sends a capped request and keeps a Nemotron answer only when its quotes are verbatim
+  ---
+  duration_ms: 13.331
+  type: 'test'
+  ...
+# Subtest: ask shows the limit message verbatim and an explicit outage notice, with the local answer both times
+ok 156 - ask shows the limit message verbatim and an explicit outage notice, with the local answer both times
+  ---
+  duration_ms: 4.787375
+  type: 'test'
+  ...
+# Subtest: ask is refused outside the judge demo workspace
+ok 157 - ask is refused outside the judge demo workspace
+  ---
+  duration_ms: 2.149125
+  type: 'test'
+  ...
+# Subtest: knowledge exposes staged uploads immediately and searches extracted text without leaking private staff material
+ok 158 - knowledge exposes staged uploads immediately and searches extracted text without leaking private staff material
+  ---
+  duration_ms: 14.58675
+  type: 'test'
+  ...
+# Subtest: learning persists; weekly practice is one page with one submit and feedback for every answer
+ok 159 - learning persists; weekly practice is one page with one submit and feedback for every answer
+  ---
+  duration_ms: 129.956875
+  type: 'test'
+  ...
+# Subtest: each question type is scored: choose picture, text with picture, tap the spot, put in order
+ok 160 - each question type is scored: choose picture, text with picture, tap the spot, put in order
+  ---
+  duration_ms: 8.000875
+  type: 'test'
+  ...
+# Subtest: submitting with unanswered questions is rejected and stores nothing
+ok 161 - submitting with unanswered questions is rejected and stores nothing
+  ---
+  duration_ms: 7.960959
+  type: 'test'
+  ...
+# Subtest: one page confirmation covers every task Averill did not see; a task it saw is checked by Averill
+ok 162 - one page confirmation covers every task Averill did not see; a task it saw is checked by Averill
+  ---
+  duration_ms: 8.225917
+  type: 'test'
+  ...
+# Subtest: retry resets only the wrong answers and keeps the right ones and the history
+ok 163 - retry resets only the wrong answers and keeps the right ones and the history
+  ---
+  duration_ms: 9.565458
+  type: 'test'
+  ...
+# Subtest: weekly practice belongs to the active person and an answer key never crosses people
+ok 164 - weekly practice belongs to the active person and an answer key never crosses people
+  ---
+  duration_ms: 2.836667
+  type: 'test'
+  ...
+# Subtest: learning is isolated by person and exclusion invalidates practice
+ok 165 - learning is isolated by person and exclusion invalidates practice
+  ---
+  duration_ms: 2.897625
+  type: 'test'
+  ...
+# Subtest: revoked and conflicting sources cannot justify questions; rule questions cite the approved source
+ok 166 - revoked and conflicting sources cannot justify questions; rule questions cite the approved source
+  ---
+  duration_ms: 12.835833
+  type: 'test'
+  ...
+# Subtest: a revoked source makes a fresh submission impossible
+ok 167 - a revoked source makes a fresh submission impossible
+  ---
+  duration_ms: 7.030583
+  type: 'test'
+  ...
+# Subtest: Copenhagen week rollover and recorded work without a free-text question
+ok 168 - Copenhagen week rollover and recorded work without a free-text question
+  ---
+  duration_ms: 2.357542
+  type: 'test'
+  ...
+# Subtest: finding exercises keep employee confirmation separate from supported checks
+ok 169 - finding exercises keep employee confirmation separate from supported checks
+  ---
+  duration_ms: 1.439166
+  type: 'test'
+  ...
+# Subtest: task exercises are one page with one confirmation; Canva steps tick from the design reading
+ok 170 - task exercises are one page with one confirmation; Canva steps tick from the design reading
+  ---
+  duration_ms: 2.414292
+  type: 'test'
+  ...
+# Subtest: without Canva the employee can confirm every step of an exercise on the one page
+ok 171 - without Canva the employee can confirm every step of an exercise on the one page
+  ---
+  duration_ms: 1.958542
+  type: 'test'
+  ...
+# Subtest: sessions saved before D1 and T7.3 open in the new format without losing anything
+ok 172 - sessions saved before D1 and T7.3 open in the new format without losing anything
+  ---
+  duration_ms: 6.6255
+  type: 'test'
+  ...
+# Subtest: startProject works with and without an approved source
+ok 173 - startProject works with and without an approved source
+  ---
+  duration_ms: 4.033833
+  type: 'test'
+  ...
+# Subtest: Canva lesson steps are read from texts, sizes, positions and colours only
+ok 174 - Canva lesson steps are read from texts, sizes, positions and colours only
+  ---
+  duration_ms: 0.611542
+  type: 'test'
+  ...
+# Subtest: design readings tick lesson steps for the active person; finishing records Averill checks separately from the employee
+ok 175 - design readings tick lesson steps for the active person; finishing records Averill checks separately from the employee
+  ---
+  duration_ms: 3.46975
+  type: 'test'
+  ...
+# Subtest: current lesson uses stricter company constraints as well as the general baseline
+ok 176 - current lesson uses stricter company constraints as well as the general baseline
+  ---
+  duration_ms: 1.601208
+  type: 'test'
+  ...
+# Subtest: HTTPS imports block private DNS/IPs, mixed DNS answers, credentials and nonstandard ports
+ok 177 - HTTPS imports block private DNS/IPs, mixed DNS answers, credentials and nonstandard ports
+  ---
+  duration_ms: 11.083375
+  type: 'test'
+  ...
+# Subtest: download redirects are validated and never receive the previous bearer token; oversized responses fail
+ok 178 - download redirects are validated and never receive the previous bearer token; oversized responses fail
+  ---
+  duration_ms: 1.230833
+  type: 'test'
+  ...
+# Subtest: company privacy blocks all network calls by default and restricted/credential files cannot enter prompts
+ok 179 - company privacy blocks all network calls by default and restricted/credential files cannot enter prompts
+  ---
+  duration_ms: 911.373542
+  type: 'test'
+  ...
+# Subtest: only explicitly selected file text is sent and retained privacy/provenance reach imported sources
+ok 180 - only explicitly selected file text is sent and retained privacy/provenance reach imported sources
+  ---
+  duration_ms: 7.355
+  type: 'test'
+  ...
+# Subtest: source answers never send restricted or legacy sources even when company AI is permitted
+ok 181 - source answers never send restricted or legacy sources even when company AI is permitted
+  ---
+  duration_ms: 4.705125
+  type: 'test'
+  ...
+# Subtest: cloud OAuth binds callback state, uses PKCE/read scopes, stores encrypted tokens and isolates owner/workspace
+ok 182 - cloud OAuth binds callback state, uses PKCE/read scopes, stores encrypted tokens and isolates owner/workspace
+  ---
+  duration_ms: 17.262541
+  type: 'test'
+  ...
+# Subtest: XLSX onboarding bulk creates separate manager, strategist and creator accounts with private personnel evidence
+ok 183 - XLSX onboarding bulk creates separate manager, strategist and creator accounts with private personnel evidence
+  ---
+  duration_ms: 2632.226917
+  type: 'test'
+  ...
+# Subtest: model interpretation rejects fabricated names/emails/evidence and never grants imported admin access
+ok 184 - model interpretation rejects fabricated names/emails/evidence and never grants imported admin access
+  ---
+  duration_ms: 0.422791
+  type: 'test'
+  ...
+# Subtest: Nebius analysis requires explicit consent, sends bounded text without credentials, and preserves the draft on failure
+ok 185 - Nebius analysis requires explicit consent, sends bounded text without credentials, and preserves the draft on failure
+  ---
+  duration_ms: 195.317292
+  type: 'test'
+  ...
+# Subtest: failed onboarding application leaves no partial people or imported copies
+ok 186 - failed onboarding application leaves no partial people or imported copies
+  ---
+  duration_ms: 435.53425
+  type: 'test'
+  ...
+# Subtest: the extractor offers prices, dates, events and places, and skips internal rule values, credentials and internal text
+ok 187 - the extractor offers prices, dates, events and places, and skips internal rule values, credentials and internal text
+  ---
+  duration_ms: 11.978875
+  type: 'test'
+  ...
+# Subtest: a review offers claims but sends nothing: the check starts only from a confirmed public-check request
+ok 188 - a review offers claims but sends nothing: the check starts only from a confirmed public-check request
+  ---
+  duration_ms: 22.2095
+  type: 'test'
+  ...
+# Subtest: nothing is offered when online checks are not available
+ok 189 - nothing is offered when online checks are not available
+  ---
+  duration_ms: 5.929291
+  type: 'test'
+  ...
+# Subtest: model public claims are used when valid, otherwise the local extractor fills in
+ok 190 - model public claims are used when valid, otherwise the local extractor fills in
+  ---
+  duration_ms: 1.694083
+  type: 'test'
+  ...
+# Subtest: only the confirmed claims reach the checker; an unticked claim is never sent
+ok 191 - only the confirmed claims reach the checker; an unticked claim is never sent
+  ---
+  duration_ms: 10.466583
+  type: 'test'
+  ...
+# Subtest: an edited claim must stay inside the draft or the shown claim
+ok 192 - an edited claim must stay inside the draft or the shown claim
+  ---
+  duration_ms: 5.301
+  type: 'test'
+  ...
+# Subtest: limits: 1 to 5 claims of at most 300 characters, bound to this field and revision
+ok 193 - limits: 1 to 5 claims of at most 300 characters, bound to this field and revision
+  ---
+  duration_ms: 2.593667
+  type: 'test'
+  ...
+# Subtest: a credential in a claim is refused before anything is sent
+ok 194 - a credential in a claim is refused before anything is sent
+  ---
+  duration_ms: 2.408
+  type: 'test'
+  ...
+# Subtest: a claim that repeats internal company text is refused before anything is sent
+ok 195 - a claim that repeats internal company text is refused before anything is sent
+  ---
+  duration_ms: 6.863
+  type: 'test'
+  ...
+# Subtest: provider failures become clear messages, not silent results
+ok 196 - provider failures become clear messages, not silent results
+  ---
+  duration_ms: 33.0105
+  type: 'test'
+  ...
+# Subtest: snippet validation: a verdict keeps its snippet only if it appears in the returned content, otherwise Unclear
+ok 197 - snippet validation: a verdict keeps its snippet only if it appears in the returned content, otherwise Unclear
+  ---
+  duration_ms: 0.472583
+  type: 'test'
+  ...
+# Subtest: the judge model path still turns an invented snippet into Unclear (provider mocked)
+ok 198 - the judge model path still turns an invented snippet into Unclear (provider mocked)
+  ---
+  duration_ms: 6.065375
+  type: 'test'
+  ...
+# Subtest: demo workspace without a local key searches through the judge server /api/search with the install id
+ok 199 - demo workspace without a local key searches through the judge server /api/search with the install id
+  ---
+  duration_ms: 352.909541
+  type: 'test'
+  ...
+# Subtest: a local Tavily key wins over the demo server, and a real workspace never uses the demo server
+ok 200 - a local Tavily key wins over the demo server, and a real workspace never uses the demo server
+  ---
+  duration_ms: 167.246667
+  type: 'test'
+  ...
+# Subtest: judge server usage errors become clear messages; the 429 is flagged as a limit
+ok 201 - judge server usage errors become clear messages; the 429 is flagged as a limit
+  ---
+  duration_ms: 196.096125
+  type: 'test'
+  ...
+# Subtest: guards run on the judge server route too: credentials and internal text never leave the device
+ok 202 - guards run on the judge server route too: credentials and internal text never leave the device
+  ---
+  duration_ms: 183.831375
+  type: 'test'
+  ...
+# Subtest: each public check adds one activity line with counts only, and admin totals do not count it twice
+ok 203 - each public check adds one activity line with counts only, and admin totals do not count it twice
+  ---
+  duration_ms: 260.769084
+  type: 'test'
+  ...
+# Subtest: worker: public-check relays only the confirmed claims with the field binding, and refuses anything else
+ok 204 - worker: public-check relays only the confirmed claims with the field binding, and refuses anything else
+  ---
+  duration_ms: 63.481417
+  type: 'test'
+  ...
+# Subtest: worker: a public check from another frame or origin is not relayed
+ok 205 - worker: a public check from another frame or origin is not relayed
+  ---
+  duration_ms: 1.831375
+  type: 'test'
+  ...
+# Subtest: only admins configure the website; private hosts and non-HTTPS addresses are refused
+ok 206 - only admins configure the website; private hosts and non-HTTPS addresses are refused
+  ---
+  duration_ms: 8.067958
+  type: 'test'
+  ...
+# Subtest: crawl keeps same-host pages; comparison finds forbidden claims and verified model contradictions
+ok 207 - crawl keeps same-host pages; comparison finds forbidden claims and verified model contradictions
+  ---
+  duration_ms: 5.630209
+  type: 'test'
+  ...
+# Subtest: website decisions need a reason and survive a new comparison
+ok 208 - website decisions need a reason and survive a new comparison
+  ---
+  duration_ms: 0.946625
+  type: 'test'
+  ...
+# Subtest: the same page sentence forbidden by several rules is reported once
+ok 209 - the same page sentence forbidden by several rules is reported once
+  ---
+  duration_ms: 0.595166
+  type: 'test'
+  ...
+# Subtest: QA profile is opt-in and rejects normal, unmarked and symlinked directories
+ok 210 - QA profile is opt-in and rejects normal, unmarked and symlinked directories
+  ---
+  duration_ms: 7.335375
+  type: 'test'
+  ...
+# Subtest: agent dispatches local tools, validates findings and marks only public claims
+ok 211 - agent dispatches local tools, validates findings and marks only public claims
+  ---
+  duration_ms: 14.555916
+  type: 'test'
+  ...
+# Subtest: agent text inside work is data: a JSON reply without tools still passes validation and falls back on errors
+ok 212 - agent text inside work is data: a JSON reply without tools still passes validation and falls back on errors
+  ---
+  duration_ms: 7.8165
+  type: 'test'
+  ...
+# Subtest: agent respects the step limit, company AI policy and source consent
+ok 213 - agent respects the step limit, company AI policy and source consent
+  ---
+  duration_ms: 12.87875
+  type: 'test'
+  ...
+# Subtest: public check sends only the claim, validates the judged snippet and blocks internal text
+ok 214 - public check sends only the claim, validates the judged snippet and blocks internal text
+  ---
+  duration_ms: 9.191708
+  type: 'test'
+  ...
+# Subtest: link check compares linked pages with approved values the draft states
+ok 215 - link check compares linked pages with approved values the draft states
+  ---
+  duration_ms: 10.336292
+  type: 'test'
+  ...
+# Subtest: deterministic rules come from explicit source lines and inherit source approval
+ok 216 - deterministic rules come from explicit source lines and inherit source approval
+  ---
+  duration_ms: 3.375125
+  type: 'test'
+  ...
+# Subtest: Nemotron extraction keeps only candidates whose quote is exact source text
+ok 217 - Nemotron extraction keeps only candidates whose quote is exact source text
+  ---
+  duration_ms: 21.065
+  type: 'test'
+  ...
+# Subtest: extraction refuses sources without Nebius consent and when company AI is off
+ok 218 - extraction refuses sources without Nebius consent and when company AI is off
+  ---
+  duration_ms: 2.021208
+  type: 'test'
+  ...
+# Subtest: only approved model rules guide review, so a new company gets findings without hand-written rule lines
+ok 219 - only approved model rules guide review, so a new company gets findings without hand-written rule lines
+  ---
+  duration_ms: 21.481583
+  type: 'test'
+  ...
+# Subtest: rule decisions follow source authority and rejections need a reason
+ok 220 - rule decisions follow source authority and rejections need a reason
+  ---
+  duration_ms: 1.996916
+  type: 'test'
+  ...
+# Subtest: conflicts only for single-valued kinds; additive rules from different sources stay active
+ok 221 - conflicts only for single-valued kinds; additive rules from different sources stay active
+  ---
+  duration_ms: 1.792542
+  type: 'test'
+  ...
+# Subtest: hashtag rules: parsed from explicit lines, matched case-insensitively, and each finding cites its exact line
+ok 222 - hashtag rules: parsed from explicit lines, matched case-insensitively, and each finding cites its exact line
+  ---
+  duration_ms: 5.797125
+  type: 'test'
+  ...
+# Subtest: index embeds only approved consented sources and keeps vectors local
+ok 223 - index embeds only approved consented sources and keeps vectors local
+  ---
+  duration_ms: 28.304833
+  type: 'test'
+  ...
+# Subtest: search finds passages by meaning and never returns sources the person cannot use
+ok 224 - search finds passages by meaning and never returns sources the person cannot use
+  ---
+  duration_ms: 1.711958
+  type: 'test'
+  ...
+# Subtest: answers use semantic passages but still require an exact model quote
+ok 225 - answers use semantic passages but still require an exact model quote
+  ---
+  duration_ms: 4.913209
+  type: 'test'
+  ...
+# Subtest: leads mark public dependencies for rules they manage; employees cannot
+ok 226 - leads mark public dependencies for rules they manage; employees cannot
+  ---
+  duration_ms: 4.800708
+  type: 'test'
+  ...
+# Subtest: only admins run checks; only stored queries are sent; approval never changes
+ok 227 - only admins run checks; only stored queries are sent; approval never changes
+  ---
+  duration_ms: 3.795792
+  type: 'test'
+  ...
+# Subtest: weekly run needs admin opt-in, runs only when due and records failures
+ok 228 - weekly run needs admin opt-in, runs only when due and records failures
+  ---
+  duration_ms: 1.791958
+  type: 'test'
+  ...
+# Subtest: review cites exact approved rules and updates when the employee corrects the external draft
+ok 229 - review cites exact approved rules and updates when the employee corrects the external draft
+  ---
+  duration_ms: 7.2155
+  type: 'test'
+  ...
+# Subtest: pending, revoked, conflicting and other-department sources cannot guide work
+ok 230 - pending, revoked, conflicting and other-department sources cannot guide work
+  ---
+  duration_ms: 0.676708
+  type: 'test'
+  ...
+# Subtest: model path refuses to send observed credentials
+ok 231 - model path refuses to send observed credentials
+  ---
+  duration_ms: 2.400375
+  type: 'test'
+  ...
+# Subtest: Nebius suggestions require exact observed and approved source excerpts
+ok 232 - Nebius suggestions require exact observed and approved source excerpts
+  ---
+  duration_ms: 3.482041
+  type: 'test'
+  ...
+# Subtest: selected-field requirements check only observed metadata; OCR never invents audience or schedule
+ok 233 - selected-field requirements check only observed metadata; OCR never invents audience or schedule
+  ---
+  duration_ms: 6.731375
+  type: 'test'
+  ...
+# Subtest: review items are scoped by role: leads see their department, company-wide approvals are admin only
+ok 234 - review items are scoped by role: leads see their department, company-wide approvals are admin only
+  ---
+  duration_ms: 19.09375
+  type: 'test'
+  ...
+# Subtest: clarification requests reach reviewers of that department, never the requester or other departments
+ok 235 - clarification requests reach reviewers of that department, never the requester or other departments
+  ---
+  duration_ms: 7.277667
+  type: 'test'
+  ...
+# Subtest: findings from shared work are listed for the signed-in person and open the review screen
+ok 236 - findings from shared work are listed for the signed-in person and open the review screen
+  ---
+  duration_ms: 8.407542
+  type: 'test'
+  ...
+# Subtest: tasks belong to their assignee: others never see them and cannot complete them
+ok 237 - tasks belong to their assignee: others never see them and cannot complete them
+  ---
+  duration_ms: 125.154708
+  type: 'test'
+  ...
+# Subtest: completing a task removes it from the list and cannot be repeated
+ok 238 - completing a task removes it from the list and cannot be repeated
+  ---
+  duration_ms: 2.720125
+  type: 'test'
+  ...
+# Subtest: tasks persist with the workspace, stay out of the public snapshot and reject bad input
+ok 239 - tasks persist with the workspace, stay out of the public snapshot and reject bad input
+  ---
+  duration_ms: 4.611166
+  type: 'test'
+  ...
+# Subtest: no new To do text contains an em dash or en dash
+ok 240 - no new To do text contains an em dash or en dash
+  ---
+  duration_ms: 11.146916
+  type: 'test'
+  ...
+# Subtest: public fact-check asks Tavily for a summary and keeps source URLs
+ok 241 - public fact-check asks Tavily for a summary and keeps source URLs
+  ---
+  duration_ms: 22.160875
+  type: 'test'
+  ...
+# Subtest: fact-check does not present a summary without a linked result
+ok 242 - fact-check does not present a summary without a linked result
+  ---
+  duration_ms: 2.146292
+  type: 'test'
+  ...
+# Subtest: sentence replacement fixes the complete sentence and preserves adjacent sentences, links and footer
+ok 243 - sentence replacement fixes the complete sentence and preserves adjacent sentences, links and footer
+  ---
+  duration_ms: 18.6625
+  type: 'test'
+  ...
+# Subtest: sentence model proposals reject unsupported numbers and cannot process unrelated finding types
+ok 244 - sentence model proposals reject unsupported numbers and cannot process unrelated finding types
+  ---
+  duration_ms: 9.081292
+  type: 'test'
+  ...
+# Subtest: sentence rewrite recovers a model-added final stop while storing an exact quote, but never repairs invented wording
+ok 245 - sentence rewrite recovers a model-added final stop while storing an exact quote, but never repairs invented wording
+  ---
+  duration_ms: 9.168791
+  type: 'test'
+  ...
+# Subtest: a valid lead citation cannot justify a new competitive-pricing claim
+ok 246 - a valid lead citation cannot justify a new competitive-pricing claim
+  ---
+  duration_ms: 6.12875
+  type: 'test'
+  ...
+# Subtest: tool operations and company requirements route separately, including mixed and follow-up questions
+ok 247 - tool operations and company requirements route separately, including mixed and follow-up questions
+  ---
+  duration_ms: 5.255917
+  type: 'test'
+  ...
+# Subtest: Tavily gets a fixed public functional query only after consent; untrusted result domains are discarded
+ok 248 - Tavily gets a fixed public functional query only after consent; untrusted result domains are discarded
+  ---
+  duration_ms: 15.078125
+  type: 'test'
+  ...
+# Subtest: denied external consent and unavailable providers keep functional help useful without fabricated checks
+ok 249 - denied external consent and unavailable providers keep functional help useful without fabricated checks
+  ---
+  duration_ms: 7.839042
+  type: 'test'
+  ...
+# Subtest: work synthesis returns a reviewed proposal with exact evidence and rejects fabricated citations
+ok 250 - work synthesis returns a reviewed proposal with exact evidence and rejects fabricated citations
+  ---
+  duration_ms: 30.772
+  type: 'test'
+  ...
+# Subtest: source revocation while a provider is running rejects the response and caches no private answer
+ok 251 - source revocation while a provider is running rejects the response and caches no private answer
+  ---
+  duration_ms: 19.681459
+  type: 'test'
+  ...
+# Subtest: browser assistant preserves public evidence and asks for consent before using a tool provider
+ok 252 - browser assistant preserves public evidence and asks for consent before using a tool provider
+  ---
+  duration_ms: 25.9555
+  type: 'test'
+  ...
+# Subtest: email-only practice never inserts unrelated Canva questions; insufficient evidence produces a useful next step
+ok 253 - email-only practice never inserts unrelated Canva questions; insufficient evidence produces a useful next step
+  ---
+  duration_ms: 80.508333
+  type: 'test'
+  ...
+# Subtest: Operations playbooks produce a department-scoped checklist without Marketing content
+ok 254 - Operations playbooks produce a department-scoped checklist without Marketing content
+  ---
+  duration_ms: 4.778583
+  type: 'test'
+  ...
+# Subtest: outbound consent is invalidated if a source changes after the preview
+ok 255 - outbound consent is invalidated if a source changes after the preview
+  ---
+  duration_ms: 1.796708
+  type: 'test'
+  ...
+# Subtest: saving a tutor activity is person-scoped, single-use and creates relevant offline practice
+ok 256 - saving a tutor activity is person-scoped, single-use and creates relevant offline practice
+  ---
+  duration_ms: 17.528958
+  type: 'test'
+  ...
+# Subtest: Stop cancels an in-flight public-help request and returns no stale guidance
+ok 257 - Stop cancels an in-flight public-help request and returns no stale guidance
+  ---
+  duration_ms: 2.4335
+  type: 'test'
+  ...
+# Subtest: marketing length excludes a long subject, URL and footer
+ok 258 - marketing length excludes a long subject, URL and footer
+  ---
+  duration_ms: 0.277875
+  type: 'test'
+  ...
+# Subtest: unknown Canva operations use a previewed public question rather than falling into company lookup
+ok 259 - unknown Canva operations use a previewed public question rather than falling into company lookup
+  ---
+  duration_ms: 2.479291
+  type: 'test'
+  ...
+# Subtest: Operations handover becomes an actionable sourced checklist and role entries stay distinct
+ok 260 - Operations handover becomes an actionable sourced checklist and role entries stay distinct
+  ---
+  duration_ms: 3.596125
+  type: 'test'
+  ...
+# Subtest: keyless demo assistance permits bundled fixture text and excludes newly imported company text
+ok 261 - keyless demo assistance permits bundled fixture text and excludes newly imported company text
+  ---
+  duration_ms: 4.652
+  type: 'test'
+  ...
+# Subtest: frame help uses Tavily and Nemotron without any company sources and keeps a tool-specific retry prompt
+ok 262 - frame help uses Tavily and Nemotron without any company sources and keeps a tool-specific retry prompt
+  ---
+  duration_ms: 5.548833
+  type: 'test'
+  ...
+# Subtest: public instructions keep readable numbered steps without raw headings or blank model steps
+ok 263 - public instructions keep readable numbered steps without raw headings or blank model steps
+  ---
+  duration_ms: 0.070333
+  type: 'test'
+  ...
+# Subtest: public tutoring works with company AI off and excludes original text, role and files from Nebius
+ok 264 - public tutoring works with company AI off and excludes original text, role and files from Nebius
+  ---
+  duration_ms: 3.980333
+  type: 'test'
+  ...
+# Subtest: public help cannot turn the company chat client into an unrestricted policy bypass
+ok 265 - public help cannot turn the company chat client into an unrestricted policy bypass
+  ---
+  duration_ms: 0.425333
+  type: 'test'
+  ...
+# Subtest: role action prompts route to synthesis even when they ask for approved campaign facts
+ok 266 - role action prompts route to synthesis even when they ask for approved campaign facts
+  ---
+  duration_ms: 0.640167
+  type: 'test'
+  ...
+# Subtest: the lead checklist uses the capped demo route with company AI off and sends only bundled source text
+ok 267 - the lead checklist uses the capped demo route with company AI off and sends only bundled source text
+  ---
+  duration_ms: 3.517292
+  type: 'test'
+  ...
+# Subtest: automatically available company answering still previews content before any model call
+ok 268 - automatically available company answering still previews content before any model call
+  ---
+  duration_ms: 2.906458
+  type: 'test'
+  ...
+# Subtest: compound contrast and spacing gets a closed public operation, readable local steps and matching guide
+ok 269 - compound contrast and spacing gets a closed public operation, readable local steps and matching guide
+  ---
+  duration_ms: 2.157584
+  type: 'test'
+  ...
+# Subtest: public Nemotron has a bounded schema budget and accepts inline step numbers without treating them as facts
+ok 270 - public Nemotron has a bounded schema budget and accepts inline step numbers without treating them as facts
+  ---
+  duration_ms: 2.331375
+  type: 'test'
+  ...
+# Subtest: invalid model evidence keeps structured local guidance instead of exposing raw search excerpts
+ok 271 - invalid model evidence keeps structured local guidance instead of exposing raw search excerpts
+  ---
+  duration_ms: 3.403125
+  type: 'test'
+  ...
+# Subtest: compound public help never accepts a spacing-only model answer as complete
+ok 272 - compound public help never accepts a spacing-only model answer as complete
+  ---
+  duration_ms: 2.502334
+  type: 'test'
+  ...
+# Subtest: local company setup, lead approval, employee visibility and source conflict survive reload
+ok 273 - local company setup, lead approval, employee visibility and source conflict survive reload
+  ---
+  duration_ms: 29.33225
+  type: 'test'
+  ...
+# Subtest: approval queue records reasons and links a replacement with a real extracted-text comparison
+ok 274 - approval queue records reasons and links a replacement with a real extracted-text comparison
+  ---
+  duration_ms: 7.705125
+  type: 'test'
+  ...
+# Subtest: company answers expose exact matching passage and approval metadata
+ok 275 - company answers expose exact matching passage and approval metadata
+  ---
+  duration_ms: 6.353167
+  type: 'test'
+  ...
+# Subtest: model claim is rejected unless its answer is an exact part of a cited source quote
+ok 276 - model claim is rejected unless its answer is an exact part of a cited source quote
+  ---
+  duration_ms: 11.658875
+  type: 'test'
+  ...
+# Subtest: missing-evidence clarification stays with requester and authorised reviewer
+ok 277 - missing-evidence clarification stays with requester and authorised reviewer
+  ---
+  duration_ms: 2.851041
+  type: 'test'
+  ...
+# Subtest: local source deletion removes managed copies but preserves the outside original
+ok 278 - local source deletion removes managed copies but preserves the outside original
+  ---
+  duration_ms: 19.638292
+  type: 'test'
+  ...
+# Subtest: folder import copies supported nested files and leaves them pending
+ok 279 - folder import copies supported nested files and leaves them pending
+  ---
+  duration_ms: 11.024791
+  type: 'test'
+  ...
+# Subtest: Vamo pack retains approval, exact versions and department visibility after restart
+ok 280 - Vamo pack retains approval, exact versions and department visibility after restart
+  ---
+  duration_ms: 66.255709
+  type: 'test'
+  ...
+1..280
+# tests 280
+# suites 0
+# pass 280
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 5334.014

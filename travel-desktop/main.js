@@ -30,6 +30,7 @@ const taskReview = require('./src/task-review');
 const { BrowserBridge } = require('./src/browser-bridge');
 const { BrowserConnect } = require('./src/browser-connect');
 const nebiusClient = require('./src/nebius');
+const { AIConnection, companyMode } = require('./src/ai-connection');
 const tavilyClient = require('./src/tavily');
 const cloudActivity = require('./src/cloud-activity');
 const rules = require('./src/rules');
@@ -82,6 +83,11 @@ const browserBridge = new BrowserBridge({
     if (payload.kind === 'public-check') return contextualReview.publicCheck(payload);
     if (payload.kind === 'image-check') return contextualReview.imageCheck(payload);
     if (payload.kind === 'design-check') {
+      if (payload.action === 'invalidate') {
+        contextualReview.clearDesign();
+        if (learning.invalidateDesign(companyWorkspace)) { workspace.save(app.getPath('userData'), companyWorkspace); publish(); }
+        return { state: 'invalidated' };
+      }
       const result = contextualReview.designCheck(payload);
       if (payload.action === 'override') return result;
       // D1: the same reading ticks the steps of an open Canva lesson. Only step titles and ticks go back to the card.
@@ -103,6 +109,9 @@ function logCloudCall(entry) {
 }
 nebiusClient.onCall(logCloudCall);
 tavilyClient.onCall(logCloudCall);
+const aiConnection = new AIConnection({ models: key => nebiusClient.models(key), pickModel: nebiusClient.pickChat, changed: () => { if (agentWindow && !agentWindow.isDestroyed()) publish(); } });
+function connectAI() { return aiConnection.connect({ key: runtimeKeys.nebius, demo: Boolean(companyWorkspace?.demoAccounts) }); }
+function restoreCompanyMode() { aiEnabled = companyMode(companyWorkspace, runtimeKeys.nebius); }
 const runtimeKeys = { nebius: process.env.NEBIUS_API_KEY || '', tavily: process.env.TAVILY_API_KEY || '' };
 // FB-10: how an online (Tavily) double-check would run now. A local key wins; the judge demo workspace falls back to the capped demo server.
 function onlineCheckState() {
@@ -118,7 +127,7 @@ async function runPublicCheck(task, claims, origin) {
   if (personId !== companyWorkspace.activePersonId || !signedIn()) throw new Error('The signed-in person changed during the public check.');
   const counts = { supported: 0, contradicted: 0, unclear: 0 };
   for (const item of result.claims) counts[counts[item.verdict] === undefined ? 'unclear' : item.verdict]++;
-  lastPublicCheck = { personId, origin, at: new Date().toISOString(), via: result.via, counts, claims: result.claims.map(item => ({ claim: item.claim, verdict: item.verdict, results: (item.results || []).slice(0, 2).map(({ title, url }) => ({ title, url })) })) };
+  lastPublicCheck = { personId, origin, at: new Date().toISOString(), via: result.via, counts, claims: result.claims.map(item => ({ claim: item.claim, verdict: item.verdict, explanation: String(item.explanation||'Public evidence is inconclusive. Review the source or your approved company brief.').slice(0,400), snippet: String(item.snippet||'').slice(0,600), results: (item.results || []).slice(0, 2).map(({ title, url }) => ({ title, url })) })) };
   try { workspace.save(app.getPath('userData'), companyWorkspace); } catch (error) { console.error('Could not save the online check activity:', error.message); }
   publish();
   return result;
@@ -134,7 +143,7 @@ async function assistCompany(question, context = '', options = {}) {
   const answerAI = aiEnabled;
   const observationKey = JSON.stringify([externalObservation?.fieldId, externalObservation?.revision, externalObservation?.contentHash]);
   const assisted = await workAssistant.answer(companyWorkspace, question, {
-    context, task: options.task || (selectedExternalWindow?.name?.toLowerCase().includes('canva') ? 'canva' : undefined),
+    context, contextIdentity: JSON.stringify([externalEpoch, selectedExternalWindow?.id, externalObservation?.fieldId, externalObservation?.revision, externalObservation?.contentHash]), task: options.task || (selectedExternalWindow?.name?.toLowerCase().includes('canva') ? 'canva' : undefined),
     scope: options.scope || 'desktop', consent: options.consent,
     nebiusKey: aiEnabled ? runtimeKeys.nebius : '', publicNebiusKey: runtimeKeys.nebius, tavilyKey: runtimeKeys.tavily,
     modelTransport: companyWorkspace.demoAccounts && !(aiEnabled && privacy.allowed(companyWorkspace) && runtimeKeys.nebius) ? (request, fetcher) => judgeServer.assist(companyWorkspace, request, { fetcher }) : undefined,
@@ -221,6 +230,8 @@ function requireSession() { if (!signedIn()) throw new Error('Sign in to your ac
 // reason names why an active browser connection ends (see browser-extension/end-reasons.js).
 function stopExternal(clearSelection = true, reason = 'stopped_by_user') {
   workAssistant.cancelAll();
+  if (learning.invalidateDesign(companyWorkspace)) workspace.save(app.getPath('userData'), companyWorkspace);
+  contextualReview.clearDesign();
   contextualReview.invalidate();
   browserBridge.stop(browserBridge.server ? reason : null);
   externalEpoch += 1;
@@ -264,7 +275,7 @@ function snapshot() {
     externalWatching: signedIn() && externalWatching,
     externalObservation: signedIn() ? externalObservation : null,
     externalError: signedIn() ? externalError : '',
-    services: { nebius: Boolean(runtimeKeys.nebius), tavily: Boolean(runtimeKeys.tavily) },
+    services: { nebius: Boolean(runtimeKeys.nebius), tavily: Boolean(runtimeKeys.tavily), connection: aiConnection.snapshot() },
     designCheck: signedIn() ? contextualReview.designStatus(companyWorkspace.activePersonId) : null,
     playbooks: signedIn() ? require('./src/role-playbooks').forPerson(workspace.person(companyWorkspace)) : [],
     onlineCheck: signedIn() ? { ...onlineCheckState(), last: lastPublicCheck?.personId === companyWorkspace.activePersonId ? lastPublicCheck : null } : null,
@@ -385,6 +396,7 @@ app.whenReady().then(async () => {
     browserConnectionError = error.code === 'EADDRINUSE' ? 'Another app is using the browser connection. Close other Averill instances, then restart this app. Advanced connection recovery is still available below.' : 'The guided browser connection could not start. Restart Averill or use Advanced connection recovery below.';
   });
   companyWorkspace = workspace.load(app.getPath('userData'));
+  if(companyWorkspace)require('./src/demo-general').ensure(app.getPath('userData'),companyWorkspace,path.join(__dirname,'demo-company'));
   await cloud.load();
   const area = screen.getPrimaryDisplay().workArea;
   const agentWidth = Math.min(520, area.width - 40);
@@ -404,7 +416,7 @@ app.whenReady().then(async () => {
   screen.on('display-metrics-changed', keepCompanionVisible);
   companionWindow.on('closed', () => { companionWindow = null; });
   agentWindow.on('closed', () => { if (companionWindow && !companionWindow.isDestroyed()) companionWindow.close(); });
-  loadSecrets().then(publish).catch(() => {});
+  loadSecrets().then(() => { restoreCompanyMode(); publish(); return connectAI(); }).catch(() => {});
   const fromAgent = (event, allowAnonymous = false) => {
     if (event.sender !== agentWindow.webContents) throw new Error('Averill window required');
     if (!allowAnonymous) {
@@ -432,7 +444,7 @@ app.whenReady().then(async () => {
     if (!companionWindow || event.sender !== companionWindow.webContents) throw new Error('Companion window required');
     requireSession(); stopExternal(); publish(); return true;
   });
-  const persistWorkspace = () => { workspace.save(app.getPath('userData'), companyWorkspace); publish(); return snapshot(); };
+  const persistWorkspace = () => { if (signedIn()) restoreCompanyMode(); workspace.save(app.getPath('userData'), companyWorkspace); publish(); return snapshot(); };
   ipcMain.handle('guide:update', (event, action, screen) => {
     fromAgent(event, true);
     if (!signedIn()) throw new Error('Sign in first.');
@@ -492,7 +504,7 @@ app.whenReady().then(async () => {
   ipcMain.handle('workspace:judge-demo', async (event) => {
     fromAgent(event, true);
     const demo = await judgeDemo.create(app.getPath('userData'), path.join(__dirname, 'demo-company'));
-    companyWorkspace = demo.data; authenticatedPersonId = demo.personId;
+    companyWorkspace = demo.data; authenticatedPersonId = demo.personId; void connectAI();
     return persistWorkspace();
   });
   ipcMain.handle('account:login', async (event, email, password) => {
@@ -501,7 +513,7 @@ app.whenReady().then(async () => {
     if (Date.now() < loginFailures.until) throw new Error('Too many attempts. Wait a minute and retry.');
     try {
       const person = await accounts.authenticate(companyWorkspace, email, password);
-      clearSessionWork(); authenticatedPersonId = person.id; workspace.switchPerson(companyWorkspace, person.id);
+      clearSessionWork(); authenticatedPersonId = person.id; workspace.switchPerson(companyWorkspace, person.id); learning.invalidateDesign(companyWorkspace);
       loginFailures = { count: 0, until: 0 }; return persistWorkspace();
     } catch (error) {
       loginFailures.count++; if (loginFailures.count >= 5) { loginFailures.until = Date.now() + 60000; loginFailures.count = 0; }
@@ -512,7 +524,7 @@ app.whenReady().then(async () => {
     fromAgent(event, true);
     if (onboardingBusy) throw new Error('Wait for onboarding to finish before changing accounts.');
     const person = accounts.demoSignIn(companyWorkspace, personId);
-    clearSessionWork(); authenticatedPersonId = person.id; workspace.switchPerson(companyWorkspace, person.id);
+    clearSessionWork(); authenticatedPersonId = person.id; workspace.switchPerson(companyWorkspace, person.id); learning.invalidateDesign(companyWorkspace);
     return persistWorkspace();
   });
   ipcMain.handle('account:logout', (event) => {
@@ -722,6 +734,7 @@ app.whenReady().then(async () => {
     fromAgent(event);
     if (!companyWorkspace || workspace.person(companyWorkspace)?.role !== 'admin') throw new Error('Administrator access required');
     await saveSecret(service, value);
+    restoreCompanyMode(); void connectAI();
     publish(); return snapshot();
   });
   ipcMain.handle('agent:snapshot', (event) => { fromAgent(event, true); return snapshot(); });
@@ -741,12 +754,10 @@ app.whenReady().then(async () => {
     publish();
     return snapshot();
   });
-  ipcMain.handle('agent:ai-mode', (event, enabled) => {
+  ipcMain.handle('agent:ai-mode', async (event) => {
     fromAgent(event);
-    if (enabled) privacy.requireAI(companyWorkspace);
-    aiEnabled = Boolean(enabled) && Boolean(runtimeKeys.nebius);
-    publish();
-    return snapshot();
+    // Compatibility with older renderers: this reconnects the service, never changes company permission.
+    restoreCompanyMode(); await connectAI(); publish(); return snapshot();
   });
   ipcMain.handle('assistant:practice', (event, id) => { fromAgent(event); return saveAssistantPractice(id); });
   ipcMain.handle('agent:ask', async (event, question, consent) => {

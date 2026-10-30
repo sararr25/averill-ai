@@ -1,3 +1,18 @@
+## Quiet visual correction — extension 0.6.0
+
+1. Open the updated app; reload the matching existing extension and reconnect Canva.
+2. Open Watch, select and move several texts: only the design panel remains. Minimize it and repeat; it must stay minimized. A new finding updates its badge without reopening it.
+3. Choose **Start Canva tutorial** or ask for Canva help. The first view must show an illustration and **Show me in Canva**, not a paragraph of numbered text. In the guide, click a highlighted control yourself: the next step follows. Stop removes its pointer.
+4. Maximize Averill: Learn uses two columns, Library uses cards across the available width. Restore the narrow sidebar: controls wrap, readable text stays at least 16px, and exercise selects stay under their labels.
+5. In the fictional demo ask “Quando postiamo di solito?” and “Come chiedo le ferie?”. Expect channel schedule cards and a three-step leave process, backed by the approved company-wide policy. Ask an unspecified rule question for topic choices. No confidential People-only source should appear for Marketing employees.
+6. Public result cards lead with their verdict/title and brief excerpt. Open details for explanation, method and source text.
+
+Synthetic UI evidence is in `docs/review-evidence-2026-10-29/quiet-visual/`. Real Canva pointer placement after manual extension reload and native VoiceOver remain separate acceptance checks.
+
+## New assistance flow — 29 October 2026
+
+Reload the matching extension **0.6.0**, reconnect the Canva tab, open **Ask Averill**, and ask “How do I improve contrast and spacing in Canva?”. Inspect the outbound items, choose **Get Nemotron help** or **Keep it local**, then **Show me in Canva**. Select editable text yourself, choose **Next step**, and use **Locate control** if the toolbar changes. The guide outlines only a uniquely recognized visible control; it never clicks it. **Design checks** returns to live measurements. Guide progress is manual navigation, not a measured design result. **Stop sharing** remains at the bottom. Desktop Ask uses the same illustrated reader and **Walk me through it** steps; highlights are available in the Canva tab.
+
 # Maya checklist regression — 29 October 2026
 
 Open `travel-desktop/dist/Averill.app`, sign in as Maya, Current work → Review the handover → Send question. Confirm the listed fictional demo excerpts. Expected: a short Nemotron priority checklist with source citations, not a literal-source extract or “Nemotron unavailable”. Company AI may stay off for this capped fixed-bundle demo route; private imported sources remain excluded. “Explain the requirements” stays a company lookup. Cancelling the preview makes no provider request. Server outages and unverified responses remain distinct and keep local guidance available.
@@ -28,7 +43,7 @@ Averill helps you complete work, improve drafts and learn how to use your tools.
 
 1. In Averill, open **Current work** and click **Install extension**. Averill opens `chrome://extensions` in Chrome and shows the `browser-extension` folder in Finder. Nothing is installed automatically.
 2. In Chrome, turn on **Developer mode**, click **Load unpacked** and choose that `browser-extension` folder. The three illustrated steps under the button show the same.
-3. If you loaded an older copy, click the reload button for the extension at `chrome://extensions`; the Pro extension is version **0.4.0**. The app and extension must come from the same build.
+3. If you loaded an older copy, click the reload button for the extension at `chrome://extensions`; the Pro extension is version **0.5.0**. The app and extension must come from the same build.
 4. Averill notices the extension by itself: **Install extension** becomes **Connect**.
 
 ## 3. Check a draft
@@ -96,7 +111,7 @@ Use the local Pro build for this section. The published release and production d
 6. Ask **Write a truthful marketing email for the approved campaign, with at least 200 body characters and one CTA.** Check the main copy, not the subject/footer length. No unsupported price, discount, weather or service claim should be accepted. The output is a proposal for your review.
 7. In the Brevo simulator, compare **Winter Escapes 2027 · ready to review** with **Winter Escapes 2027 · launch draft**. The latter deliberately contains a guarantee and other planted mistakes; the former is the supported comparison.
 8. For an offending sentence in a supported plain-text draft, inspect the explanation, **Preview change**, the whole replacement sentence and its evidence, then **Apply change** and **Undo change**. A draft with ambiguous repeats, changed text or a link inside the sentence may require a manual edit. It must never leave a half-sentence through fragment deletion.
-9. On Canva, reload the already installed extension to **0.4.0**, reconnect and check all five slides. Earlier findings remain after visiting a clean last slide; **Checked X of 5** shows progress. A missing slide/design identity must stay incomplete. Grouping, export and publication remain human actions.
+9. On Canva, reload the already installed extension to **0.5.0**, reconnect and check all five slides. Earlier findings remain after visiting a clean last slide; **Checked X of 5** shows progress. A missing slide/design identity must stay incomplete. Grouping, export and publication remain human actions.
 10. Stop sharing or sign out while help is running. The pending answer must not appear in a later work context. Repeat with a provider outage: explicit local guidance or an honest unavailable state must remain.
 
 For role testing, sign in as the content creator, strategist and marketing lead and compare the suggested tasks. Operations needs an approved source in its own department to produce a sourced handover checklist. A prompt template alone is not acceptance of a new department.

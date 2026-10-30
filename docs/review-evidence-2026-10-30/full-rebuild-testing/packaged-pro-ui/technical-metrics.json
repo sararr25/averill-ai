@@ -1,0 +1,10 @@
+{
+  "variant": "B",
+  "scope": "Synthetic task/DOM measures, not human task speed",
+  "metrics": {
+    "visibleMessages": 2,
+    "indexedQuestions": 9,
+    "workViews": 3,
+    "libraryHeight": 481.796875
+  }
+}

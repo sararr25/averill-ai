@@ -29,6 +29,7 @@ if (!process.versions.electron) {
   let heartbeat, calls = 0;
   const originalFetch = global.fetch;
   global.fetch = async (url,options) => {
+    if(!live&&String(url).endsWith('/models'))return new Response(JSON.stringify({data:[{id:'nvidia/Nemotron-rehearsal'}]}));
     if (String(url).includes('/chat/completions')) {
       assert.ok(live,'No provider request without explicit synthetic consent');
       const payload = JSON.parse(options.body);
@@ -67,28 +68,23 @@ if (!process.versions.electron) {
     const source=(await snap()).workspace.sources.find(s=>s.title.includes('synthetic-marketing-policy'));
     assert.ok(source && source.status==='approved','Approval survives restart');
     if(process.env.AVERILL_REHEARSAL_PHASE==='restart') {
-      assert.equal((await snap()).aiEnabled,false);
+      assert.equal((await snap()).aiEnabled,Boolean(process.env.NEBIUS_API_KEY));
       assert.equal((await snap()).externalObservation,null);
       assert.equal((await snap()).learning.sessions.length,1,'Own confirmed lesson persists');
       await run('window.desktop.logout()'); await login('employee@vamo.example');
       assert.equal((await snap()).learning.sessions.length,0,'Other person does not see owner lesson');
       const receiptPath=path.join(out,'verification.json');
       const receipt=JSON.parse(fs.readFileSync(receiptPath));
-      receipt.checks.push('restart requires login','approval persistence','AI disabled after restart','learning persistence after restart');
+      receipt.checks.push('restart requires login','approval persistence','permitted company mode restored automatically after restart','learning persistence after restart');
       receipt.restartVerified=true;
       fs.writeFileSync(receiptPath,JSON.stringify(receipt,null,2)+'\n');
-      console.log('PASS packaged-resource restart, approvals, sign-in, AI reset and person-owned learning');
+      console.log('PASS packaged-resource restart, approvals, sign-in, automatic AI readiness and person-owned learning');
       app.quit(); return;
     }
     await run('window.desktop.companyPrivacy(true)');
-    await run("showTab('work');window.confirmMessages=[];window.confirm=message=>{confirmMessages.push(message);return false;};document.getElementById('ai-toggle').click();");
-    await pause(120);
-    assert.equal((await snap()).aiEnabled,false);
-    assert.equal(calls,0);
-    if(live) {
-      await run("window.confirm=message=>{confirmMessages.push(message);return true;};document.getElementById('ai-toggle').click();");
-      await pause(180); assert.equal((await snap()).aiEnabled,true);
-    }
+    await run("showTab('work');");
+    assert.equal((await snap()).aiEnabled,Boolean(process.env.NEBIUS_API_KEY));
+    assert.equal(calls,0,'Connection metadata never sends work content');
     const pair=await run('window.desktop.pairBrowser()'); let sequence=0;
     const send=async extra=>{
       const response=await originalFetch(pair.endpoint,{method:'POST',headers:{Origin:'chrome-extension://'+'d'.repeat(32),'Content-Type':'application/json','X-Averill-Token':pair.token},body:JSON.stringify({tabId:17,pageOrigin:'https://example.test',sequence:++sequence,...extra})});
