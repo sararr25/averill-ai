@@ -1,3 +1,0 @@
-The following is a diff from the previous accessibility tree for Window: "Averill" with ~ and + representing changed and added elements, respectively. Removed elements are summarized by ID range.
-Removed element IDs: 79-81
-The focused UI element is 122 heading You want to select a second element without losing the first. What do you do?, Value: 4

@@ -3,6 +3,9 @@ const fs = require('node:fs');
 const path = require('node:path');
 const os = require('node:os');
 require('./src/qa-profile').apply(app);
+// averill-public: judges bring their own Nebius and Tavily keys; the owner's capped demo server is never used.
+const PUBLIC_BUILD = true;
+app.setPath('userData', path.join(app.getPath('appData'), 'Averill Public'));
 require('dotenv').config({ path: path.join(__dirname, '..', '.env.local'), quiet: true });
 const { inspect, answer: localAnswer } = require('./src/engine');
 const { answerQuestion } = require('./src/assistant');
@@ -110,12 +113,13 @@ function logCloudCall(entry) {
 nebiusClient.onCall(logCloudCall);
 tavilyClient.onCall(logCloudCall);
 const aiConnection = new AIConnection({ models: key => nebiusClient.models(key), pickModel: nebiusClient.pickChat, changed: () => { if (agentWindow && !agentWindow.isDestroyed()) publish(); } });
-function connectAI() { return aiConnection.connect({ key: runtimeKeys.nebius, demo: Boolean(companyWorkspace?.demoAccounts) }); }
+function demoServer() { return !PUBLIC_BUILD && companyWorkspace?.demoAccounts === true; }
+function connectAI() { return aiConnection.connect({ key: runtimeKeys.nebius, demo: demoServer() }); }
 function restoreCompanyMode() { aiEnabled = companyMode(companyWorkspace, runtimeKeys.nebius); }
 const runtimeKeys = { nebius: process.env.NEBIUS_API_KEY || '', tavily: process.env.TAVILY_API_KEY || '' };
 // FB-10: how an online (Tavily) double-check would run now. A local key wins; the judge demo workspace falls back to the capped demo server.
 function onlineCheckState() {
-  const via = !signedIn() ? null : runtimeKeys.tavily ? 'local-key' : companyWorkspace.demoAccounts === true ? 'demo-server' : null;
+  const via = !signedIn() ? null : runtimeKeys.tavily ? 'local-key' : demoServer() ? 'demo-server' : null;
   return { available: Boolean(via), via, quota: via === 'demo-server' ? 'demo' : null, nemotron: Boolean(aiEnabled && runtimeKeys.nebius && signedIn() && privacy.allowed(companyWorkspace)) };
 }
 // The last online check, kept in memory only. It lists the public statements the employee confirmed and what came back.
@@ -146,8 +150,8 @@ async function assistCompany(question, context = '', options = {}) {
     context, contextIdentity: JSON.stringify([externalEpoch, selectedExternalWindow?.id, externalObservation?.fieldId, externalObservation?.revision, externalObservation?.contentHash]), task: options.task || (selectedExternalWindow?.name?.toLowerCase().includes('canva') ? 'canva' : undefined),
     scope: options.scope || 'desktop', consent: options.consent,
     nebiusKey: aiEnabled ? runtimeKeys.nebius : '', publicNebiusKey: runtimeKeys.nebius, tavilyKey: runtimeKeys.tavily,
-    modelTransport: companyWorkspace.demoAccounts && !(aiEnabled && privacy.allowed(companyWorkspace) && runtimeKeys.nebius) ? (request, fetcher) => judgeServer.assist(companyWorkspace, request, { fetcher }) : undefined,
-    searchTransportFactory: companyWorkspace.demoAccounts && !runtimeKeys.tavily ? fetcher => judgeServer.searchTransport(companyWorkspace, { fetcher }) : undefined,
+    modelTransport: demoServer() && !(aiEnabled && privacy.allowed(companyWorkspace) && runtimeKeys.nebius) ? (request, fetcher) => judgeServer.assist(companyWorkspace, request, { fetcher }) : undefined,
+    searchTransportFactory: demoServer() && !runtimeKeys.tavily ? fetcher => judgeServer.searchTransport(companyWorkspace, { fetcher }) : undefined,
     validate: () => { if (!signedIn() || companyWorkspace !== answeringWorkspace || companyWorkspace.activePersonId !== personId || externalEpoch !== epoch || aiEnabled !== answerAI || context && JSON.stringify([externalObservation?.fieldId, externalObservation?.revision, externalObservation?.contentHash]) !== observationKey) throw new Error('The work session changed. Ask again.'); },
   });
   return assisted;
@@ -732,7 +736,8 @@ app.whenReady().then(async () => {
   });
   ipcMain.handle('workspace:save-key', async (event, service, value) => {
     fromAgent(event);
-    if (!companyWorkspace || workspace.person(companyWorkspace)?.role !== 'admin') throw new Error('Administrator access required');
+    // Public demo: every fictional demo person may enter the judge's own keys; real workspaces stay owner-only.
+    if (!companyWorkspace || !(workspace.person(companyWorkspace)?.role === 'admin' || PUBLIC_BUILD && companyWorkspace.demoAccounts === true && signedIn())) throw new Error('Administrator access required');
     await saveSecret(service, value);
     restoreCompanyMode(); void connectAI();
     publish(); return snapshot();
@@ -768,7 +773,7 @@ app.whenReady().then(async () => {
       if (assisted.assistant || assisted.consentRequired) return assisted;
       // T1.3: in the demo workspace without a local key, non-design questions go to the capped demo server only after the
       // employee confirmed what is sent (consent === true). consent === undefined asks the renderer for that confirmation.
-      if (companyWorkspace.demoAccounts === true && !aiEnabled && signedIn()) {
+      if (demoServer() && !aiEnabled && signedIn()) {
         const plan = judgeServer.askPlan(companyWorkspace, question);
         if (plan && consent === undefined) return { consentRequired: true, items: plan.items };
         if (plan && consent === true) {
@@ -858,7 +863,7 @@ app.whenReady().then(async () => {
       if (reviewIdentity(reviewState(), task) !== expected) throw new Error('The work or company guidance changed. Review again.');
     };
     // Judge demo: Nemotron through the owner's capped server instead of a local key. Real workspaces never take this path.
-    const demoAI = useAI === true && companyWorkspace?.demoAccounts === true;
+    const demoAI = useAI === true && demoServer();
     const result = demoAI
       ? await judgeServer.review(companyWorkspace, task, observed.text, observed.field)
       : await reviewObserved(state, task, useAI, validate);

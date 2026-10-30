@@ -37,7 +37,8 @@ Averill helps you complete work, improve drafts and learn how to use your tools.
 1. Download `Averill-macOS-arm64.zip` from the [latest release](https://github.com/sararr25/averill-ai/releases/latest) and unzip it.
 2. Right-click `Averill.app` › **Open** › **Open**. The app is unsigned, so macOS asks once.
 3. Click **Try the demo**. You are signed in as Emma from Marketing. No password is needed. Averill opens on **To do**, which lists the tasks that need your review.
-4. Choose **1-minute tour**, or **Skip**. The **?** button on each screen explains that screen later.
+4. **Add your own API keys.** Home shows **Your API keys** until both are saved: paste a [Nebius Token Factory](https://tokenfactory.nebius.com) key (NVIDIA Nemotron) and a [Tavily](https://tavily.com) key, then **Save**. They stay on your Mac, encrypted by the macOS Keychain, and go only to their own provider. You can change them later in **More › Workspace settings**. Without keys the approved-rules checks still work locally; wherever this guide mentions the Vamo demo server or its daily limit, this public version uses your keys instead.
+5. Choose **1-minute tour**, or **Skip**. The **?** button on each screen explains that screen later.
 
 ## 2. Add the Chrome extension
 

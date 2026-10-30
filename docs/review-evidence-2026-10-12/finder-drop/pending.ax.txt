@@ -1,2 +1,0 @@
-There has been no change in the accessibility tree for Window: "Averill".
-The focused UI element is 100 search text field (settable) Search documents, Value: qa-native-drop, Placeholder: Search titles and extracted text

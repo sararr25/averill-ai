@@ -322,6 +322,24 @@ function action(label, callback) {
   return button;
 }
 
+// averill-public: the judge's own Nebius and Tavily keys, saved encrypted on this Mac only.
+function serviceKeys(feedbackId) {
+  const keySection = node('div'); keySection.className = 'workspace-keys';
+  keySection.append(node('h3', 'Your API keys'), node('p', `Nebius (NVIDIA Nemotron): ${current.services?.nebius ? 'configured' : 'missing'} · Tavily: ${current.services?.tavily ? 'configured' : 'missing'}. Keys stay on this Mac, protected by macOS Keychain, and are sent only to their own provider. Without them the approved-rules checks still work locally.`));
+  for (const [service, label] of [['nebius', 'Nebius'], ['tavily', 'Tavily']]) {
+    const keyForm = node('form'); keyForm.className = 'workspace-form';
+    const input = node('input'); input.type = 'password'; input.placeholder = `${label} API key`; input.autocomplete = 'off'; input.required = true;
+    const save = node('button', `Save ${label} key`, 'secondary-button'); save.type = 'submit';
+    const fieldLabel=node('label',`${label} API key`);fieldLabel.append(input);keyForm.append(fieldLabel,save);
+    keyForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      try { current = await window.desktop.saveApiKey(service, input.value); input.value = ''; el(feedbackId).textContent = `${label} key saved securely.`; render(); }
+      catch (error) { el(feedbackId).textContent = error.message; }
+    });
+    keySection.append(keyForm);
+  }
+  return keySection;
+}
 function renderWorkspace() {
   const panel = el('workspace-panel');
   const renderKey=JSON.stringify([current.workspace,current.onboarding,current.auth,current.services,current.cloud,current.privacy]);
@@ -391,22 +409,8 @@ function renderWorkspace() {
       catch (error) { el('workspace-feedback').textContent = error.message; }
     });
     panel.append(form);
-    const keySection = node('div'); keySection.className = 'workspace-keys';
-    keySection.append(node('h3', 'Service keys'), node('p', `Nebius: ${current.services?.nebius ? 'configured' : 'missing'} · Tavily: ${current.services?.tavily ? 'configured' : 'missing'}. Keys are stored with macOS Keychain protection when entered here.`));
-    for (const [service, label] of [['nebius', 'Nebius'], ['tavily', 'Tavily']]) {
-      const keyForm = node('form'); keyForm.className = 'workspace-form';
-      const input = node('input'); input.type = 'password'; input.placeholder = `${label} API key`; input.autocomplete = 'off'; input.required = true;
-      const save = node('button', `Save ${label} key`, 'secondary-button'); save.type = 'submit';
-      const fieldLabel=node('label',`${label} API key`);fieldLabel.append(input);keyForm.append(fieldLabel,save);
-      keyForm.addEventListener('submit', async (event) => {
-        event.preventDefault();
-        try { current = await window.desktop.saveApiKey(service, input.value); input.value = ''; el('workspace-feedback').textContent = `${label} key saved securely.`; render(); }
-        catch (error) { el('workspace-feedback').textContent = error.message; }
-      });
-      keySection.append(keyForm);
-    }
-    panel.append(keySection);
   }
+  if (active.role === 'admin' || data.demoAccounts) panel.append(serviceKeys('workspace-feedback'));
   panel.append(node('h3', active.role === 'admin' ? 'Advanced: import individual sources' : 'Your department sources'));
   const importRow = node('div'); importRow.className = 'workspace-actions';
   const scope = node('select'); scope.setAttribute('aria-label', 'Import visibility');

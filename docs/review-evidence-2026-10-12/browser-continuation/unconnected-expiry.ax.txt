@@ -1,2 +1,0 @@
-There has been no change in the accessibility tree for Window: "Averill".
-The focused UI element is 3 HTML content Averill, URL: file:///Users/sararuffini/Documents/Hackatons/Nvidia/averill-ai/travel-desktop/src/agent.html

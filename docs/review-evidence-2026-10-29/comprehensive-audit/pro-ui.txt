@@ -1,7 +1,0 @@
-PASS Current work opens help and role task choices without library navigation
-PASS Outbound preview shows exact public query and actual text, then a sourced functional answer appears
-PASS One explicit confirmation records own grouping practice; offline quiz contains only the relevant visual question
-PASS Partial outbound selection keeps assistance local; unchecked inputs never leave
-PASS Marketing draft reaches the real renderer with exact source evidence and complete supported copy
-PASS Logout clears role tasks and private conversation
-6 Pro renderer checks passed; synthetic provider transport, not real-platform acceptance.

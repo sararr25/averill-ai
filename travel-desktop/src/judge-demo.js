@@ -58,6 +58,8 @@ async function create(userData, packRoot) {
   }
   const data = workspace.create(userData, 'Vamo (judge demo)', 'Alex Holm');
   data.demoAccounts = true;
+  // averill-public: the fictional demo may use the judge's own Nebius key once one is saved.
+  data.privacy = { companyAI: true, updatedBy: 'public-demo', updatedAt: new Date().toISOString() };
   const credentials = [];
   const owner = workspace.person(data);
   const ownerPassword = accounts.temporaryPassword();

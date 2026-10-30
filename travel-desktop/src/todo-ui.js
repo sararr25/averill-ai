@@ -64,10 +64,13 @@ function renderTodo() {
   if (!list) { host.replaceChildren(); delete host.dataset.key; badge.hidden = true; return; }
   badge.textContent = String(list.count); badge.hidden = list.count === 0;
   document.querySelector('[data-tab-button=todo]').setAttribute('aria-label', list.count ? `Home, ${list.count} open` : 'Home');
-  const key = JSON.stringify(list);
+  // averill-public: until both judge keys are saved, Home leads with the key form.
+  const needsKeys = current.auth?.demo && !(current.services?.nebius && current.services?.tavily);
+  const key = JSON.stringify([list, needsKeys, current.services?.nebius, current.services?.tavily]);
   if (host.dataset.key === key) return;
   host.dataset.key = key;
   host.replaceChildren(
+    ...(needsKeys ? [serviceKeys('todo-status')] : []),
     todoStart(),
     todoGroup('Needs your review', 'Nothing needs your review right now.', list.review, 'Shared findings, source approval requests and clarification requests waiting for you.'),
     todoGroup('Your tasks', 'You have no open tasks.', list.tasks, 'Work assigned to you. Done tasks leave this list.'),

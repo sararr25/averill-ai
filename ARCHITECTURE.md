@@ -30,11 +30,11 @@ The keyless judge path reuses `/api/ask` with a fixed `assist` mode and `/api/se
 
 # Explicit packaged QA profile and rendezvous recovery - 19 October 2026
 
-Before app readiness, an optional marked synthetic profile can override only the temporary test instance's userData/sessionData paths. It does not alter default launch or authentication. An occupied browser rendezvous leaves the existing listener intact and exposes an authenticated, actionable Current work message with manual recovery. [Acceptance boundaries](docs/PACKAGED_ACCEPTANCE_2026-10-19.md).
+Before app readiness, an optional marked synthetic profile can override only the temporary test instance's userData/sessionData paths. It does not alter default launch or authentication. An occupied browser rendezvous leaves the existing listener intact and exposes an authenticated, actionable Current work message with manual recovery. Acceptance boundaries.
 
 # Canva editing and accessibility seam - 19 October 2026
 
-The extension selects either the existing plaintext adapter or a named Canva `.ql-editor` adapter. Canva writes require one paragraph with equivalent span formatting, an exact unique removal, native editing-pipeline confirmation after the editor frame, and a matching formatting signature. Undo revalidates text, revision and signature; uncertain writes expose prior text for manual recovery. Apply/Undo are serialized and completed operations cannot bind to a different selection. No arbitrary contenteditable support is introduced. Card focus/status persist across rerenders; keyboard events are scoped to the companion before host modal document handlers. Library dialog focus can resolve a stable source/action identity after its trigger is rerendered. [Evidence and limits](docs/CONTINUATION_2026-10-19.md).
+The extension selects either the existing plaintext adapter or a named Canva `.ql-editor` adapter. Canva writes require one paragraph with equivalent span formatting, an exact unique removal, native editing-pipeline confirmation after the editor frame, and a matching formatting signature. Undo revalidates text, revision and signature; uncertain writes expose prior text for manual recovery. Apply/Undo are serialized and completed operations cannot bind to a different selection. No arbitrary contenteditable support is introduced. Card focus/status persist across rerenders; keyboard events are scoped to the companion before host modal document handlers. Library dialog focus can resolve a stable source/action identity after its trigger is rerendered. Evidence and limits.
 
 # Companion desktop and demo acceptance — 18 October 2026
 
@@ -42,7 +42,7 @@ Averill's desktop shell imports the selected Companion tokens through `src/compa
 
 # Averill system design
 
-Current status, 4 October 2026: the Guided UI release is public at [v0.1.0-preview.20261004.2](https://github.com/sararr25/averill-ai/releases/tag/v0.1.0-preview.20261004.2). See [docs/PROJECT_STATUS_2026-10-04.md](docs/PROJECT_STATUS_2026-10-04.md) and [docs/NEXT_STEPS_2026-10-04.md](docs/NEXT_STEPS_2026-10-04.md) for current evidence, ordered checks and pending fixes. Dated earlier sections are historical where superseded.
+Current status, 4 October 2026: the Guided UI release is public at [v0.1.0-preview.20261004.2](https://github.com/sararr25/averill-ai/releases/tag/v0.1.0-preview.20261004.2). See docs/PROJECT_STATUS_2026-10-04.md and docs/NEXT_STEPS_2026-10-04.md for current evidence, ordered checks and pending fixes. Dated earlier sections are historical where superseded.
 
 Current update, 3 October 2026: shipped packs/editors use Vamo, new person-scoped drafts use vamo:v2, and old persisted credentials/approved copies are unchanged. See docs/DEMO_MIGRATION.md. Legacy company labels below describe prior versions.
 
@@ -90,7 +90,7 @@ The 28 September additions keep `main.js` as the trust boundary. `learning:actio
 
 `workspace:update-source` accepts a reviewer reason and optional ID of an approved predecessor in the same department/scope. The predecessor is superseded when the new document is approved. `source-review.js` compares at most 250 lines per document and 200 changes; this is a textual diff, not an automatic semantic conflict judgement. Clarification requests are local workspace records visible to the requester and authorised reviewer. Document decision reasons are withheld from ordinary employee snapshots after approval.
 
-Local account disabling takes effect at the next authentication; there is no remote session revocation. Password reset creates a new local login document. Source deletion removes only managed original copies and extracted text from the current profile, not the outside original or OS backups. Applied onboarding staging copies are removed; only counts/timestamps remain in the batch record. The workspace JSON, source copies and login documents are not application-encrypted. See [company-readiness gates](docs/ADDITIONS_STATUS.md) before real-company use.
+Local account disabling takes effect at the next authentication; there is no remote session revocation. Password reset creates a new local login document. Source deletion removes only managed original copies and extracted text from the current profile, not the outside original or OS backups. Applied onboarding staging copies are removed; only counts/timestamps remain in the batch record. The workspace JSON, source copies and login documents are not application-encrypted. See company-readiness gates before real-company use.
 
 ```text
 Employee edits supplied work window
@@ -148,7 +148,7 @@ Electron `desktopCapturer` lists windows, excluding Averill-owned window IDs. Th
 
 ## Extension sequence
 
-The opt-in browser DOM/field adapter is implemented. Finish installed-extension privacy/session and social-specific checks, then test disposable real-platform draft accounts. Verify permission revocation and full-screen/second-monitor behavior. Generated-public-text Nebius task review passed with consent on 3–4 October; this does not verify real-company confidentiality or live OAuth. Expand task schemas beyond exact phrase rules, then tackle company deployment and stronger semantic evidence checks. Keep work actions human-owned. See [docs/HANDOVER.md](docs/HANDOVER.md) for current checks and limits.
+The opt-in browser DOM/field adapter is implemented. Finish installed-extension privacy/session and social-specific checks, then test disposable real-platform draft accounts. Verify permission revocation and full-screen/second-monitor behavior. Generated-public-text Nebius task review passed with consent on 3–4 October; this does not verify real-company confidentiality or live OAuth. Expand task schemas beyond exact phrase rules, then tackle company deployment and stronger semantic evidence checks. Keep work actions human-owned. See docs/HANDOVER.md for current checks and limits.
 
 ## Learning state and IPC
 
@@ -180,7 +180,7 @@ The normal Aurelia Demo workspace was explicitly prepared after the user reporte
 
 ## Multisource onboarding update — 27 September 2026
 
-Desktop/Finder drop, local/synced files, HTTPS links and Google Drive/OneDrive selected-file OAuth import now feed the local review. Direct cloud use requires registered OAuth clients and remains live-unverified. Company AI defaults off; owner authorization and per-file selection are required. Restricted files are blocked. Local company copies are not application-encrypted; provider confidentiality/no-training/retention settings remain unverified. See [cloud setup](docs/CLOUD_CONNECTIONS.md), [company confidentiality](docs/COMPANY_CONFIDENTIALITY.md) and [handover](docs/HANDOVER.md) for implementation, verification and remaining gates.
+Desktop/Finder drop, local/synced files, HTTPS links and Google Drive/OneDrive selected-file OAuth import now feed the local review. Direct cloud use requires registered OAuth clients and remains live-unverified. Company AI defaults off; owner authorization and per-file selection are required. Restricted files are blocked. Local company copies are not application-encrypted; provider confidentiality/no-training/retention settings remain unverified. See cloud setup, company confidentiality and handover for implementation, verification and remaining gates.
 
 ## Feedback and know-how library — 27 September 2026
 
